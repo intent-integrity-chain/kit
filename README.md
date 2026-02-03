@@ -182,7 +182,7 @@ IIKit builds on [GitHub Spec-Kit](https://github.com/github/spec-kit), which pio
 IIKit extends Spec-Kit with:
 - **Assertion integrity** - Cryptographic verification to prevent circular validation
 - **Intent Integrity Chain** - Theoretical framework connecting intent to implementation
-- **Tessl distribution** - Package management and runtime library knowledge
+- **Tessl integration** - Distribution via tile registry plus runtime library knowledge during implementation
 
 ## Learn More
 
