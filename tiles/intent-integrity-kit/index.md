@@ -1,10 +1,12 @@
-# Intent Integrity Kit Skills
+# Intent Integrity Kit
 
-A complete 10-phase specification-driven development workflow for AI coding assistants.
+**Closing the intent-to-code chasm**
+
+A complete specification-driven development workflow for AI coding assistants with cryptographic verification.
 
 ## Overview
 
-Intent Integrity Kit provides skills that guide AI assistants through a structured development process, from defining project governance to implementing features and exporting tasks to GitHub Issues.
+Intent Integrity Kit (IIKit) preserves your intent from idea to implementation. It guides AI assistants through a structured development process while preventing circular verification - where AI modifies tests to match buggy code.
 
 ## Workflow Phases
 
@@ -24,6 +26,8 @@ Intent Integrity Kit provides skills that guide AI assistants through a structur
 
 ## Key Features
 
+- **Intent Preservation**: Traces intent from idea through spec, test, and code
+- **Assertion Integrity**: SHA256 hashing prevents test tampering during implementation
 - **Phase Separation**: Strict boundaries between governance, requirements, and implementation
 - **Constitution Enforcement**: All skills validate against project principles
 - **TDD Support**: Generate test specs before implementation with tamper detection
@@ -33,7 +37,7 @@ Intent Integrity Kit provides skills that guide AI assistants through a structur
 
 ## Quick Start
 
-1. **Create a constitution** (optional but recommended):
+1. **Create a constitution** (recommended):
    ```
    /iikit-00-constitution
    ```
@@ -43,7 +47,7 @@ Intent Integrity Kit provides skills that guide AI assistants through a structur
    /iikit-01-specify Add user authentication with OAuth2 support
    ```
 
-3. **Follow the workflow** through plan, tasks, and implementation.
+3. **Follow the workflow** through plan, testify, tasks, and implementation.
 
 ## Artifacts Created
 
@@ -58,11 +62,15 @@ specs/NNN-feature-name/
 ├── contracts/        # API specifications
 ├── checklists/       # Quality checklists
 └── tests/
-    └── test-specs.md # TDD test specifications
+    └── test-specs.md # TDD test specifications (hash-locked)
 ```
 
 ## Installation
 
 ```bash
-tessl install tessl-labs/intent-integrity-kit
+tessl install intent-integrity-chain/kit
 ```
+
+## Learn More
+
+- [Intent Integrity Chain](https://github.com/jbaruch/intent-integrity-chain) - The methodology behind IIKit

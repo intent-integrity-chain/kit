@@ -41,13 +41,13 @@ Migration is **FEASIBLE** with straightforward architecture. Claude skills are a
 
 | Item | Location | Notes |
 |------|----------|-------|
-| Intent Integrity Kit Template | `Spec_Kit_Template_v0_0_90.zip` | Contains all agent files, scripts, templates |
+| Intent Integrity Kit Template | `IIKit_Template_v0_0_90.zip` | Contains all agent files, scripts, templates |
 | GitHub Repository | https://github.com/github/intent-integrity-kit | Reference documentation and latest updates |
 
 **Extracted source structure:**
 
 ```
-Spec_Kit_Template_v0_0_90/
+IIKit_Template_v0_0_90/
 ├── .github/
 │   ├── agents/                    # Agent files (9 total)
 │   │   ├── iikit-00-constitution.agent.md
@@ -354,7 +354,7 @@ project/
 
 ### Constitution Enforcement
 
-**The constitution is a PROJECT ARTIFACT, not framework rules.** Spec-kit provides a template with placeholders. Users run `/iikit-00-constitution` to create their project's specific governance principles.
+**The constitution is a PROJECT ARTIFACT, not framework rules.** IIKit provides a template with placeholders. Users run `/iikit-00-constitution` to create their project's specific governance principles.
 
 **Enforcement hierarchy:**
 
@@ -447,14 +447,14 @@ This project uses specification-driven development. The phases are:
 Never skip phases. Each /iikit-* command validates its prerequisites.
 Read .specify/memory/constitution.md for this project's governing principles.
 
-<!-- SPEC-KIT-TECH-START -->
+<!-- IIKIT-TECH-START -->
 <!-- Tech stack will be inserted here by /iikit-03-plan -->
-<!-- SPEC-KIT-TECH-END -->
+<!-- IIKIT-TECH-END -->
 ```
 
 Agent files are reminders, not enforcement—they provide context but can't block operations.
 
-**IMPORTANT:** The `<!-- SPEC-KIT-TECH-START -->` and `<!-- SPEC-KIT-TECH-END -->` markers MUST be present for `update-agent-context.sh` to function.
+**IMPORTANT:** The `<!-- IIKIT-TECH-START -->` and `<!-- IIKIT-TECH-END -->` markers MUST be present for `update-agent-context.sh` to function.
 
 ### Context Passing
 
@@ -570,12 +570,12 @@ The `update-agent-context.sh` script dynamically modifies platform-specific agen
 **Marker-based editing:**
 
 ```markdown
-<!-- SPEC-KIT-TECH-START -->
+<!-- IIKIT-TECH-START -->
 This project uses:
 - Python 3.11 with FastAPI
 - PostgreSQL 15
 - Redis for caching
-<!-- SPEC-KIT-TECH-END -->
+<!-- IIKIT-TECH-END -->
 ```
 
 **Behavior:**
@@ -704,7 +704,7 @@ Every skill must handle these error conditions gracefully:
 
 **Acceptance criteria:**
 - [ ] `/iikit-00-constitution` creates valid constitution from template
-- [ ] Agent files include `SPEC-KIT-TECH-START/END` markers
+- [ ] Agent files include `IIKIT-TECH-START/END` markers
 - [ ] PreToolUse hook validates constitution exists
 - [ ] context.json schema documented with all fields
 

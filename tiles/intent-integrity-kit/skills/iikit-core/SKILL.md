@@ -115,7 +115,7 @@ Show the current project and feature status.
 5. **Report**:
    ```
    ╭─────────────────────────────────────────────╮
-   │  SPEC-KIT STATUS                            │
+   │  IIKIT STATUS                            │
    ├─────────────────────────────────────────────┤
    │  Project:        [project name]             │
    │  Constitution:   [exists/missing]      [✓/✗]│
@@ -151,7 +151,7 @@ Display the complete workflow reference.
 
 ```
 ╭─────────────────────────────────────────────────────────────────────╮
-│  SPEC-KIT WORKFLOW                                                  │
+│  IIKIT WORKFLOW                                                  │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
 │  Phase 0: Foundation                                                │

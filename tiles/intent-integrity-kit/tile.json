@@ -1,8 +1,8 @@
 {
-  "name": "tessl-labs/intent-integrity-kit",
-  "version": "0.7.10",
-  "summary": "Specification-driven development workflow skills for AI coding assistants",
-  "description": "A complete specification-driven development workflow with 10 phases (0-9) plus a utility skill. Guides AI assistants through constitution, specification, clarification, planning, checklists, TDD test specs, task breakdown, analysis, implementation, and GitHub issue export.",
+  "name": "intent-integrity-chain/kit",
+  "version": "1.0.0",
+  "summary": "Closing the intent-to-code chasm - specification-driven development with cryptographic verification",
+  "description": "Intent Integrity Kit (IIKit) preserves your intent from idea to implementation through specification-driven development. Features 10 workflow phases with assertion integrity hashing to prevent circular verification. Compatible with Claude Code, Codex, Gemini, and OpenCode.",
   "private": false,
   "docs": "index.md",
   "skills": {
@@ -40,5 +40,5 @@
       "path": "skills/iikit-09-taskstoissues/SKILL.md"
     }
   },
-  "keywords": ["specification", "tdd", "workflow", "planning", "tasks", "requirements"]
+  "keywords": ["intent-integrity", "tdd", "specification", "workflow", "ai-coding", "verification"]
 }

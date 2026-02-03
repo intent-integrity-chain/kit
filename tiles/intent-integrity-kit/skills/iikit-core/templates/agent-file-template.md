@@ -49,6 +49,6 @@ Read `.specify/memory/constitution.md` for this project's governing principles.
 
 [LAST 3 FEATURES AND WHAT THEY ADDED]
 
-<!-- SPEC-KIT-TECH-START -->
+<!-- IIKIT-TECH-START -->
 <!-- Tech stack will be inserted here by /iikit-plan -->
-<!-- SPEC-KIT-TECH-END -->
+<!-- IIKIT-TECH-END -->
