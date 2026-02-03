@@ -127,17 +127,22 @@ Understanding what belongs where is critical:
 
 **Constitution is tech-agnostic.** It survives framework migrations.
 
-## Tessl Integration
+## Powered by Tessl
 
-IIKit uses [Tessl](https://tessl.io) tiles for AI-optimized library documentation.
+IIKit is distributed as a [Tessl](https://tessl.io) tile - a versioned package of AI-optimized context.
 
-During `/iikit-03-plan`:
-- Searches and installs tiles for your tech stack
-- Documents findings in `research.md`
+**What Tessl provides:**
 
-During `/iikit-08-implement`:
-- Queries `mcp__tessl__query_library_docs` before writing library code
-- Uses current APIs, not outdated training data
+- **Installation**: `tessl install intent-integrity-chain/kit` adds IIKit to any project
+- **Runtime knowledge**: During implementation, IIKit queries the Tessl registry for current library APIs - so the AI uses 2025 React patterns, not 2021 training data
+- **2000+ tiles**: Documentation, rules, and skills for major frameworks and libraries
+
+**How IIKit uses Tessl:**
+
+| Phase | What happens |
+|-------|--------------|
+| `/iikit-03-plan` | Discovers and installs tiles for your tech stack |
+| `/iikit-08-implement` | Queries `mcp__tessl__query_library_docs` before writing library code |
 
 ## Project Structure
 
