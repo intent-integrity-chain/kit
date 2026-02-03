@@ -27,6 +27,8 @@ setup_test_dir() {
 
     # Copy fixtures
     cp "$FIXTURES_DIR/constitution.md" "$TEST_DIR/.specify/memory/constitution.md"
+    # Also copy to root level (where validate_constitution looks for it)
+    cp "$FIXTURES_DIR/constitution.md" "$TEST_DIR/CONSTITUTION.md"
 
     # Initial commit so git commands work properly
     git -C "$TEST_DIR" add -A >/dev/null 2>&1

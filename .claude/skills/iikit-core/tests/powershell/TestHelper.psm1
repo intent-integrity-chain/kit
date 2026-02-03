@@ -17,13 +17,29 @@ function New-TestDirectory {
     $testDir = Join-Path ([System.IO.Path]::GetTempPath()) "speckit-test-$([guid]::NewGuid().ToString('N').Substring(0,8))"
     New-Item -ItemType Directory -Path $testDir -Force | Out-Null
 
+    # Initialize git so this directory is its own repo root
+    # This prevents git from walking up to find the parent repo
+    Push-Location $testDir
+    git init . 2>&1 | Out-Null
+    git config user.email "test@test.com"
+    git config user.name "Test"
+    Pop-Location
+
     # Create basic structure
     New-Item -ItemType Directory -Path (Join-Path $testDir ".specify/memory") -Force | Out-Null
     New-Item -ItemType Directory -Path (Join-Path $testDir "specs") -Force | Out-Null
-    New-Item -ItemType Directory -Path (Join-Path $testDir ".claude/skills/speckit-core/templates") -Force | Out-Null
+    New-Item -ItemType Directory -Path (Join-Path $testDir ".claude/skills/iikit-core/templates") -Force | Out-Null
 
     # Copy constitution fixture
     Copy-Item (Join-Path $script:FixturesDir "constitution.md") (Join-Path $testDir ".specify/memory/constitution.md")
+    # Also copy to root level (where validate_constitution looks for it)
+    Copy-Item (Join-Path $script:FixturesDir "constitution.md") (Join-Path $testDir "CONSTITUTION.md")
+
+    # Initial commit so git commands work properly
+    Push-Location $testDir
+    git add -A 2>&1 | Out-Null
+    git commit -m "test setup" 2>&1 | Out-Null
+    Pop-Location
 
     return $testDir
 }

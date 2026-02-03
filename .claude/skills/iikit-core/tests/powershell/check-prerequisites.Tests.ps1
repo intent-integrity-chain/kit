@@ -60,7 +60,13 @@ Describe "Validation mode" {
         New-MockFeature -TestDir $script:TestDir
         Remove-Item "CONSTITUTION.md"
 
-        $result = & $script:CheckScript -Json 2>&1 | Out-String
+        # Script throws due to $ErrorActionPreference = 'Stop', so capture via try/catch
+        $result = ""
+        try {
+            & $script:CheckScript -Json *>&1 | Out-String
+        } catch {
+            $result = $_.Exception.Message
+        }
         $result | Should -Match "Constitution"
     }
 
@@ -87,7 +93,13 @@ Describe "Task requirement" {
     It "-RequireTasks fails without tasks.md" {
         New-MockFeature -TestDir $script:TestDir
 
-        $result = & $script:CheckScript -Json -RequireTasks 2>&1 | Out-String
+        # Script throws due to $ErrorActionPreference = 'Stop', so capture via try/catch
+        $result = ""
+        try {
+            & $script:CheckScript -Json -RequireTasks *>&1 | Out-String
+        } catch {
+            $result = $_.Exception.Message
+        }
         $result | Should -Match "tasks.md"
     }
 
