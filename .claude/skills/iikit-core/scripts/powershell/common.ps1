@@ -213,7 +213,7 @@ function Test-DirHasFiles {
 function Test-Constitution {
     param([string]$RepoRoot)
 
-    $constitution = Join-Path $RepoRoot '.specify/memory/constitution.md'
+    $constitution = Join-Path $RepoRoot 'CONSTITUTION.md'
 
     if (-not (Test-Path $constitution)) {
         Write-Error "Constitution not found at $constitution"

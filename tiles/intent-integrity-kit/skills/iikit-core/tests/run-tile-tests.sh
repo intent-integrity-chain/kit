@@ -310,10 +310,10 @@ test_nested_git_repo() {
     git config user.name "Test"
     echo "# Parent" > README.md
     git add README.md && git commit -qm "init parent"
-    mkdir -p .specify/memory specs
+    mkdir -p .specify specs
 
     # Create child project (subdirectory with its own .specify)
-    mkdir -p child/.specify/memory child/specs
+    mkdir -p child/.specify child/specs
     echo "# Child" > child/README.md
 
     # Test from child directory - should use child's .specify, not parent's
@@ -339,9 +339,9 @@ test_single_feature_fallback() {
     local prereq_script=".tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash/check-prerequisites.sh"
 
     # Setup: Create a feature directory but stay on main branch
-    mkdir -p .specify/memory specs/001-test-feature
-    echo "# Test Constitution" > .specify/memory/constitution.md
-    echo "## Core Principles" >> .specify/memory/constitution.md
+    mkdir -p .specify specs/001-test-feature
+    echo "# Test Constitution" > CONSTITUTION.md
+    echo "## Core Principles" >> CONSTITUTION.md
 
     # Create minimal spec and plan
     cat > specs/001-test-feature/spec.md << 'SPEC'

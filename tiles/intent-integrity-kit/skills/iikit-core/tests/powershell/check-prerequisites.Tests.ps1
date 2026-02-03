@@ -58,7 +58,7 @@ Describe "Validation mode" {
 
     It "fails when constitution missing" {
         New-MockFeature -TestDir $script:TestDir
-        Remove-Item ".specify/memory/constitution.md"
+        Remove-Item "CONSTITUTION.md"
 
         $result = & $script:CheckScript -Json 2>&1 | Out-String
         $result | Should -Match "Constitution"

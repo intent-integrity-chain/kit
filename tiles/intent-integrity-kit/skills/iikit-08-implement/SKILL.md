@@ -21,12 +21,12 @@ Before ANY action, load and internalize the project constitution:
 
 1. Read constitution:
    ```bash
-   cat .specify/memory/constitution.md 2>/dev/null || echo "NO_CONSTITUTION"
+   cat CONSTITUTION.md 2>/dev/null || echo "NO_CONSTITUTION"
    ```
 
 2. If file doesn't exist:
    ```
-   ERROR: Project constitution not found at .specify/memory/constitution.md
+   ERROR: Project constitution not found at CONSTITUTION.md
 
    Cannot proceed without constitution.
    Run: /iikit-00-constitution
@@ -105,7 +105,7 @@ If `tests/test-specs.md` exists, perform assertion integrity verification:
 .claude/skills/iikit-core/scripts/bash/testify-tdd.sh comprehensive-check \
     "FEATURE_DIR/tests/test-specs.md" \
     ".specify/context.json" \
-    ".specify/memory/constitution.md"
+    "CONSTITUTION.md"
 ```
 
 **Step 2: Parse the JSON response**

@@ -90,7 +90,7 @@ Implements Constitution → Specify → Clarify → Plan → Tasks → Analyze �
 
 | Agent | Size | Purpose | Key Output |
 |-------|------|---------|------------|
-| iikit-00-constitution | 5.2KB | Create project governance principles | `.specify/memory/constitution.md` |
+| iikit-00-constitution | 5.2KB | Create project governance principles | `CONSTITUTION.md` |
 | iikit-01-specify | 12.8KB | Feature specs from natural language | `spec.md`, branches, validation checklist |
 | iikit-02-clarify | 11.3KB | Structured questioning (max 5: 3 initial + 2 follow-up) | Clarification answers in spec |
 | iikit-03-plan | 3.1KB | Technical architecture decisions | `plan.md`, `research.md`, `data-model.md`, `contracts/` |
@@ -445,7 +445,7 @@ This project uses specification-driven development. The phases are:
 7. implement → writes code (requires tasks.md + checklists pass)
 
 Never skip phases. Each /iikit-* command validates its prerequisites.
-Read .specify/memory/constitution.md for this project's governing principles.
+Read CONSTITUTION.md for this project's governing principles.
 
 <!-- IIKIT-TECH-START -->
 <!-- Tech stack will be inserted here by /iikit-03-plan -->
@@ -506,7 +506,7 @@ get_current_branch() {
     "ux.md": {"total": 12, "completed": 10, "status": "incomplete"}
   },
   "constitution": {
-    "path": ".specify/memory/constitution.md",
+    "path": "CONSTITUTION.md",
     "version": "1.0",
     "validated": true
   },
@@ -656,7 +656,7 @@ Every skill must handle these error conditions gracefully:
 | Condition | Detection | Response |
 |-----------|-----------|----------|
 | Git unavailable | `git rev-parse 2>/dev/null` fails | Check `SPECIFY_FEATURE` env var; if unset, prompt user to set it |
-| Constitution missing | File not found at `.specify/memory/constitution.md` | STOP with "Run /iikit-00-constitution first" |
+| Constitution missing | File not found at `CONSTITUTION.md` | STOP with "Run /iikit-00-constitution first" |
 | Constitution malformed | Missing required sections (Principles, Constraints) | STOP with specific parsing error, suggest manual fix |
 | context.json missing | File not found | Create with defaults (iikit-specify) or STOP with prerequisite error (other skills) |
 | context.json corrupted | JSON parse fails | Backup corrupted file, recreate from filesystem scan |
@@ -686,7 +686,7 @@ Every skill must handle these error conditions gracefully:
 | `.github/agents/iikit-06-analyze.agent.md` | `.claude/skills/iikit-06-analyze/SKILL.md` |
 | `.github/agents/iikit-07-implement.agent.md` | `.claude/skills/iikit-07-implement/SKILL.md` |
 | `.github/agents/iikit-05-taskstoissues.agent.md` | `.claude/skills/iikit-05-taskstoissues/SKILL.md` |
-| `.specify/memory/constitution.md` | `.claude/skills/iikit-00-constitution/references/constitution-template.md` |
+| `CONSTITUTION.md` | `.claude/skills/iikit-00-constitution/references/constitution-template.md` |
 | `.specify/templates/*.md` | `.claude/skills/*/references/` |
 | `.specify/scripts/bash/*.sh` | Keep in `.specify/scripts/bash/` (portability) |
 
@@ -885,12 +885,12 @@ Before ANY action, load and internalize the project constitution:
 
 1. Read constitution:
    ```bash
-   cat .specify/memory/constitution.md
+   cat CONSTITUTION.md
    ```
 
 2. If file doesn't exist:
    ```
-   ERROR: Project constitution not found at .specify/memory/constitution.md
+   ERROR: Project constitution not found at CONSTITUTION.md
    
    STOP - Cannot proceed without constitution.
    Run /iikit-00-constitution first to define project principles.
@@ -1033,7 +1033,7 @@ If any checklist incomplete:
 # Called by PreToolUse hook before Edit|Write|Bash operations
 
 TOOL_INPUT="$1"
-CONSTITUTION=".specify/memory/constitution.md"
+CONSTITUTION="CONSTITUTION.md"
 
 if [[ ! -f "$CONSTITUTION" ]]; then
   echo "ERROR: No project constitution found at $CONSTITUTION"

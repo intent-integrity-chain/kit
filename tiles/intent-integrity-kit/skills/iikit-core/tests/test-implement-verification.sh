@@ -44,7 +44,7 @@ trap "rm -rf $TEMP_DIR" EXIT
 setup_feature_dir() {
     local feature_dir="$TEMP_DIR/specs/001-test-feature"
     mkdir -p "$feature_dir/tests"
-    mkdir -p "$TEMP_DIR/.specify/memory"
+    mkdir -p "$TEMP_DIR/.specify"
     echo "$feature_dir"
 }
 
@@ -71,7 +71,7 @@ create_constitution() {
     local tdd_requirement="$1"  # "mandatory" or "optional"
 
     if [[ "$tdd_requirement" == "mandatory" ]]; then
-        cat > "$TEMP_DIR/.specify/memory/constitution.md" << 'EOF'
+        cat > "$TEMP_DIR/CONSTITUTION.md" << 'EOF'
 # Project Constitution
 
 ## Testing Requirements
@@ -80,7 +80,7 @@ All features MUST use TDD methodology.
 Tests MUST be written before implementation.
 EOF
     else
-        cat > "$TEMP_DIR/.specify/memory/constitution.md" << 'EOF'
+        cat > "$TEMP_DIR/CONSTITUTION.md" << 'EOF'
 # Project Constitution
 
 ## Code Quality
@@ -99,7 +99,7 @@ run_implement_verification() {
     local feature_dir="$1"
     local test_specs="$feature_dir/tests/test-specs.md"
     local context_file="$TEMP_DIR/.specify/context.json"
-    local constitution_file="$TEMP_DIR/.specify/memory/constitution.md"
+    local constitution_file="$TEMP_DIR/CONSTITUTION.md"
 
     # Step 1: Check if test-specs.md exists (implement does this)
     if [[ ! -f "$test_specs" ]]; then

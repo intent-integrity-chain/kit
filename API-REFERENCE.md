@@ -6,7 +6,7 @@
 
 | # | Skill | Command | Input | Output | Prerequisites |
 |---|-------|---------|-------|--------|---------------|
-| 0 | Constitution | `/iikit-00-constitution` | Governance principles (optional) | `.specify/memory/constitution.md` | None |
+| 0 | Constitution | `/iikit-00-constitution` | Governance principles (optional) | `CONSTITUTION.md` | None |
 | 1 | Specify | `/iikit-01-specify` | Feature description (required) | `specs/NNN-feature/spec.md` | Constitution (warn if missing) |
 | 2 | Clarify | `/iikit-02-clarify` | None (reads spec) | Updated `spec.md` with clarifications | spec.md |
 | 3 | Plan | `/iikit-03-plan` | None (reads spec) | `plan.md`, `research.md`, `data-model.md`, `contracts/` | constitution.md, spec.md |
@@ -83,7 +83,7 @@
 - If empty: Uses template, infers from existing repo context
 
 **Output**:
-- `.specify/memory/constitution.md`
+- `CONSTITUTION.md`
 
 **Prerequisites**: None
 
@@ -429,7 +429,7 @@ Components:
 
 | Artifact | Created By | Used By | Location |
 |----------|------------|---------|----------|
-| constitution.md | 00 | All skills | `.specify/memory/` |
+| constitution.md | 00 | All skills | `root (CONSTITUTION.md)` |
 | spec.md | 01 | 02, 03, 04, 05, 06, 07 | `specs/NNN-feature/` |
 | plan.md | 03 | 05, 06, 07, 08 | `specs/NNN-feature/` |
 | research.md | 03 | 08 | `specs/NNN-feature/` |

@@ -195,7 +195,7 @@ check_dir() { [[ -d "$1" && -n $(ls -A "$1" 2>/dev/null) ]] && echo "  ✓ $2" |
 # Validate constitution exists
 validate_constitution() {
     local repo_root="$1"
-    local constitution="$repo_root/.specify/memory/constitution.md"
+    local constitution="$repo_root/CONSTITUTION.md"
 
     if [[ ! -f "$constitution" ]]; then
         echo "ERROR: Constitution not found at $constitution" >&2

@@ -127,7 +127,7 @@ teardown() {
 }
 
 @test "validate_constitution: fails when constitution missing" {
-    rm .specify/memory/constitution.md
+    rm CONSTITUTION.md
     run validate_constitution "$TEST_DIR"
     [[ "$status" -eq 1 ]]
     assert_contains "$output" "not found"

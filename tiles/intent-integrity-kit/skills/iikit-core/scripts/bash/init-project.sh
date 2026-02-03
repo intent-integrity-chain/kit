@@ -62,9 +62,9 @@ fi
 
 # Commit constitution if requested and it exists
 CONSTITUTION_COMMITTED=false
-if [ "$COMMIT_CONSTITUTION" = true ] && [ -f "$PROJECT_ROOT/.specify/memory/constitution.md" ]; then
+if [ "$COMMIT_CONSTITUTION" = true ] && [ -f "$PROJECT_ROOT/CONSTITUTION.md" ]; then
     cd "$PROJECT_ROOT"
-    git add .specify/memory/constitution.md
+    git add CONSTITUTION.md
     # Also add README if it exists
     if [ -f "$PROJECT_ROOT/README.md" ]; then
         git add README.md

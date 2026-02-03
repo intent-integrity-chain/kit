@@ -418,17 +418,17 @@ test_templates_exist() {
     done
 }
 
-test_specify_memory_readme() {
-    log_section ".specify/memory/README.md Consistency"
+test_specify_directory() {
+    log_section ".specify/README.md Consistency"
 
-    [[ ! -f ".specify/memory/README.md" ]] && { log_info ".specify/memory/README.md not found, skipping"; return; }
+    [[ ! -f ".specify/README.md" ]] && { log_info ".specify/README.md not found, skipping"; return; }
 
     # Should not reference .specify/templates/
     ((TESTS_RUN++))
-    if grep -q "\.specify/templates/" .specify/memory/README.md 2>/dev/null; then
-        log_fail ".specify/memory/README.md references deprecated .specify/templates/"
+    if grep -q "\.specify/templates/" .specify/README.md 2>/dev/null; then
+        log_fail ".specify/README.md references deprecated .specify/templates/"
     else
-        log_pass ".specify/memory/README.md has correct template path"
+        log_pass ".specify/README.md has correct template path"
     fi
 }
 
@@ -648,13 +648,13 @@ test_all_documentation_template_refs() {
         fi
     done
 
-    # Check .specify/memory/README.md specifically (it's in a subdirectory)
-    if [[ -f ".specify/memory/README.md" ]]; then
+    # Check .specify/README.md specifically (it's in a subdirectory)
+    if [[ -f ".specify/README.md" ]]; then
         ((TESTS_RUN++))
-        if grep -q "\.specify/templates/" ".specify/memory/README.md" 2>/dev/null; then
-            log_fail ".specify/memory/README.md references deprecated .specify/templates/"
+        if grep -q "\.specify/templates/" ".specify/README.md" 2>/dev/null; then
+            log_fail ".specify/README.md references deprecated .specify/templates/"
         else
-            log_pass ".specify/memory/README.md has no deprecated .specify/templates/"
+            log_pass ".specify/README.md has no deprecated .specify/templates/"
         fi
     fi
 }
@@ -760,7 +760,7 @@ main() {
     test_skill_numbering
     test_scripts_exist
     test_templates_exist
-    test_specify_memory_readme
+    test_specify_directory
     test_local_vs_tiles_sync
     test_bash_script_template_refs
     test_powershell_script_template_refs

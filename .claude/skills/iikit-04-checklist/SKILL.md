@@ -38,7 +38,7 @@ Before ANY action, load and internalize the project constitution:
 
 1. Read constitution:
    ```bash
-   cat .specify/memory/constitution.md 2>/dev/null || echo "NO_CONSTITUTION"
+   cat CONSTITUTION.md 2>/dev/null || echo "NO_CONSTITUTION"
    ```
 
 2. If exists, parse all principles for checklist generation.

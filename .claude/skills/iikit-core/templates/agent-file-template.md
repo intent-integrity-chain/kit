@@ -23,7 +23,7 @@ The development workflow follows these phases:
 
 ## Constitution
 
-Read `.specify/memory/constitution.md` for this project's governing principles.
+Read `CONSTITUTION.md` for this project's governing principles.
 
 ## Active Technologies
 

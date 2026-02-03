@@ -42,9 +42,10 @@ Read `FRAMEWORK-PRINCIPLES.md` for this framework's development principles.
 .gemini/skills/              # Symlink -> .claude/skills
 .opencode/skills/            # Symlink -> .claude/skills
 
+CONSTITUTION.md              # Project governance (spec-agnostic, lives at root)
+
 .specify/
-  memory/                    # Project-specific artifacts (created by skills)
-    constitution.md          # Project constitution (created by /iikit-00-constitution)
+  context.json               # Feature state between skill invocations
 
 specs/                       # Feature specifications (created per feature)
   NNN-feature-name/
@@ -93,7 +94,7 @@ chmod +x .claude/skills/iikit-core/scripts/bash/*.sh
 
 ### Constitution
 
-The constitution (`.specify/memory/constitution.md`) is a **project artifact** created by `/iikit-00-constitution` when users adopt the framework. It defines project-specific governance principles. All skills load and validate against it. Critical gate skills (plan, analyze, implement) halt on violations.
+The constitution (`CONSTITUTION.md`) is a **project artifact** created by `/iikit-00-constitution` when users adopt the framework. It defines project-specific governance principles. All skills load and validate against it. Critical gate skills (plan, analyze, implement) halt on violations.
 
 **Note**: The framework's own development principles are in `FRAMEWORK-PRINCIPLES.md`.
 

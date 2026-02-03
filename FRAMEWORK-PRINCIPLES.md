@@ -2,7 +2,7 @@
 
 > **Note**: This document defines the development principles for the **intent-integrity-kit-skills framework itself**.
 > Projects that use this framework create their own constitution via `/iikit-00-constitution`,
-> stored at `.specify/memory/constitution.md`.
+> stored at `CONSTITUTION.md`.
 
 <!--
 SYNC IMPACT REPORT

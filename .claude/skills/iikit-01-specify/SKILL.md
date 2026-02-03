@@ -21,12 +21,12 @@ Before ANY action, load and internalize the project constitution:
 
 1. Read constitution:
    ```bash
-   cat .specify/memory/constitution.md 2>/dev/null || echo "NO_CONSTITUTION"
+   cat CONSTITUTION.md 2>/dev/null || echo "NO_CONSTITUTION"
    ```
 
 2. If file doesn't exist:
    ```
-   WARNING: Project constitution not found at .specify/memory/constitution.md
+   WARNING: Project constitution not found at CONSTITUTION.md
 
    Proceeding without constitution.
    Recommendation: Run /iikit-00-constitution first to define project principles.

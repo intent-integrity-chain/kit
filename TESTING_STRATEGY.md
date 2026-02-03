@@ -35,12 +35,12 @@ Verify that the validation functions in `common.sh` and `common.ps1` work correc
 #### Bash Commands
 ```bash
 # Test without constitution
-rm -f .specify/memory/constitution.md
+rm -f CONSTITUTION.md
 ./.claude/skills/iikit-core/scripts/bash/setup-plan.sh --json
 # Expected: ERROR: Constitution not found...
 
 # Test without spec
-echo "# Constitution" > .specify/memory/constitution.md
+echo "# Constitution" > CONSTITUTION.md
 ./.claude/skills/iikit-core/scripts/bash/setup-plan.sh --json
 # Expected: ERROR: spec.md not found...
 

@@ -45,7 +45,7 @@ The critical requirement is that tech stack belongs ONLY in the plan phase, NOT 
 
 | File | Vanilla | Skills | Notes |
 |------|:-------:|:------:|-------|
-| `.specify/memory/constitution.md` | Yes | Yes | |
+| `CONSTITUTION.md` | Yes | Yes | |
 | `specs/NNN-*/spec.md` | Yes | Yes | |
 | `specs/NNN-*/checklists/requirements.md` | Yes | Yes | |
 | `specs/NNN-*/plan.md` | Yes | Yes | |

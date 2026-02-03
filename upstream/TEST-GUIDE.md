@@ -75,7 +75,7 @@ Create a constitution for a simple task management CLI app with these principles
 ```
 
 **Verify:**
-- [ ] Creates `.specify/memory/constitution.md`
+- [ ] Creates `CONSTITUTION.md`
 - [ ] Contains principles (NO tech stack)
 - [ ] Has governance section
 

@@ -21,12 +21,12 @@ Before ANY action, load and analyze the project constitution for TDD requirement
 
 1. Read constitution:
    ```bash
-   cat .specify/memory/constitution.md 2>/dev/null || echo "NO_CONSTITUTION"
+   cat CONSTITUTION.md 2>/dev/null || echo "NO_CONSTITUTION"
    ```
 
 2. If file doesn't exist:
    ```
-   ERROR: Project constitution not found at .specify/memory/constitution.md
+   ERROR: Project constitution not found at CONSTITUTION.md
 
    Cannot proceed without constitution.
    Run: /iikit-00-constitution

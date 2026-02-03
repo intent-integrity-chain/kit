@@ -33,12 +33,12 @@ Initialize intent-integrity-kit in the current directory.
 
 1. **Check if already initialized**:
    ```bash
-   test -d ".specify/memory" && echo "ALREADY_INITIALIZED"
+   test -f "CONSTITUTION.md" && echo "ALREADY_INITIALIZED"
    ```
 
 2. **Create directory structure**:
    ```bash
-   mkdir -p .specify/memory
+   mkdir -p .specify
    mkdir -p specs
    ```
 
@@ -59,7 +59,7 @@ Initialize intent-integrity-kit in the current directory.
    Intent Integrity Kit initialized!
 
    Directory structure created:
-   - .specify/memory/    (project artifacts)
+   - .specify/    (project artifacts)
    - specs/              (feature specifications)
 
    Next step: /iikit-00-constitution
@@ -97,7 +97,7 @@ Show the current project and feature status.
 
 2. **Check constitution**:
    ```bash
-   test -f ".specify/memory/constitution.md" && echo "CONSTITUTION_EXISTS"
+   test -f "CONSTITUTION.md" && echo "CONSTITUTION_EXISTS"
    ```
 
 3. **List features**:

@@ -55,7 +55,7 @@ teardown() {
 
 @test "check-prerequisites: fails when constitution missing" {
     feature_dir=$(create_mock_feature "001-test-feature")
-    rm .specify/memory/constitution.md
+    rm CONSTITUTION.md
 
     run "$CHECK_SCRIPT" --json
     [[ "$status" -eq 1 ]]

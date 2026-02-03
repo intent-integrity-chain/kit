@@ -128,7 +128,7 @@ Describe "Test-Constitution" {
     }
 
     It "fails when constitution missing" {
-        Remove-Item ".specify/memory/constitution.md"
+        Remove-Item "CONSTITUTION.md"
         $result = Test-Constitution -RepoRoot $script:TestDir 2>$null
         $result | Should -Be $false
     }

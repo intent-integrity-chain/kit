@@ -5,7 +5,7 @@ description: Create or update project governance principles and constitution
 
 # Intent Integrity Kit Constitution
 
-Create or update the project constitution at `.specify/memory/constitution.md`. This file defines the governing principles, constraints, and governance rules for specification-driven development.
+Create or update the project constitution at `CONSTITUTION.md`. This file defines the governing principles, constraints, and governance rules for specification-driven development.
 
 ## Scope - What Constitution Contains
 
@@ -36,17 +36,17 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 1. Check if constitution already exists:
    ```bash
-   cat .specify/memory/constitution.md 2>/dev/null || echo "NO_CONSTITUTION"
+   cat CONSTITUTION.md 2>/dev/null || echo "NO_CONSTITUTION"
    ```
 
 2. If constitution doesn't exist, copy from [constitution-template.md](.claude/skills/iikit-core/templates/constitution-template.md):
    ```bash
-   cp .claude/skills/iikit-core/templates/constitution-template.md .specify/memory/constitution.md
+   cp .claude/skills/iikit-core/templates/constitution-template.md CONSTITUTION.md
    ```
 
 ## Execution Flow
 
-1. **Load the existing constitution** at `.specify/memory/constitution.md`.
+1. **Load the existing constitution** at `CONSTITUTION.md`.
    - Identify every placeholder token of the form `[ALL_CAPS_IDENTIFIER]`.
    - **IMPORTANT**: The user might require fewer or more principles than the template. Adapt accordingly.
 
@@ -122,7 +122,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
    Re-validate after fixes until no violations remain.
 
-8. **Write the completed constitution** back to `.specify/memory/constitution.md`
+8. **Write the completed constitution** back to `CONSTITUTION.md`
 
 9. **Initialize Git Repository (REQUIRED)**
 
@@ -144,7 +144,7 @@ You **MUST** consider the user input before proceeding (if not empty).
     After writing the constitution, commit it to establish the project baseline:
 
     ```bash
-    git add .specify/memory/constitution.md
+    git add CONSTITUTION.md
     # Also add README if it exists
     [ -f README.md ] && git add README.md
     git commit -m "Initialize intent-integrity-kit project with constitution"

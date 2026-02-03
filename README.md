@@ -125,7 +125,7 @@ Understanding what belongs where is critical:
 | Data models | | | ✓ |
 | Architecture decisions | | | ✓ |
 
-**Constitution is tech-agnostic.** It survives framework migrations.
+**Constitution is spec-agnostic.** It transcends individual features - that's why it lives at the root, not in `/specs`.
 
 ## Powered by Tessl
 
@@ -148,22 +148,22 @@ IIKit is distributed as a [Tessl](https://tessl.io) tile - a versioned package o
 
 ```
 your-project/
-├── .specify/
-│   └── memory/
-│       └── constitution.md      # Project governance
-├── specs/
-│   └── NNN-feature-name/
-│       ├── spec.md              # Feature specification
-│       ├── plan.md              # Implementation plan
-│       ├── tasks.md             # Task breakdown
-│       ├── research.md          # Tech research + tiles
-│       ├── data-model.md        # Data structures
-│       ├── contracts/           # API contracts
-│       ├── checklists/          # Quality checklists
-│       └── tests/
-│           └── test-specs.md    # Locked test specifications
+├── CONSTITUTION.md              # Project governance (spec-agnostic)
+├── AGENTS.md                    # Agent instructions
 ├── tessl.json                   # Installed tiles
-└── AGENTS.md                    # Agent instructions
+├── .specify/                    # IIKit working directory
+│   └── context.json             # Feature state
+└── specs/
+    └── NNN-feature-name/
+        ├── spec.md              # Feature specification
+        ├── plan.md              # Implementation plan
+        ├── tasks.md             # Task breakdown
+        ├── research.md          # Tech research + tiles
+        ├── data-model.md        # Data structures
+        ├── contracts/           # API contracts
+        ├── checklists/          # Quality checklists
+        └── tests/
+            └── test-specs.md    # Locked test specifications
 ```
 
 ## Supported Agents

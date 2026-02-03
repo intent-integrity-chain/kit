@@ -19,7 +19,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 **STRICTLY READ-ONLY**: Do **not** modify any files. Output a structured analysis report. Offer an optional remediation plan (user must explicitly approve before any editing).
 
-**Constitution Authority**: The project constitution (`.specify/memory/constitution.md`) is **non-negotiable** within this analysis scope. Constitution conflicts are automatically CRITICAL and require adjustment of the spec, plan, or tasks--not dilution, reinterpretation, or silent ignoring of the principle.
+**Constitution Authority**: The project constitution (`CONSTITUTION.md`) is **non-negotiable** within this analysis scope. Constitution conflicts are automatically CRITICAL and require adjustment of the spec, plan, or tasks--not dilution, reinterpretation, or silent ignoring of the principle.
 
 ## Constitution Loading (REQUIRED)
 
@@ -27,12 +27,12 @@ Before ANY action, load the project constitution:
 
 1. Read constitution:
    ```bash
-   cat .specify/memory/constitution.md 2>/dev/null || echo "NO_CONSTITUTION"
+   cat CONSTITUTION.md 2>/dev/null || echo "NO_CONSTITUTION"
    ```
 
 2. If file doesn't exist:
    ```
-   ERROR: Project constitution not found at .specify/memory/constitution.md
+   ERROR: Project constitution not found at CONSTITUTION.md
 
    Cannot proceed without constitution.
    Run: /iikit-00-constitution

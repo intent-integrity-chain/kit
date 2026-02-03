@@ -56,7 +56,7 @@ if (Test-Path $gitDir) {
 
 # Commit constitution if requested and it exists
 $constitutionCommitted = $false
-$constitutionPath = Join-Path $projectRoot '.specify/memory/constitution.md'
+$constitutionPath = Join-Path $projectRoot 'CONSTITUTION.md'
 if ($CommitConstitution -and (Test-Path $constitutionPath)) {
     Set-Location $projectRoot
     git add $constitutionPath
