@@ -175,8 +175,18 @@ your-project/
 | Google Gemini | `GEMINI.md` -> `AGENTS.md` |
 | OpenCode | `AGENTS.md` |
 
+## Acknowledgments
+
+IIKit builds on [GitHub Spec-Kit](https://github.com/github/spec-kit), which pioneered specification-driven development for AI coding assistants. The phased workflow, artifact structure, and checklist gating concepts originate from Spec-Kit.
+
+IIKit extends Spec-Kit with:
+- **Assertion integrity** - Cryptographic verification to prevent circular validation
+- **Intent Integrity Chain** - Theoretical framework connecting intent to implementation
+- **Tessl distribution** - Package management and runtime library knowledge
+
 ## Learn More
 
+- [GitHub Spec-Kit](https://github.com/github/spec-kit) - The original specification-driven development framework
 - [Intent Integrity Chain explained](https://github.com/jbaruch/intent-integrity-chain) - The methodology behind IIKit
 - [Back to the Future of Software](https://speaking.jbaru.ch/DVCzoZ/back-to-the-future-of-software-how-to-survive-ai-with-intent-integrity-chain) - Conference talk on IIC
 
