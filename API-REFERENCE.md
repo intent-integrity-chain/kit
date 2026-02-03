@@ -6,6 +6,7 @@
 
 | # | Skill | Command | Input | Output | Prerequisites |
 |---|-------|---------|-------|--------|---------------|
+| - | Core | `/iikit-core` | Subcommand: init, status, help | Project structure, status report | None |
 | 0 | Constitution | `/iikit-00-constitution` | Governance principles (optional) | `CONSTITUTION.md` | None |
 | 1 | Specify | `/iikit-01-specify` | Feature description (required) | `specs/NNN-feature/spec.md` | Constitution (warn if missing) |
 | 2 | Clarify | `/iikit-02-clarify` | None (reads spec) | Updated `spec.md` with clarifications | spec.md |
@@ -71,6 +72,43 @@
 ---
 
 ## Skill Details
+
+### Core
+
+**Purpose**: Initialize project, check status, display workflow help
+
+**Command**: `/iikit-core [subcommand]`
+
+**Subcommands**:
+
+| Subcommand | Purpose |
+|------------|---------|
+| `init` | Initialize IIKit in current directory |
+| `status` | Show project and feature status |
+| `help` | Display workflow phases and commands |
+
+If no subcommand provided, shows help.
+
+**init Output**:
+- `.specify/` directory
+- `specs/` directory
+- Initializes git if needed
+
+**status Output**:
+```
+╭─────────────────────────────────────────────────────╮
+│  IIKIT STATUS                                       │
+├─────────────────────────────────────────────────────┤
+│  Constitution:  [exists/missing]                    │
+│  Current Feature: NNN-feature-name                  │
+│  Artifacts: spec.md ✓, plan.md ✓, tasks.md ✗       │
+│  Next Step: /iikit-06-tasks                         │
+╰─────────────────────────────────────────────────────╯
+```
+
+**Prerequisites**: None
+
+---
 
 ### 00 - Constitution
 
