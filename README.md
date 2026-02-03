@@ -26,7 +26,7 @@ Intent ──▶ Spec ──▶ Test ──▶ Code
 
 ```bash
 # Install via Tessl
-tessl install tessl-labs/intent-integrity-kit
+tessl install intent-integrity-chain/kit
 ```
 
 > **Don't have Tessl?** Install it first: `npm install -g @tessl/cli`

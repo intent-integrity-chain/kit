@@ -44,7 +44,7 @@ Before ANY action, load the project constitution:
 
 1. Run prerequisites check:
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks
+   bash .tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks
    ```
 
 2. Parse JSON for `FEATURE_DIR` and `AVAILABLE_DOCS`.

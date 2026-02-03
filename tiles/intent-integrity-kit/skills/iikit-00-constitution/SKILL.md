@@ -41,7 +41,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 2. If constitution doesn't exist, copy from [constitution-template.md](../iikit-core/templates/constitution-template.md):
    ```bash
-   cp .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/templates/constitution-template.md .specify/memory/constitution.md
+   cp .tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/templates/constitution-template.md .specify/memory/constitution.md
    ```
 
 ## Execution Flow

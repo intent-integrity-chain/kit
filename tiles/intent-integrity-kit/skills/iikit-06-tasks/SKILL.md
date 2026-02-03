@@ -30,7 +30,7 @@ Before ANY action, load and internalize the project constitution:
 
 1. Run prerequisites check:
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --json
+   bash .tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --json
    ```
 
 2. Parse JSON for `FEATURE_DIR` and `AVAILABLE_DOCS`.
