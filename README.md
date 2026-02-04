@@ -26,7 +26,7 @@ Intent ──▶ Spec ──▶ Test ──▶ Code
 
 ```bash
 # Install via Tessl
-tessl install intent-integrity-chain/kit
+tessl install tessl-labs/intent-integrity-kit
 ```
 
 > **Don't have Tessl?** Install it first: `npm install -g @tessl/cli`
@@ -37,22 +37,25 @@ tessl install intent-integrity-chain/kit
 # 1. Launch your AI assistant
 claude          # or: codex, gemini, opencode
 
-# 2. Define project governance
+# 2. Initialize the project
+/iikit-core init
+
+# 3. Define project governance
 /iikit-00-constitution
 
-# 3. Specify a feature
+# 4. Specify a feature
 /iikit-01-specify Build a CLI task manager with add, list, complete commands
 
-# 4. Plan the implementation
+# 5. Plan the implementation
 /iikit-03-plan
 
-# 5. Generate tests from requirements
+# 6. Generate tests from requirements
 /iikit-05-testify
 
-# 6. Break into tasks
+# 7. Break into tasks
 /iikit-06-tasks
 
-# 7. Implement (with integrity verification)
+# 8. Implement (with integrity verification)
 /iikit-08-implement
 ```
 
@@ -133,7 +136,7 @@ IIKit is distributed as a [Tessl](https://tessl.io) tile - a versioned package o
 
 **What Tessl provides:**
 
-- **Installation**: `tessl install intent-integrity-chain/kit` adds IIKit to any project
+- **Installation**: `tessl install tessl-labs/intent-integrity-kit` adds IIKit to any project
 - **Runtime knowledge**: During implementation, IIKit queries the Tessl registry for current library APIs - so the AI uses 2025 React patterns, not 2021 training data
 - **2000+ tiles**: Documentation, rules, and skills for major frameworks and libraries
 

@@ -60,12 +60,12 @@ Before ANY action, load and internalize the project constitution:
 
    **Unix/macOS/Linux:**
    ```bash
-   bash .tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash/setup-plan.sh --json
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/setup-plan.sh --json
    ```
 
    **Windows (PowerShell):**
    ```powershell
-   pwsh .tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/powershell/setup-plan.ps1 -Json
+   pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/setup-plan.ps1 -Json
    ```
 
 2. Parse JSON for:
@@ -325,12 +325,12 @@ List all available skills from installed tiles:
 
    **Unix/macOS/Linux:**
    ```bash
-   bash .tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash/update-agent-context.sh claude
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/update-agent-context.sh claude
    ```
 
    **Windows (PowerShell):**
    ```powershell
-   pwsh .tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/powershell/update-agent-context.ps1 -AgentType claude
+   pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/update-agent-context.ps1 -AgentType claude
    ```
 
    This updates CLAUDE.md with the new technology stack using the [agent-file-template.md](../iikit-core/templates/agent-file-template.md).

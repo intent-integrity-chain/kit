@@ -80,19 +80,19 @@ Before creating a feature branch, check context and ask user:
 **Unix/macOS/Linux:**
 ```bash
 # With branch creation (default):
-bash .tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash/create-new-feature.sh --json "$ARGUMENTS" --short-name "your-short-name"
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/create-new-feature.sh --json "$ARGUMENTS" --short-name "your-short-name"
 
 # Without branch creation (if user declined):
-bash .tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash/create-new-feature.sh --json --skip-branch "$ARGUMENTS" --short-name "your-short-name"
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/create-new-feature.sh --json --skip-branch "$ARGUMENTS" --short-name "your-short-name"
 ```
 
 **Windows (PowerShell):**
 ```powershell
 # With branch creation (default):
-pwsh .tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/powershell/create-new-feature.ps1 -Json "$ARGUMENTS" -ShortName "your-short-name"
+pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/create-new-feature.ps1 -Json "$ARGUMENTS" -ShortName "your-short-name"
 
 # Without branch creation (if user declined):
-pwsh .tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/powershell/create-new-feature.ps1 -Json -SkipBranch "$ARGUMENTS" -ShortName "your-short-name"
+pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/create-new-feature.ps1 -Json -SkipBranch "$ARGUMENTS" -ShortName "your-short-name"
 ```
 
 Parse the JSON output for `BRANCH_NAME`, `SPEC_FILE`, and `FEATURE_NUM`.

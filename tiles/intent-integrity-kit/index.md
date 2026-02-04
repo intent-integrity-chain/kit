@@ -37,17 +37,22 @@ Intent Integrity Kit (IIKit) preserves your intent from idea to implementation. 
 
 ## Quick Start
 
-1. **Create a constitution** (recommended):
+1. **Initialize your project**:
+   ```
+   /iikit-core init
+   ```
+
+2. **Create a constitution** (defines project governance):
    ```
    /iikit-00-constitution
    ```
 
-2. **Specify a feature**:
+3. **Specify a feature**:
    ```
    /iikit-01-specify Add user authentication with OAuth2 support
    ```
 
-3. **Follow the workflow** through plan, testify, tasks, and implementation.
+4. **Follow the workflow** through plan, testify, tasks, and implementation.
 
 ## Artifacts Created
 
@@ -68,7 +73,7 @@ specs/NNN-feature-name/
 ## Installation
 
 ```bash
-tessl install intent-integrity-chain/kit
+tessl install tessl-labs/intent-integrity-kit
 ```
 
 ## Learn More

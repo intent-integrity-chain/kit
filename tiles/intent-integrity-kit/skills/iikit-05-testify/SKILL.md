@@ -79,7 +79,7 @@ Before ANY action, load and analyze the project constitution for TDD requirement
 
 1. Run prerequisites check:
    ```bash
-   bash .tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --json
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --json
    ```
 
 2. Parse JSON for `FEATURE_DIR` and `AVAILABLE_DOCS`.
@@ -251,19 +251,19 @@ mkdir -p FEATURE_DIR/tests
 **Unix/macOS/Linux:**
 ```bash
 # Store in context.json (primary)
-bash .tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash/testify-tdd.sh store-hash "FEATURE_DIR/tests/test-specs.md" ".specify/context.json"
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh store-hash "FEATURE_DIR/tests/test-specs.md" ".specify/context.json"
 
 # Store as git note (tamper-resistant backup)
-bash .tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash/testify-tdd.sh store-git-note "FEATURE_DIR/tests/test-specs.md"
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh store-git-note "FEATURE_DIR/tests/test-specs.md"
 ```
 
 **Windows (PowerShell):**
 ```powershell
 # Store in context.json (primary)
-pwsh .tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/powershell/testify-tdd.ps1 store-hash "FEATURE_DIR/tests/test-specs.md" ".specify/context.json"
+pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/testify-tdd.ps1 store-hash "FEATURE_DIR/tests/test-specs.md" ".specify/context.json"
 
 # Store as git note (tamper-resistant backup)
-pwsh .tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/powershell/testify-tdd.ps1 store-git-note "FEATURE_DIR/tests/test-specs.md"
+pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/testify-tdd.ps1 store-git-note "FEATURE_DIR/tests/test-specs.md"
 ```
 
 This stores a SHA256 hash of all Given/When/Then assertion lines in two locations:
