@@ -8,6 +8,9 @@ INIT_SCRIPT="$SCRIPTS_DIR/init-project.sh"
 setup() {
     TEST_DIR=$(mktemp -d)
     cd "$TEST_DIR"
+    # Configure git identity for CI environments that lack ~/.gitconfig
+    git config --global user.email "test@test.com" 2>/dev/null || true
+    git config --global user.name "Test" 2>/dev/null || true
 }
 
 teardown() {
