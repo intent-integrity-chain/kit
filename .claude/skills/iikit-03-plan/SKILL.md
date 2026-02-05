@@ -60,7 +60,7 @@ Before ANY action, load and internalize the project constitution:
 
    **Unix/macOS/Linux:**
    ```bash
-   .claude/skills/iikit-core/scripts/bash/setup-plan.sh --json
+   bash .claude/skills/iikit-core/scripts/bash/setup-plan.sh --json
    ```
 
    **Windows (PowerShell):**
@@ -325,7 +325,7 @@ List all available skills from installed tiles:
 
    **Unix/macOS/Linux:**
    ```bash
-   .claude/skills/iikit-core/scripts/bash/update-agent-context.sh claude
+   bash .claude/skills/iikit-core/scripts/bash/update-agent-context.sh claude
    ```
 
    **Windows (PowerShell):**
@@ -485,11 +485,15 @@ After completing the plan:
    - Helps catch requirement gaps before implementation
    - Required to reach 100% before `/iikit-08-implement`
 
-2. **Required**: Run `/iikit-06-tasks` to generate the task breakdown
+2. If constitution requires TDD: **(REQUIRED by constitution) Generate test specifications** with `/iikit-05-testify`
+   - If no TDD requirement: **(Optional) Generate test specifications for TDD** with `/iikit-05-testify`
+
+3. **Required**: Run `/iikit-06-tasks` to generate the task breakdown
 
 Suggest to user:
 ```
 Plan complete! Next steps:
 - /iikit-04-checklist - (Recommended) Generate quality checklists for requirements validation
+- /iikit-05-testify - Generate test specifications (REQUIRED if TDD mandated, otherwise Optional)
 - /iikit-06-tasks - Generate task breakdown from plan
 ```

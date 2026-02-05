@@ -4,21 +4,29 @@ set -e
 
 # Parse command line arguments
 JSON_MODE=false
+PROJECT_ROOT_ARG=""
 ARGS=()
 
-for arg in "$@"; do
-    case "$arg" in
+while [[ $# -gt 0 ]]; do
+    case "$1" in
         --json)
             JSON_MODE=true
+            shift
+            ;;
+        --project-root)
+            PROJECT_ROOT_ARG="$2"
+            shift 2
             ;;
         --help|-h)
-            echo "Usage: $0 [--json]"
-            echo "  --json    Output results in JSON format"
-            echo "  --help    Show this help message"
+            echo "Usage: $0 [--json] [--project-root PATH]"
+            echo "  --json           Output results in JSON format"
+            echo "  --project-root   Override project root directory (for testing)"
+            echo "  --help           Show this help message"
             exit 0
             ;;
         *)
-            ARGS+=("$arg")
+            ARGS+=("$1")
+            shift
             ;;
     esac
 done
@@ -29,7 +37,11 @@ source "$SCRIPT_DIR/common.sh"
 
 # Check if we're on a proper feature branch FIRST (may set SPECIFY_FEATURE)
 # This must happen before get_feature_paths so it uses the corrected feature name
-REPO_ROOT=$(get_repo_root)
+if [[ -n "$PROJECT_ROOT_ARG" ]]; then
+    REPO_ROOT="$PROJECT_ROOT_ARG"
+else
+    REPO_ROOT=$(get_repo_root)
+fi
 HAS_GIT="false"
 has_git && HAS_GIT="true"
 CURRENT_BRANCH=$(get_current_branch)
@@ -37,6 +49,15 @@ check_feature_branch "$CURRENT_BRANCH" "$HAS_GIT" || exit 1
 
 # Now get all paths (will use SPECIFY_FEATURE if it was set by check_feature_branch)
 eval $(get_feature_paths)
+
+# Override paths if --project-root was specified
+if [[ -n "$PROJECT_ROOT_ARG" ]]; then
+    REPO_ROOT="$PROJECT_ROOT_ARG"
+    FEATURE_DIR=$(find_feature_dir_by_prefix "$REPO_ROOT" "$CURRENT_BRANCH")
+    FEATURE_SPEC="$FEATURE_DIR/spec.md"
+    IMPL_PLAN="$FEATURE_DIR/plan.md"
+    TASKS="$FEATURE_DIR/tasks.md"
+fi
 
 # VALIDATION: Check constitution exists
 validate_constitution "$REPO_ROOT" || exit 1

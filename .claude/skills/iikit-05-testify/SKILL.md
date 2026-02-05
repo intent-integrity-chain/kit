@@ -79,7 +79,7 @@ Before ANY action, load and analyze the project constitution for TDD requirement
 
 1. Run prerequisites check:
    ```bash
-   .claude/skills/iikit-core/scripts/bash/check-prerequisites.sh --json
+   bash .claude/skills/iikit-core/scripts/bash/check-prerequisites.sh --json
    ```
 
 2. Parse JSON for `FEATURE_DIR` and `AVAILABLE_DOCS`.
@@ -251,10 +251,10 @@ mkdir -p FEATURE_DIR/tests
 **Unix/macOS/Linux:**
 ```bash
 # Store in context.json (primary)
-.claude/skills/iikit-core/scripts/bash/testify-tdd.sh store-hash "FEATURE_DIR/tests/test-specs.md" ".specify/context.json"
+bash .claude/skills/iikit-core/scripts/bash/testify-tdd.sh store-hash "FEATURE_DIR/tests/test-specs.md" ".specify/context.json"
 
 # Store as git note (tamper-resistant backup)
-.claude/skills/iikit-core/scripts/bash/testify-tdd.sh store-git-note "FEATURE_DIR/tests/test-specs.md"
+bash .claude/skills/iikit-core/scripts/bash/testify-tdd.sh store-git-note "FEATURE_DIR/tests/test-specs.md"
 ```
 
 **Windows (PowerShell):**
@@ -371,13 +371,11 @@ DO NOT MODIFY TEST ASSERTIONS
 After generating test specifications:
 
 1. **Required**: Run `/iikit-06-tasks` to generate tasks that reference the test specs
-2. **Optional**: Run `/iikit-07-analyze` to validate cross-artifact consistency
 
 Suggest to user:
 ```
 Test specifications generated! Next steps:
 - /iikit-06-tasks - Generate task breakdown (tasks can now reference test specs)
-- /iikit-07-analyze - (Optional) Validate consistency
 ```
 
 **Note**: When TDD is mandatory, `/iikit-08-implement` will verify test specs exist before proceeding.

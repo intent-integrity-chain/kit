@@ -47,7 +47,7 @@ Before ANY action, load and internalize the project constitution:
 
 1. Run prerequisites check:
    ```bash
-   .claude/skills/iikit-core/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks
    ```
 
 2. Parse JSON for `FEATURE_DIR` and `AVAILABLE_DOCS`.
@@ -102,10 +102,7 @@ If `tests/test-specs.md` exists, perform assertion integrity verification:
 
 **Step 1: Run comprehensive integrity check**
 ```bash
-.claude/skills/iikit-core/scripts/bash/testify-tdd.sh comprehensive-check \
-    "FEATURE_DIR/tests/test-specs.md" \
-    ".specify/context.json" \
-    "CONSTITUTION.md"
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh comprehensive-check "FEATURE_DIR/tests/test-specs.md" ".specify/context.json" "CONSTITUTION.md"
 ```
 
 **Step 2: Parse the JSON response**
@@ -203,14 +200,14 @@ After running tests, verify execution with:
 
 **Unix/macOS/Linux:**
 ```bash
-.claude/skills/iikit-core/scripts/bash/verify-test-execution.sh verify \
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/verify-test-execution.sh verify \
     "FEATURE_DIR/tests/test-specs.md" \
     "$(cat test-output.log)"
 ```
 
 **Windows (PowerShell):**
 ```powershell
-pwsh .claude/skills/iikit-core/scripts/powershell/verify-test-execution.ps1 verify `
+pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/verify-test-execution.ps1 verify `
     "FEATURE_DIR/tests/test-specs.md" `
     (Get-Content test-output.log -Raw)
 ```

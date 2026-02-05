@@ -4,6 +4,7 @@
 [CmdletBinding()]
 param(
     [switch]$Json,
+    [string]$ProjectRoot,
     [switch]$Help
 )
 
@@ -11,9 +12,10 @@ $ErrorActionPreference = 'Stop'
 
 # Show help if requested
 if ($Help) {
-    Write-Output "Usage: ./setup-plan.ps1 [-Json] [-Help]"
-    Write-Output "  -Json     Output results in JSON format"
-    Write-Output "  -Help     Show this help message"
+    Write-Output "Usage: ./setup-plan.ps1 [-Json] [-ProjectRoot PATH] [-Help]"
+    Write-Output "  -Json          Output results in JSON format"
+    Write-Output "  -ProjectRoot   Override project root directory (for testing)"
+    Write-Output "  -Help          Show this help message"
     exit 0
 }
 
@@ -22,7 +24,11 @@ if ($Help) {
 
 # Check if we're on a proper feature branch FIRST (may set SPECIFY_FEATURE)
 # This must happen before Get-FeaturePathsEnv so it uses the corrected feature name
-$repoRoot = Get-RepoRoot
+if ($ProjectRoot) {
+    $repoRoot = $ProjectRoot
+} else {
+    $repoRoot = Get-RepoRoot
+}
 $hasGit = Test-HasGit
 $currentBranch = Get-CurrentBranch
 if (-not (Test-FeatureBranch -Branch $currentBranch -HasGit $hasGit)) {
@@ -31,6 +37,15 @@ if (-not (Test-FeatureBranch -Branch $currentBranch -HasGit $hasGit)) {
 
 # Now get all paths (will use SPECIFY_FEATURE if it was set by Test-FeatureBranch)
 $paths = Get-FeaturePathsEnv
+
+# Override paths if -ProjectRoot was specified
+if ($ProjectRoot) {
+    $paths.REPO_ROOT = $ProjectRoot
+    $paths.FEATURE_DIR = Find-FeatureDirByPrefix -RepoRoot $ProjectRoot -BranchName $currentBranch
+    $paths.FEATURE_SPEC = Join-Path $paths.FEATURE_DIR 'spec.md'
+    $paths.IMPL_PLAN = Join-Path $paths.FEATURE_DIR 'plan.md'
+    $paths.TASKS = Join-Path $paths.FEATURE_DIR 'tasks.md'
+}
 
 # VALIDATION: Check constitution exists
 if (-not (Test-Constitution -RepoRoot $paths.REPO_ROOT)) {

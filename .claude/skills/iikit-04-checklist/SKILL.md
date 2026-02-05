@@ -47,7 +47,7 @@ Before ANY action, load and internalize the project constitution:
 
 1. Run prerequisites check:
    ```bash
-   .claude/skills/iikit-core/scripts/bash/check-prerequisites.sh --json
+   bash .claude/skills/iikit-core/scripts/bash/check-prerequisites.sh --json
    ```
 
 2. Parse JSON for `FEATURE_DIR` and `AVAILABLE_DOCS`.
@@ -256,7 +256,8 @@ Output:
 After creating and resolving checklists:
 
 1. **If gaps remain**: Run `/iikit-04-checklist` again to continue gap resolution
-2. **When all gaps resolved**: Run `/iikit-06-tasks` to generate the task breakdown
+2. **Optional**: Run `/iikit-05-testify` to generate test specifications (TDD support)
+3. **When all gaps resolved**: Run `/iikit-06-tasks` to generate the task breakdown
 
 Suggest to user:
 ```
@@ -267,6 +268,7 @@ Gaps remaining: Y
 
 Next steps:
 - /iikit-04-checklist - (If gaps remain) Continue resolving requirement gaps
+- /iikit-05-testify - (Optional) Generate test specifications for TDD
 - /iikit-06-tasks - Generate task breakdown from plan
 ```
 

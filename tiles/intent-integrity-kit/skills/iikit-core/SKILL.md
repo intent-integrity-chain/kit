@@ -46,12 +46,12 @@ Initialize intent-integrity-kit in the current directory.
 
    **Unix/macOS/Linux:**
    ```bash
-   .claude/skills/iikit-core/scripts/bash/init-project.sh --json
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/init-project.sh --json
    ```
 
    **Windows (PowerShell):**
    ```powershell
-   pwsh .claude/skills/iikit-core/scripts/powershell/init-project.ps1 -Json
+   pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/init-project.ps1 -Json
    ```
 
 4. **Report**:
@@ -59,10 +59,10 @@ Initialize intent-integrity-kit in the current directory.
    Intent Integrity Kit initialized!
 
    Directory structure created:
-   - .specify/    (project artifacts)
+   - .specify/           (IIKit working directory)
    - specs/              (feature specifications)
 
-   Next step: /iikit-00-constitution
+   Next step: /iikit-00-constitution (creates CONSTITUTION.md)
    ```
 
 ### If Already Initialized
@@ -87,12 +87,12 @@ Show the current project and feature status.
 
    **Unix/macOS/Linux:**
    ```bash
-   .claude/skills/iikit-core/scripts/bash/check-prerequisites.sh --json --paths-only
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --json --paths-only
    ```
 
    **Windows (PowerShell):**
    ```powershell
-   pwsh .claude/skills/iikit-core/scripts/powershell/check-prerequisites.ps1 -Json -PathsOnly
+   pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/check-prerequisites.ps1 -Json -PathsOnly
    ```
 
 2. **Check constitution**:

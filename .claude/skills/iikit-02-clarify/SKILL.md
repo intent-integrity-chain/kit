@@ -30,7 +30,7 @@ Before ANY action, load and internalize the project constitution:
 
 1. Run prerequisites check:
    ```bash
-   .claude/skills/iikit-core/scripts/bash/check-prerequisites.sh --json --paths-only
+   bash .claude/skills/iikit-core/scripts/bash/check-prerequisites.sh --json --paths-only
    ```
 
 2. Parse JSON for:

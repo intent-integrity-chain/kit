@@ -102,16 +102,16 @@ You **MUST** consider the user input before proceeding (if not empty).
    **If violations found:**
    ```
    ╭─────────────────────────────────────────────────────────────────╮
-   │  PHASE SEPARATION VIOLATION DETECTED                           │
+   │  PHASE SEPARATION VIOLATION DETECTED                            │
    ├─────────────────────────────────────────────────────────────────┤
-   │  Constitution contains technology-specific content:            │
-   │  - [list each violation]                                       │
+   │  Constitution contains technology-specific content:             │
+   │  - [list each violation]                                        │
    │                                                                 │
-   │  Technology decisions belong in /iikit-03-plan, not here.    │
-   │  Constitution must be technology-agnostic to survive tech      │
+   │  Technology decisions belong in /iikit-03-plan, not here.     │
+   │  Constitution must be technology-agnostic to survive tech       │
    │  stack changes.                                                 │
    ├─────────────────────────────────────────────────────────────────┤
-   │  ACTION: Removing technology references and generalizing...    │
+   │  ACTION: Removing technology references and generalizing...     │
    ╰─────────────────────────────────────────────────────────────────╯
    ```
 

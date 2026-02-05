@@ -253,22 +253,13 @@ Output:
 
 ## Next Steps
 
-After creating and resolving checklists, determine next step based on constitution:
+After creating and resolving checklists:
 
-**If TDD is MANDATORY in constitution:**
-```
-Checklist complete!
+1. **If gaps remain**: Run `/iikit-04-checklist` again to continue gap resolution
+2. **Optional**: Run `/iikit-05-testify` to generate test specifications (TDD support)
+3. **When all gaps resolved**: Run `/iikit-06-tasks` to generate the task breakdown
 
-Gaps resolved: X (added to spec)
-Gaps remaining: Y
-
-Next steps:
-- /iikit-04-checklist - (If gaps remain) Continue resolving requirement gaps
-- /iikit-05-testify - (REQUIRED by constitution) Generate test specifications
-- /iikit-06-tasks - Generate task breakdown
-```
-
-**If TDD is optional or not mentioned:**
+Suggest to user:
 ```
 Checklist complete!
 
@@ -278,7 +269,7 @@ Gaps remaining: Y
 Next steps:
 - /iikit-04-checklist - (If gaps remain) Continue resolving requirement gaps
 - /iikit-05-testify - (Optional) Generate test specifications for TDD
-- /iikit-06-tasks - Generate task breakdown
+- /iikit-06-tasks - Generate task breakdown from plan
 ```
 
 **Note:** `/iikit-08-implement` requires all checklists to be 100% complete (no `[ ]` items).

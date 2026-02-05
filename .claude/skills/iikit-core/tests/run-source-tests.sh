@@ -124,15 +124,15 @@ test_tiles_bash_command_paths() {
 
     [[ ! -d "$base" ]] && { log_info "tiles/intent-integrity-kit/ not found, skipping"; return; }
 
-    # Bash commands MUST use .tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/ prefix
+    # Bash commands MUST use .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/ prefix
     # This is the installed path when users run tessl install
     ((TESTS_RUN++))
     local correct_bash_cmds
-    correct_bash_cmds=$(grep -rh "bash .tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash/" "$base"/iikit-*/SKILL.md 2>/dev/null | wc -l)
+    correct_bash_cmds=$(grep -rh "bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/" "$base"/iikit-*/SKILL.md 2>/dev/null | wc -l)
     if [[ "$correct_bash_cmds" -gt 0 ]]; then
         log_pass "tile bash commands use full .tessl/tiles/... path ($correct_bash_cmds refs)"
     else
-        log_fail "tile bash commands don't use .tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/ path"
+        log_fail "tile bash commands don't use .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/ path"
     fi
 
     # Bash commands MUST NOT use relative ../iikit-core/ paths (would break at runtime)
@@ -149,7 +149,7 @@ test_tiles_bash_command_paths() {
     # PowerShell commands MUST use .tessl/tiles/ prefix
     ((TESTS_RUN++))
     local correct_pwsh_cmds
-    correct_pwsh_cmds=$(grep -rh "pwsh .tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/powershell/" "$base"/iikit-*/SKILL.md 2>/dev/null | wc -l)
+    correct_pwsh_cmds=$(grep -rh "pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/" "$base"/iikit-*/SKILL.md 2>/dev/null | wc -l)
     if [[ "$correct_pwsh_cmds" -gt 0 ]]; then
         log_pass "tile pwsh commands use full .tessl/tiles/... path ($correct_pwsh_cmds refs)"
     else

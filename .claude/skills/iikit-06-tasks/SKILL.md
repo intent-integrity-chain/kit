@@ -30,7 +30,7 @@ Before ANY action, load and internalize the project constitution:
 
 1. Run prerequisites check:
    ```bash
-   .claude/skills/iikit-core/scripts/bash/check-prerequisites.sh --json
+   bash .claude/skills/iikit-core/scripts/bash/check-prerequisites.sh --json
    ```
 
 2. Parse JSON for `FEATURE_DIR` and `AVAILABLE_DOCS`.

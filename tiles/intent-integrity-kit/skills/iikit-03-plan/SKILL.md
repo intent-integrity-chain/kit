@@ -373,15 +373,15 @@ Before finalizing, scan the draft plan for governance content that belongs in `/
 **If violations found:**
 ```
 ╭─────────────────────────────────────────────────────────────────╮
-│  PHASE SEPARATION VIOLATION DETECTED                           │
+│  PHASE SEPARATION VIOLATION DETECTED                            │
 ├─────────────────────────────────────────────────────────────────┤
-│  Plan contains governance content:                             │
-│  - [list each violation]                                       │
+│  Plan contains governance content:                              │
+│  - [list each violation]                                        │
 │                                                                 │
-│  Governance principles belong in /iikit-00-constitution.     │
-│  Plan defines HOW to implement THIS feature, not project laws. │
+│  Governance principles belong in /iikit-00-constitution.      │
+│  Plan defines HOW to implement THIS feature, not project laws.  │
 ├─────────────────────────────────────────────────────────────────┤
-│  ACTION: Moving governance content to constitution reference...│
+│  ACTION: Moving governance content to constitution reference... │
 ╰─────────────────────────────────────────────────────────────────╯
 ```
 
@@ -455,9 +455,9 @@ If plan.md exists and has Technical Context filled in:
    │    + Added: Event sourcing pattern                  │
    ├─────────────────────────────────────────────────────┤
    │  DOWNSTREAM IMPACT:                                 │
-   │  ⚠ tasks.md MUST be regenerated (architecture change)│
-   │  ⚠ contracts/ need updates (API change)            │
-   │  ⚠ data-model.md may need updates                  │
+   │  ⚠ tasks.md MUST be regenerated (arch change)       │
+   │  ⚠ contracts/ need updates (API change)             │
+   │  ⚠ data-model.md may need updates                   │
    ╰─────────────────────────────────────────────────────╯
    ```
 
@@ -478,22 +478,22 @@ Recommend re-running:
 
 ## Next Steps
 
-After completing the plan, determine next step based on constitution:
+After completing the plan:
 
-**If TDD is MANDATORY in constitution:**
+1. **Recommended**: Run `/iikit-04-checklist` to create domain-specific quality checklists
+   - Generates "unit tests for English" to validate requirements quality
+   - Helps catch requirement gaps before implementation
+   - Required to reach 100% before `/iikit-08-implement`
+
+2. If constitution requires TDD: **(REQUIRED by constitution) Generate test specifications** with `/iikit-05-testify`
+   - If no TDD requirement: **(Optional) Generate test specifications for TDD** with `/iikit-05-testify`
+
+3. **Required**: Run `/iikit-06-tasks` to generate the task breakdown
+
+Suggest to user:
 ```
 Plan complete! Next steps:
-1. /iikit-04-checklist - (Recommended) Generate quality checklists
-2. /iikit-05-testify - (REQUIRED by constitution) Generate test specifications
-3. /iikit-06-tasks - Generate task breakdown
+- /iikit-04-checklist - (Recommended) Generate quality checklists for requirements validation
+- /iikit-05-testify - Generate test specifications (REQUIRED if TDD mandated, otherwise Optional)
+- /iikit-06-tasks - Generate task breakdown from plan
 ```
-
-**If TDD is optional or not mentioned:**
-```
-Plan complete! Next steps:
-1. /iikit-04-checklist - (Recommended) Generate quality checklists
-2. /iikit-05-testify - (Optional) Generate test specifications for TDD
-3. /iikit-06-tasks - Generate task breakdown
-```
-
-**IMPORTANT**: Do NOT suggest `/iikit-08-implement` here - it requires tasks.md to exist first.

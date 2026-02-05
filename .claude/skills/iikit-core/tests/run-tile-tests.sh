@@ -66,11 +66,11 @@ setup() {
     else
         log_info "Installing from registry (latest)..."
         # Note: May need to specify version if recently published
-        tessl install intent-integrity-chain/kit 2>&1 | grep -v "^-"
-        if [[ ! -d ".tessl/tiles/intent-integrity-chain/kit" ]]; then
+        tessl install tessl-labs/intent-integrity-kit 2>&1 | grep -v "^-"
+        if [[ ! -d ".tessl/tiles/tessl-labs/intent-integrity-kit" ]]; then
             log_info "Retrying with explicit version..."
-            tessl install intent-integrity-chain/kit@0.7.0 2>&1 | grep -v "^-" || \
-            tessl install intent-integrity-chain/kit@0.6.5 2>&1 | grep -v "^-"
+            tessl install tessl-labs/intent-integrity-kit@0.7.0 2>&1 | grep -v "^-" || \
+            tessl install tessl-labs/intent-integrity-kit@0.6.5 2>&1 | grep -v "^-"
         fi
     fi
 }
@@ -82,7 +82,7 @@ teardown() {
 
 test_scripts_exist() {
     log_section "Bash Scripts Exist"
-    local bash_base=".tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash"
+    local bash_base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
 
     run_test "check-prerequisites.sh exists" "[[ -f '$bash_base/check-prerequisites.sh' ]]"
     run_test "create-new-feature.sh exists" "[[ -f '$bash_base/create-new-feature.sh' ]]"
@@ -94,7 +94,7 @@ test_scripts_exist() {
 
 test_powershell_scripts_exist() {
     log_section "PowerShell Scripts Exist"
-    local ps_base=".tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/powershell"
+    local ps_base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell"
 
     run_test "check-prerequisites.ps1 exists" "[[ -f '$ps_base/check-prerequisites.ps1' ]]"
     run_test "create-new-feature.ps1 exists" "[[ -f '$ps_base/create-new-feature.ps1' ]]"
@@ -108,7 +108,7 @@ test_powershell_scripts_exist() {
 
 test_scripts_executable() {
     log_section "Scripts Execute with Bash"
-    local base=".tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash"
+    local base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
 
     ((TESTS_RUN++))
     if bash "$base/check-prerequisites.sh" --help >/dev/null 2>&1; then
@@ -144,7 +144,7 @@ test_scripts_executable() {
 
 test_templates_exist() {
     log_section "Templates Exist"
-    local base=".tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/templates"
+    local base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/templates"
 
     run_test "constitution-template.md" "[[ -f '$base/constitution-template.md' ]]"
     run_test "spec-template.md" "[[ -f '$base/spec-template.md' ]]"
@@ -156,7 +156,7 @@ test_templates_exist() {
 
 test_skills_exist() {
     log_section "Skills Exist"
-    local base=".tessl/tiles/intent-integrity-chain/kit/skills"
+    local base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills"
 
     # Check iikit-core exists
     run_test "iikit-core skill" "[[ -d '$base/iikit-core' && -f '$base/iikit-core/SKILL.md' ]]"
@@ -169,7 +169,7 @@ test_skills_exist() {
 
 test_workflow_order() {
     log_section "Workflow Order (Next Steps)"
-    local base=".tessl/tiles/intent-integrity-chain/kit/skills"
+    local base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills"
 
     # Plan should NOT suggest implement (requires tasks)
     ((TESTS_RUN++))
@@ -198,7 +198,7 @@ test_workflow_order() {
 
 test_tdd_check_has_args() {
     log_section "TDD Check Has Arguments"
-    local impl=".tessl/tiles/intent-integrity-chain/kit/skills/iikit-08-implement/SKILL.md"
+    local impl=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-08-implement/SKILL.md"
 
     ((TESTS_RUN++))
     if grep -q 'testify-tdd.sh comprehensive-check "FEATURE_DIR' "$impl"; then
@@ -210,7 +210,7 @@ test_tdd_check_has_args() {
 
 test_bash_prefix() {
     log_section "Scripts Use Bash Prefix"
-    local base=".tessl/tiles/intent-integrity-chain/kit/skills"
+    local base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills"
 
     # Check skills use "bash .tessl/..." not just ".tessl/..."
     ((TESTS_RUN++))
@@ -234,7 +234,7 @@ test_bash_prefix() {
 
 test_tdd_conditional_next_steps() {
     log_section "TDD Conditional Next Steps"
-    local base=".tessl/tiles/intent-integrity-chain/kit/skills"
+    local base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills"
 
     # Plan skill must show TDD as "REQUIRED by constitution" when mandatory
     ((TESTS_RUN++))
@@ -263,7 +263,7 @@ test_tdd_conditional_next_steps() {
 
 test_testify_tdd_comprehensive_check() {
     log_section "TDD Script Comprehensive Check"
-    local script=".tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash/testify-tdd.sh"
+    local script=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh"
 
     # Test that comprehensive-check requires 4 arguments (command + 3 args)
     ((TESTS_RUN++))
@@ -297,7 +297,7 @@ test_testify_tdd_comprehensive_check() {
 test_nested_git_repo() {
     log_section "Nested Git Repository Detection"
     # Store absolute path to script before changing directories
-    local script="$TEST_DIR/.tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash/create-new-feature.sh"
+    local script="$TEST_DIR/.tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/create-new-feature.sh"
 
     # Create a nested git structure
     local parent_dir
@@ -336,7 +336,7 @@ test_nested_git_repo() {
 
 test_single_feature_fallback() {
     log_section "Single Feature Directory Fallback"
-    local prereq_script=".tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash/check-prerequisites.sh"
+    local prereq_script=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh"
 
     # Setup: Create a feature directory but stay on main branch
     mkdir -p .specify specs/001-test-feature
@@ -377,7 +377,7 @@ PLAN
 
 test_tdd_assessment() {
     log_section "TDD Assessment Logic"
-    local script=".tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash/testify-tdd.sh"
+    local script=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh"
     local tmp_constitution
     tmp_constitution=$(mktemp)
 
@@ -431,7 +431,7 @@ test_tdd_assessment() {
 
 test_assertion_hash_integrity() {
     log_section "Assertion Hash Integrity"
-    local script=".tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash/testify-tdd.sh"
+    local script=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh"
     local tmp_test_specs
     local tmp_context
     tmp_test_specs=$(mktemp)
@@ -484,7 +484,7 @@ EOF
 
 test_multiple_feature_warning() {
     log_section "Multiple Feature Directory Warning"
-    local prereq_script=".tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash/check-prerequisites.sh"
+    local prereq_script=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh"
 
     # Create multiple feature directories
     mkdir -p specs/002-another-feature
@@ -516,7 +516,7 @@ SPEC
 
 test_feature_prefix_matching() {
     log_section "Feature Prefix Matching"
-    local prereq_script=".tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash/check-prerequisites.sh"
+    local prereq_script=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh"
 
     # Create a feature with different branch name than directory
     # Branch: 001-fix-bug, Directory: 001-test-feature (already exists from earlier test)
@@ -543,7 +543,7 @@ test_feature_prefix_matching() {
 
 test_init_script() {
     log_section "Init Script"
-    local script=".tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash/init-project.sh"
+    local script=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/init-project.sh"
 
     ((TESTS_RUN++))
     if [[ -f "$script" ]]; then
@@ -561,7 +561,7 @@ test_init_script() {
 
 test_update_agent_context_script() {
     log_section "Update Agent Context Script"
-    local script=".tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash/update-agent-context.sh"
+    local script=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/update-agent-context.sh"
 
     ((TESTS_RUN++))
     if [[ -f "$script" ]]; then
@@ -580,7 +580,7 @@ test_update_agent_context_script() {
 
 test_template_paths_resolve() {
     log_section "Template Paths Resolve"
-    local base=".tessl/tiles/intent-integrity-chain/kit/skills/iikit-core"
+    local base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core"
     local scripts_dir="$base/scripts/bash"
     local templates_dir="$base/templates"
 
@@ -645,7 +645,7 @@ test_template_paths_resolve() {
 
 test_skill_template_references() {
     log_section "Skill Template References"
-    local base=".tessl/tiles/intent-integrity-chain/kit/skills"
+    local base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills"
 
     # Check that skill files reference correct template paths
     # iikit-00-constitution should reference iikit-core/templates/
@@ -685,7 +685,7 @@ test_skill_template_references() {
 
 test_skill_script_references() {
     log_section "Skill Script References (Bash)"
-    local base=".tessl/tiles/intent-integrity-chain/kit/skills"
+    local base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills"
 
     # CRITICAL: Verify all SKILL.md files reference scripts at iikit-core/scripts/
     # This catches the bug where skills referenced iikit-01-specify/scripts/ instead
@@ -741,7 +741,7 @@ test_skill_script_references() {
 
 test_powershell_script_references() {
     log_section "Skill Script References (PowerShell)"
-    local base=".tessl/tiles/intent-integrity-chain/kit/skills"
+    local base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills"
 
     # Check that PowerShell script paths point to iikit-core, not individual skill directories
     ((TESTS_RUN++))
@@ -794,7 +794,7 @@ test_powershell_script_references() {
 
 test_documentation_path_consistency() {
     log_section "Documentation Path Consistency"
-    local tile_root=".tessl/tiles/intent-integrity-chain/kit"
+    local tile_root=".tessl/tiles/tessl-labs/intent-integrity-kit"
 
     # Check that documented paths actually exist
     # Extract paths from SKILL.md files and verify they resolve
@@ -803,7 +803,7 @@ test_documentation_path_consistency() {
     ((TESTS_RUN++))
     local missing_scripts=0
     while IFS= read -r script_ref; do
-        # Extract the path after .tessl/tiles/intent-integrity-chain/kit/
+        # Extract the path after .tessl/tiles/tessl-labs/intent-integrity-kit/
         local rel_path
         rel_path=$(echo "$script_ref" | grep -oE 'skills/[^"'"'"' ]+\.sh' | head -1)
         if [[ -n "$rel_path" && ! -f "$tile_root/$rel_path" ]]; then
@@ -856,7 +856,7 @@ test_documentation_path_consistency() {
 
 test_readme_path_consistency() {
     log_section "README/Doc Path Consistency"
-    local tile_root=".tessl/tiles/intent-integrity-chain/kit"
+    local tile_root=".tessl/tiles/tessl-labs/intent-integrity-kit"
 
     # Check index.md and any README files for path consistency
     local doc_files=("$tile_root/index.md")
@@ -885,8 +885,8 @@ test_readme_path_consistency() {
 
 test_bash_script_inner_template_refs() {
     log_section "Bash Script Inner Template References"
-    local base=".tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/bash"
-    local templates_dir=".tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/templates"
+    local base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
+    local templates_dir=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/templates"
 
     # Scripts that reference templates - verify they use relative ../../templates/ path
     local scripts_with_templates=(
@@ -932,8 +932,8 @@ test_bash_script_inner_template_refs() {
 
 test_powershell_script_inner_template_refs() {
     log_section "PowerShell Script Inner Template References"
-    local base=".tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/scripts/powershell"
-    local templates_dir=".tessl/tiles/intent-integrity-chain/kit/skills/iikit-core/templates"
+    local base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell"
+    local templates_dir=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/templates"
 
     # Scripts that reference templates
     local scripts_with_templates=(
@@ -979,7 +979,7 @@ test_powershell_script_inner_template_refs() {
 
 test_all_skill_template_refs() {
     log_section "All SKILL.md Template References"
-    local base=".tessl/tiles/intent-integrity-chain/kit/skills"
+    local base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills"
 
     # All template references should use iikit-core/templates/
     ((TESTS_RUN++))
@@ -1005,7 +1005,7 @@ test_all_skill_template_refs() {
 
 test_skill_numbering_consistency() {
     log_section "Skill Numbering Consistency"
-    local base=".tessl/tiles/intent-integrity-chain/kit/skills"
+    local base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills"
 
     # Verify skill directories match expected numbering
     local expected_skills=(

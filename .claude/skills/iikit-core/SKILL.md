@@ -46,7 +46,7 @@ Initialize intent-integrity-kit in the current directory.
 
    **Unix/macOS/Linux:**
    ```bash
-   .claude/skills/iikit-core/scripts/bash/init-project.sh --json
+   bash .claude/skills/iikit-core/scripts/bash/init-project.sh --json
    ```
 
    **Windows (PowerShell):**
@@ -87,7 +87,7 @@ Show the current project and feature status.
 
    **Unix/macOS/Linux:**
    ```bash
-   .claude/skills/iikit-core/scripts/bash/check-prerequisites.sh --json --paths-only
+   bash .claude/skills/iikit-core/scripts/bash/check-prerequisites.sh --json --paths-only
    ```
 
    **Windows (PowerShell):**
