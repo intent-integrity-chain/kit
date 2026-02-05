@@ -1,6 +1,6 @@
 {
   "name": "tessl-labs/intent-integrity-kit",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "summary": "Closing the intent-to-code chasm - specification-driven development with cryptographic verification",
   "description": "Intent Integrity Kit (IIKit) preserves your intent from idea to implementation through specification-driven development. Features 10 workflow phases with assertion integrity hashing to prevent circular verification. Compatible with Claude Code, Codex, Gemini, and OpenCode.",
   "private": false,
