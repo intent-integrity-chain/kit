@@ -28,3 +28,66 @@ jobs:
 
       - name: Run source validation tests
         run: .claude/skills/iikit-core/tests/run-source-tests.sh
+
+  publish:
+    name: Sync, Publish & Verify
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check if tile version changed
+        id: version
+        run: |
+          NEW=$(jq -r .version tiles/intent-integrity-kit/tile.json)
+          OLD=$(git show HEAD~1:tiles/intent-integrity-kit/tile.json 2>/dev/null | jq -r .version 2>/dev/null || echo "")
+          echo "old=$OLD" >> "$GITHUB_OUTPUT"
+          echo "new=$NEW" >> "$GITHUB_OUTPUT"
+          if [[ "$NEW" != "$OLD" && -n "$OLD" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Version changed: $OLD → $NEW"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Version unchanged ($NEW), skipping publish"
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.version.outputs.changed == 'true'
+        with:
+          node-version: '20'
+
+      - name: Install tessl
+        if: steps.version.outputs.changed == 'true'
+        run: npm install -g @tessl/cli
+
+      - name: Make scripts executable
+        if: steps.version.outputs.changed == 'true'
+        run: |
+          chmod +x scripts/sync-to-tile.sh
+          chmod +x .claude/skills/iikit-core/scripts/bash/*.sh
+          chmod +x .claude/skills/iikit-core/tests/*.sh
+
+      - name: Sync source to tile
+        if: steps.version.outputs.changed == 'true'
+        run: ./scripts/sync-to-tile.sh
+
+      - name: Publish tile v${{ steps.version.outputs.new }}
+        if: steps.version.outputs.changed == 'true'
+        env:
+          TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
+        run: tessl tile publish tiles/intent-integrity-kit
+
+      - name: Verify tile (install from registry + e2e tests)
+        if: steps.version.outputs.changed == 'true'
+        run: .claude/skills/iikit-core/tests/run-tile-tests.sh --from-registry
+
+      - name: Tag release
+        if: steps.version.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "v${{ steps.version.outputs.new }}"
+          git push --tags
