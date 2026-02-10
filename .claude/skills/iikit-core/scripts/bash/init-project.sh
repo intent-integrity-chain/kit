@@ -60,6 +60,71 @@ else
     GIT_STATUS="initialized"
 fi
 
+# Install git hooks for assertion integrity enforcement
+# install_hook <hook_type> <source_file> <marker>
+# Sets RESULT_installed (true/false) and RESULT_status (installed/updated/installed_alongside/source_not_found/skipped)
+install_hook() {
+    local hook_type="$1"   # e.g., "pre-commit" or "post-commit"
+    local source_file="$2" # e.g., "pre-commit-hook.sh"
+    local marker="$3"      # e.g., "IIKIT-PRE-COMMIT"
+
+    RESULT_installed=false
+    RESULT_status="skipped"
+
+    if [ ! -d "$PROJECT_ROOT/.git" ]; then
+        return
+    fi
+
+    SCRIPT_DIR="$(CDPATH="" cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local hook_source="$SCRIPT_DIR/$source_file"
+
+    if [ ! -f "$hook_source" ]; then
+        RESULT_status="source_not_found"
+        return
+    fi
+
+    local hooks_dir="$PROJECT_ROOT/.git/hooks"
+    mkdir -p "$hooks_dir"
+    local existing_hook="$hooks_dir/$hook_type"
+
+    if [ ! -f "$existing_hook" ]; then
+        # No existing hook — copy directly
+        cp "$hook_source" "$existing_hook"
+        chmod +x "$existing_hook"
+        RESULT_installed=true
+        RESULT_status="installed"
+    elif grep -q "$marker" "$existing_hook" 2>/dev/null; then
+        # Existing IIKit hook — update in place
+        cp "$hook_source" "$existing_hook"
+        chmod +x "$existing_hook"
+        RESULT_installed=true
+        RESULT_status="updated"
+    else
+        # Existing non-IIKit hook — install alongside
+        local iikit_hook="$hooks_dir/iikit-$hook_type"
+        cp "$hook_source" "$iikit_hook"
+        chmod +x "$iikit_hook"
+        # Append call to existing hook if not already present
+        if ! grep -q "iikit-$hook_type" "$existing_hook" 2>/dev/null; then
+            echo "" >> "$existing_hook"
+            echo "# IIKit assertion integrity check" >> "$existing_hook"
+            echo '"$(dirname "$0")/iikit-'"$hook_type"'"' >> "$existing_hook"
+        fi
+        RESULT_installed=true
+        RESULT_status="installed_alongside"
+    fi
+}
+
+# Install pre-commit hook (validates assertion hashes before commit)
+install_hook "pre-commit" "pre-commit-hook.sh" "IIKIT-PRE-COMMIT"
+HOOK_INSTALLED="$RESULT_installed"
+HOOK_STATUS="$RESULT_status"
+
+# Install post-commit hook (stores assertion hashes as git notes after commit)
+install_hook "post-commit" "post-commit-hook.sh" "IIKIT-POST-COMMIT"
+POST_HOOK_INSTALLED="$RESULT_installed"
+POST_HOOK_STATUS="$RESULT_status"
+
 # Commit constitution if requested and it exists
 CONSTITUTION_COMMITTED=false
 if [ "$COMMIT_CONSTITUTION" = true ] && [ -f "$PROJECT_ROOT/CONSTITUTION.md" ]; then
@@ -76,9 +141,28 @@ if [ "$COMMIT_CONSTITUTION" = true ] && [ -f "$PROJECT_ROOT/CONSTITUTION.md" ]; 
     fi
 fi
 
+report_hook_status() {
+    local hook_name="$1"
+    local status="$2"
+    case "$status" in
+        installed)
+            echo "[specify] $hook_name hook installed"
+            ;;
+        updated)
+            echo "[specify] $hook_name hook updated"
+            ;;
+        installed_alongside)
+            echo "[specify] $hook_name hook installed alongside existing hook"
+            ;;
+        source_not_found)
+            echo "[specify] Warning: $hook_name hook source not found — skipped installation" >&2
+            ;;
+    esac
+}
+
 if $JSON_MODE; then
-    printf '{"success":true,"git_initialized":%s,"git_status":"%s","constitution_committed":%s,"project_root":"%s"}\n' \
-        "$GIT_INITIALIZED" "$GIT_STATUS" "$CONSTITUTION_COMMITTED" "$PROJECT_ROOT"
+    printf '{"success":true,"git_initialized":%s,"git_status":"%s","constitution_committed":%s,"hook_installed":%s,"hook_status":"%s","post_hook_installed":%s,"post_hook_status":"%s","project_root":"%s"}\n' \
+        "$GIT_INITIALIZED" "$GIT_STATUS" "$CONSTITUTION_COMMITTED" "$HOOK_INSTALLED" "$HOOK_STATUS" "$POST_HOOK_INSTALLED" "$POST_HOOK_STATUS" "$PROJECT_ROOT"
 else
     if [ "$GIT_INITIALIZED" = true ]; then
         echo "[specify] Git repository initialized at $PROJECT_ROOT"
@@ -88,4 +172,6 @@ else
     if [ "$CONSTITUTION_COMMITTED" = true ]; then
         echo "[specify] Constitution committed to git"
     fi
+    report_hook_status "Pre-commit" "$HOOK_STATUS"
+    report_hook_status "Post-commit" "$POST_HOOK_STATUS"
 fi
