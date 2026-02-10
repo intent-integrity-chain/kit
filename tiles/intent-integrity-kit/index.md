@@ -28,6 +28,7 @@ Intent Integrity Kit (IIKit) preserves your intent from idea to implementation. 
 
 - **Intent Preservation**: Traces intent from idea through spec, test, and code
 - **Assertion Integrity**: SHA256 hashing prevents test tampering during implementation
+- **Git Hook Enforcement**: Pre-commit and post-commit hooks enforce assertion integrity agent-agnostically — works with Claude Code, Codex, Copilot, Gemini, and any other agent because git triggers them, not the agent
 - **Phase Separation**: Strict boundaries between governance, requirements, and implementation
 - **Constitution Enforcement**: All skills validate against project principles
 - **TDD Support**: Generate test specs before implementation with tamper detection
@@ -76,6 +77,14 @@ specs/NNN-feature-name/
 tessl install tessl-labs/intent-integrity-kit
 ```
 
+## What's New in v1.1.0
+
+- **Git pre-commit hook**: Blocks commits that contain tampered test-specs.md assertions. Checks staged content against stored SHA256 hashes in both context.json (committed version) and git notes.
+- **Git post-commit hook**: Automatically stores assertion hashes as git notes when test-specs.md is committed. Git notes live in the object database and are tamper-resistant.
+- **Defense-in-depth**: Dual-layer verification catches single tampers (context.json mismatch), working-tree forgery (reads committed context.json), and sneaky tampers (git note override). Multi-entry notes support projects with multiple features.
+- **Automatic installation**: Both hooks are installed by `/iikit-core init` with three modes — direct install, update existing IIKit hooks, or install alongside non-IIKit hooks.
+
 ## Learn More
 
+- [Intent Integrity Kit on GitHub](https://github.com/intent-integrity-chain/kit) - Source code, issues, and contributions
 - [Intent Integrity Chain](https://github.com/jbaruch/intent-integrity-chain) - The methodology behind IIKit
