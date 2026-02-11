@@ -20,17 +20,17 @@ jobs:
 
       - name: Make scripts executable
         run: |
-          chmod +x .claude/skills/iikit-core/scripts/bash/*.sh
-          chmod +x .claude/skills/iikit-core/tests/*.sh
+          chmod +x tiles/intent-integrity-kit/skills/iikit-core/scripts/bash/*.sh
+          chmod +x tests/*.sh
 
       - name: Run BATS unit tests
-        run: .claude/skills/iikit-core/tests/run-tests.sh
+        run: tests/run-tests.sh
 
       - name: Run source validation tests
-        run: .claude/skills/iikit-core/tests/run-source-tests.sh
+        run: tests/run-source-tests.sh
 
   publish:
-    name: Sync, Publish & Verify
+    name: Publish & Verify
     runs-on: ubuntu-latest
     needs: test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -68,13 +68,8 @@ jobs:
       - name: Make scripts executable
         if: steps.version.outputs.changed == 'true'
         run: |
-          chmod +x scripts/sync-to-tile.sh
-          chmod +x .claude/skills/iikit-core/scripts/bash/*.sh
-          chmod +x .claude/skills/iikit-core/tests/*.sh
-
-      - name: Sync source to tile
-        if: steps.version.outputs.changed == 'true'
-        run: ./scripts/sync-to-tile.sh
+          chmod +x tiles/intent-integrity-kit/skills/iikit-core/scripts/bash/*.sh
+          chmod +x tests/*.sh
 
       - name: Publish tile v${{ steps.version.outputs.new }}
         if: steps.version.outputs.changed == 'true'
@@ -84,7 +79,7 @@ jobs:
 
       - name: Verify tile (install from registry + e2e tests)
         if: steps.version.outputs.changed == 'true'
-        run: .claude/skills/iikit-core/tests/run-tile-tests.sh --from-registry
+        run: tests/run-tile-tests.sh --from-registry
 
       - name: Tag release
         if: steps.version.outputs.changed == 'true'
