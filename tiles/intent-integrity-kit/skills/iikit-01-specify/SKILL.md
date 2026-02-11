@@ -169,24 +169,24 @@ Before finalizing, scan the draft specification for implementation details that 
 
 **If violations found:**
 ```
-╭─────────────────────────────────────────────────────────────────╮
-│  PHASE SEPARATION VIOLATION DETECTED                            │
-├─────────────────────────────────────────────────────────────────┤
-│  Specification contains implementation details:                 │
-│  - [list each violation]                                        │
-│                                                                 │
-│  Implementation decisions belong in /iikit-03-plan.           │
-│  Specification defines WHAT users need, not HOW to build it.    │
-├─────────────────────────────────────────────────────────────────┤
-│  ACTION: Removing implementation details...                     │
-╰─────────────────────────────────────────────────────────────────╯
++---------------------------------------------------------------+
+|  PHASE SEPARATION VIOLATION DETECTED                          |
++---------------------------------------------------------------+
+|  Specification contains implementation details:               |
+|  - [list each violation]                                      |
+|                                                               |
+|  Implementation decisions belong in /iikit-03-plan.           |
+|  Specification defines WHAT users need, not HOW to build it.  |
++---------------------------------------------------------------+
+|  ACTION: Removing implementation details...                   |
++---------------------------------------------------------------+
 ```
 
 **Auto-fix:** Rewrite violating sections to be implementation-agnostic:
-- "Store in PostgreSQL database" → "Persist data reliably"
-- "Build REST API endpoints" → "Expose functionality to external systems"
-- "Use React for the frontend" → "Provide web-based user interface"
-- "Response time under 200ms" → "Users experience responsive interactions"
+- "Store in PostgreSQL database" -> "Persist data reliably"
+- "Build REST API endpoints" -> "Expose functionality to external systems"
+- "Use React for the frontend" -> "Provide web-based user interface"
+- "Response time under 200ms" -> "Users experience responsive interactions"
 
 Re-validate after fixes until no violations remain.
 
@@ -309,29 +309,29 @@ test -f "$SPEC_FILE" && echo "EXISTING_SPEC_FOUND"
 
 3. **Compare with new content**:
    ```
-   ╭─────────────────────────────────────────────────────╮
-   │  SEMANTIC DIFF: spec.md                             │
-   ├─────────────────────────────────────────────────────┤
-   │  User Stories:                                      │
-   │    + Added: US4 "Export Tasks"                      │
-   │    ~ Changed: US2 title updated                     │
-   │    - Removed: None                                  │
-   │                                                     │
-   │  Requirements:                                      │
-   │    + Added: FR-011, FR-012                          │
-   │    ~ Changed: FR-003 description modified           │
-   │    - Removed: FR-008 (verify intentional)           │
-   │                                                     │
-   │  Success Criteria:                                  │
-   │    + Added: SC-008                                  │
-   │    ~ Changed: None                                  │
-   │    - Removed: None                                  │
-   ├─────────────────────────────────────────────────────┤
-   │  DOWNSTREAM IMPACT:                                 │
-   │  ⚠ plan.md may need updates (new requirements)      │
-   │  ⚠ tasks.md may need regeneration                   │
-   │  ⚠ checklists may be invalidated                    │
-   ╰─────────────────────────────────────────────────────╯
+   +-----------------------------------------------------+
+   |  SEMANTIC DIFF: spec.md                             |
+   +-----------------------------------------------------+
+   |  User Stories:                                      |
+   |    + Added: US4 "Export Tasks"                      |
+   |    ~ Changed: US2 title updated                     |
+   |    - Removed: None                                  |
+   |                                                     |
+   |  Requirements:                                      |
+   |    + Added: FR-011, FR-012                          |
+   |    ~ Changed: FR-003 description modified           |
+   |    - Removed: FR-008 (verify intentional)           |
+   |                                                     |
+   |  Success Criteria:                                  |
+   |    + Added: SC-008                                  |
+   |    ~ Changed: None                                  |
+   |    - Removed: None                                  |
+   +-----------------------------------------------------+
+   |  DOWNSTREAM IMPACT:                                 |
+   |  ! plan.md may need updates (new requirements)      |
+   |  ! tasks.md may need regeneration                   |
+   |  ! checklists may be invalidated                    |
+   +-----------------------------------------------------+
    ```
 
 4. **Ask for confirmation**:
@@ -341,9 +341,9 @@ test -f "$SPEC_FILE" && echo "EXISTING_SPEC_FOUND"
 ### 3. Downstream Impact Warning
 
 If changes detected, warn about affected artifacts:
-- Removed requirements → tasks may reference deleted items
-- Changed requirements → plan may be inconsistent
-- New requirements → tasks.md needs regeneration
+- Removed requirements -> tasks may reference deleted items
+- Changed requirements -> plan may be inconsistent
+- New requirements -> tasks.md needs regeneration
 
 ## Next Steps
 

@@ -74,9 +74,9 @@ Before ANY action, load and internalize the project constitution:
 
 ### Cross-Artifact Consistency
 
-1. **Spec → Tasks**: Every FR-XXX should have corresponding task(s)
-2. **Plan → Tasks**: Tech stack should match task file paths
-3. **Constitution → Plan**: Verify no constitution violations
+1. **Spec -> Tasks**: Every FR-XXX should have corresponding task(s)
+2. **Plan -> Tasks**: Tech stack should match task file paths
+3. **Constitution -> Plan**: Verify no constitution violations
 
 ### Readiness Score
 
@@ -86,7 +86,7 @@ Report: Artifacts complete, Spec coverage %, Plan alignment, Constitution compli
 
 1. Read each checklist file in `FEATURE_DIR/checklists/`
 2. Count: Incomplete (`- [ ]`) vs Complete (`- [x]`)
-3. **PASS**: All checklists 100% → proceed
+3. **PASS**: All checklists 100% -> proceed
 4. **FAIL**: Ask user to proceed or halt
 
 ## Launch Kanban Dashboard (Optional)
@@ -130,7 +130,7 @@ If `tests/test-specs.md` exists, perform assertion integrity verification:
 
 **Step 1: Run comprehensive integrity check**
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh comprehensive-check "FEATURE_DIR/tests/test-specs.md" ".specify/context.json" "CONSTITUTION.md"
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh comprehensive-check "FEATURE_DIR/tests/test-specs.md" "FEATURE_DIR/context.json" "CONSTITUTION.md"
 ```
 
 **Step 2: Parse the JSON response**
@@ -183,7 +183,7 @@ Test assertions are locked. During implementation:
 - Assertion tampering will block future implementation runs
 ```
 
-If TDD is **mandatory** in constitution but test-specs.md missing → ERROR:
+If TDD is **mandatory** in constitution but test-specs.md missing -> ERROR:
 ```
 ERROR: TDD is MANDATORY per constitution but tests/test-specs.md not found.
 
@@ -242,9 +242,9 @@ pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powe
 
 The script returns JSON with status:
 - `PASS` - All tests ran and passed
-- `TESTS_FAILING` - Tests ran but some failed → fix code
+- `TESTS_FAILING` - Tests ran but some failed -> fix code
 - `INCOMPLETE` - Fewer tests ran than expected in test-specs.md
-- `NO_TESTS_RUN` - Could not detect test execution → tests weren't run
+- `NO_TESTS_RUN` - Could not detect test execution -> tests weren't run
 
 **Block on any status other than `PASS`.**
 
@@ -347,7 +347,7 @@ Before writing ANY file:
 
 **Batch completion report** (parallel mode):
 ```
-Batch N complete: [T005 ✓] [T006 ✓] [T007 ✗]
+Batch N complete: [T005 Y] [T006 Y] [T007 N]
   T005: Created user model (src/models/user.py)
   T006: Created auth middleware (src/middleware/auth.py)
   T007: FAILED — missing dependency, see error above

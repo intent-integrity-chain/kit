@@ -178,9 +178,9 @@ If checklist contains `[Gap]` items, guide the user through resolving them one b
 2. **For each gap**, present:
 
    ```markdown
-   ────────────────────────────────────────────────────────────────
+   ----------------------------------------------------------------
    Gap 1 of N: [CHK00X]
-   ────────────────────────────────────────────────────────────────
+   ----------------------------------------------------------------
 
    **Missing Requirement:**
    [Quote the checklist item]

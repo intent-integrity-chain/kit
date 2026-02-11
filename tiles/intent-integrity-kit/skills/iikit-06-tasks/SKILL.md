@@ -75,17 +75,17 @@ Before ANY action, load and internalize the project constitution:
 ### Quality Report
 
 ```
-╭───────────────────────────────────────────────╮
-│  PLAN READINESS REPORT                        │
-├───────────────────────────────────────────────┤
-│  Tech Stack:       [Defined/Missing]    [✓/✗] │
-│  User Stories:     X found with criteria      │
-│  Shared Entities:  X (→ Foundational phase)   │
-│  API Contracts:    X endpoints defined        │
-│  Research Items:   X decisions documented     │
-├───────────────────────────────────────────────┤
-│  TASK GENERATION: [READY/NEEDS WORK]          │
-╰───────────────────────────────────────────────╯
++-----------------------------------------------+
+|  PLAN READINESS REPORT                        |
++-----------------------------------------------+
+|  Tech Stack:       [Defined/Missing]    [Y/N] |
+|  User Stories:     X found with criteria      |
+|  Shared Entities:  X (-> Foundational phase)  |
+|  API Contracts:    X endpoints defined        |
+|  Research Items:   X decisions documented     |
++-----------------------------------------------+
+|  TASK GENERATION: [READY/NEEDS WORK]          |
++-----------------------------------------------+
 ```
 
 ## Execution Flow
@@ -254,8 +254,8 @@ Use template structure with:
    **Algorithm (DFS-based cycle detection)**:
    ```
    1. Build adjacency list from task dependencies:
-      - For each task with "blockedBy: [T00X, T00Y]", add edges T00X → task, T00Y → task
-      - For each task with "blocks: [T00X]", add edge task → T00X
+      - For each task with "blockedBy: [T00X, T00Y]", add edges T00X -> task, T00Y -> task
+      - For each task with "blocks: [T00X]", add edge task -> T00X
 
    2. Initialize:
       - visited = {} (empty set)
@@ -290,7 +290,7 @@ Use template structure with:
    ```
    ERROR: Circular dependency detected.
 
-   CIRCULAR DEPENDENCY: T005 → T012 → T008 → T005
+   CIRCULAR DEPENDENCY: T005 -> T012 -> T008 -> T005
 
    Tasks involved:
    - T005: [description]
@@ -317,7 +317,7 @@ Use template structure with:
 
 3. **Critical Path Analysis**:
    - Identify longest dependency chain
-   - Report: "Critical path: T001 → T003 → T012 → T018 (4 tasks)"
+   - Report: "Critical path: T001 -> T003 -> T012 -> T018 (4 tasks)"
    - Suggest parallelization opportunities
    - **List parallel batches** per phase so the implement skill can dispatch them directly:
      ```
@@ -353,19 +353,19 @@ Use template structure with:
 ### Dependency Report
 
 ```
-╭───────────────────────────────────────────────╮
-│  DEPENDENCY GRAPH ANALYSIS                    │
-├───────────────────────────────────────────────┤
-│  Total Tasks:      X                          │
-│  Circular Deps:    [None/X found]       [✓/✗] │
-│  Orphan Tasks:     [None/X found]       [✓/!] │
-│  Critical Path:    X tasks deep               │
-│  Phase Boundaries: [Valid/X violations] [✓/✗] │
-│  Story Independence: [Yes/No]           [✓/✗] │
-├───────────────────────────────────────────────┤
-│  Parallel Opportunities: X task groups        │
-│  Estimated Parallelism: X% speedup            │
-╰───────────────────────────────────────────────╯
++-----------------------------------------------+
+|  DEPENDENCY GRAPH ANALYSIS                    |
++-----------------------------------------------+
+|  Total Tasks:      X                          |
+|  Circular Deps:    [None/X found]     [Y/N]   |
+|  Orphan Tasks:     [None/X found]     [Y/!]   |
+|  Critical Path:    X tasks deep               |
+|  Phase Boundaries: [Valid/X violations] [Y/N] |
+|  Story Independence: [Yes/No]           [Y/N] |
++-----------------------------------------------+
+|  Parallel Opportunities: X task groups        |
+|  Estimated Parallelism: X% speedup            |
++-----------------------------------------------+
 ```
 
 ## Report
@@ -400,24 +400,24 @@ If tasks.md exists with task items:
 
 3. **Compare with new generation**:
    ```
-   ╭─────────────────────────────────────────────────────╮
-   │  SEMANTIC DIFF: tasks.md                            │
-   ├─────────────────────────────────────────────────────┤
-   │  Tasks:                                             │
-   │    + Added: T025-T030 (new user story US4)          │
-   │    ~ Renamed: T012 description updated              │
-   │    - Removed: T008 (was for deleted FR-008)         │
-   │    ✓ Preserved: 15 completed tasks kept             │
-   │                                                     │
-   │  Phases:                                            │
-   │    + Added: Phase 5 (User Story 4)                  │
-   │    ~ Reordered: None                                │
-   ├─────────────────────────────────────────────────────┤
-   │  COMPLETION STATUS:                                 │
-   │    Previously completed: 15 tasks                   │
-   │    Mapped to new tasks: 14 tasks                    │
-   │    Lost (task removed): 1 task                      │
-   ╰─────────────────────────────────────────────────────╯
+   +-----------------------------------------------------+
+   |  SEMANTIC DIFF: tasks.md                            |
+   +-----------------------------------------------------+
+   |  Tasks:                                             |
+   |    + Added: T025-T030 (new user story US4)          |
+   |    ~ Renamed: T012 description updated              |
+   |    - Removed: T008 (was for deleted FR-008)         |
+   |    [Y] Preserved: 15 completed tasks kept           |
+   |                                                     |
+   |  Phases:                                            |
+   |    + Added: Phase 5 (User Story 4)                  |
+   |    ~ Reordered: None                                |
+   +-----------------------------------------------------+
+   |  COMPLETION STATUS:                                 |
+   |    Previously completed: 15 tasks                   |
+   |    Mapped to new tasks: 14 tasks                    |
+   |    Lost (task removed): 1 task                      |
+   +-----------------------------------------------------+
    ```
 
 ### 2. Smart Merge Strategy

@@ -185,8 +185,8 @@ CONTRACTS_DIR='$feature_dir/contracts'
 EOF
 }
 
-check_file() { [[ -f "$1" ]] && echo "  ✓ $2" || echo "  ✗ $2"; }
-check_dir() { [[ -d "$1" && -n $(ls -A "$1" 2>/dev/null) ]] && echo "  ✓ $2" || echo "  ✗ $2"; }
+check_file() { [[ -f "$1" ]] && echo "  [Y] $2" || echo "  [N] $2"; }
+check_dir() { [[ -d "$1" && -n $(ls -A "$1" 2>/dev/null) ]] && echo "  [Y] $2" || echo "  [N] $2"; }
 
 # =============================================================================
 # VALIDATION FUNCTIONS

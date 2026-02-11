@@ -17,7 +17,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Operating Constraints
 
-**STRICTLY READ-ONLY**: Do **not** modify any files. Output a structured analysis report. Offer an optional remediation plan (user must explicitly approve before any editing).
+**READ-ONLY** (with one exception): Do **not** modify spec, plan, or task files. Output a structured analysis report to the console AND write it to `FEATURE_DIR/analysis.md`. This file signals that analysis has been performed and provides data for the dashboard's Analyze view. Offer an optional remediation plan (user must explicitly approve before any editing).
 
 **Constitution Authority**: The project constitution (`CONSTITUTION.md`) is **non-negotiable** within this analysis scope. Constitution conflicts are automatically CRITICAL and require adjustment of the spec, plan, or tasks--not dilution, reinterpretation, or silent ignoring of the principle.
 
@@ -171,7 +171,7 @@ PHASE SEPARATION VIOLATIONS:
 
 ### 5. Produce Analysis Report
 
-Output a Markdown report (no file writes):
+Output a Markdown report to the console AND write the same content to `FEATURE_DIR/analysis.md`:
 
 ```markdown
 ## Specification Analysis Report

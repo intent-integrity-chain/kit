@@ -94,9 +94,9 @@ test -f .tessl/RULES.md && echo "RULES_ACTIVE" || echo "NO_RULES"
 2. Skills are cataloged in research.md "Available Skills" section
 
 **Examples of skill tile usage**:
-- Database migration task → invoke migration skill if installed
-- API endpoint scaffolding → invoke API scaffold skill if installed
-- Test generation → invoke test generation skill if installed
+- Database migration task -> invoke migration skill if installed
+- API endpoint scaffolding -> invoke API scaffold skill if installed
+- Test generation -> invoke test generation skill if installed
 
 **Pattern for invoking a skill tile**:
 ```
@@ -122,16 +122,16 @@ Skill(skill="<skill-name>", args="<context from current task>")
 If Tessl was available and used during implementation, generate a usage report:
 
 ```
-╭─────────────────────────────────────────────╮
-│  TESSL TILE USAGE REPORT                    │
-├─────────────────────────────────────────────┤
-│  Documentation queries:  X                  │
-│    - <library>: <topics queried>            │
-│                                             │
-│  Skills invoked:         X                  │
-│    - /<skill-name> (task IDs)               │
-│                                             │
-│  Rules applied:          [Yes/No]           │
-│  Tiles used:             X of Y installed   │
-╰─────────────────────────────────────────────╯
++---------------------------------------------+
+|  TESSL TILE USAGE REPORT                    |
++---------------------------------------------+
+|  Documentation queries:  X                  |
+|    - <library>: <topics queried>            |
+|                                             |
+|  Skills invoked:         X                  |
+|    - /<skill-name> (task IDs)               |
+|                                             |
+|  Rules applied:          [Yes/No]           |
+|  Tiles used:             X of Y installed   |
++---------------------------------------------+
 ```

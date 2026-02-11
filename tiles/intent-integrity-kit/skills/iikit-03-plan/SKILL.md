@@ -139,19 +139,19 @@ Read the spec.md and validate:
 
 Calculate and display:
 ```
-╭─────────────────────────────────────────────╮
-│  SPEC QUALITY REPORT                        │
-├─────────────────────────────────────────────┤
-│  Requirements:     X found (min: 3)    [✓/✗]│
-│  Success Criteria: X found (min: 3)    [✓/✗]│
-│  User Stories:     X found (min: 1)    [✓/✗]│
-│  Measurable:       X criteria have metrics  │
-│  Clarifications:   X unresolved             │
-│  Coverage:         X% requirements linked   │
-├─────────────────────────────────────────────┤
-│  OVERALL SCORE: X/10                        │
-│  STATUS: [READY/NEEDS WORK]                 │
-╰─────────────────────────────────────────────╯
++---------------------------------------------+
+|  SPEC QUALITY REPORT                        |
++---------------------------------------------+
+|  Requirements:     X found (min: 3)    [Y/N]|
+|  Success Criteria: X found (min: 3)    [Y/N]|
+|  User Stories:     X found (min: 1)    [Y/N]|
+|  Measurable:       X criteria have metrics  |
+|  Clarifications:   X unresolved             |
+|  Coverage:         X% requirements linked   |
++---------------------------------------------+
+|  OVERALL SCORE: X/10                        |
+|  STATUS: [READY/NEEDS WORK]                 |
++---------------------------------------------+
 ```
 
 **If score < 6**: Recommend running `/iikit-02-clarify` first
@@ -372,23 +372,23 @@ Before finalizing, scan the draft plan for governance content that belongs in `/
 
 **If violations found:**
 ```
-╭─────────────────────────────────────────────────────────────────╮
-│  PHASE SEPARATION VIOLATION DETECTED                            │
-├─────────────────────────────────────────────────────────────────┤
-│  Plan contains governance content:                              │
-│  - [list each violation]                                        │
-│                                                                 │
-│  Governance principles belong in /iikit-00-constitution.      │
-│  Plan defines HOW to implement THIS feature, not project laws.  │
-├─────────────────────────────────────────────────────────────────┤
-│  ACTION: Moving governance content to constitution reference... │
-╰─────────────────────────────────────────────────────────────────╯
++---------------------------------------------------------------+
+|  PHASE SEPARATION VIOLATION DETECTED                          |
++---------------------------------------------------------------+
+|  Plan contains governance content:                            |
+|  - [list each violation]                                      |
+|                                                               |
+|  Governance principles belong in /iikit-00-constitution.      |
+|  Plan defines HOW to implement THIS feature, not project laws.|
++---------------------------------------------------------------+
+|  ACTION: Moving governance content to constitution reference..|
++---------------------------------------------------------------+
 ```
 
 **Auto-fix:** Replace governance statements with constitution references:
-- "Always use TDD" → "Per constitution: [reference TDD principle]"
-- "Code must have 100% coverage" → "Coverage target per constitution"
-- "All PRs require review" → (remove - this is workflow, not implementation)
+- "Always use TDD" -> "Per constitution: [reference TDD principle]"
+- "Code must have 100% coverage" -> "Coverage target per constitution"
+- "All PRs require review" -> (remove - this is workflow, not implementation)
 
 Re-validate after fixes until no violations remain.
 
@@ -442,29 +442,29 @@ If plan.md exists and has Technical Context filled in:
 
 2. **Compare with new content**:
    ```
-   ╭─────────────────────────────────────────────────────╮
-   │  SEMANTIC DIFF: plan.md                             │
-   ├─────────────────────────────────────────────────────┤
-   │  Tech Stack:                                        │
-   │    ~ Language: Python 3.11 → Python 3.12            │
-   │    + Added: Redis for caching                       │
-   │    - Removed: None                                  │
-   │                                                     │
-   │  Architecture:                                      │
-   │    ~ Changed: Switched from REST to GraphQL         │
-   │    + Added: Event sourcing pattern                  │
-   ├─────────────────────────────────────────────────────┤
-   │  DOWNSTREAM IMPACT:                                 │
-   │  ⚠ tasks.md MUST be regenerated (arch change)       │
-   │  ⚠ contracts/ need updates (API change)             │
-   │  ⚠ data-model.md may need updates                   │
-   ╰─────────────────────────────────────────────────────╯
+   +-----------------------------------------------------+
+   |  SEMANTIC DIFF: plan.md                             |
+   +-----------------------------------------------------+
+   |  Tech Stack:                                        |
+   |    ~ Language: Python 3.11 -> Python 3.12           |
+   |    + Added: Redis for caching                       |
+   |    - Removed: None                                  |
+   |                                                     |
+   |  Architecture:                                      |
+   |    ~ Changed: Switched from REST to GraphQL         |
+   |    + Added: Event sourcing pattern                  |
+   +-----------------------------------------------------+
+   |  DOWNSTREAM IMPACT:                                 |
+   |  ! tasks.md MUST be regenerated (arch change)       |
+   |  ! contracts/ need updates (API change)             |
+   |  ! data-model.md may need updates                   |
+   +-----------------------------------------------------+
    ```
 
 3. **Flag breaking changes**:
-   - Language change → ALL tasks affected
-   - Framework change → Most tasks affected
-   - Storage change → Data layer tasks affected
+   - Language change -> ALL tasks affected
+   - Framework change -> Most tasks affected
+   - Storage change -> Data layer tasks affected
 
 ### 2. Automatic Downstream Invalidation
 

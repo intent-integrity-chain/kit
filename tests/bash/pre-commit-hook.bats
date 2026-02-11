@@ -69,11 +69,11 @@ teardown() {
 EOF
 
     # Store the hash in context.json using testify-tdd.sh
-    mkdir -p "$TEST_DIR/.specify"
-    "$TESTIFY_SCRIPT" store-hash "$TEST_DIR/specs/001-feature/tests/test-specs.md" "$TEST_DIR/.specify/context.json" > /dev/null
+
+    "$TESTIFY_SCRIPT" store-hash "$TEST_DIR/specs/001-feature/tests/test-specs.md" "$TEST_DIR/specs/001-feature/context.json" > /dev/null
 
     # Stage the test-specs.md
-    git -C "$TEST_DIR" add specs/001-feature/tests/test-specs.md .specify/context.json
+    git -C "$TEST_DIR" add specs/001-feature/tests/test-specs.md specs/001-feature/context.json
     git -C "$TEST_DIR" commit -m "add test specs" >/dev/null 2>&1
 
     # Now re-stage the same unchanged file (via a no-op edit)
@@ -99,8 +99,8 @@ EOF
 EOF
 
     # Store the hash
-    mkdir -p "$TEST_DIR/.specify"
-    "$TESTIFY_SCRIPT" store-hash "$TEST_DIR/specs/001-feature/tests/test-specs.md" "$TEST_DIR/.specify/context.json" > /dev/null
+
+    "$TESTIFY_SCRIPT" store-hash "$TEST_DIR/specs/001-feature/tests/test-specs.md" "$TEST_DIR/specs/001-feature/context.json" > /dev/null
 
     # Commit the original
     git -C "$TEST_DIR" add -A >/dev/null 2>&1
@@ -135,7 +135,7 @@ EOF
 **Then**: a result
 EOF
 
-    # No .specify/context.json exists
+    # No specs/001-feature/context.json exists
     git -C "$TEST_DIR" add specs/001-feature/tests/test-specs.md
 
     cd "$TEST_DIR"
@@ -186,8 +186,8 @@ EOF
 EOF
 
     # Store the hash
-    mkdir -p "$TEST_DIR/.specify"
-    "$TESTIFY_SCRIPT" store-hash "$TEST_DIR/specs/001-feature/tests/test-specs.md" "$TEST_DIR/.specify/context.json" > /dev/null
+
+    "$TESTIFY_SCRIPT" store-hash "$TEST_DIR/specs/001-feature/tests/test-specs.md" "$TEST_DIR/specs/001-feature/context.json" > /dev/null
 
     # Commit the original
     git -C "$TEST_DIR" add -A >/dev/null 2>&1

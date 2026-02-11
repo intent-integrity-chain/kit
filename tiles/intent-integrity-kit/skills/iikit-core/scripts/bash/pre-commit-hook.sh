@@ -67,10 +67,8 @@ if [[ -f "$CONSTITUTION_FILE" ]]; then
 fi
 
 # ============================================================================
-# CONTEXT FILE — read stored hashes
+# CONTEXT FILE — read stored hashes (per-feature, derived from test-specs.md path)
 # ============================================================================
-
-CONTEXT_FILE="$REPO_ROOT/.specify/context.json"
 
 # ============================================================================
 # SLOW PATH — verify each staged test-specs.md
@@ -103,10 +101,17 @@ while IFS= read -r staged_path; do
         continue
     fi
 
+    # Derive per-feature context.json path from the test-specs.md path
+    # test-specs.md is at specs/NNN-feature/tests/test-specs.md
+    # context.json is at specs/NNN-feature/context.json
+    FEATURE_DIR=$(dirname "$(dirname "$staged_path")")
+    CONTEXT_FILE="$REPO_ROOT/$FEATURE_DIR/context.json"
+    CONTEXT_REL_PATH="$FEATURE_DIR/context.json"
+
     # Check if context.json is ALSO being staged in this commit
     # (indicates testify is committing its output — test-specs.md + context.json together)
     CONTEXT_STAGED=false
-    if echo "$STAGED_FILES_ALL" | grep -q '\.specify/context\.json$'; then
+    if echo "$STAGED_FILES_ALL" | grep -qF "$CONTEXT_REL_PATH"; then
         CONTEXT_STAGED=true
     fi
 
@@ -121,7 +126,7 @@ while IFS= read -r staged_path; do
         CONTEXT_JSON=$(cat "$CONTEXT_FILE" 2>/dev/null)
     else
         # Not staged: read committed version from HEAD (tamper-resistant)
-        CONTEXT_JSON=$(git show HEAD:.specify/context.json 2>/dev/null) || true
+        CONTEXT_JSON=$(git show "HEAD:$CONTEXT_REL_PATH" 2>/dev/null) || true
     fi
 
     if [[ -n "$CONTEXT_JSON" ]] && echo "$CONTEXT_JSON" | jq empty 2>/dev/null; then
@@ -188,7 +193,7 @@ while IFS= read -r staged_path; do
     # where agent modifies context.json in working tree but only stages test-specs.md).
     HASH_STATUS="missing"
     if [[ "$CONTEXT_STAGED" == true ]] && [[ "$CONTEXT_STATUS" == "valid" ]]; then
-        # Testify commit: context.json staged with matching hash → trust it
+        # Testify commit: context.json staged with matching hash -> trust it
         HASH_STATUS="valid"
     elif [[ "$NOTE_STATUS" == "invalid" ]] || [[ "$CONTEXT_STATUS" == "invalid" ]]; then
         HASH_STATUS="invalid"
@@ -226,9 +231,9 @@ done <<< "$STAGED_TEST_SPECS"
 
 if [[ "$BLOCKED" == true ]]; then
     echo "" >&2
-    echo "╭─────────────────────────────────────────────────────────────╮" >&2
-    echo "│  IIKIT PRE-COMMIT: ASSERTION INTEGRITY CHECK FAILED        │" >&2
-    echo "╰─────────────────────────────────────────────────────────────╯" >&2
+    echo "+-------------------------------------------------------------+" >&2
+    echo "|  IIKIT PRE-COMMIT: ASSERTION INTEGRITY CHECK FAILED        |" >&2
+    echo "+-------------------------------------------------------------+" >&2
     echo "" >&2
     for msg in "${BLOCK_MESSAGES[@]}"; do
         echo "[iikit] $msg" >&2

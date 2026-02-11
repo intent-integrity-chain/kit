@@ -101,24 +101,24 @@ You **MUST** consider the user input before proceeding (if not empty).
 
    **If violations found:**
    ```
-   ╭─────────────────────────────────────────────────────────────────╮
-   │  PHASE SEPARATION VIOLATION DETECTED                            │
-   ├─────────────────────────────────────────────────────────────────┤
-   │  Constitution contains technology-specific content:             │
-   │  - [list each violation]                                        │
-   │                                                                 │
-   │  Technology decisions belong in /iikit-03-plan, not here.     │
-   │  Constitution must be technology-agnostic to survive tech       │
-   │  stack changes.                                                 │
-   ├─────────────────────────────────────────────────────────────────┤
-   │  ACTION: Removing technology references and generalizing...     │
-   ╰─────────────────────────────────────────────────────────────────╯
+   +---------------------------------------------------------------+
+   |  PHASE SEPARATION VIOLATION DETECTED                          |
+   +---------------------------------------------------------------+
+   |  Constitution contains technology-specific content:           |
+   |  - [list each violation]                                      |
+   |                                                               |
+   |  Technology decisions belong in /iikit-03-plan, not here.     |
+   |  Constitution must be technology-agnostic to survive tech     |
+   |  stack changes.                                               |
+   +---------------------------------------------------------------+
+   |  ACTION: Removing technology references and generalizing...   |
+   +---------------------------------------------------------------+
    ```
 
    **Auto-fix:** Rewrite the violating sections to be technology-agnostic:
-   - "Use Python" → "Use appropriate language for the domain"
-   - "Store in PostgreSQL" → "Use persistent storage"
-   - "Deploy with Docker" → "Use containerization when appropriate"
+   - "Use Python" -> "Use appropriate language for the domain"
+   - "Store in PostgreSQL" -> "Use persistent storage"
+   - "Deploy with Docker" -> "Use containerization when appropriate"
 
    Re-validate after fixes until no violations remain.
 
