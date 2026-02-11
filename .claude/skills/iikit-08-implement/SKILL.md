@@ -89,6 +89,34 @@ Report: Artifacts complete, Spec coverage %, Plan alignment, Constitution compli
 3. **PASS**: All checklists 100% → proceed
 4. **FAIL**: Ask user to proceed or halt
 
+## Launch Kanban Dashboard (Optional)
+
+Before starting implementation, launch the live kanban dashboard so the user can watch progress in their browser.
+
+**Unix/macOS/Linux:**
+```bash
+if command -v npx >/dev/null 2>&1; then
+  npx iikit-kanban . &
+  echo "[iikit] Kanban dashboard launching at http://localhost:3000"
+else
+  echo "[iikit] Kanban dashboard unavailable (npx not found). Install Node.js 18+ for live progress visualization."
+fi
+```
+
+**Windows (PowerShell):**
+```powershell
+if (Get-Command npx -ErrorAction SilentlyContinue) {
+  Start-Process npx -ArgumentList "iikit-kanban", "." -NoNewWindow
+  Write-Host "[iikit] Kanban dashboard launching at http://localhost:3000"
+} else {
+  Write-Host "[iikit] Kanban dashboard unavailable (npx not found). Install Node.js 18+ for live progress visualization."
+}
+```
+
+The dashboard shows user stories as kanban cards (Todo / In Progress / Done) with live-updating task checkboxes. As tasks are marked `[x]` in tasks.md, the board updates in the browser automatically.
+
+If npx is not available, implementation continues normally without the visual dashboard.
+
 ## Execution Flow
 
 ### 1. Load Implementation Context
