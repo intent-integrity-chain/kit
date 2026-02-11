@@ -2,7 +2,14 @@
 
 **Closing the intent-to-code chasm**
 
+[GitHub](https://github.com/intent-integrity-chain/kit) | [npm: iikit-kanban](https://www.npmjs.com/package/iikit-kanban)
+
 A complete specification-driven development workflow for AI coding assistants with cryptographic verification.
+
+## What's New in v1.2.0
+
+- **Live kanban dashboard**: The implement skill (`/iikit-08-implement`) now automatically launches a browser-based kanban board via `npx iikit-kanban`. Watch user stories move through Todo / In Progress / Done columns as the AI agent checks off tasks in real time. Dark/light theme, collapsible task lists, integrity badges. Gracefully skips if Node.js is not available.
+- **Git hooks** (v1.1.0): Pre-commit blocks tampered assertions. Post-commit stores hashes as tamper-resistant git notes. Defense-in-depth with dual-layer verification.
 
 ## Overview
 
@@ -77,18 +84,8 @@ specs/NNN-feature-name/
 tessl install tessl-labs/intent-integrity-kit
 ```
 
-## What's New in v1.2.0
-
-- **Live kanban dashboard**: The implement skill (`/iikit-08-implement`) now automatically launches a browser-based kanban board via `npx iikit-kanban`. Watch user stories move through Todo / In Progress / Done columns as the AI agent checks off tasks in real time. Dark/light theme, collapsible task lists, integrity badges. Gracefully skips if Node.js is not available.
-
-## What's New in v1.1.0
-
-- **Git pre-commit hook**: Blocks commits that contain tampered test-specs.md assertions. Checks staged content against stored SHA256 hashes in both context.json (committed version) and git notes.
-- **Git post-commit hook**: Automatically stores assertion hashes as git notes when test-specs.md is committed. Git notes live in the object database and are tamper-resistant.
-- **Defense-in-depth**: Dual-layer verification catches single tampers (context.json mismatch), working-tree forgery (reads committed context.json), and sneaky tampers (git note override). Multi-entry notes support projects with multiple features.
-- **Automatic installation**: Both hooks are installed by `/iikit-core init` with three modes — direct install, update existing IIKit hooks, or install alongside non-IIKit hooks.
-
 ## Learn More
 
 - [Intent Integrity Kit on GitHub](https://github.com/intent-integrity-chain/kit) - Source code, issues, and contributions
+- [IIKit Kanban Board](https://github.com/intent-integrity-chain/iikit-kanban) - Live dashboard source code
 - [Intent Integrity Chain](https://github.com/jbaruch/intent-integrity-chain) - The methodology behind IIKit
