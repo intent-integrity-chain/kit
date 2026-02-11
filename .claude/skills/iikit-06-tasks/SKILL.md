@@ -75,17 +75,17 @@ Before ANY action, load and internalize the project constitution:
 ### Quality Report
 
 ```
-╭─────────────────────────────────────────────╮
-│  PLAN READINESS REPORT                      │
-├─────────────────────────────────────────────┤
-│  Tech Stack:       [Defined/Missing]   [✓/✗]│
-│  User Stories:     X found with criteria    │
-│  Shared Entities:  X (→ Foundational phase) │
-│  API Contracts:    X endpoints defined      │
-│  Research Items:   X decisions documented   │
-├─────────────────────────────────────────────┤
-│  TASK GENERATION: [READY/NEEDS WORK]        │
-╰─────────────────────────────────────────────╯
+╭───────────────────────────────────────────────╮
+│  PLAN READINESS REPORT                        │
+├───────────────────────────────────────────────┤
+│  Tech Stack:       [Defined/Missing]    [✓/✗] │
+│  User Stories:     X found with criteria      │
+│  Shared Entities:  X (→ Foundational phase)   │
+│  API Contracts:    X endpoints defined        │
+│  Research Items:   X decisions documented     │
+├───────────────────────────────────────────────┤
+│  TASK GENERATION: [READY/NEEDS WORK]          │
+╰───────────────────────────────────────────────╯
 ```
 
 ## Execution Flow
@@ -347,19 +347,19 @@ Use template structure with:
 ### Dependency Report
 
 ```
-╭─────────────────────────────────────────────╮
-│  DEPENDENCY GRAPH ANALYSIS                  │
-├─────────────────────────────────────────────┤
-│  Total Tasks:      X                        │
-│  Circular Deps:    [None/X found]      [✓/✗]│
-│  Orphan Tasks:     [None/X found]      [✓/!]│
-│  Critical Path:    X tasks deep             │
-│  Phase Boundaries: [Valid/X violations][✓/✗]│
-│  Story Independence: [Yes/No]          [✓/✗]│
-├─────────────────────────────────────────────┤
-│  Parallel Opportunities: X task groups      │
-│  Estimated Parallelism: X% speedup          │
-╰─────────────────────────────────────────────╯
+╭───────────────────────────────────────────────╮
+│  DEPENDENCY GRAPH ANALYSIS                    │
+├───────────────────────────────────────────────┤
+│  Total Tasks:      X                          │
+│  Circular Deps:    [None/X found]       [✓/✗] │
+│  Orphan Tasks:     [None/X found]       [✓/!] │
+│  Critical Path:    X tasks deep               │
+│  Phase Boundaries: [Valid/X violations] [✓/✗] │
+│  Story Independence: [Yes/No]           [✓/✗] │
+├───────────────────────────────────────────────┤
+│  Parallel Opportunities: X task groups        │
+│  Estimated Parallelism: X% speedup            │
+╰───────────────────────────────────────────────╯
 ```
 
 ## Report
