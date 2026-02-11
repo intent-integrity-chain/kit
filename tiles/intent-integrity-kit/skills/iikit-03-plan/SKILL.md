@@ -139,19 +139,19 @@ Read the spec.md and validate:
 
 Calculate and display:
 ```
-+---------------------------------------------+
-|  SPEC QUALITY REPORT                        |
-+---------------------------------------------+
-|  Requirements:     X found (min: 3)    [Y/N]|
-|  Success Criteria: X found (min: 3)    [Y/N]|
-|  User Stories:     X found (min: 1)    [Y/N]|
-|  Measurable:       X criteria have metrics  |
-|  Clarifications:   X unresolved             |
-|  Coverage:         X% requirements linked   |
-+---------------------------------------------+
-|  OVERALL SCORE: X/10                        |
-|  STATUS: [READY/NEEDS WORK]                 |
-+---------------------------------------------+
++----------------------------------------------------+
+|  SPEC QUALITY REPORT                               |
++----------------------------------------------------+
+|  Requirements:     16 found (min: 3)         [Y/N] |
+|  Success Criteria: 8 found (min: 3)          [Y/N] |
+|  User Stories:     5 found (min: 1)          [Y/N] |
+|  Measurable:       6 criteria have metrics         |
+|  Clarifications:   0 unresolved                    |
+|  Coverage:         100% requirements linked        |
++----------------------------------------------------+
+|  OVERALL SCORE: 10/10                              |
+|  STATUS: [READY/NEEDS WORK]                        |
++----------------------------------------------------+
 ```
 
 **If score < 6**: Recommend running `/iikit-02-clarify` first

@@ -188,7 +188,7 @@ Display the complete workflow reference.
 |  /iikit-04-checklist   Generate quality checklists                  |
 |                                                                     |
 |  Phase 3: Testing (Optional unless constitutionally required)       |
-|  ---------------------------------------------------------         |
+|  ---------------------------------------------------------          |
 |  /iikit-05-testify     Generate test specifications (TDD)           |
 |                                                                     |
 |  Phase 4: Task Breakdown                                            |
@@ -199,7 +199,7 @@ Display the complete workflow reference.
 |  Phase 5: Implementation                                            |
 |  -----------------------                                            |
 |  /iikit-08-implement   Execute implementation                       |
-|  /iikit-09-taskstoissues Export tasks to GitHub Issues               |
+|  /iikit-09-taskstoissues Export tasks to GitHub Issues              |
 |                                                                     |
 |  Utility Commands                                                   |
 |  ----------------                                                   |
