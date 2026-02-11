@@ -267,17 +267,70 @@ Create/verify ignore files based on tech stack. See [ignore-patterns.md](referen
 
 ### 5. Parse and Execute Tasks
 
-Extract from tasks.md:
-- Task phases, dependencies, parallel markers [P]
-- Execute phase-by-phase, respecting dependencies
-- Parallel tasks [P] can run together
+#### 5.1 Task Extraction
 
-**Execution rules**:
+Parse tasks.md and extract for each task:
+- **Phase** membership (Phase 1, 2, 3+, Final)
+- **Completion status** — `[x]` (complete) or `[ ]` (pending). Tasks already marked `[x]` are never re-executed.
+- **Dependencies** (blockedBy / blocks relationships)
+- **[P] marker** — task is safe to run concurrently with other `[P]` tasks in the same phase
+- **[USn] label** — user story assignment (enables cross-story parallelism)
+
+Build an in-memory task graph before executing anything. This handles both fresh starts and cold resumes from partially-completed tasks.md.
+
+#### 5.2 Execution Strategy Selection
+
+Determine whether you can dispatch multiple subagents concurrently:
+
+- **If you can** (e.g., Claude Code `Task` tool, OpenCode parallel dispatch): use **Parallel mode**
+- **If you cannot** (e.g., Gemini sequential sub-agents, Codex CLI, or no subagent support): use **Sequential mode**
+
+Report the selected mode before starting:
+```
+EXECUTION MODE: [Parallel | Sequential]
+Phases: X | Total tasks: Y | Completed: C | Remaining: R | Parallel batches: Z
+```
+
+See [parallel-execution.md](references/parallel-execution.md) for the full orchestrator/worker protocol.
+
+#### 5.3 Phase-by-Phase Execution
+
+For each phase in order:
+
+1. **Collect eligible tasks** — tasks whose dependencies are all satisfied
+2. **Build parallel batches** from eligible `[P]` tasks that share no mutual dependencies
+3. **Dispatch the batch**:
+   - *Parallel mode*: Launch one subagent per task in the batch concurrently. Each subagent receives the task description, relevant spec/plan context, and constitutional rules. Only the orchestrator (main agent) writes to tasks.md.
+   - *Sequential mode*: Execute tasks in the batch one at a time
+4. **Collect results** — wait for all tasks in the batch to complete
+5. **Checkpoint** — mark completed tasks `[x]` in tasks.md (single write per batch)
+6. **Repeat** until phase is done, then advance to the next phase
+
+**Cross-story parallelism** (after Phase 2): If independent user stories have no shared dependencies, their phases can execute as parallel workstreams. Check that no two workstreams modify the same files before dispatching.
+
+#### 5.4 Execution Rules
+
 - Query Tessl tiles before implementing library code
 - Tests before code if TDD
-- **Run tests after writing them** - verify red/green cycle
+- **Run tests after writing them** — verify red/green cycle
 - **Never mark test tasks complete without execution output**
 - Mark completed tasks as `[x]` only after verification
+- **Only the orchestrator updates tasks.md** — subagents report results back, they do not write to tasks.md directly
+
+#### 5.5 Parallel Failure Handling
+
+When one or more tasks fail during parallel execution:
+1. **Let in-flight siblings finish** — do not cancel running tasks
+2. **Collect all results** — record which tasks succeeded and which failed
+3. **Mark successes** `[x]` in tasks.md
+4. **Report each failure** with full error details
+5. **Halt the phase** — do not start new batches until all failures are resolved
+
+**Cross-story workstream failure**: If a workstream fails while other workstreams are running, let the other workstreams finish. Mark their completed tasks `[x]`. Then halt before the Final (Polish) phase and report the failed workstream.
+
+**Constitutional violation in a worker**: The worker STOPs itself per §6 (does not write the violating file) and reports the violation to the orchestrator. The orchestrator treats this as a task failure for batch-management purposes: in-flight siblings are allowed to finish, successes are marked `[x]`, and the phase is halted. The batch completion report MUST label the violation distinctly (e.g., `T002: CONSTITUTIONAL VIOLATION — ...`).
+
+**Resumption**: After the user fixes the issue, re-evaluate the halted phase from the task graph. Already-completed tasks (`[x]`) are skipped. Only remaining tasks are dispatched.
 
 ### 6. Output Validation (REQUIRED)
 
@@ -288,9 +341,18 @@ Before writing ANY file:
 
 ### 7. Progress Tracking
 
-- Report after each task
-- Halt on non-parallel task failure
+- Report after each task (sequential) or after each batch (parallel)
+- Halt on non-parallel task failure; on parallel failure see §5.5
 - Mark completed tasks `[x]` in tasks.md
+
+**Batch completion report** (parallel mode):
+```
+Batch N complete: [T005 ✓] [T006 ✓] [T007 ✗]
+  T005: Created user model (src/models/user.py)
+  T006: Created auth middleware (src/middleware/auth.py)
+  T007: FAILED — missing dependency, see error above
+Progress: X/Y tasks complete
+```
 
 ### 8. Completion
 
@@ -315,6 +377,7 @@ Before writing ANY file:
 | Constitution violation | STOP, explain, suggest alternative |
 | Checklist incomplete | Ask user, STOP if declined |
 | Task fails | Report error, halt sequential |
+| Parallel task fails | Let siblings finish, collect results, mark successes, halt phase |
 | Tests written but not run | STOP: Execute tests before marking complete |
 | Tests failing | STOP: Fix code (not tests), re-run until green |
 

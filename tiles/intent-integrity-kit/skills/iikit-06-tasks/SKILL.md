@@ -319,6 +319,12 @@ Use template structure with:
    - Identify longest dependency chain
    - Report: "Critical path: T001 → T003 → T012 → T018 (4 tasks)"
    - Suggest parallelization opportunities
+   - **List parallel batches** per phase so the implement skill can dispatch them directly:
+     ```
+     Parallel batches:
+       Phase 2: [T004, T005] (no mutual deps) | [T006] (depends on T004)
+       Phase 3: [T008, T009, T010] (no mutual deps) | [T011] (depends on T008)
+     ```
 
 4. **Phase Boundary Validation**:
    - Ensure no cross-phase dependencies go backwards

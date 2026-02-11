@@ -1087,9 +1087,9 @@ main() {
     done
 
     echo ""
-    echo "╔═══════════════════════════════════════════════╗"
-    echo "║     Intent Integrity Kit Tile Integration Tests           ║"
-    echo "╚═══════════════════════════════════════════════╝"
+    echo "╔══════════════════════════════════════════════════╗"
+    echo "║  Intent Integrity Kit Tile Integration Tests   ║"
+    echo "╚══════════════════════════════════════════════════╝"
 
     trap teardown EXIT
 

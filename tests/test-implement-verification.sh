@@ -365,9 +365,9 @@ EOF
 
 main() {
     echo ""
-    echo "╔════════════════════════════════════════════════════╗"
-    echo "║  Implement Verification Enforcement Tests          ║"
-    echo "╚════════════════════════════════════════════════════╝"
+    echo "╔═══════════════════════════════════════════════════╗"
+    echo "║  Implement Verification Enforcement Tests        ║"
+    echo "╚═══════════════════════════════════════════════════╝"
     echo ""
 
     # Check dependencies

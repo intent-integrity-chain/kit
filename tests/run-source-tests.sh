@@ -1,0 +1,489 @@
+#!/usr/bin/env bash
+#
+# Intent Integrity Kit Source Validation Tests
+#
+# Tests the source repository for documentation and skill consistency.
+# Single source of truth: tiles/intent-integrity-kit/skills/
+# .claude/skills/ is a symlink to the tile.
+#
+# Usage:
+#   ./tests/run-source-tests.sh
+#
+
+set -uo pipefail
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+TESTS_RUN=0
+TESTS_PASSED=0
+TESTS_FAILED=0
+
+# Find repo root (tests/ is at repo root)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+log_pass() { echo -e "${GREEN}[PASS]${NC} $1"; ((TESTS_PASSED++)); }
+log_fail() { echo -e "${RED}[FAIL]${NC} $1"; ((TESTS_FAILED++)); }
+log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
+log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
+log_section() { echo -e "\n${BLUE}=== $1 ===${NC}"; }
+
+cd "$REPO_ROOT"
+
+# The single source of truth for skills
+SKILLS_DIR="tiles/intent-integrity-kit/skills"
+
+# ─── Symlink Structure ───────────────────────────────────────────────────────
+
+test_symlink_structure() {
+    log_section "Symlink Structure"
+
+    # .claude/skills must be a symlink to the tile
+    ((TESTS_RUN++))
+    if [[ -L ".claude/skills" ]]; then
+        local target
+        target=$(readlink .claude/skills)
+        if [[ "$target" == *"tiles/intent-integrity-kit/skills"* ]]; then
+            log_pass ".claude/skills symlinks to tile ($target)"
+        else
+            log_fail ".claude/skills symlinks to wrong target: $target"
+        fi
+    else
+        log_fail ".claude/skills is not a symlink"
+    fi
+
+    # .tessl/tiles/tessl-labs/intent-integrity-kit must be a symlink to the tile
+    ((TESTS_RUN++))
+    if [[ -L ".tessl/tiles/tessl-labs/intent-integrity-kit" ]]; then
+        log_pass ".tessl/tiles/tessl-labs/intent-integrity-kit is a symlink"
+    else
+        log_fail ".tessl/tiles/tessl-labs/intent-integrity-kit is not a symlink"
+    fi
+
+    # .codex/skills, .gemini/skills, .opencode/skills should chain through .claude/skills
+    for agent in .codex .gemini .opencode; do
+        ((TESTS_RUN++))
+        if [[ -L "$agent/skills" ]]; then
+            log_pass "$agent/skills is a symlink"
+        else
+            log_fail "$agent/skills is not a symlink"
+        fi
+    done
+
+    # .tessl path should resolve to the tile scripts
+    ((TESTS_RUN++))
+    if [[ -f ".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh" ]]; then
+        log_pass ".tessl path resolves to tile scripts"
+    else
+        log_fail ".tessl path does not resolve to tile scripts"
+    fi
+}
+
+# ─── Skill Completeness ─────────────────────────────────────────────────────
+
+test_skill_completeness() {
+    log_section "Skill Completeness"
+
+    local expected=(
+        "iikit-00-constitution"
+        "iikit-01-specify"
+        "iikit-02-clarify"
+        "iikit-03-plan"
+        "iikit-04-checklist"
+        "iikit-05-testify"
+        "iikit-06-tasks"
+        "iikit-07-analyze"
+        "iikit-08-implement"
+        "iikit-09-taskstoissues"
+        "iikit-core"
+    )
+
+    for skill in "${expected[@]}"; do
+        ((TESTS_RUN++))
+        if [[ -d "$SKILLS_DIR/$skill" && -f "$SKILLS_DIR/$skill/SKILL.md" ]]; then
+            log_pass "skill exists: $skill"
+        else
+            log_fail "skill missing: $skill"
+        fi
+    done
+}
+
+# ─── Script Path Consistency ─────────────────────────────────────────────────
+
+test_script_paths() {
+    log_section "Script Paths in SKILL.md (must use .tessl/tiles/...)"
+
+    # All bash command paths must use .tessl/tiles/tessl-labs/intent-integrity-kit/skills/
+    ((TESTS_RUN++))
+    local correct_bash
+    correct_bash=$(grep -rh "bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/" "$SKILLS_DIR"/iikit-*/SKILL.md 2>/dev/null | wc -l)
+    correct_bash="${correct_bash//[^0-9]/}"
+    if [[ "$correct_bash" -gt 0 ]]; then
+        log_pass "bash commands use .tessl/tiles/... path ($correct_bash refs)"
+    else
+        log_fail "no bash commands use .tessl/tiles/... path"
+    fi
+
+    # No .claude/skills/ paths should remain in SKILL.md files
+    ((TESTS_RUN++))
+    local wrong_paths
+    wrong_paths=$(grep -rch "\.claude/skills/" "$SKILLS_DIR"/iikit-*/SKILL.md 2>/dev/null | awk '{s+=$1}END{print s+0}')
+    if [[ "$wrong_paths" -eq 0 ]]; then
+        log_pass "no .claude/skills/ paths in SKILL.md files"
+    else
+        log_fail "found $wrong_paths .claude/skills/ references in SKILL.md files"
+        grep -rn "\.claude/skills/" "$SKILLS_DIR"/iikit-*/SKILL.md 2>/dev/null | head -5
+    fi
+
+    # PowerShell commands should use .tessl/tiles/ path
+    ((TESTS_RUN++))
+    local correct_pwsh
+    correct_pwsh=$(grep -rh "pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/" "$SKILLS_DIR"/iikit-*/SKILL.md 2>/dev/null | wc -l)
+    correct_pwsh="${correct_pwsh//[^0-9]/}"
+    if [[ "$correct_pwsh" -gt 0 ]]; then
+        log_pass "pwsh commands use .tessl/tiles/... path ($correct_pwsh refs)"
+    else
+        log_warn "no pwsh commands found (may be OK)"
+    fi
+
+    # No deprecated .specify/scripts/ references
+    ((TESTS_RUN++))
+    if grep -rq "\.specify/scripts/" "$SKILLS_DIR"/iikit-*/SKILL.md 2>/dev/null; then
+        log_fail "SKILL.md files reference deprecated .specify/scripts/"
+    else
+        log_pass "no deprecated .specify/scripts/ references"
+    fi
+}
+
+# ─── Scripts and Templates Exist ─────────────────────────────────────────────
+
+test_scripts_exist() {
+    log_section "Scripts Exist"
+
+    local bash_base="$SKILLS_DIR/iikit-core/scripts/bash"
+    local bash_scripts=(
+        "check-prerequisites.sh"
+        "create-new-feature.sh"
+        "setup-plan.sh"
+        "testify-tdd.sh"
+        "common.sh"
+        "update-agent-context.sh"
+    )
+
+    for script in "${bash_scripts[@]}"; do
+        ((TESTS_RUN++))
+        if [[ -f "$bash_base/$script" ]]; then
+            log_pass "bash: $script"
+        else
+            log_fail "bash missing: $script"
+        fi
+    done
+
+    local ps_base="$SKILLS_DIR/iikit-core/scripts/powershell"
+    local ps_scripts=(
+        "check-prerequisites.ps1"
+        "create-new-feature.ps1"
+        "setup-plan.ps1"
+        "testify-tdd.ps1"
+        "common.ps1"
+        "update-agent-context.ps1"
+        "init-project.ps1"
+        "setup-windows-links.ps1"
+    )
+
+    for script in "${ps_scripts[@]}"; do
+        ((TESTS_RUN++))
+        if [[ -f "$ps_base/$script" ]]; then
+            log_pass "pwsh: $script"
+        else
+            log_fail "pwsh missing: $script"
+        fi
+    done
+}
+
+test_templates_exist() {
+    log_section "Templates Exist"
+    local base="$SKILLS_DIR/iikit-core/templates"
+
+    local templates=(
+        "constitution-template.md"
+        "spec-template.md"
+        "plan-template.md"
+        "tasks-template.md"
+        "checklist-template.md"
+        "testspec-template.md"
+        "agent-file-template.md"
+    )
+
+    for template in "${templates[@]}"; do
+        ((TESTS_RUN++))
+        if [[ -f "$base/$template" ]]; then
+            log_pass "template: $template"
+        else
+            log_fail "template missing: $template"
+        fi
+    done
+}
+
+# ─── Parallel Execution Feature ──────────────────────────────────────────────
+
+test_parallel_execution() {
+    log_section "Parallel Execution Feature"
+    local impl="$SKILLS_DIR/iikit-08-implement/SKILL.md"
+    local ref="$SKILLS_DIR/iikit-08-implement/references/parallel-execution.md"
+    local tasks="$SKILLS_DIR/iikit-06-tasks/SKILL.md"
+
+    # parallel-execution.md reference doc exists
+    ((TESTS_RUN++))
+    if [[ -f "$ref" ]]; then
+        log_pass "references/parallel-execution.md exists"
+    else
+        log_fail "references/parallel-execution.md missing"
+        return
+    fi
+
+    # SKILL.md links to parallel-execution.md
+    ((TESTS_RUN++))
+    if grep -q 'parallel-execution.md' "$impl"; then
+        log_pass "implement SKILL.md references parallel-execution.md"
+    else
+        log_fail "implement SKILL.md does not reference parallel-execution.md"
+    fi
+
+    # Section 5 has subsections 5.1-5.5
+    local subsections=("5.1 Task Extraction" "5.2 Execution Strategy Selection" "5.3 Phase-by-Phase Execution" "5.4 Execution Rules" "5.5 Parallel Failure Handling")
+    for sub in "${subsections[@]}"; do
+        ((TESTS_RUN++))
+        if grep -q "$sub" "$impl"; then
+            log_pass "Section $sub present"
+        else
+            log_fail "Section $sub missing from implement SKILL.md"
+        fi
+    done
+
+    # Execution mode report includes Completed/Remaining counts
+    ((TESTS_RUN++))
+    if grep -q 'Completed: C.*Remaining: R' "$impl"; then
+        log_pass "execution mode report includes Completed/Remaining"
+    else
+        log_fail "execution mode report missing Completed/Remaining counts"
+    fi
+
+    # Error handling table has parallel task failure row
+    ((TESTS_RUN++))
+    if grep -q 'Parallel task fails' "$impl"; then
+        log_pass "error handling table has parallel task failure row"
+    else
+        log_fail "error handling table missing parallel task failure row"
+    fi
+
+    # Constitutional violation in parallel context documented
+    ((TESTS_RUN++))
+    if grep -q 'Constitutional violation in a worker' "$impl"; then
+        log_pass "constitutional violation in parallel context documented"
+    else
+        log_fail "constitutional violation in parallel context not documented"
+    fi
+
+    # Batch completion report format exists
+    ((TESTS_RUN++))
+    if grep -q 'Batch N complete' "$impl"; then
+        log_pass "batch completion report format present"
+    else
+        log_fail "batch completion report format missing"
+    fi
+
+    # ── Reference doc sections ──
+
+    local ref_sections=(
+        "Capability Detection"
+        "Orchestrator/Worker Model"
+        "Subagent Context Construction"
+        "Within-Phase Protocol"
+        "Cross-Story Protocol"
+        "File Conflict Detection"
+        "TDD in Parallel Context"
+        "Tessl in Parallel Context"
+    )
+    for section in "${ref_sections[@]}"; do
+        ((TESTS_RUN++))
+        if grep -q "## $section" "$ref"; then
+            log_pass "reference: $section section present"
+        else
+            log_fail "reference: $section section missing"
+        fi
+    done
+
+    # Key protocol rules in reference doc
+    ((TESTS_RUN++))
+    if grep -q 'Do NOT write to tasks.md' "$ref"; then
+        log_pass "worker responsibility: no tasks.md writes"
+    else
+        log_fail "worker responsibility: no tasks.md writes rule missing"
+    fi
+
+    ((TESTS_RUN++))
+    if grep -q 'constitutional rules before every file write' "$ref"; then
+        log_pass "worker responsibility: constitutional check"
+    else
+        log_fail "worker responsibility: constitutional check rule missing"
+    fi
+
+    ((TESTS_RUN++))
+    if grep -q 'Dispatch priority' "$ref"; then
+        log_pass "dispatch priority rule present"
+    else
+        log_fail "dispatch priority rule missing"
+    fi
+
+    ((TESTS_RUN++))
+    if grep -q 'task ID as tiebreaker' "$ref"; then
+        log_pass "sibling ordering tiebreaker defined"
+    else
+        log_fail "sibling ordering tiebreaker missing"
+    fi
+
+    ((TESTS_RUN++))
+    if grep -q 'If eligibility fails' "$ref"; then
+        log_pass "cross-story fallback clause present"
+    else
+        log_fail "cross-story fallback clause missing"
+    fi
+
+    ((TESTS_RUN++))
+    if grep -q 'RED-phase batches' "$ref"; then
+        log_pass "TDD RED-phase exception documented"
+    else
+        log_fail "TDD RED-phase exception missing"
+    fi
+
+    ((TESTS_RUN++))
+    if grep -q 'zero tasks.*immediately complete' "$ref"; then
+        log_pass "empty phase handling documented"
+    else
+        log_fail "empty phase handling missing"
+    fi
+
+    ((TESTS_RUN++))
+    if grep -q 'Workstream failure' "$ref"; then
+        log_pass "cross-story workstream failure handling present"
+    else
+        log_fail "cross-story workstream failure handling missing"
+    fi
+
+    ((TESTS_RUN++))
+    if grep -q 'Pre-dispatch.*best-effort' "$ref"; then
+        log_pass "pre-dispatch file conflict check documented"
+    else
+        log_fail "pre-dispatch file conflict check missing"
+    fi
+
+    ((TESTS_RUN++))
+    if grep -q 'exclude the conflicting tasks from the batch' "$ref"; then
+        log_pass "pre-dispatch conflict action specified"
+    else
+        log_fail "pre-dispatch conflict action not specified"
+    fi
+
+    ((TESTS_RUN++))
+    if grep -q 'Leave conflicting tasks unmarked' "$ref"; then
+        log_pass "post-conflict checkpoint rules specified"
+    else
+        log_fail "post-conflict checkpoint rules not specified"
+    fi
+
+    # ── Tasks skill parallel batch listing ──
+
+    ((TESTS_RUN++))
+    if grep -q 'Parallel batches:' "$tasks"; then
+        log_pass "tasks skill: parallel batch listing in critical path analysis"
+    else
+        log_fail "tasks skill: parallel batch listing missing"
+    fi
+}
+
+# ─── Documentation Consistency ───────────────────────────────────────────────
+
+test_documentation() {
+    log_section "Documentation Consistency"
+
+    local doc_files=(
+        "README.md"
+        "CLAUDE.md"
+        "FRAMEWORK-PRINCIPLES.md"
+    )
+
+    for doc in "${doc_files[@]}"; do
+        [[ ! -f "$doc" ]] && continue
+
+        ((TESTS_RUN++))
+        if grep -q "\.specify/scripts/" "$doc" 2>/dev/null; then
+            log_fail "$doc references deprecated .specify/scripts/"
+        else
+            log_pass "$doc: no deprecated paths"
+        fi
+    done
+}
+
+# ─── tile.json Consistency ───────────────────────────────────────────────────
+
+test_tile_json() {
+    log_section "tile.json Consistency"
+    local tile_json="tiles/intent-integrity-kit/tile.json"
+
+    ((TESTS_RUN++))
+    if [[ -f "$tile_json" ]]; then
+        log_pass "tile.json exists"
+    else
+        log_fail "tile.json missing"
+        return
+    fi
+
+    # All skills listed in tile.json should exist on disk
+    local skill_names
+    skill_names=$(grep '"path"' "$tile_json" | sed 's/.*"skills\/\(iikit-[^/]*\)\/.*/\1/')
+    for skill in $skill_names; do
+        ((TESTS_RUN++))
+        if [[ -d "$SKILLS_DIR/$skill" ]]; then
+            log_pass "tile.json skill on disk: $skill"
+        else
+            log_fail "tile.json lists $skill but directory missing"
+        fi
+    done
+}
+
+# ─── Main ────────────────────────────────────────────────────────────────────
+
+main() {
+    echo ""
+    echo "╔═══════════════════════════════════════════════╗"
+    echo "║  Intent Integrity Kit Source Validation Tests ║"
+    echo "╚═══════════════════════════════════════════════╝"
+    echo ""
+    log_info "Repo root: $REPO_ROOT"
+    log_info "Skills dir: $SKILLS_DIR"
+
+    test_symlink_structure
+    test_skill_completeness
+    test_script_paths
+    test_scripts_exist
+    test_templates_exist
+    test_parallel_execution
+    test_documentation
+    test_tile_json
+
+    log_section "Summary"
+    echo "  Total:  $TESTS_RUN"
+    echo -e "  ${GREEN}Passed: $TESTS_PASSED${NC}"
+    echo -e "  ${RED}Failed: $TESTS_FAILED${NC}"
+
+    [[ $TESTS_FAILED -gt 0 ]] && exit 1
+    exit 0
+}
+
+main "$@"
