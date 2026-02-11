@@ -1,8 +1,8 @@
 {
   "name": "tessl-labs/intent-integrity-kit",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "summary": "Closing the intent-to-code chasm - specification-driven development with cryptographic verification",
-  "description": "Intent Integrity Kit (IIKit) preserves your intent from idea to implementation through specification-driven development. Features 10 workflow phases with assertion integrity hashing to prevent circular verification. Compatible with Claude Code, Codex, Gemini, and OpenCode.\n\nWhat's new in v1.1.0: Git pre-commit and post-commit hooks for agent-agnostic assertion integrity enforcement. Pre-commit validates test-specs.md assertions haven't been tampered with. Post-commit stores hashes as tamper-resistant git notes. Defense-in-depth with dual-layer verification. Automatically installed via /iikit-core init.",
+  "description": "Intent Integrity Kit (IIKit) preserves your intent from idea to implementation through specification-driven development. Features 10 workflow phases with assertion integrity hashing to prevent circular verification. Compatible with Claude Code, Codex, Gemini, and OpenCode.\n\nWhat's new in v1.2.0: The implement skill now launches a live kanban dashboard (npx iikit-kanban) in your browser before starting implementation. Watch user stories move through Todo/In Progress/Done as the AI agent checks off tasks in real time. Also includes v1.1.0 git hooks for assertion integrity enforcement.",
   "private": false,
   "repository": "https://github.com/intent-integrity-chain/kit",
   "docs": "index.md",

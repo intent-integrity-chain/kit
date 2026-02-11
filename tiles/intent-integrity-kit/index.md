@@ -77,6 +77,10 @@ specs/NNN-feature-name/
 tessl install tessl-labs/intent-integrity-kit
 ```
 
+## What's New in v1.2.0
+
+- **Live kanban dashboard**: The implement skill (`/iikit-08-implement`) now automatically launches a browser-based kanban board via `npx iikit-kanban`. Watch user stories move through Todo / In Progress / Done columns as the AI agent checks off tasks in real time. Dark/light theme, collapsible task lists, integrity badges. Gracefully skips if Node.js is not available.
+
 ## What's New in v1.1.0
 
 - **Git pre-commit hook**: Blocks commits that contain tampered test-specs.md assertions. Checks staged content against stored SHA256 hashes in both context.json (committed version) and git notes.
