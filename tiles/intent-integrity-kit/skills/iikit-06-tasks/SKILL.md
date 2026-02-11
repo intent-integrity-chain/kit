@@ -42,6 +42,18 @@ Before ANY action, load and internalize the project constitution:
    Run: /iikit-03-plan
    ```
 
+4. **Checklist completion check** (soft gate):
+   - If `FEATURE_DIR/checklists/` directory exists and contains `.md` files:
+     - Parse all checklist files for `- [ ]` (unchecked) and `- [x]` (checked) items
+     - If any unchecked items remain:
+       ```
+       WARNING: Checklists exist but are incomplete (X/Y items checked, Z%).
+       Recommend running /iikit-04-checklist to resolve before proceeding.
+       Continue anyway? [y/N]
+       ```
+     - If user declines, stop and suggest `/iikit-04-checklist`
+   - If no checklists directory exists: proceed silently (checklists are optional)
+
 ## Smart Validation
 
 **BEFORE generating tasks, perform validation:**

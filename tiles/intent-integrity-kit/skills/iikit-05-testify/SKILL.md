@@ -104,6 +104,18 @@ Before ANY action, load and analyze the project constitution for TDD requirement
    Run: /iikit-01-specify
    ```
 
+6. **Checklist completion check** (soft gate):
+   - If `FEATURE_DIR/checklists/` directory exists and contains `.md` files:
+     - Parse all checklist files for `- [ ]` (unchecked) and `- [x]` (checked) items
+     - If any unchecked items remain:
+       ```
+       WARNING: Checklists exist but are incomplete (X/Y items checked, Z%).
+       Recommend running /iikit-04-checklist to resolve before proceeding.
+       Continue anyway? [y/N]
+       ```
+     - If user declines, stop and suggest `/iikit-04-checklist`
+   - If no checklists directory exists: proceed silently (checklists are optional)
+
 ## Acceptance Scenario Validation
 
 Before generating tests, validate that spec.md has acceptance scenarios:

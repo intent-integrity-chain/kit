@@ -222,12 +222,44 @@ If checklist contains `[Gap]` items, guide the user through resolving them one b
 
 **Skip gap resolution if:** User passes `--no-interactive` flag or there are no `[Gap]` items.
 
+### 5b. Remaining Item Validation (REQUIRED)
+
+**After gap resolution (or if no gaps), validate ALL remaining unchecked `[ ]` items.**
+
+The checklist is optional — not creating one is fine. But if checklists exist, they MUST be 100% complete before the skill reports success.
+
+For each remaining `[ ]` item:
+
+1. **Assess against spec/plan/constitution**: Can this item be checked off based on existing artifacts?
+
+2. **If YES** (requirement is adequately covered):
+   - Check the item off: `[x]`
+   - Add brief justification after the item text (e.g., "— Covered by FR-013 and SC-008")
+
+3. **If NO** (genuine gap found):
+   - Convert to `[Gap]` and run gap resolution (step 5) for this item
+   - Or ask user: "This requirement quality concern is unaddressed: [quote item]. Add to spec, or defer?"
+
+4. **Continue until all items are `[x]`** or explicitly deferred by user.
+
+5. **Final count**:
+   ```
+   Checklist Validation:
+   - Total items:     N
+   - Checked off:     X (validated against spec/plan)
+   - Gaps resolved:   Y (added to spec.md)
+   - Deferred:        Z (user chose to skip)
+   ```
+
+**If deferred items remain**: Warn that downstream skills will flag incomplete checklists.
+
 ### 6. Report
 
 Output:
 - Full path to created checklist
-- Item count
+- Item count (total, checked, deferred)
 - Gap resolution summary (if applicable)
+- Checklist completion percentage
 - Summary:
   - Focus areas selected
   - Depth level
@@ -255,21 +287,31 @@ Output:
 
 After creating and resolving checklists:
 
-1. **If gaps remain**: Run `/iikit-04-checklist` again to continue gap resolution
+1. **If deferred items remain**: Run `/iikit-04-checklist` again to resolve them
 2. **Optional**: Run `/iikit-05-testify` to generate test specifications (TDD support)
-3. **When all gaps resolved**: Run `/iikit-06-tasks` to generate the task breakdown
+3. **When 100% complete**: Run `/iikit-06-tasks` to generate the task breakdown
 
 Suggest to user:
 ```
-Checklist complete!
+Checklist complete! (100% — N/N items checked)
 
-Gaps resolved: X (added to spec)
-Gaps remaining: Y
+Gaps resolved: X (added to spec.md)
+Items validated: Y (checked against spec/plan)
+Deferred: Z
 
 Next steps:
-- /iikit-04-checklist - (If gaps remain) Continue resolving requirement gaps
 - /iikit-05-testify - (Optional) Generate test specifications for TDD
 - /iikit-06-tasks - Generate task breakdown from plan
 ```
 
-**Note:** `/iikit-08-implement` requires all checklists to be 100% complete (no `[ ]` items).
+**If deferred items remain:**
+```
+Checklist incomplete (X% — N/M items checked)
+
+Deferred items: Z (will trigger warnings in downstream skills)
+
+Next steps:
+- /iikit-04-checklist - Resolve remaining deferred items
+```
+
+**IMPORTANT**: Checklists are optional — not creating one is fine. But once created, they MUST reach 100% before the skill reports success. Downstream skills (`/iikit-05-testify`, `/iikit-06-tasks`, `/iikit-07-analyze`) SHOULD warn if checklists exist but are incomplete.
