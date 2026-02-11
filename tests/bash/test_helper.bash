@@ -4,7 +4,8 @@
 # Get the directory of this helper script
 HELPER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TESTS_DIR="$(dirname "$HELPER_DIR")"
-SCRIPTS_DIR="$(dirname "$TESTS_DIR")/scripts/bash"
+REPO_ROOT="$(dirname "$TESTS_DIR")"
+SCRIPTS_DIR="$REPO_ROOT/tiles/intent-integrity-kit/skills/iikit-core/scripts/bash"
 FIXTURES_DIR="$TESTS_DIR/fixtures"
 
 # Source common functions
