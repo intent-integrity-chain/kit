@@ -35,6 +35,7 @@ jobs:
     needs: test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
+      id-token: write
       contents: write
     steps:
       - uses: actions/checkout@v4
@@ -56,12 +57,19 @@ jobs:
             echo "Version unchanged ($NEW), skipping publish"
           fi
 
+      - name: Publish tile v${{ steps.version.outputs.new }}
+        if: steps.version.outputs.changed == 'true'
+        uses: tesslio/publish@main
+        with:
+          token: ${{ secrets.TESSL_TOKEN }}
+          path: tiles/intent-integrity-kit
+
       - uses: actions/setup-node@v4
         if: steps.version.outputs.changed == 'true'
         with:
           node-version: '20'
 
-      - name: Install tessl
+      - name: Install tessl CLI (for e2e verification)
         if: steps.version.outputs.changed == 'true'
         run: npm install -g @tessl/cli
 
@@ -70,12 +78,6 @@ jobs:
         run: |
           chmod +x tiles/intent-integrity-kit/skills/iikit-core/scripts/bash/*.sh
           chmod +x tests/*.sh
-
-      - name: Publish tile v${{ steps.version.outputs.new }}
-        if: steps.version.outputs.changed == 'true'
-        env:
-          TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
-        run: tessl tile publish tiles/intent-integrity-kit
 
       - name: Verify tile (install from registry + e2e tests)
         if: steps.version.outputs.changed == 'true'
