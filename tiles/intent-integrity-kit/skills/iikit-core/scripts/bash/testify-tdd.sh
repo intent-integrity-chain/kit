@@ -117,11 +117,26 @@ compute_assertion_hash() {
     printf '%s' "$assertions" | shasum -a 256 | cut -d' ' -f1
 }
 
+# Derive context.json path from test-specs.md path
+# test-specs.md lives at specs/NNN-feature/tests/test-specs.md
+# context.json lives at specs/NNN-feature/context.json
+derive_context_path() {
+    local test_specs_file="$1"
+    local tests_dir
+    tests_dir=$(dirname "$test_specs_file")
+    local feature_dir
+    feature_dir=$(dirname "$tests_dir")
+    echo "$feature_dir/context.json"
+}
+
 # Store assertion hash in context.json
 # Creates or updates the testify section
+# context.json path is derived from test-specs.md location (not caller-specified)
 store_assertion_hash() {
     local test_specs_file="$1"
-    local context_file="$2"
+    # Accept legacy second arg for backwards compat, but always derive the correct path
+    local context_file
+    context_file=$(derive_context_path "$test_specs_file")
     local hash
     local timestamp
 
@@ -153,9 +168,12 @@ store_assertion_hash() {
 
 # Verify assertion hash matches stored value
 # Returns: "valid", "invalid", or "missing"
+# context.json path is derived from test-specs.md location
 verify_assertion_hash() {
     local test_specs_file="$1"
-    local context_file="$2"
+    # Accept legacy second arg for backwards compat, but always derive the correct path
+    local context_file
+    context_file=$(derive_context_path "$test_specs_file")
 
     # Check if context file exists
     if [[ ! -f "$context_file" ]]; then
@@ -319,8 +337,10 @@ check_git_diff() {
 # tdd_determination: "mandatory", "optional", or "forbidden"
 comprehensive_integrity_check() {
     local test_specs_file="$1"
-    local context_file="$2"
-    local constitution_file="$3"
+    # Second arg is now ignored — context path derived from test-specs location
+    local constitution_file="${3:-$2}"  # Support both old 3-arg and new 2-arg calling
+    local context_file
+    context_file=$(derive_context_path "$test_specs_file")
 
     local hash_result="skipped"
     local git_note_result="skipped"
@@ -491,18 +511,18 @@ if [[ $# -gt 0 ]]; then
             compute_assertion_hash "$2"
             ;;
         store-hash)
-            if [[ $# -lt 3 ]]; then
-                echo "Usage: $0 store-hash <test-specs-file> <context-file>"
+            if [[ $# -lt 2 ]]; then
+                echo "Usage: $0 store-hash <test-specs-file>"
                 exit 1
             fi
-            store_assertion_hash "$2" "$3"
+            store_assertion_hash "$2"
             ;;
         verify-hash)
-            if [[ $# -lt 3 ]]; then
-                echo "Usage: $0 verify-hash <test-specs-file> <context-file>"
+            if [[ $# -lt 2 ]]; then
+                echo "Usage: $0 verify-hash <test-specs-file>"
                 exit 1
             fi
-            verify_assertion_hash "$2" "$3"
+            verify_assertion_hash "$2"
             ;;
         store-git-note)
             if [[ $# -lt 2 ]]; then
@@ -526,11 +546,11 @@ if [[ $# -gt 0 ]]; then
             check_git_diff "$2"
             ;;
         comprehensive-check)
-            if [[ $# -lt 4 ]]; then
-                echo "Usage: $0 comprehensive-check <test-specs-file> <context-file> <constitution-file>"
+            if [[ $# -lt 3 ]]; then
+                echo "Usage: $0 comprehensive-check <test-specs-file> <constitution-file>"
                 exit 1
             fi
-            comprehensive_integrity_check "$2" "$3" "$4"
+            comprehensive_integrity_check "$2" "$3"
             ;;
         *)
             echo "Unknown command: $1"
@@ -541,17 +561,17 @@ if [[ $# -gt 0 ]]; then
             echo "  Scenario Counting:"
             echo "    count-scenarios <spec-file>           - Count acceptance scenarios"
             echo "    has-scenarios <spec-file>             - Check if scenarios exist"
-            echo "  Hash-based Integrity (context.json):"
+            echo "  Hash-based Integrity (context.json auto-derived from test-specs path):"
             echo "    extract-assertions <test-specs-file>  - Extract assertion lines"
             echo "    compute-hash <test-specs-file>        - Compute SHA256 hash"
-            echo "    store-hash <test-specs> <context>     - Store hash in context.json"
-            echo "    verify-hash <test-specs> <context>    - Verify against context.json"
+            echo "    store-hash <test-specs-file>          - Store hash in feature's context.json"
+            echo "    verify-hash <test-specs-file>         - Verify against feature's context.json"
             echo "  Git-based Integrity (tamper-resistant):"
             echo "    store-git-note <test-specs-file>      - Store hash as git note"
             echo "    verify-git-note <test-specs-file>     - Verify against git note"
             echo "    check-git-diff <test-specs-file>      - Check uncommitted changes"
             echo "  Comprehensive:"
-            echo "    comprehensive-check <test-specs> <context> <constitution>"
+            echo "    comprehensive-check <test-specs-file> <constitution-file>"
             exit 1
             ;;
     esac

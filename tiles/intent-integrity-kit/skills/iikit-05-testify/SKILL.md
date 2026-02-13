@@ -262,8 +262,8 @@ mkdir -p FEATURE_DIR/tests
 
 **Unix/macOS/Linux:**
 ```bash
-# Store in context.json (primary)
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh store-hash "FEATURE_DIR/tests/test-specs.md" "FEATURE_DIR/context.json"
+# Store in context.json (auto-derived: FEATURE_DIR/context.json)
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh store-hash "FEATURE_DIR/tests/test-specs.md"
 
 # Store as git note (tamper-resistant backup)
 bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh store-git-note "FEATURE_DIR/tests/test-specs.md"
@@ -271,15 +271,15 @@ bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash
 
 **Windows (PowerShell):**
 ```powershell
-# Store in context.json (primary)
-pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/testify-tdd.ps1 store-hash "FEATURE_DIR/tests/test-specs.md" "FEATURE_DIR/context.json"
+# Store in context.json (auto-derived: FEATURE_DIR/context.json)
+pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/testify-tdd.ps1 store-hash "FEATURE_DIR/tests/test-specs.md"
 
 # Store as git note (tamper-resistant backup)
 pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/testify-tdd.ps1 store-git-note "FEATURE_DIR/tests/test-specs.md"
 ```
 
 This stores a SHA256 hash of all Given/When/Then assertion lines in two locations:
-1. **FEATURE_DIR/context.json** - Primary storage per feature, checked first
+1. **FEATURE_DIR/context.json** - Primary storage per feature (path auto-derived from test-specs.md location — agent cannot override)
 2. **Git note** - Tamper-resistant backup (requires git history rewrite to modify)
 
 The implement skill will verify this hash before proceeding, blocking execution if assertions were tampered with.

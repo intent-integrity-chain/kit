@@ -130,7 +130,7 @@ If `tests/test-specs.md` exists, perform assertion integrity verification:
 
 **Step 1: Run comprehensive integrity check**
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh comprehensive-check "FEATURE_DIR/tests/test-specs.md" "FEATURE_DIR/context.json" "CONSTITUTION.md"
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh comprehensive-check "FEATURE_DIR/tests/test-specs.md" "CONSTITUTION.md"
 ```
 
 **Step 2: Parse the JSON response**

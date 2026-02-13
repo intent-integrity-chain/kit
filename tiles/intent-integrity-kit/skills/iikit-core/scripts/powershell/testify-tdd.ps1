@@ -130,12 +130,24 @@ function Get-AssertionHash {
     return $hash.ToLower()
 }
 
+# Derive context.json path from test-specs.md path
+# test-specs.md lives at specs/NNN-feature/tests/test-specs.md
+# context.json lives at specs/NNN-feature/context.json
+function Get-ContextPath {
+    param([string]$TestSpecsFile)
+    $testsDir = Split-Path $TestSpecsFile -Parent    # specs/NNN-feature/tests
+    $featureDir = Split-Path $testsDir -Parent        # specs/NNN-feature
+    return Join-Path $featureDir "context.json"
+}
+
 # Store assertion hash in context.json
+# context.json path is derived from test-specs.md location (not caller-specified)
 function Set-AssertionHash {
     param(
         [string]$TestSpecsFile,
-        [string]$ContextFile
+        [string]$ContextFile  # Legacy param — ignored, path is derived
     )
+    $ContextFile = Get-ContextPath -TestSpecsFile $TestSpecsFile
 
     $hash = Get-AssertionHash -TestSpecsFile $TestSpecsFile
     $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
@@ -168,11 +180,13 @@ function Set-AssertionHash {
 }
 
 # Verify assertion hash matches stored value
+# context.json path is derived from test-specs.md location
 function Test-AssertionHash {
     param(
         [string]$TestSpecsFile,
-        [string]$ContextFile
+        [string]$ContextFile  # Legacy param — ignored, path is derived
     )
+    $ContextFile = Get-ContextPath -TestSpecsFile $TestSpecsFile
 
     # Check if context file exists
     if (-not (Test-Path $ContextFile)) {
@@ -334,9 +348,10 @@ function Test-GitDiff {
 function Get-ComprehensiveIntegrityCheck {
     param(
         [string]$TestSpecsFile,
-        [string]$ContextFile,
+        [string]$ContextFile,  # Legacy param — ignored, path is derived
         [string]$ConstitutionFile
     )
+    $ContextFile = Get-ContextPath -TestSpecsFile $TestSpecsFile
 
     $hashResult = "skipped"
     $gitNoteResult = "skipped"
@@ -505,18 +520,18 @@ switch ($Command) {
         Get-AssertionHash -TestSpecsFile $FilePath
     }
     "store-hash" {
-        if (-not $FilePath -or -not $ContextFile) {
-            Write-Error "Usage: testify-tdd.ps1 store-hash <test-specs-file> <context-file>"
+        if (-not $FilePath) {
+            Write-Error "Usage: testify-tdd.ps1 store-hash <test-specs-file>"
             exit 1
         }
-        Set-AssertionHash -TestSpecsFile $FilePath -ContextFile $ContextFile
+        Set-AssertionHash -TestSpecsFile $FilePath
     }
     "verify-hash" {
-        if (-not $FilePath -or -not $ContextFile) {
-            Write-Error "Usage: testify-tdd.ps1 verify-hash <test-specs-file> <context-file>"
+        if (-not $FilePath) {
+            Write-Error "Usage: testify-tdd.ps1 verify-hash <test-specs-file>"
             exit 1
         }
-        Test-AssertionHash -TestSpecsFile $FilePath -ContextFile $ContextFile
+        Test-AssertionHash -TestSpecsFile $FilePath
     }
     "store-git-note" {
         if (-not $FilePath) {
@@ -540,11 +555,11 @@ switch ($Command) {
         Test-GitDiff -TestSpecsFile $FilePath
     }
     "comprehensive-check" {
-        if (-not $FilePath -or -not $ContextFile -or -not $ConstitutionFile) {
-            Write-Error "Usage: testify-tdd.ps1 comprehensive-check <test-specs-file> <context-file> <constitution-file>"
+        if (-not $FilePath -or -not $ContextFile) {
+            Write-Error "Usage: testify-tdd.ps1 comprehensive-check <test-specs-file> <constitution-file>"
             exit 1
         }
-        Get-ComprehensiveIntegrityCheck -TestSpecsFile $FilePath -ContextFile $ContextFile -ConstitutionFile $ConstitutionFile
+        Get-ComprehensiveIntegrityCheck -TestSpecsFile $FilePath -ConstitutionFile $ContextFile
     }
     default {
         Write-Host "Unknown command: $Command"
@@ -556,17 +571,17 @@ switch ($Command) {
         Write-Host "  Scenario Counting:"
         Write-Host "    count-scenarios <spec-file>           - Count acceptance scenarios"
         Write-Host "    has-scenarios <spec-file>             - Check if scenarios exist"
-        Write-Host "  Hash-based Integrity (context.json):"
+        Write-Host "  Hash-based Integrity (context.json auto-derived from test-specs path):"
         Write-Host "    extract-assertions <test-specs-file>  - Extract assertion lines"
         Write-Host "    compute-hash <test-specs-file>        - Compute SHA256 hash"
-        Write-Host "    store-hash <test-specs> <context>     - Store hash in context.json"
-        Write-Host "    verify-hash <test-specs> <context>    - Verify against context.json"
+        Write-Host "    store-hash <test-specs-file>          - Store hash in feature's context.json"
+        Write-Host "    verify-hash <test-specs-file>         - Verify against feature's context.json"
         Write-Host "  Git-based Integrity (tamper-resistant):"
         Write-Host "    store-git-note <test-specs-file>      - Store hash as git note"
         Write-Host "    verify-git-note <test-specs-file>     - Verify against git note"
         Write-Host "    check-git-diff <test-specs-file>      - Check uncommitted changes"
         Write-Host "  Comprehensive:"
-        Write-Host "    comprehensive-check <test-specs> <context> <constitution>"
+        Write-Host "    comprehensive-check <test-specs-file> <constitution-file>"
         exit 1
     }
 }
