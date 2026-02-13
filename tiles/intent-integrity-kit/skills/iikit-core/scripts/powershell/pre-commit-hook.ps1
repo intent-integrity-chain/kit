@@ -69,8 +69,6 @@ if (Test-Path $constitutionFile) {
 # CONTEXT FILE — read stored hashes
 # ============================================================================
 
-$contextFile = Join-Path $repoRoot ".specify/context.json"
-
 # ============================================================================
 # SLOW PATH — verify each staged test-specs.md
 # ============================================================================
@@ -80,10 +78,20 @@ $blockMessages = @()
 
 # Capture all staged files once for context.json co-staging detection
 $allStagedFiles = git diff --cached --name-only 2>$null
-$contextStaged = $allStagedFiles | Where-Object { $_ -match '\.specify/context\.json$' }
 
 foreach ($stagedPath in $stagedTestSpecs) {
     if ([string]::IsNullOrEmpty($stagedPath)) { continue }
+
+    # Derive per-feature context.json path from the test-specs.md path
+    # test-specs.md is at specs/NNN-feature/tests/test-specs.md
+    # context.json is at specs/NNN-feature/context.json
+    $testsDir = Split-Path $stagedPath -Parent          # specs/NNN-feature/tests
+    $featureDir = Split-Path $testsDir -Parent           # specs/NNN-feature
+    $contextRelPath = Join-Path $featureDir "context.json"  # specs/NNN-feature/context.json
+    $contextFile = Join-Path $repoRoot $contextRelPath
+
+    # Check if this feature's context.json is also being staged
+    $contextStaged = $allStagedFiles | Where-Object { $_ -eq $contextRelPath -or $_ -eq ($contextRelPath -replace '\\', '/') }
 
     # Extract staged version to a temp file (check what's being committed)
     $tempFile = [System.IO.Path]::GetTempFileName()
@@ -119,7 +127,7 @@ foreach ($stagedPath in $stagedTestSpecs) {
     } else {
         # Not staged: read committed version from HEAD (tamper-resistant)
         try {
-            $contextJson = git show "HEAD:.specify/context.json" 2>$null
+            $contextJson = git show "HEAD:$($contextRelPath -replace '\\', '/')" 2>$null
             if ($LASTEXITCODE -ne 0) { $contextJson = $null }
         } catch { $contextJson = $null }
     }
