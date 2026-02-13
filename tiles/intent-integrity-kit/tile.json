@@ -1,8 +1,8 @@
 {
   "name": "tessl-labs/intent-integrity-kit",
-  "version": "1.4.3",
+  "version": "1.5.0",
   "summary": "Closing the intent-to-code chasm - specification-driven development with cryptographic verification",
-  "description": "Intent Integrity Kit (IIKit) preserves your intent from idea to implementation through specification-driven development. Features 10 workflow phases with assertion integrity hashing to prevent circular verification. Compatible with Claude Code, Codex, Gemini, and OpenCode.\n\nWhat's new in v1.4.3: Remove context.json path from script API — scripts now derive the correct per-feature path from test-specs.md location automatically. Agents can no longer accidentally store hashes in the wrong location.",
+  "description": "Intent Integrity Kit (IIKit) preserves your intent from idea to implementation through specification-driven development. Features 10 workflow phases with assertion integrity hashing to prevent circular verification. Compatible with Claude Code, Codex, Gemini, and OpenCode.\n\nWhat's new in v1.5.0: Clarification Q&A entries now include spec item references (FR-xxx, US-x, SC-xxx) for full traceability from clarifications back to the spec items they affect.",
   "private": false,
   "repository": "https://github.com/intent-integrity-chain/kit",
   "docs": "index.md",

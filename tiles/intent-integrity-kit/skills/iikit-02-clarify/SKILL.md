@@ -111,6 +111,7 @@ Generate a prioritized queue of candidate clarification questions (maximum 5).
 - Each question must be answerable with EITHER:
   - A short multiple-choice selection (2-5 options), OR
   - A one-word / short-phrase answer (<=5 words)
+- For each question, identify the spec items (FR-xxx, US-x, SC-xxx) it relates to — these will be recorded as references when the answer is integrated
 - Only include questions whose answers materially impact architecture, data modeling, task decomposition, test design, UX behavior, operational readiness, or compliance validation
 - Ensure category coverage balance
 - Exclude questions already answered
@@ -161,8 +162,13 @@ For each accepted answer:
 
 1. Ensure a `## Clarifications` section exists in the spec
 2. Under it, create a `### Session YYYY-MM-DD` subheading for today
-3. Append: `- Q: <question> -> A: <final answer>`
-4. Apply the clarification to the appropriate section:
+3. Identify which spec items (FR-xxx, US-x, SC-xxx) the clarification affects
+4. Append with references: `- Q: <question> -> A: <final answer> [FR-001, US-2]`
+   - References MUST list every spec item that the answer clarifies, constrains, or modifies
+   - Use the exact IDs from the spec (e.g., `FR-001`, `US-3`, `SC-002`)
+   - If the clarification adds a **new** requirement or story, reference the newly created ID
+   - If the clarification is cross-cutting (e.g., terminology, general scope), reference all materially affected items
+5. Apply the clarification to the appropriate section:
    - Functional ambiguity -> Functional Requirements
    - User interaction -> User Stories
    - Data shape -> Data Model
@@ -170,12 +176,16 @@ For each accepted answer:
    - Edge case -> Edge Cases / Error Handling
    - Terminology conflict -> Normalize across spec
 
-5. **Save the spec file AFTER each integration** to minimize risk of context loss
+6. **Save the spec file AFTER each integration** to minimize risk of context loss
+
+See [clarification-format.md](references/clarification-format.md) for format details and examples.
 
 ### 5. Validation
 
 After EACH write plus final pass:
 - Clarifications session contains exactly one bullet per accepted answer
+- Each Q&A entry ends with a `[refs]` bracket listing at least one valid spec item ID
+- All referenced IDs (FR-xxx, US-x, SC-xxx) exist in the spec
 - Total asked questions <= 5
 - Updated sections contain no lingering vague placeholders
 - No contradictory earlier statements remain
@@ -187,6 +197,13 @@ Output:
 - Number of questions asked & answered
 - Path to updated spec
 - Sections touched
+- Traceability summary (which spec items were clarified):
+
+| Clarification | Referenced Items |
+|---------------|-----------------|
+| Q1: [short summary] | FR-001, US-2 |
+| Q2: [short summary] | SC-003 |
+
 - Coverage summary table:
 
 | Category | Status |
