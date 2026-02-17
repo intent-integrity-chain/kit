@@ -23,7 +23,14 @@ REPO_ROOT=$(get_repo_root)
 HAS_GIT="false"
 has_git && HAS_GIT="true"
 CURRENT_BRANCH=$(get_current_branch)
-check_feature_branch "$CURRENT_BRANCH" "$HAS_GIT" || exit 1
+BRANCH_EXIT=0
+check_feature_branch "$CURRENT_BRANCH" "$HAS_GIT" || BRANCH_EXIT=$?
+if [[ $BRANCH_EXIT -eq 2 ]]; then
+    echo "ERROR: Multiple features exist. Run: /iikit-core use <feature> to select one." >&2
+    exit 2
+elif [[ $BRANCH_EXIT -ne 0 ]]; then
+    exit 1
+fi
 
 # Now get all paths (will use SPECIFY_FEATURE if it was set by check_feature_branch)
 eval $(get_feature_paths)

@@ -255,8 +255,8 @@ test_parallel_execution() {
         log_fail "implement SKILL.md does not reference parallel-execution.md"
     fi
 
-    # Section 5 has subsections 5.1-5.5
-    local subsections=("5.1 Task Extraction" "5.2 Execution Strategy Selection" "5.3 Phase-by-Phase Execution" "5.4 Execution Rules" "5.5 Parallel Failure Handling")
+    # Section 5 has subsections 5.1-5.5 (bold-formatted in SKILL.md)
+    local subsections=("5.1 Task extraction" "5.2 Execution strategy" "5.3 Phase-by-phase" "5.4 Rules" "5.5 Failure handling")
     for sub in "${subsections[@]}"; do
         ((TESTS_RUN++))
         if grep -q "$sub" "$impl"; then
@@ -266,17 +266,17 @@ test_parallel_execution() {
         fi
     done
 
-    # Execution mode report includes Completed/Remaining counts
+    # Execution mode report references formatting-guide.md
     ((TESTS_RUN++))
-    if grep -q 'Completed: C.*Remaining: R' "$impl"; then
-        log_pass "execution mode report includes Completed/Remaining"
+    if grep -q 'formatting-guide.md.*Execution Mode' "$impl"; then
+        log_pass "execution mode report references formatting guide"
     else
-        log_fail "execution mode report missing Completed/Remaining counts"
+        log_fail "execution mode report missing formatting guide reference"
     fi
 
-    # Error handling table has parallel task failure row
+    # Error handling table has parallel/task failure row
     ((TESTS_RUN++))
-    if grep -q 'Parallel task fails' "$impl"; then
+    if grep -qi 'task.*parallel.*failure\|parallel.*failure' "$impl"; then
         log_pass "error handling table has parallel task failure row"
     else
         log_fail "error handling table missing parallel task failure row"
@@ -284,18 +284,18 @@ test_parallel_execution() {
 
     # Constitutional violation in parallel context documented
     ((TESTS_RUN++))
-    if grep -q 'Constitutional violation in a worker' "$impl"; then
+    if grep -qi 'constitutional violation.*worker' "$impl"; then
         log_pass "constitutional violation in parallel context documented"
     else
         log_fail "constitutional violation in parallel context not documented"
     fi
 
-    # Batch completion report format exists
+    # Batch/progress reporting documented
     ((TESTS_RUN++))
-    if grep -q 'Batch N complete' "$impl"; then
-        log_pass "batch completion report format present"
+    if grep -qi 'report after each task/batch\|batch.*complete' "$impl"; then
+        log_pass "batch completion reporting present"
     else
-        log_fail "batch completion report format missing"
+        log_fail "batch completion reporting missing"
     fi
 
     # ── Reference doc sections ──
@@ -400,7 +400,7 @@ test_parallel_execution() {
     # ── Tasks skill parallel batch listing ──
 
     ((TESTS_RUN++))
-    if grep -q 'Parallel batches:' "$tasks"; then
+    if grep -qi 'parallel batches\|list parallel batches' "$tasks"; then
         log_pass "tasks skill: parallel batch listing in critical path analysis"
     else
         log_fail "tasks skill: parallel batch listing missing"

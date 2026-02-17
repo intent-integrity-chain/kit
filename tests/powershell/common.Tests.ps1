@@ -227,3 +227,120 @@ Describe "Get-SpecQualityScore" {
         $result | Should -BeLessThan 6
     }
 }
+
+Describe "Write-ActiveFeature / Read-ActiveFeature" {
+    BeforeEach {
+        $script:TestDir = New-TestDirectory
+        Push-Location $script:TestDir
+    }
+
+    AfterEach {
+        Pop-Location
+        Remove-TestDirectory -TestDir $script:TestDir
+    }
+
+    It "writes and reads active feature" {
+        New-Item -ItemType Directory -Path "specs/001-test-feature" -Force | Out-Null
+        Write-ActiveFeature -Feature "001-test-feature"
+        $result = Read-ActiveFeature
+        $result | Should -Be "001-test-feature"
+    }
+
+    It "returns null for missing active-feature file" {
+        $result = Read-ActiveFeature
+        $result | Should -BeNullOrEmpty
+    }
+
+    It "returns null for invalid feature directory" {
+        New-Item -ItemType Directory -Path ".specify" -Force | Out-Null
+        "999-nonexistent" | Out-File ".specify/active-feature" -NoNewline
+        $result = Read-ActiveFeature
+        $result | Should -BeNullOrEmpty
+    }
+}
+
+Describe "Get-FeatureStage" {
+    BeforeEach {
+        $script:TestDir = New-TestDirectory
+        Push-Location $script:TestDir
+    }
+
+    AfterEach {
+        Pop-Location
+        Remove-TestDirectory -TestDir $script:TestDir
+    }
+
+    It "returns specified for spec-only feature" {
+        New-Item -ItemType Directory -Path "specs/001-test" -Force | Out-Null
+        "# Spec" | Out-File "specs/001-test/spec.md"
+        $result = Get-FeatureStage -RepoRoot $script:TestDir -Feature "001-test"
+        $result | Should -Be "specified"
+    }
+
+    It "returns planned for feature with plan" {
+        New-Item -ItemType Directory -Path "specs/001-test" -Force | Out-Null
+        "# Spec" | Out-File "specs/001-test/spec.md"
+        "# Plan" | Out-File "specs/001-test/plan.md"
+        $result = Get-FeatureStage -RepoRoot $script:TestDir -Feature "001-test"
+        $result | Should -Be "planned"
+    }
+
+    It "returns tasks-ready for untouched tasks" {
+        New-Item -ItemType Directory -Path "specs/001-test" -Force | Out-Null
+        @("- [ ] T001 Do something", "- [ ] T002 Do another") | Out-File "specs/001-test/tasks.md"
+        $result = Get-FeatureStage -RepoRoot $script:TestDir -Feature "001-test"
+        $result | Should -Be "tasks-ready"
+    }
+
+    It "returns implementing percentage" {
+        New-Item -ItemType Directory -Path "specs/001-test" -Force | Out-Null
+        @("- [x] T001 Done", "- [ ] T002 Not done") | Out-File "specs/001-test/tasks.md"
+        $result = Get-FeatureStage -RepoRoot $script:TestDir -Feature "001-test"
+        $result | Should -Be "implementing-50%"
+    }
+
+    It "returns complete for all done" {
+        New-Item -ItemType Directory -Path "specs/001-test" -Force | Out-Null
+        @("- [x] T001 Done", "- [x] T002 Also done") | Out-File "specs/001-test/tasks.md"
+        $result = Get-FeatureStage -RepoRoot $script:TestDir -Feature "001-test"
+        $result | Should -Be "complete"
+    }
+
+    It "returns unknown for nonexistent feature" {
+        $result = Get-FeatureStage -RepoRoot $script:TestDir -Feature "999-nope"
+        $result | Should -Be "unknown"
+    }
+}
+
+Describe "Test-FeatureBranch exit code 2" {
+    BeforeEach {
+        $script:TestDir = New-TestDirectory
+        Push-Location $script:TestDir
+        $env:SPECIFY_FEATURE = $null
+    }
+
+    AfterEach {
+        Pop-Location
+        $env:SPECIFY_FEATURE = $null
+        Remove-TestDirectory -TestDir $script:TestDir
+    }
+
+    It "returns NEEDS_SELECTION for multiple features" {
+        New-Item -ItemType Directory -Path "specs/001-first" -Force | Out-Null
+        New-Item -ItemType Directory -Path "specs/002-second" -Force | Out-Null
+        $result = Test-FeatureBranch -Branch "main" -HasGit $true
+        $result | Should -Contain "NEEDS_SELECTION"
+    }
+
+    It "writes sticky on NNN- branch match" {
+        $result = Test-FeatureBranch -Branch "001-test-feature" -HasGit $true
+        $result | Should -Be "OK"
+        Test-Path ".specify/active-feature" | Should -Be $true
+    }
+
+    It "writes sticky on single feature auto-select" {
+        New-Item -ItemType Directory -Path "specs/001-only-feature" -Force | Out-Null
+        $result = Test-FeatureBranch -Branch "main" -HasGit $true
+        $result | Should -Be "OK"
+    }
+}

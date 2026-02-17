@@ -174,3 +174,44 @@ teardown() {
     assert_contains "$output" "--json"
     assert_contains "$output" "--require-tasks"
 }
+
+# =============================================================================
+# Multi-feature / needs_selection tests
+# =============================================================================
+
+@test "check-prerequisites: exits 2 with needs_selection for multiple features" {
+    unset SPECIFY_FEATURE
+    # Remove active-feature if it exists
+    rm -f "$TEST_DIR/.specify/active-feature"
+    mkdir -p "$TEST_DIR/specs/001-feature-a"
+    mkdir -p "$TEST_DIR/specs/002-feature-b"
+
+    run "$CHECK_SCRIPT" --json
+    [[ "$status" -eq 2 ]]
+    assert_contains "$output" "needs_selection"
+}
+
+@test "check-prerequisites: needs_selection includes features list" {
+    unset SPECIFY_FEATURE
+    rm -f "$TEST_DIR/.specify/active-feature"
+    mkdir -p "$TEST_DIR/specs/001-feature-a"
+    mkdir -p "$TEST_DIR/specs/002-feature-b"
+
+    run "$CHECK_SCRIPT" --json
+    [[ "$status" -eq 2 ]]
+    assert_contains "$output" "001-feature-a"
+    assert_contains "$output" "002-feature-b"
+}
+
+@test "check-prerequisites: active-feature file resolves ambiguity" {
+    unset SPECIFY_FEATURE
+    # Create two features but set active-feature to one
+    create_mock_feature "001-feature-a"
+    create_mock_feature "002-feature-b"
+    mkdir -p "$TEST_DIR/.specify"
+    echo "001-feature-a" > "$TEST_DIR/.specify/active-feature"
+
+    run "$CHECK_SCRIPT" --json
+    [[ "$status" -eq 0 ]]
+    assert_contains "$output" "001-feature-a"
+}

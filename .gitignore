@@ -1,6 +1,8 @@
 # Project-specific artifacts (created by users, not part of framework)
 .specify/memory/constitution.md
 .specify/context.json
+.specify/active-feature
+.specify/evals/
 
 # Test directories (regenerate using TEST-GUIDE.md)
 test-vanilla-*/

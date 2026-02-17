@@ -61,7 +61,17 @@ EXAMPLES:
 $repoRoot = Get-RepoRoot
 $hasGit = Test-HasGit
 $currentBranch = Get-CurrentBranch
-if (-not (Test-FeatureBranch -Branch $currentBranch -HasGit $hasGit)) {
+$branchResult = Test-FeatureBranch -Branch $currentBranch -HasGit $hasGit
+if ($branchResult -eq "NEEDS_SELECTION") {
+    $featuresJson = Get-FeaturesJson
+    if ($Json -or $PathsOnly) {
+        Write-Output "{`"needs_selection`":true,`"features`":$featuresJson}"
+    } else {
+        Write-Output "NEEDS_SELECTION: true"
+        Write-Output "Run: /iikit-core use <feature> to select a feature."
+    }
+    exit 2
+} elseif ($branchResult -eq "ERROR") {
     exit 1
 }
 

@@ -1,11 +1,14 @@
 ---
 name: iikit-02-clarify
-description: Identify underspecified areas and ask targeted clarification questions
+description: >-
+  Resolve ambiguities in feature specifications by asking targeted questions.
+  Use when requirements are unclear, incomplete, missing details, or need refinement before planning.
+license: MIT
 ---
 
 # Intent Integrity Kit Clarify
 
-Identify underspecified areas in the current feature spec by asking up to 5 highly targeted clarification questions and encoding answers back into the spec.
+Ask up to 5 targeted clarification questions to reduce ambiguity in the active feature spec, then encode answers back into the spec.
 
 ## User Input
 
@@ -15,220 +18,88 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
-## Constitution Loading (REQUIRED)
+## Constitution Loading
 
-Before ANY action, load and internalize the project constitution:
-
-1. Read constitution:
-   ```bash
-   cat CONSTITUTION.md 2>/dev/null || echo "NO_CONSTITUTION"
-   ```
-
-2. If exists, parse all principles, constraints, and governance rules.
+Load constitution per [constitution-loading.md](../iikit-core/references/constitution-loading.md) (soft mode — parse if exists, continue if not).
 
 ## Prerequisites Check
 
-1. Run prerequisites check:
+1. Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --json --paths-only`
+2. Parse JSON for `FEATURE_DIR` and `FEATURE_SPEC`. If missing: ERROR with `Run: /iikit-01-specify`.
+3. If JSON contains `needs_selection: true`: present the `features` array as a numbered table (name and stage columns). Follow the options presentation pattern in [conversation-guide.md](../iikit-core/references/conversation-guide.md). After user selects, run:
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --json --paths-only
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selection>
    ```
+   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selection>`
 
-2. Parse JSON for:
-   - `FEATURE_DIR`
-   - `FEATURE_SPEC`
-
-3. If JSON parsing fails:
-   ```
-   ERROR: Feature specification not found.
-
-   No active feature detected. Create a feature specification first.
-   Run: /iikit-01-specify <feature description>
-   ```
-
-## Goal
-
-Detect and reduce ambiguity or missing decision points in the active feature specification and record the clarifications directly in the spec file.
-
-**Note**: This clarification workflow should run BEFORE invoking `/iikit-03-plan`. If the user explicitly states they are skipping clarification, proceed but warn that downstream rework risk increases.
+   Then re-run the prerequisites check from step 1.
 
 ## Execution Steps
 
-### 1. Load Spec and Scan for Ambiguities
+### 1. Scan for Ambiguities
 
-Load the current spec file and perform a structured ambiguity & coverage scan using this taxonomy. For each category, mark status: Clear / Partial / Missing.
+Load spec and perform structured scan using this taxonomy. Mark each: Clear / Partial / Missing.
 
-**Functional Scope & Behavior:**
-- Core user goals & success criteria
-- Explicit out-of-scope declarations
-- User roles / personas differentiation
+- **Functional Scope**: core goals, out-of-scope declarations, user roles
+- **Domain & Data Model**: entities, identity rules, state transitions, scale
+- **Interaction & UX**: critical journeys, error/empty/loading states, accessibility
+- **Non-Functional**: performance, scalability, reliability, observability, security, compliance
+- **Integrations**: external APIs, data formats, protocol assumptions
+- **Edge Cases**: negative scenarios, rate limiting, conflict resolution
+- **Constraints**: technical constraints, rejected alternatives
+- **Terminology**: canonical terms, deprecated synonyms
+- **Completion Signals**: acceptance criteria testability, measurable DoD
 
-**Domain & Data Model:**
-- Entities, attributes, relationships
-- Identity & uniqueness rules
-- Lifecycle/state transitions
-- Data volume / scale assumptions
+### 2. Generate Question Queue (max 5)
 
-**Interaction & UX Flow:**
-- Critical user journeys / sequences
-- Error/empty/loading states
-- Accessibility or localization notes
+**Constraints**:
+- Each answerable with multiple-choice (2-5 options) OR short phrase (<=5 words)
+- Identify related spec items (FR-xxx, US-x, SC-xxx) for each question
+- Only include questions that materially impact architecture, data, tasks, tests, UX, or compliance
+- Balance category coverage, exclude already-answered, favor downstream rework reduction
 
-**Non-Functional Quality Attributes:**
-- Performance (latency, throughput targets)
-- Scalability (horizontal/vertical, limits)
-- Reliability & availability
-- Observability (logging, metrics, tracing)
-- Security & privacy
-- Compliance / regulatory constraints
+### 3. Sequential Questioning
 
-**Integration & External Dependencies:**
-- External services/APIs and failure modes
-- Data import/export formats
-- Protocol/versioning assumptions
+Present ONE question at a time.
 
-**Edge Cases & Failure Handling:**
-- Negative scenarios
-- Rate limiting / throttling
-- Conflict resolution
+**For multiple-choice**: follow the options presentation pattern in [conversation-guide.md](../iikit-core/references/conversation-guide.md). Analyze options, state recommendation with reasoning, render options table. User can reply with letter, "yes"/"recommended", or custom text.
 
-**Constraints & Tradeoffs:**
-- Technical constraints
-- Explicit tradeoffs or rejected alternatives
+**After answer**: validate against constraints, record, move to next.
 
-**Terminology & Consistency:**
-- Canonical glossary terms
-- Avoided synonyms / deprecated terms
-
-**Completion Signals:**
-- Acceptance criteria testability
-- Measurable Definition of Done indicators
-
-### 2. Generate Question Queue
-
-Generate a prioritized queue of candidate clarification questions (maximum 5).
-
-**Constraints:**
-- Each question must be answerable with EITHER:
-  - A short multiple-choice selection (2-5 options), OR
-  - A one-word / short-phrase answer (<=5 words)
-- For each question, identify the spec items (FR-xxx, US-x, SC-xxx) it relates to — these will be recorded as references when the answer is integrated
-- Only include questions whose answers materially impact architecture, data modeling, task decomposition, test design, UX behavior, operational readiness, or compliance validation
-- Ensure category coverage balance
-- Exclude questions already answered
-- Favor clarifications that reduce downstream rework risk
-
-### 3. Sequential Questioning Loop
-
-Present EXACTLY ONE question at a time.
-
-**For multiple-choice questions:**
-
-1. **Analyze all options** and determine the **most suitable option** based on:
-   - Best practices for the project type
-   - Common patterns in similar implementations
-   - Risk reduction (security, performance, maintainability)
-   - Alignment with project goals or constraints
-
-2. Present your **recommended option prominently**:
-   ```
-   **Recommended:** Option [X] - <reasoning>
-   ```
-
-3. Render all options as a table:
-
-   | Option | Description |
-   |--------|-------------|
-   | A | Option A description |
-   | B | Option B description |
-   | C | Option C description |
-   | Short | Provide a different short answer (<=5 words) |
-
-4. Add: `You can reply with the option letter (e.g., "A"), accept the recommendation by saying "yes" or "recommended", or provide your own short answer.`
-
-**After user answers:**
-- If user replies with "yes", "recommended", or "suggested", use your stated recommendation
-- Validate the answer maps to one option or fits the <=5 word constraint
-- If ambiguous, ask for quick disambiguation
-- Record in working memory and move to next question
-
-**Stop asking when:**
-- All critical ambiguities resolved early
-- User signals completion ("done", "good", "no more")
-- You reach 5 asked questions
+**Stop when**: all critical ambiguities resolved, user signals done, or 5 questions asked.
 
 ### 4. Integration After Each Answer
 
-For each accepted answer:
+1. Ensure `## Clarifications` section exists in spec with `### Session YYYY-MM-DD` subheading
+2. Append: `- Q: <question> -> A: <answer> [FR-001, US-2]`
+   - References MUST list every affected spec item
+   - If cross-cutting, reference all materially affected items
+3. Apply clarification to appropriate spec section (functional -> Requirements, data -> Data Model, etc.)
+4. **Save spec after each integration** to minimize context loss
 
-1. Ensure a `## Clarifications` section exists in the spec
-2. Under it, create a `### Session YYYY-MM-DD` subheading for today
-3. Identify which spec items (FR-xxx, US-x, SC-xxx) the clarification affects
-4. Append with references: `- Q: <question> -> A: <final answer> [FR-001, US-2]`
-   - References MUST list every spec item that the answer clarifies, constrains, or modifies
-   - Use the exact IDs from the spec (e.g., `FR-001`, `US-3`, `SC-002`)
-   - If the clarification adds a **new** requirement or story, reference the newly created ID
-   - If the clarification is cross-cutting (e.g., terminology, general scope), reference all materially affected items
-5. Apply the clarification to the appropriate section:
-   - Functional ambiguity -> Functional Requirements
-   - User interaction -> User Stories
-   - Data shape -> Data Model
-   - Non-functional constraint -> Quality Attributes
-   - Edge case -> Edge Cases / Error Handling
-   - Terminology conflict -> Normalize across spec
-
-6. **Save the spec file AFTER each integration** to minimize risk of context loss
-
-See [clarification-format.md](references/clarification-format.md) for format details and examples.
+See [clarification-format.md](references/clarification-format.md) for format details.
 
 ### 5. Validation
 
-After EACH write plus final pass:
-- Clarifications session contains exactly one bullet per accepted answer
-- Each Q&A entry ends with a `[refs]` bracket listing at least one valid spec item ID
-- All referenced IDs (FR-xxx, US-x, SC-xxx) exist in the spec
-- Total asked questions <= 5
-- Updated sections contain no lingering vague placeholders
-- No contradictory earlier statements remain
-- Markdown structure valid
+After each write and final pass:
+- One bullet per accepted answer, each ending with `[refs]`
+- All referenced IDs exist in spec
+- Total questions <= 5
+- No vague placeholders or contradictions remain
 
-### 6. Report Completion
+### 6. Report
 
-Output:
-- Number of questions asked & answered
-- Path to updated spec
-- Sections touched
-- Traceability summary (which spec items were clarified):
-
-| Clarification | Referenced Items |
-|---------------|-----------------|
-| Q1: [short summary] | FR-001, US-2 |
-| Q2: [short summary] | SC-003 |
-
-- Coverage summary table:
-
-| Category | Status |
-|----------|--------|
-| [Category] | Resolved / Deferred / Clear / Outstanding |
-
-- If Outstanding or Deferred remain, recommend next steps
-- Suggested next command (`/iikit-03-plan`)
+Output: questions asked/answered, path to updated spec, sections touched, traceability summary table (clarification -> referenced items), coverage summary (category -> status), suggested next command (`/iikit-03-plan`).
 
 ## Behavior Rules
 
-- If no meaningful ambiguities found, respond: "No critical ambiguities detected worth formal clarification." and suggest proceeding
-- If spec file missing:
-  ```
-  ERROR: spec.md not found in feature directory.
-
-  Run: /iikit-01-specify <feature description>
-  ```
-- Never exceed 5 total asked questions
+- No meaningful ambiguities found: "No critical ambiguities detected." and suggest proceeding
+- Never exceed 5 questions
 - Avoid speculative tech stack questions unless absence blocks functional clarity
-- Respect user early termination signals ("stop", "done", "proceed")
+- Respect early termination signals ("stop", "done", "proceed")
 
 ## Next Steps
 
-After completing clarification:
-- Run `/iikit-03-plan` to create the technical implementation plan
+Suggest the user run `/clear` before proceeding — the interactive Q&A session consumed significant context, and planning benefits from a fresh context window. State is preserved in spec.md and `.specify/context.json`.
 
-The plan skill will validate that the spec exists before proceeding.
+Run `/iikit-03-plan` to create the technical implementation plan.

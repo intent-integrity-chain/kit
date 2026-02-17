@@ -8,5 +8,19 @@
         "start"
       ]
     }
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "name": "iikit-context",
+            "type": "command",
+            "command": ".gemini/skills/iikit-core/scripts/bash/session-context-hook-gemini.sh",
+            "timeout": 5000
+          }
+        ]
+      }
+    ]
   }
 }

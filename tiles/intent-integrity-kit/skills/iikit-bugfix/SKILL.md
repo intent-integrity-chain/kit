@@ -1,0 +1,254 @@
+---
+name: iikit-bugfix
+description: >-
+  Report and fix bugs without full specification workflow.
+  Use when a developer discovers a bug and wants to record it, generate fix tasks, and proceed to implementation.
+license: MIT
+---
+
+# Intent Integrity Kit Bugfix
+
+Report a bug against an existing feature, create a structured `bugs.md` record, and generate fix tasks in `tasks.md`.
+
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+You **MUST** consider the user input before proceeding (if not empty).
+
+## Constitution Loading
+
+Load constitution per [constitution-loading.md](../iikit-core/references/constitution-loading.md) (soft mode — warn if missing, proceed without).
+
+## Execution Flow
+
+The text after `/iikit-bugfix` is either a `#number` (GitHub issue) or a text bug description.
+
+### 1. Parse Input
+
+Determine the input type:
+
+- **`#number` pattern** (e.g., `#42`): GitHub inbound flow (Step 2a)
+- **Text description**: Text description flow (Step 2b)
+- **Empty**: ERROR with usage example: `/iikit-bugfix 'Login fails when email contains plus sign'` or `/iikit-bugfix #42`
+
+If input contains BOTH `#number` and text, prioritize the `#number` and warn that text is ignored.
+
+### 2a. GitHub Inbound Flow
+
+1. Check `gh` CLI availability: `which gh` / `Get-Command gh`
+2. If unavailable: ERROR with remediation: "Install GitHub CLI: https://cli.github.com/ or use text description instead."
+3. Fetch issue: `gh issue view <number> --json title,body,labels`
+4. If fetch fails (issue not found, auth error): ERROR with clear message and remediation.
+5. Map fields:
+   - `title` → bug description
+   - `body` → reproduction steps
+   - `labels` → severity mapping: labels containing "critical" → critical, "high"/"priority" → high, "bug" → medium (default), otherwise → medium
+6. Store issue number for GitHub Issue field in bugs.md
+7. Continue to Step 3
+
+### 2b. Text Description Flow
+
+1. Store the text as the bug description
+2. Continue to Step 3
+
+### 3. Select Target Feature
+
+Run feature listing:
+
+**Unix/macOS/Linux:**
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/bugfix-helpers.sh --list-features
+```
+**Windows (PowerShell):**
+```powershell
+pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/bugfix-helpers.ps1 --list-features
+```
+
+Parse the JSON array. If empty: ERROR with "No features found. Run `/iikit-01-specify` first to create a feature."
+
+Present a numbered table of features:
+
+| # | Feature | Stage |
+|---|---------|-------|
+| 1 | 001-user-auth | implementing-50% |
+| 2 | 002-api-gateway | specified |
+
+Prompt user to select a feature by number.
+
+### 4. Validate Feature
+
+After selection, validate:
+
+**Unix/macOS/Linux:**
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/bugfix-helpers.sh --validate-feature "<feature_dir>"
+```
+**Windows (PowerShell):**
+```powershell
+pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/bugfix-helpers.ps1 --validate-feature "<feature_dir>"
+```
+
+If invalid: ERROR with the message from the JSON response.
+
+### 5. Gather Bug Details
+
+**For text input (2b):**
+- Prompt user for **severity**: present options (critical, high, medium, low) with descriptions
+- Prompt user for **reproduction steps**: numbered list of steps to reproduce
+
+**For GitHub inbound (2a):**
+- Severity is pre-filled from labels (confirm with user if mapping is ambiguous)
+- Reproduction steps are pre-filled from issue body (confirm with user)
+
+### 6. Generate Bug ID
+
+**Unix/macOS/Linux:**
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/bugfix-helpers.sh --next-bug-id "<feature_dir>"
+```
+**Windows (PowerShell):**
+```powershell
+pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/bugfix-helpers.ps1 --next-bug-id "<feature_dir>"
+```
+
+### 7. Write bugs.md
+
+Create or append to `<feature_dir>/bugs.md` using the template at [bugs-template.md](references/bugs-template.md).
+
+Fill in:
+- **BUG-ID**: from Step 6
+- **Reported**: today's date (YYYY-MM-DD)
+- **Severity**: from Step 5
+- **Status**: `reported`
+- **GitHub Issue**: `#number` if from GitHub inbound, `_(none)_` otherwise
+- **Description**: bug description
+- **Reproduction Steps**: from Step 5
+- **Root Cause**: `_(empty until investigation)_`
+- **Fix Reference**: `_(empty until implementation)_`
+
+If `bugs.md` already exists, append with `---` separator before the new entry. Do NOT modify existing entries.
+
+If `bugs.md` does not exist, create it with the header `# Bug Reports: <feature-name>` followed by the entry.
+
+### 8. Outbound GitHub Issue (Text Input Only)
+
+For text-input bugs only (NOT for GitHub inbound — issue already exists):
+
+1. Check `gh` CLI availability and remote configuration
+2. If available: create issue via `gh issue create --title "<description>" --body "<bugs.md entry content>" --label "bug"`
+3. Store returned issue number in the bugs.md GitHub Issue field
+4. If `gh` unavailable or no remote: warn that GitHub issue creation was skipped, proceed with local workflow
+
+### 9. Assess TDD Requirements
+
+**Unix/macOS/Linux:**
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh assess-tdd "CONSTITUTION.md"
+```
+**Windows (PowerShell):**
+```powershell
+pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/testify-tdd.ps1 assess-tdd "CONSTITUTION.md"
+```
+
+Parse JSON response for `determination` field.
+
+### 10. TDD Flow (If Mandatory)
+
+If TDD is mandatory (`determination` = `mandatory`):
+
+1. Check if `<feature_dir>/tests/test-specs.md` exists
+2. If missing: ERROR with "TDD is required by constitution but test-specs.md not found. Run `/iikit-05-testify` first."
+3. If exists: append a "Bug Fix Tests" section with:
+   - Continue TS-NNN numbering from the last existing entry
+   - Write Given/When/Then test specification derived from the bug report
+   - Given: the conditions that trigger the bug
+   - When: the action that causes the incorrect behavior
+   - Then: the expected correct behavior
+4. Re-hash test-specs.md:
+   ```bash
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh compute-hash "<feature_dir>/tests/test-specs.md"
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh store-hash "<feature_dir>/tests/test-specs.md" "<hash>"
+   ```
+5. Continue to Step 11 with TDD task variant
+
+### 11. Generate Bug Fix Tasks
+
+Get next task IDs:
+
+**Unix/macOS/Linux:**
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/bugfix-helpers.sh --next-task-ids "<feature_dir>" <count>
+```
+**Windows (PowerShell):**
+```powershell
+pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/bugfix-helpers.ps1 --next-task-ids "<feature_dir>" <count>
+```
+
+**Non-TDD task set** (count = 3):
+```markdown
+## Bug Fix Tasks
+
+- [ ] T-BNNN [BUG-NNN] Investigate root cause for BUG-NNN: <description>
+- [ ] T-BNNN+1 [BUG-NNN] Implement fix for BUG-NNN: <description>
+- [ ] T-BNNN+2 [BUG-NNN] Write regression test for BUG-NNN: <description>
+```
+
+**TDD task set** (count = 2):
+```markdown
+## Bug Fix Tasks
+
+- [ ] T-BNNN [BUG-NNN] Implement fix for BUG-NNN referencing test spec TS-NNN: <description>
+- [ ] T-BNNN+1 [BUG-NNN] Verify fix passes test TS-NNN for BUG-NNN: <description>
+```
+
+If GitHub issue is linked, include reference in task descriptions (e.g., `(GitHub #42)`).
+
+Append to existing `<feature_dir>/tasks.md`. If tasks.md does not exist, create it with:
+```markdown
+# Tasks: <feature-name>
+
+## Bug Fix Tasks
+
+[tasks here]
+```
+
+Do NOT modify existing entries or task IDs in tasks.md.
+
+### 12. Report
+
+Output a summary:
+
+```
+Bug reported successfully!
+
+  Bug ID:      BUG-NNN
+  Feature:     <feature-name>
+  Severity:    <severity>
+  GitHub Issue: #number (or N/A)
+  Tasks:       T-BNNN through T-BNNN+N
+
+Files modified:
+  - <feature_dir>/bugs.md (created/appended)
+  - <feature_dir>/tasks.md (appended)
+  - <feature_dir>/tests/test-specs.md (appended, TDD only)
+
+Next steps:
+  - /iikit-08-implement - Implement the bug fix tasks
+```
+
+## Error Handling
+
+| Condition | Response |
+|-----------|----------|
+| Empty input | ERROR with usage example |
+| No features found | ERROR: "Run `/iikit-01-specify` first" |
+| Feature validation failed | ERROR with specific message |
+| `gh` CLI unavailable (inbound) | ERROR with install instructions |
+| `gh` CLI unavailable (outbound) | WARN and skip, proceed locally |
+| GitHub issue not found | ERROR with "verify issue number" |
+| TDD required, no test-specs.md | ERROR: "Run `/iikit-05-testify` first" |
+| Existing bugs.md | Append without modifying existing entries |
+| Existing tasks.md | Append without modifying existing entries |

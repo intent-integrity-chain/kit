@@ -1,28 +1,18 @@
 ---
 name: iikit-04-checklist
-description: Generate domain-specific quality checklists for requirements validation
+description: >-
+  Generate quality checklists that validate requirements completeness, clarity, and consistency.
+  Use when reviewing specs for gaps, verifying requirement quality, or gating before implementation.
+license: MIT
 ---
 
 # Intent Integrity Kit Checklist
 
-Generate a custom checklist for the current feature based on user requirements. Checklists are "Unit Tests for English" - they validate the REQUIREMENTS, not the implementation.
+Generate "Unit Tests for English" — checklists that validate REQUIREMENTS quality, not implementation.
 
-## Checklist Purpose: "Unit Tests for English"
+## Core Principle
 
-**CRITICAL CONCEPT**: Checklists are **UNIT TESTS FOR REQUIREMENTS WRITING** - they validate the quality, clarity, and completeness of requirements in a given domain.
-
-**NOT for verification/testing**:
-- NOT "Verify the button clicks correctly"
-- NOT "Test error handling works"
-- NOT "Confirm the API returns 200"
-- NOT checking if code/implementation matches the spec
-
-**FOR requirements quality validation**:
-- "Are visual hierarchy requirements defined for all card types?" (completeness)
-- "Is 'prominent display' quantified with specific sizing/positioning?" (clarity)
-- "Are hover state requirements consistent across all interactive elements?" (consistency)
-- "Are accessibility requirements defined for keyboard navigation?" (coverage)
-- "Does the spec define what happens when logo image fails to load?" (edge cases)
+Every checklist item evaluates the **requirements themselves** for completeness, clarity, consistency, measurability, and coverage. Items MUST NOT test implementation behavior.
 
 ## User Input
 
@@ -32,286 +22,80 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
-## Constitution Loading (REQUIRED)
+## Constitution Loading
 
-Before ANY action, load and internalize the project constitution:
-
-1. Read constitution:
-   ```bash
-   cat CONSTITUTION.md 2>/dev/null || echo "NO_CONSTITUTION"
-   ```
-
-2. If exists, parse all principles for checklist generation.
+Load constitution per [constitution-loading.md](../iikit-core/references/constitution-loading.md) (basic mode).
 
 ## Prerequisites Check
 
-1. Run prerequisites check:
-   ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --json
-   ```
-
+1. Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --json`
 2. Parse JSON for `FEATURE_DIR` and `AVAILABLE_DOCS`.
+3. If JSON contains `needs_selection: true`: present the `features` array as a numbered table (name and stage columns). Follow the options presentation pattern in [conversation-guide.md](../iikit-core/references/conversation-guide.md). After user selects, run:
+   ```bash
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selection>
+   ```
+   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selection>`
+
+   Then re-run the prerequisites check from step 1.
 
 ## Execution Steps
 
 ### 1. Clarify Intent
 
-Derive up to THREE contextual clarifying questions. They MUST:
-- Be generated from user's phrasing + signals from spec/plan/tasks
-- Only ask about information that materially changes checklist content
-- Be skipped if already unambiguous in `$ARGUMENTS`
-
-**Question archetypes:**
-- Scope refinement: "Should this include integration touchpoints?"
-- Risk prioritization: "Which risk areas need mandatory gating checks?"
-- Depth calibration: "Is this a lightweight sanity list or formal release gate?"
-- Audience framing: "Will this be used by author only or peers during PR review?"
-- Boundary exclusion: "Should we explicitly exclude performance tuning items?"
+Derive up to THREE contextual questions (skip if unambiguous from `$ARGUMENTS`):
+- Scope: include integration touchpoints?
+- Risk: which areas need mandatory gating?
+- Depth: lightweight sanity list or formal release gate?
+- Audience: author-only or peer PR review?
 
 ### 2. Load Feature Context
 
-Read from FEATURE_DIR:
-- `spec.md`: Feature requirements and scope
-- `plan.md` (if exists): Technical details, dependencies
-- `tasks.md` (if exists): Implementation tasks
+Read from FEATURE_DIR: `spec.md` (required), `plan.md` (optional), `tasks.md` (optional).
 
 ### 3. Generate Checklist
 
-Create `FEATURE_DIR/checklists/[domain].md`:
+Create `FEATURE_DIR/checklists/[domain].md`.
 
-**CORE PRINCIPLE - Test the Requirements, Not the Implementation**:
+**Item structure**: question format about requirement quality, with quality dimension tag and spec reference.
 
-Every checklist item MUST evaluate the REQUIREMENTS THEMSELVES for:
-- **Completeness**: Are all necessary requirements present?
-- **Clarity**: Are requirements unambiguous and specific?
-- **Consistency**: Do requirements align with each other?
-- **Measurability**: Can requirements be objectively verified?
-- **Coverage**: Are all scenarios/edge cases addressed?
+Correct: "Are visual hierarchy requirements defined with measurable criteria?" [Clarity, Spec SFR-1]
+Wrong: "Verify the button clicks correctly" (this tests implementation)
 
-**Category Structure** - Group items by requirement quality dimensions:
-- Requirement Completeness
-- Requirement Clarity
-- Requirement Consistency
-- Acceptance Criteria Quality
-- Scenario Coverage
-- Edge Case Coverage
-- Non-Functional Requirements
-- Dependencies & Assumptions
-- Ambiguities & Conflicts
+**Categories**: Requirement Completeness, Clarity, Consistency, Acceptance Criteria Quality, Scenario Coverage, Edge Case Coverage, Non-Functional Requirements, Dependencies & Assumptions.
 
-**HOW TO WRITE CHECKLIST ITEMS**:
+**Traceability**: >=80% of items must reference spec sections or use markers: `[Gap]`, `[Ambiguity]`, `[Conflict]`, `[Assumption]`.
 
-WRONG (Testing implementation):
-- "Verify landing page displays 3 episode cards"
-- "Test hover states work on desktop"
-- "Confirm logo click navigates home"
+See [checklist-examples.md](references/checklist-examples.md) for correct/wrong examples and required patterns.
 
-CORRECT (Testing requirements quality):
-- "Are the exact number and layout of featured episodes specified?" [Completeness]
-- "Is 'prominent display' quantified with specific sizing/positioning?" [Clarity]
-- "Are hover state requirements consistent across all interactive elements?" [Consistency]
-- "Are keyboard navigation requirements defined for all interactive UI?" [Coverage]
-- "Is the fallback behavior specified when logo image fails to load?" [Edge Cases]
+Use [checklist-template.md](../iikit-core/templates/checklist-template.md) for format structure.
 
-**ITEM STRUCTURE**:
-Each item should follow this pattern:
-- Question format asking about requirement quality
-- Focus on what's WRITTEN (or not written) in the spec/plan
-- Include quality dimension in brackets [Completeness/Clarity/Consistency/etc.]
-- Reference spec section `[Spec SS.Y]` when checking existing requirements
-- Use `[Gap]` marker when checking for missing requirements
+### 4. Gap Resolution (Interactive)
 
-**Traceability Requirements**:
-- MINIMUM: >=80% of items MUST include at least one traceability reference
-- Each item should reference: spec section, or use markers: `[Gap]`, `[Ambiguity]`, `[Conflict]`, `[Assumption]`
+For each `[Gap]` item: follow the gap resolution pattern in [conversation-guide.md](../iikit-core/references/conversation-guide.md). Present missing requirement, explain risk, offer options. On resolution: update spec.md and check item off. Skip if `--no-interactive` or no gaps.
 
-**ABSOLUTELY PROHIBITED**:
-- Any item starting with "Verify", "Test", "Confirm", "Check" + implementation behavior
-- References to code execution, user actions, system behavior
-- "Displays correctly", "works properly", "functions as expected"
-- "Click", "navigate", "render", "load", "execute"
-- Test cases, test plans, QA procedures
-- Implementation details (frameworks, APIs, algorithms)
+### 5. Remaining Item Validation
 
-**REQUIRED PATTERNS**:
-- "Are [requirement type] defined/specified/documented for [scenario]?"
-- "Is [vague term] quantified/clarified with specific criteria?"
-- "Are requirements consistent between [section A] and [section B]?"
-- "Can [requirement] be objectively measured/verified?"
-- "Are [edge cases/scenarios] addressed in requirements?"
-- "Does the spec define [missing aspect]?"
+After gap resolution, validate ALL unchecked `[ ]` items against spec/plan/constitution:
+- If covered: check off with justification
+- If genuine gap: convert to `[Gap]` and resolve or defer
 
-### 4. Checklist Format
+Continue until all items are `[x]` or explicitly deferred.
 
-Read [checklist-template.md](../iikit-core/templates/checklist-template.md) for the standard structure.
-
-Use template structure:
-
-```markdown
-# [CHECKLIST TYPE] Checklist: [FEATURE NAME]
-
-**Purpose**: [Brief description]
-**Created**: [DATE]
-**Feature**: [Link to spec.md]
-
-## [Category 1]
-
-- [ ] CHK001 - [Requirement quality question] [Quality Dimension, Spec Reference]
-- [ ] CHK002 - [Requirement quality question] [Quality Dimension, Gap]
-
-## [Category 2]
-
-- [ ] CHK003 - [Another requirement quality question] [Quality Dimension]
-
-## Notes
-
-- Check items off as completed: `[x]`
-- Items are numbered sequentially (CHK001, CHK002, etc.)
-```
-
-### 5. Gap Resolution (Interactive)
-
-If checklist contains `[Gap]` items, guide the user through resolving them one by one:
-
-1. **Count gaps**: Identify all items marked with `[Gap]`
-
-2. **For each gap**, present:
-
-   ```markdown
-   ----------------------------------------------------------------
-   Gap 1 of N: [CHK00X]
-   ----------------------------------------------------------------
-
-   **Missing Requirement:**
-   [Quote the checklist item]
-
-   **Why This Matters:**
-   [Brief explanation of risk if left unspecified]
-
-   **Suggested Options:**
-
-   | Option | Description | Implications |
-   |--------|-------------|--------------|
-   | A | [First reasonable default] | [Trade-offs] |
-   | B | [Alternative approach] | [Trade-offs] |
-   | C | [Another option] | [Trade-offs] |
-   | Skip | Leave unspecified for now | Will remain as [Gap] |
-
-   **Your choice (A/B/C/Skip/Custom):** _
-   ```
-
-3. **Process user response:**
-   - If A/B/C: Update `spec.md` with the new requirement
-   - If Skip: Leave as `[Gap]`, continue to next
-   - If Custom: Add user's custom text to `spec.md`
-
-4. **After each resolved gap:**
-   - Mark the checklist item as `[x]` (complete)
-   - Show confirmation of what was added to spec
-   - Move to next gap
-
-5. **Summary after all gaps processed:**
-   ```
-   Gap Resolution Complete:
-   - Resolved: X items (added to spec.md)
-   - Skipped: Y items (remain as [Gap])
-   - Total gaps: Z
-
-   Spec updated at: specs/NNN-feature/spec.md
-   ```
-
-**Skip gap resolution if:** User passes `--no-interactive` flag or there are no `[Gap]` items.
-
-### 5b. Remaining Item Validation (REQUIRED)
-
-**After gap resolution (or if no gaps), validate ALL remaining unchecked `[ ]` items.**
-
-The checklist is optional — not creating one is fine. But if checklists exist, they MUST be 100% complete before the skill reports success.
-
-For each remaining `[ ]` item:
-
-1. **Assess against spec/plan/constitution**: Can this item be checked off based on existing artifacts?
-
-2. **If YES** (requirement is adequately covered):
-   - Check the item off: `[x]`
-   - Add brief justification after the item text (e.g., "— Covered by FR-013 and SC-008")
-
-3. **If NO** (genuine gap found):
-   - Convert to `[Gap]` and run gap resolution (step 5) for this item
-   - Or ask user: "This requirement quality concern is unaddressed: [quote item]. Add to spec, or defer?"
-
-4. **Continue until all items are `[x]`** or explicitly deferred by user.
-
-5. **Final count**:
-   ```
-   Checklist Validation:
-   - Total items:     N
-   - Checked off:     X (validated against spec/plan)
-   - Gaps resolved:   Y (added to spec.md)
-   - Deferred:        Z (user chose to skip)
-   ```
-
-**If deferred items remain**: Warn that downstream skills will flag incomplete checklists.
+**IMPORTANT**: Checklists are optional — not creating one is fine. But once created, they MUST reach 100% before the skill reports success.
 
 ### 6. Report
 
-Output:
-- Full path to created checklist
-- Item count (total, checked, deferred)
-- Gap resolution summary (if applicable)
-- Checklist completion percentage
-- Summary:
-  - Focus areas selected
-  - Depth level
-  - Actor/timing
-  - Any user-specified must-have items incorporated
-
-## Example Checklist Types
-
-**UX Requirements Quality:** `ux.md`
-- "Are visual hierarchy requirements defined with measurable criteria?" [Clarity, Spec SFR-1]
-- "Is the number and positioning of UI elements explicitly specified?" [Completeness]
-- "Are interaction state requirements (hover, focus, active) consistently defined?" [Consistency]
-
-**API Requirements Quality:** `api.md`
-- "Are error response formats specified for all failure scenarios?" [Completeness]
-- "Are rate limiting requirements quantified with specific thresholds?" [Clarity]
-- "Are authentication requirements consistent across all endpoints?" [Consistency]
-
-**Security Requirements Quality:** `security.md`
-- "Are authentication requirements specified for all protected resources?" [Coverage]
-- "Are data protection requirements defined for sensitive information?" [Completeness]
-- "Is the threat model documented and requirements aligned to it?" [Traceability]
+Output: checklist path, item counts (total/checked/deferred), gap resolution summary, completion percentage.
 
 ## Next Steps
 
-After creating and resolving checklists:
+Suggest the user run `/clear` before proceeding — the interactive gap resolution consumed significant context. State is preserved in checklist files and `.specify/context.json`.
 
-1. **If deferred items remain**: Run `/iikit-04-checklist` again to resolve them
-2. **Optional**: Run `/iikit-05-testify` to generate test specifications (TDD support)
-3. **When 100% complete**: Run `/iikit-06-tasks` to generate the task breakdown
-
-Suggest to user:
 ```
-Checklist complete! (100% — N/N items checked)
-
-Gaps resolved: X (added to spec.md)
-Items validated: Y (checked against spec/plan)
-Deferred: Z
-
+Checklist complete! (100%)
 Next steps:
 - /iikit-05-testify - (Optional) Generate test specifications for TDD
 - /iikit-06-tasks - Generate task breakdown from plan
 ```
 
-**If deferred items remain:**
-```
-Checklist incomplete (X% — N/M items checked)
-
-Deferred items: Z (will trigger warnings in downstream skills)
-
-Next steps:
-- /iikit-04-checklist - Resolve remaining deferred items
-```
-
-**IMPORTANT**: Checklists are optional — not creating one is fine. But once created, they MUST reach 100% before the skill reports success. Downstream skills (`/iikit-05-testify`, `/iikit-06-tasks`, `/iikit-07-analyze`) SHOULD warn if checklists exist but are incomplete.
+If deferred items remain, warn that downstream skills will flag incomplete checklists.

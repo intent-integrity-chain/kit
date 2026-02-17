@@ -284,6 +284,10 @@ if (Test-Path $template) {
 # Set the SPECIFY_FEATURE environment variable for the current session
 $env:SPECIFY_FEATURE = $branchName
 
+# Write sticky active feature (survives restarts)
+. "$PSScriptRoot/common.ps1"
+Write-ActiveFeature -Feature $branchName -RepoRoot $repoRoot
+
 if ($Json) {
     $obj = [PSCustomObject]@{
         BRANCH_NAME = $branchName
@@ -297,5 +301,4 @@ if ($Json) {
     Write-Output "SPEC_FILE: $specFile"
     Write-Output "FEATURE_NUM: $featureNum"
     Write-Output "HAS_GIT: $hasGit"
-    Write-Output "SPECIFY_FEATURE environment variable set to: $branchName"
 }

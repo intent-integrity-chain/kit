@@ -1,6 +1,9 @@
 ---
 name: iikit-core
-description: Initialize intent-integrity-kit project, check status, and display workflow help
+description: >-
+  Initialize project, check feature status, and display workflow help.
+  Use when setting up a new project, checking progress, or needing the command reference.
+license: MIT
 ---
 
 # Intent Integrity Kit Core
@@ -17,11 +20,10 @@ Parse the user input to determine which subcommand to execute.
 
 ## Subcommands
 
-This skill supports three subcommands:
-
 1. **init** - Initialize intent-integrity-kit in a new or existing project
 2. **status** - Show current project and feature status
-3. **help** - Display workflow phases and command reference
+3. **use** - Select the active feature for multi-feature projects
+4. **help** - Display workflow phases and command reference
 
 If no subcommand is provided, show help.
 
@@ -31,129 +33,47 @@ Initialize intent-integrity-kit in the current directory.
 
 ### Execution Flow
 
-1. **Check if already initialized**:
-   ```bash
-   test -f "CONSTITUTION.md" && echo "ALREADY_INITIALIZED"
-   ```
+1. **Check if already initialized**: `test -f "CONSTITUTION.md"`
 
-2. **Create directory structure**:
-   ```bash
-   mkdir -p .specify
-   mkdir -p specs
-   ```
+2. **Create directory structure**: `mkdir -p .specify specs`
 
-3. **Initialize Git (if needed)**:
+3. **Initialize Git and install hooks**:
 
    **Unix/macOS/Linux:**
    ```bash
    bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/init-project.sh --json
    ```
-
    **Windows (PowerShell):**
    ```powershell
    pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/init-project.ps1 -Json
    ```
 
-4. **Install Git Hooks**:
+   The script installs two git hooks:
+   - **Pre-commit**: validates assertion integrity before each commit
+   - **Post-commit**: stores assertion hashes as tamper-resistant git notes
 
-   The `init-project.sh` / `init-project.ps1` scripts automatically install two git hooks:
+   Both use three installation modes: direct install, update existing IIKit hook, or install alongside existing non-IIKit hook.
 
-   **Pre-commit hook** — Validates assertion integrity before each commit. Checks that `test-specs.md` assertions haven't been tampered with since `/iikit-05-testify` generated them. Compares against both `context.json` hashes and git notes.
-
-   **Post-commit hook** — Stores assertion hashes as git notes after each commit that includes `test-specs.md`. This creates tamper-resistant hash storage in git's object database, closing the gap where an agent could modify both `test-specs.md` and `context.json` to bypass the pre-commit check.
-
-   Both hooks use the same three installation modes:
-   - **No existing hook** — installs directly as `.git/hooks/<hook-type>`
-   - **Existing IIKit hook** (has marker comment) — updates in place
-   - **Existing non-IIKit hook** — installs as `.git/hooks/iikit-<hook-type>` and appends a one-line call to the existing hook
-
-   Both hooks are thin wrappers that source `testify-tdd.sh` at runtime — when the framework updates, hooks pick up the latest logic automatically.
-
-5. **Report**:
-   ```
-   Intent Integrity Kit initialized!
-
-   Directory structure created:
-   - .specify/           (IIKit working directory)
-   - specs/              (feature specifications)
-
-   Pre-commit hook: [installed/updated/installed alongside existing hook]
-   Post-commit hook: [installed/updated/installed alongside existing hook]
-
-   Next step: /iikit-00-constitution (creates CONSTITUTION.md)
-   ```
+4. **Report**: directories created, hook status, suggest `/iikit-00-constitution`
 
 ### If Already Initialized
 
-```
-Intent Integrity Kit is already initialized in this project.
-
-Current status:
-- Constitution: [exists/missing]
-- Features: X feature directories in specs/
-
-Run /iikit-core status for detailed status.
-```
+Show constitution status, feature count, and suggest `/iikit-core status`.
 
 ## Subcommand: status
 
-Show the current project and feature status.
-
 ### Execution Flow
 
-1. **Get paths and status**:
-
-   **Unix/macOS/Linux:**
+1. **Get paths**:
    ```bash
    bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --json --paths-only
    ```
 
-   **Windows (PowerShell):**
-   ```powershell
-   pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/check-prerequisites.ps1 -Json -PathsOnly
-   ```
+2. **Check**: constitution exists, feature count, current feature artifacts (spec.md, plan.md, tasks.md, checklists/, test-specs.md)
 
-2. **Check constitution**:
-   ```bash
-   test -f "CONSTITUTION.md" && echo "CONSTITUTION_EXISTS"
-   ```
-
-3. **List features**:
-   ```bash
-   ls -d specs/[0-9][0-9][0-9]-*/ 2>/dev/null | wc -l
-   ```
-
-4. **For current feature, check artifacts**:
-   - spec.md
-   - plan.md
-   - tasks.md
-   - checklists/
-   - tests/test-specs.md
-
-5. **Report**:
-   ```
-   +---------------------------------------------+
-   |  IIKIT STATUS                               |
-   +---------------------------------------------+
-   |  Project:        [project name]             |
-   |  Constitution:   [exists/missing]      [Y/N]|
-   |  Features:       X total                    |
-   |                                             |
-   |  Current Feature: [NNN-feature-name]        |
-   |  -----------------------------------------  |
-   |  spec.md:        [exists/missing]      [Y/N]|
-   |  plan.md:        [exists/missing]      [Y/N]|
-   |  tasks.md:       [exists/missing]      [Y/N]|
-   |  checklists/:    [X files]                  |
-   |  test-specs.md:  [exists/missing]      [Y/N]|
-   +---------------------------------------------+
-   |  Next Step: [recommended command]           |
-   +---------------------------------------------+
-   ```
+3. **Report**: project name, constitution status, feature count, current feature artifact status, recommended next step
 
 ### Next Step Logic
-
-Determine the recommended next step based on what's missing:
 
 1. No constitution -> `/iikit-00-constitution`
 2. No feature -> `/iikit-01-specify <description>`
@@ -161,60 +81,75 @@ Determine the recommended next step based on what's missing:
 4. Has plan, no tasks -> `/iikit-06-tasks`
 5. Has tasks -> `/iikit-08-implement`
 
+## Subcommand: use
+
+Select the active feature when multiple features exist in `specs/`.
+
+### User Input
+
+The `$ARGUMENTS` after `use` is the feature selector: a number (`1`, `001`), partial name (`user-auth`), or full directory name (`001-user-auth`).
+
+### Execution Flow
+
+1. **Run**:
+   ```bash
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selector>
+   ```
+   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selector>`
+
+2. Parse JSON for `active_feature` and `stage`.
+
+3. **Report**: confirm which feature is now active, its current stage, and suggest the appropriate next command based on stage:
+   - `specified` -> `/iikit-02-clarify` or `/iikit-03-plan`
+   - `planned` -> `/iikit-04-checklist` or `/iikit-06-tasks`
+   - `tasks-ready` -> `/iikit-08-implement`
+   - `implementing-NN%` -> `/iikit-08-implement` (resume)
+   - `complete` -> All done
+
+### Error Handling
+
+| Condition | Response |
+|-----------|----------|
+| No selector provided | Show available features with stages, ask user to pick |
+| No match | Show available features |
+| Ambiguous match | Show matching features, ask to be more specific |
+
 ## Subcommand: help
 
-Display the complete workflow reference.
-
-### Output
+Display the complete workflow reference:
 
 ```
-+---------------------------------------------------------------------+
-|  IIKIT WORKFLOW                                                     |
-+---------------------------------------------------------------------+
-|                                                                     |
-|  Phase 0: Foundation                                                |
-|  ---------------------                                              |
-|  /iikit-core init      Initialize intent-integrity-kit in a project |
-|  /iikit-00-constitution Define project governance principles        |
-|                                                                     |
-|  Phase 1: Specification                                             |
-|  ----------------------                                             |
-|  /iikit-01-specify     Create feature spec from description         |
-|  /iikit-02-clarify     Resolve ambiguities (max 5 questions)        |
-|                                                                     |
-|  Phase 2: Planning                                                  |
-|  ----------------                                                   |
-|  /iikit-03-plan        Create technical implementation plan         |
-|  /iikit-04-checklist   Generate quality checklists                  |
-|                                                                     |
-|  Phase 3: Testing (Optional unless constitutionally required)       |
-|  ---------------------------------------------------------          |
-|  /iikit-05-testify     Generate test specifications (TDD)           |
-|                                                                     |
-|  Phase 4: Task Breakdown                                            |
-|  -----------------------                                            |
-|  /iikit-06-tasks       Generate task breakdown                      |
-|  /iikit-07-analyze     Validate cross-artifact consistency          |
-|                                                                     |
-|  Phase 5: Implementation                                            |
-|  -----------------------                                            |
-|  /iikit-08-implement   Execute implementation                       |
-|  /iikit-09-taskstoissues Export tasks to GitHub Issues              |
-|                                                                     |
-|  Utility Commands                                                   |
-|  ----------------                                                   |
-|  /iikit-core status    Show project/feature status                  |
-|  /iikit-core help      Display this help                            |
-|                                                                     |
-+---------------------------------------------------------------------+
-|  TIP: Each command validates its prerequisites automatically.       |
-|       Run /iikit-core status to see your current progress.          |
-+---------------------------------------------------------------------+
+Phase 0: Foundation
+  /iikit-core init        Initialize project
+  /iikit-core use         Select active feature
+  /iikit-00-constitution  Define governance principles
+
+Phase 1: Specification
+  /iikit-01-specify       Create feature spec
+  /iikit-02-clarify       Resolve ambiguities
+
+Phase 2: Planning
+  /iikit-03-plan          Create implementation plan
+  /iikit-04-checklist     Generate quality checklists
+
+Phase 3: Testing (optional unless constitutionally required)
+  /iikit-05-testify       Generate test specifications
+
+Phase 4: Task Breakdown
+  /iikit-06-tasks         Generate task breakdown
+  /iikit-07-analyze       Validate consistency
+
+Phase 5: Implementation
+  /iikit-08-implement     Execute implementation
+  /iikit-09-taskstoissues Export to GitHub Issues
+
+Each command validates its prerequisites automatically.
+Run /iikit-core status to see your current progress.
 ```
 
 ## Default (No Subcommand)
 
-If user runs `/iikit-core` without arguments, show the help output.
+Show help output.
 
 ## Error Handling
 
@@ -222,4 +157,4 @@ If user runs `/iikit-core` without arguments, show the help output.
 |-----------|----------|
 | Unknown subcommand | Show help with error message |
 | Not in a project directory | Suggest running `init` |
-| Git not available | Warning but continue (scripts handle this) |
+| Git not available | Warning but continue |

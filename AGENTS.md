@@ -10,7 +10,8 @@ Intent Integrity Kit (IIKit) preserves your intent from idea to implementation t
 
 This project uses specification-driven development. The phases are:
 
-**Utility:** `/iikit-core` - Initialize project, check status, show help (run `init` before starting)
+**Utility:** `/iikit-core` - Initialize project, check status, select active feature, show help (run `init` before starting)
+**Utility:** `/iikit-bugfix` - Report and fix bugs without full specification workflow
 
 0. `/iikit-00-constitution` - Define project governance principles
 1. `/iikit-01-specify` - Create feature specification from natural language
@@ -46,6 +47,8 @@ CONSTITUTION.md              # Project governance (spec-agnostic, lives at root)
 
 .specify/
   context.json               # Feature state between skill invocations
+  active-feature             # Sticky active feature selection (survives restarts)
+  evals/                     # Tessl eval results (fetched, not committed)
 
 specs/                       # Feature specifications (created per feature)
   NNN-feature-name/
@@ -72,13 +75,17 @@ chmod +x .claude/skills/iikit-core/scripts/bash/*.sh
 
 # Create a new feature
 .claude/skills/iikit-core/scripts/bash/create-new-feature.sh --json "Feature description"
+
+# Select active feature (multi-feature projects)
+.claude/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selector>
 ```
 
 ## Skills Available
 
 | Skill | Command | Description |
 |-------|---------|-------------|
-| Core | `/iikit-core` | Initialize project, check status, show help |
+| Core | `/iikit-core` | Initialize project, check status, select feature, show help |
+| Bugfix | `/iikit-bugfix` | Report and fix bugs without full specification workflow |
 | Constitution | `/iikit-00-constitution` | Create project governance principles |
 | Specify | `/iikit-01-specify` | Create feature spec from description |
 | Clarify | `/iikit-02-clarify` | Resolve spec ambiguities |
@@ -109,6 +116,16 @@ The `.specify/context.json` file persists state between skill invocations:
 - Available artifacts
 - Clarification status
 - Checklist completion
+
+### Multi-Feature Support
+
+When multiple features exist in `specs/`, IIKit detects the active feature using this cascade:
+1. `.specify/active-feature` file (sticky, survives restarts)
+2. `SPECIFY_FEATURE` env var (CI/scripts)
+3. Git branch (`NNN-*` pattern)
+4. Single feature auto-select
+
+Use `/iikit-core use <feature>` to switch between features. Accepts a number (`1`), partial name (`user-auth`), or full directory name (`001-user-auth`).
 
 ### Checklist Gating
 

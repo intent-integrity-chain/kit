@@ -1,6 +1,98 @@
 #!/usr/bin/env pwsh
 # Common PowerShell functions analogous to common.sh
 
+# =============================================================================
+# ACTIVE FEATURE HELPERS
+# =============================================================================
+
+function Read-ActiveFeature {
+    param([string]$RepoRoot)
+
+    if (-not $RepoRoot) { $RepoRoot = Get-RepoRoot }
+    $activeFile = Join-Path $RepoRoot '.specify' 'active-feature'
+
+    if (Test-Path $activeFile) {
+        $feature = (Get-Content -Path $activeFile -Raw -ErrorAction SilentlyContinue).Trim()
+        $featureDir = Join-Path $RepoRoot 'specs' $feature
+        if ($feature -and (Test-Path $featureDir -PathType Container)) {
+            return $feature
+        }
+    }
+    return $null
+}
+
+function Write-ActiveFeature {
+    param(
+        [string]$Feature,
+        [string]$RepoRoot
+    )
+
+    if (-not $RepoRoot) { $RepoRoot = Get-RepoRoot }
+    $specifyDir = Join-Path $RepoRoot '.specify'
+    $activeFile = Join-Path $specifyDir 'active-feature'
+
+    if (-not (Test-Path $specifyDir)) {
+        New-Item -ItemType Directory -Path $specifyDir -Force | Out-Null
+    }
+    Set-Content -Path $activeFile -Value $Feature -NoNewline -Encoding utf8
+}
+
+function Get-FeatureStage {
+    param(
+        [string]$RepoRoot,
+        [string]$Feature
+    )
+
+    $featureDir = Join-Path $RepoRoot 'specs' $Feature
+
+    if (-not (Test-Path $featureDir -PathType Container)) {
+        return 'unknown'
+    }
+
+    $tasksFile = Join-Path $featureDir 'tasks.md'
+    if (Test-Path $tasksFile) {
+        $content = Get-Content -Path $tasksFile -ErrorAction SilentlyContinue
+        $total = 0
+        $done = 0
+        foreach ($line in $content) {
+            if ($line -match '^- \[.\]') {
+                $total++
+                if ($line -match '^- \[[xX]\]') {
+                    $done++
+                }
+            }
+        }
+        if ($total -gt 0) {
+            if ($done -eq $total) { return 'complete' }
+            if ($done -gt 0) {
+                $pct = [math]::Floor(($done * 100) / $total)
+                return "implementing-${pct}%"
+            }
+            return 'tasks-ready'
+        }
+    }
+
+    if (Test-Path (Join-Path $featureDir 'plan.md')) { return 'planned' }
+    if (Test-Path (Join-Path $featureDir 'spec.md')) { return 'specified' }
+
+    return 'unknown'
+}
+
+function Get-FeaturesJson {
+    $repoRoot = Get-RepoRoot
+    $specsDir = Join-Path $repoRoot 'specs'
+    $features = @()
+
+    if (Test-Path $specsDir) {
+        Get-ChildItem -Path $specsDir -Directory | Where-Object { $_.Name -match '^[0-9]{3}-' } | ForEach-Object {
+            $stage = Get-FeatureStage -RepoRoot $repoRoot -Feature $_.Name
+            $features += [PSCustomObject]@{ name = $_.Name; stage = $stage }
+        }
+    }
+
+    return ($features | ConvertTo-Json -Compress -AsArray)
+}
+
 function Get-RepoRoot {
     try {
         $result = git rev-parse --show-toplevel 2>$null
@@ -16,12 +108,20 @@ function Get-RepoRoot {
 }
 
 function Get-CurrentBranch {
-    # First check if SPECIFY_FEATURE environment variable is set
+    # Detection cascade: active-feature file > SPECIFY_FEATURE env > git branch > single feature > fallback
+
+    # 1. Check sticky active-feature file (survives restarts)
+    $active = Read-ActiveFeature
+    if ($active) {
+        return $active
+    }
+
+    # 2. Check SPECIFY_FEATURE environment variable (CI/scripts)
     if ($env:SPECIFY_FEATURE) {
         return $env:SPECIFY_FEATURE
     }
 
-    # Then check git if available
+    # 3. Check git branch if available
     try {
         $result = git rev-parse --abbrev-ref HEAD 2>$null
         if ($LASTEXITCODE -eq 0) {
@@ -31,7 +131,7 @@ function Get-CurrentBranch {
         # Git command failed
     }
 
-    # For non-git repos, try to find the latest feature directory
+    # 4. For non-git repos, try to find the latest feature directory
     $repoRoot = Get-RepoRoot
     $specsDir = Join-Path $repoRoot "specs"
 
@@ -76,18 +176,20 @@ function Test-FeatureBranch {
     # For non-git repos, we can't enforce branch naming but still provide output
     if (-not $HasGit) {
         Write-Warning "[specify] Warning: Git repository not detected; skipped branch validation"
-        return $true
+        return "OK"
     }
 
     # Accept if branch matches NNN- pattern (standard feature branch)
     if ($Branch -match '^[0-9]{3}-') {
-        return $true
+        Write-ActiveFeature -Feature $Branch
+        return "OK"
     }
 
     # Accept if SPECIFY_FEATURE env var is set (explicit feature context, e.g., -SkipBranch)
     if ($env:SPECIFY_FEATURE) {
         Write-Warning "[specify] Using feature context from SPECIFY_FEATURE: $env:SPECIFY_FEATURE"
-        return $true
+        Write-ActiveFeature -Feature $env:SPECIFY_FEATURE
+        return "OK"
     }
 
     # Check if there are feature directories we can use
@@ -96,24 +198,24 @@ function Test-FeatureBranch {
     $featureDirs = @()
 
     if (Test-Path $specsDir) {
-        $featureDirs = Get-ChildItem -Path $specsDir -Directory | Where-Object { $_.Name -match '^[0-9]{3}-' }
+        $featureDirs = @(Get-ChildItem -Path $specsDir -Directory | Where-Object { $_.Name -match '^[0-9]{3}-' })
     }
 
     if ($featureDirs.Count -eq 1) {
         Write-Warning "[specify] Not on feature branch, but found single feature directory: $($featureDirs[0].Name)"
         $env:SPECIFY_FEATURE = $featureDirs[0].Name
-        return $true
+        Write-ActiveFeature -Feature $featureDirs[0].Name
+        return "OK"
     } elseif ($featureDirs.Count -gt 1) {
         Write-Output "WARNING: Not on a feature branch and multiple feature directories exist."
         Write-Output "Current branch: $Branch"
-        Write-Output "Set SPECIFY_FEATURE=<feature-name> to specify which feature to use."
-        Write-Output "Or run: /iikit-01-specify to create a new feature."
-        return $false
+        Write-Output "Run: /iikit-core use <feature> to select a feature."
+        return "NEEDS_SELECTION"
     }
 
     Write-Output "ERROR: Not on a feature branch. Current branch: $Branch"
     Write-Output "Run: /iikit-01-specify <feature description>"
-    return $false
+    return "ERROR"
 }
 
 function Get-FeatureDir {

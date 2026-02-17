@@ -117,44 +117,53 @@ teardown() {
 # =============================================================================
 
 @test "store-hash: creates context file and stores hash" {
-    context_file="$TEST_DIR/.specify/context.json"
+    # Place test-specs.md in proper structure so derive_context_path resolves inside TEST_DIR
+    mkdir -p "$TEST_DIR/specs/001-test-feature/tests"
+    cp "$FIXTURES_DIR/test-specs.md" "$TEST_DIR/specs/001-test-feature/tests/test-specs.md"
+    local test_specs="$TEST_DIR/specs/001-test-feature/tests/test-specs.md"
 
-    result=$("$TESTIFY_SCRIPT" store-hash "$FIXTURES_DIR/test-specs.md" "$context_file")
+    result=$("$TESTIFY_SCRIPT" store-hash "$test_specs")
 
+    local context_file="$TEST_DIR/specs/001-test-feature/context.json"
     [[ -f "$context_file" ]]
     assert_contains "$(cat "$context_file")" '"assertion_hash"'
     assert_contains "$(cat "$context_file")" '"generated_at"'
 }
 
 @test "verify-hash: returns valid for matching hash" {
-    context_file="$TEST_DIR/.specify/context.json"
+    mkdir -p "$TEST_DIR/specs/001-test-feature/tests"
+    cp "$FIXTURES_DIR/test-specs.md" "$TEST_DIR/specs/001-test-feature/tests/test-specs.md"
+    local test_specs="$TEST_DIR/specs/001-test-feature/tests/test-specs.md"
 
     # Store hash first
-    "$TESTIFY_SCRIPT" store-hash "$FIXTURES_DIR/test-specs.md" "$context_file"
+    "$TESTIFY_SCRIPT" store-hash "$test_specs"
 
     # Verify it
-    result=$("$TESTIFY_SCRIPT" verify-hash "$FIXTURES_DIR/test-specs.md" "$context_file")
+    result=$("$TESTIFY_SCRIPT" verify-hash "$test_specs")
     [[ "$result" == "valid" ]]
 }
 
 @test "verify-hash: returns missing for no context file" {
-    result=$("$TESTIFY_SCRIPT" verify-hash "$FIXTURES_DIR/test-specs.md" "/nonexistent/context.json")
+    # Use a path where no context.json will exist
+    mkdir -p "$TEST_DIR/specs/999-no-context/tests"
+    cp "$FIXTURES_DIR/test-specs.md" "$TEST_DIR/specs/999-no-context/tests/test-specs.md"
+    result=$("$TESTIFY_SCRIPT" verify-hash "$TEST_DIR/specs/999-no-context/tests/test-specs.md")
     [[ "$result" == "missing" ]]
 }
 
 @test "verify-hash: returns invalid for modified assertions" {
-    context_file="$TEST_DIR/.specify/context.json"
-    test_specs="$TEST_DIR/test-specs.md"
+    mkdir -p "$TEST_DIR/specs/001-test-feature/tests"
+    cp "$FIXTURES_DIR/test-specs.md" "$TEST_DIR/specs/001-test-feature/tests/test-specs.md"
+    local test_specs="$TEST_DIR/specs/001-test-feature/tests/test-specs.md"
 
-    # Copy test specs and store hash
-    cp "$FIXTURES_DIR/test-specs.md" "$test_specs"
-    "$TESTIFY_SCRIPT" store-hash "$test_specs" "$context_file"
+    # Store hash
+    "$TESTIFY_SCRIPT" store-hash "$test_specs"
 
     # Modify an assertion
     echo "**Given**: modified assertion" >> "$test_specs"
 
     # Verify should return invalid
-    result=$("$TESTIFY_SCRIPT" verify-hash "$test_specs" "$context_file")
+    result=$("$TESTIFY_SCRIPT" verify-hash "$test_specs")
     [[ "$result" == "invalid" ]]
 }
 
@@ -163,37 +172,37 @@ teardown() {
 # =============================================================================
 
 @test "comprehensive-check: returns PASS for valid setup" {
-    context_file="$TEST_DIR/.specify/context.json"
-    test_specs="$TEST_DIR/test-specs.md"
+    mkdir -p "$TEST_DIR/specs/001-test-feature/tests"
+    cp "$FIXTURES_DIR/test-specs.md" "$TEST_DIR/specs/001-test-feature/tests/test-specs.md"
+    local test_specs="$TEST_DIR/specs/001-test-feature/tests/test-specs.md"
 
-    cp "$FIXTURES_DIR/test-specs.md" "$test_specs"
-    "$TESTIFY_SCRIPT" store-hash "$test_specs" "$context_file"
+    "$TESTIFY_SCRIPT" store-hash "$test_specs"
 
-    result=$("$TESTIFY_SCRIPT" comprehensive-check "$test_specs" "$context_file" "$FIXTURES_DIR/constitution.md")
+    result=$("$TESTIFY_SCRIPT" comprehensive-check "$test_specs" "$FIXTURES_DIR/constitution.md")
     assert_contains "$result" '"overall_status": "PASS"'
 }
 
 @test "comprehensive-check: returns BLOCKED for tampered assertions" {
-    context_file="$TEST_DIR/.specify/context.json"
-    test_specs="$TEST_DIR/test-specs.md"
+    mkdir -p "$TEST_DIR/specs/001-test-feature/tests"
+    cp "$FIXTURES_DIR/test-specs.md" "$TEST_DIR/specs/001-test-feature/tests/test-specs.md"
+    local test_specs="$TEST_DIR/specs/001-test-feature/tests/test-specs.md"
 
-    cp "$FIXTURES_DIR/test-specs.md" "$test_specs"
-    "$TESTIFY_SCRIPT" store-hash "$test_specs" "$context_file"
+    "$TESTIFY_SCRIPT" store-hash "$test_specs"
 
     # Tamper with assertions
     echo "**Then**: tampered assertion" >> "$test_specs"
 
-    result=$("$TESTIFY_SCRIPT" comprehensive-check "$test_specs" "$context_file" "$FIXTURES_DIR/constitution.md")
+    result=$("$TESTIFY_SCRIPT" comprehensive-check "$test_specs" "$FIXTURES_DIR/constitution.md")
     assert_contains "$result" '"overall_status": "BLOCKED"'
 }
 
 @test "comprehensive-check: includes TDD determination" {
-    context_file="$TEST_DIR/.specify/context.json"
-    test_specs="$TEST_DIR/test-specs.md"
+    mkdir -p "$TEST_DIR/specs/001-test-feature/tests"
+    cp "$FIXTURES_DIR/test-specs.md" "$TEST_DIR/specs/001-test-feature/tests/test-specs.md"
+    local test_specs="$TEST_DIR/specs/001-test-feature/tests/test-specs.md"
 
-    cp "$FIXTURES_DIR/test-specs.md" "$test_specs"
-    "$TESTIFY_SCRIPT" store-hash "$test_specs" "$context_file"
+    "$TESTIFY_SCRIPT" store-hash "$test_specs"
 
-    result=$("$TESTIFY_SCRIPT" comprehensive-check "$test_specs" "$context_file" "$FIXTURES_DIR/constitution.md")
+    result=$("$TESTIFY_SCRIPT" comprehensive-check "$test_specs" "$FIXTURES_DIR/constitution.md")
     assert_contains "$result" '"tdd_determination": "mandatory"'
 }

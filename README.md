@@ -4,6 +4,12 @@
 
 An AI coding assistant toolkit that preserves your intent from idea to implementation, with cryptographic verification at each step. Compatible with Claude Code, OpenAI Codex, Google Gemini, and OpenCode.
 
+## What's New in v1.5.0
+
+- **Spec item references in clarifications**: Clarification Q&A entries now include spec item references (FR-xxx, US-x, SC-xxx) for full traceability from clarifications back to the spec items they affect.
+
+[Previous releases →](CHANGELOG.md)
+
 ## What is Intent Integrity?
 
 When you tell an AI what you want, there's a gap between your *intent* and the *code* it produces. Requirements get lost, assumptions slip in, tests get modified to match bugs. The **Intent Integrity Chain** is a methodology to close that chasm.
@@ -112,6 +118,56 @@ The core of IIKit is preventing circular verification - where AI modifies tests 
 
 This ensures test changes are **intentional** and traceable to requirement changes.
 
+## Iterating on Specs and Plans
+
+The workflow is linear *the first time through*. After that, you'll often go back to refine things. Here's how.
+
+### Changing requirements (spec.md)
+
+**Option A — Re-run the skill:** `/iikit-01-specify` with updated description. It detects the existing spec.md, shows a semantic diff (added/removed/changed requirements), warns about downstream impact, and asks before overwriting.
+
+**Option B — Edit directly:** Open `specs/NNN-feature/spec.md` and edit the markdown. This is fine for small tweaks (rewording a requirement, adding an edge case). Then re-run downstream phases to propagate changes.
+
+**What to re-run after:**
+
+| What changed | Re-run |
+|--------------|--------|
+| Added/removed requirements | `/iikit-03-plan` then `/iikit-06-tasks` |
+| Changed acceptance criteria (Given/When/Then) | `/iikit-05-testify` (re-locks assertions) |
+| Clarified wording only | Nothing — downstream artifacts still valid |
+
+### Changing the technical plan (plan.md, research.md)
+
+**Option A — Re-run:** `/iikit-03-plan` detects the existing plan.md, shows a semantic diff of tech stack and architecture changes, and flags breaking changes with downstream impact.
+
+**Option B — Edit directly:** Edit `plan.md` or `research.md` for targeted changes (swap a library, update a version, add a design decision).
+
+**What to re-run after:**
+
+| What changed | Re-run |
+|--------------|--------|
+| Swapped a framework/library | `/iikit-06-tasks` (tasks may differ) |
+| Changed data model | `/iikit-05-testify` then `/iikit-06-tasks` |
+| Added a design constraint | `/iikit-04-checklist` (new quality checks) |
+| Minor version bump | Nothing |
+
+### Changing tasks (tasks.md)
+
+Re-run `/iikit-06-tasks`. It preserves `[x]` completion status on existing tasks, maps old task IDs to new ones by similarity, and warns about changes to already-completed tasks.
+
+### Quick reference: "I want to change X, what do I run?"
+
+```
+Changed requirements?        → edit spec.md → /iikit-03-plan → /iikit-06-tasks
+Changed acceptance criteria?  → edit spec.md → /iikit-05-testify
+Changed tech stack?           → /iikit-03-plan (or edit plan.md) → /iikit-06-tasks
+Changed a library?            → edit research.md → /iikit-06-tasks
+Need more quality checks?     → /iikit-04-checklist
+Everything looks wrong?       → /iikit-07-analyze (finds inconsistencies)
+```
+
+**Rule of thumb:** Edit the artifact directly for small changes. Re-run the skill for significant changes — it shows you the diff and warns about downstream impact. Then cascade forward through the phases that depend on what you changed.
+
 ## Phase Separation
 
 Understanding what belongs where is critical:
@@ -195,4 +251,4 @@ IIKit extends Spec-Kit with:
 
 ## License
 
-MIT License - See [LICENSE](LICENSE) for details.
+MIT License - See [LICENSE](https://github.com/intent-integrity-chain/kit/blob/main/LICENSE) for details.

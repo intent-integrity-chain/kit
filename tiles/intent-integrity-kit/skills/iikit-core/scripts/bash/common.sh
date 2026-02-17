@@ -1,6 +1,114 @@
 #!/usr/bin/env bash
 # Common functions and variables for all scripts
 
+# =============================================================================
+# ACTIVE FEATURE HELPERS
+# =============================================================================
+
+# Read the sticky active feature from .specify/active-feature
+# Returns the feature name if the file exists and the corresponding specs/ dir is valid
+# Usage: read_active_feature [repo_root]
+read_active_feature() {
+    local repo_root="${1:-$(get_repo_root)}"
+    local active_file="$repo_root/.specify/active-feature"
+
+    if [[ -f "$active_file" ]]; then
+        local feature
+        feature=$(cat "$active_file" 2>/dev/null)
+        if [[ -n "$feature" && -d "$repo_root/specs/$feature" ]]; then
+            echo "$feature"
+            return 0
+        fi
+    fi
+    return 1
+}
+
+# Write the sticky active feature to .specify/active-feature
+# Usage: write_active_feature <feature> [repo_root]
+write_active_feature() {
+    local feature="$1"
+    local repo_root="${2:-$(get_repo_root)}"
+    local active_file="$repo_root/.specify/active-feature"
+
+    mkdir -p "$repo_root/.specify"
+    echo "$feature" > "$active_file"
+}
+
+# Detect feature stage from artifacts present in the feature directory
+# Returns: specified | planned | tasks-ready | implementing-NN% | complete
+get_feature_stage() {
+    local repo_root="$1"
+    local feature="$2"
+    local feature_dir="$repo_root/specs/$feature"
+
+    if [[ ! -d "$feature_dir" ]]; then
+        echo "unknown"
+        return
+    fi
+
+    # Check for tasks and completion percentage
+    if [[ -f "$feature_dir/tasks.md" ]]; then
+        local total=0
+        local done=0
+        while IFS= read -r line; do
+            if [[ "$line" =~ ^-\ \[.\] ]]; then
+                total=$((total + 1))
+                if [[ "$line" =~ ^-\ \[[xX]\] ]]; then
+                    done=$((done + 1))
+                fi
+            fi
+        done < "$feature_dir/tasks.md"
+
+        if [[ "$total" -gt 0 ]]; then
+            if [[ "$done" -eq "$total" ]]; then
+                echo "complete"
+            elif [[ "$done" -gt 0 ]]; then
+                local pct=$(( (done * 100) / total ))
+                echo "implementing-${pct}%"
+            else
+                echo "tasks-ready"
+            fi
+            return
+        fi
+    fi
+
+    if [[ -f "$feature_dir/plan.md" ]]; then
+        echo "planned"
+        return
+    fi
+
+    if [[ -f "$feature_dir/spec.md" ]]; then
+        echo "specified"
+        return
+    fi
+
+    echo "unknown"
+}
+
+# List all features with stages as a JSON array
+list_features_json() {
+    local repo_root=$(get_repo_root)
+    local specs_dir="$repo_root/specs"
+    local first=true
+
+    printf '['
+    if [[ -d "$specs_dir" ]]; then
+        for dir in "$specs_dir"/*; do
+            if [[ -d "$dir" ]] && [[ "$(basename "$dir")" =~ ^[0-9]{3}- ]]; then
+                local name=$(basename "$dir")
+                local stage=$(get_feature_stage "$repo_root" "$name")
+                if $first; then
+                    first=false
+                else
+                    printf ','
+                fi
+                printf '{"name":"%s","stage":"%s"}' "$name" "$stage"
+            fi
+        done
+    fi
+    printf ']'
+}
+
 # Get repository root, with fallback for non-git repositories
 get_repo_root() {
     if git rev-parse --show-toplevel >/dev/null 2>&1; then
@@ -13,20 +121,28 @@ get_repo_root() {
 }
 
 # Get current branch, with fallback for non-git repositories
+# Detection cascade: active-feature file > SPECIFY_FEATURE env > git branch > single feature > fallback
 get_current_branch() {
-    # First check if SPECIFY_FEATURE environment variable is set
+    # 1. Check sticky active-feature file (survives restarts)
+    local active
+    active=$(read_active_feature 2>/dev/null) && [[ -n "$active" ]] && {
+        echo "$active"
+        return
+    }
+
+    # 2. Check SPECIFY_FEATURE environment variable (CI/scripts)
     if [[ -n "${SPECIFY_FEATURE:-}" ]]; then
         echo "$SPECIFY_FEATURE"
         return
     fi
 
-    # Then check git if available
+    # 3. Check git branch if available
     if git rev-parse --abbrev-ref HEAD >/dev/null 2>&1; then
         git rev-parse --abbrev-ref HEAD
         return
     fi
 
-    # For non-git repos, try to find the latest feature directory
+    # 4. For non-git repos, try to find the latest feature directory
     local repo_root=$(get_repo_root)
     local specs_dir="$repo_root/specs"
 
@@ -74,12 +190,14 @@ check_feature_branch() {
 
     # Accept if branch matches NNN- pattern (standard feature branch)
     if [[ "$branch" =~ ^[0-9]{3}- ]]; then
+        write_active_feature "$branch"
         return 0
     fi
 
     # Accept if SPECIFY_FEATURE env var is set (explicit feature context, e.g., --skip-branch)
     if [[ -n "${SPECIFY_FEATURE:-}" ]]; then
         echo "[specify] Using feature context from SPECIFY_FEATURE: $SPECIFY_FEATURE" >&2
+        write_active_feature "$SPECIFY_FEATURE"
         return 0
     fi
 
@@ -101,13 +219,13 @@ check_feature_branch() {
     if [[ "$feature_count" -eq 1 ]]; then
         echo "[specify] Not on feature branch, but found single feature directory: $latest_feature" >&2
         export SPECIFY_FEATURE="$latest_feature"
+        write_active_feature "$latest_feature"
         return 0
     elif [[ "$feature_count" -gt 1 ]]; then
         echo "WARNING: Not on a feature branch and multiple feature directories exist." >&2
         echo "Current branch: $branch" >&2
-        echo "Set SPECIFY_FEATURE=<feature-name> to specify which feature to use." >&2
-        echo "Or run: /iikit-01-specify to create a new feature." >&2
-        return 1
+        echo "Run: /iikit-core use <feature> to select a feature." >&2
+        return 2
     fi
 
     echo "ERROR: Not on a feature branch. Current branch: $branch" >&2

@@ -84,7 +84,21 @@ REPO_ROOT=$(get_repo_root)
 HAS_GIT="false"
 has_git && HAS_GIT="true"
 CURRENT_BRANCH=$(get_current_branch)
-check_feature_branch "$CURRENT_BRANCH" "$HAS_GIT" || exit 1
+BRANCH_EXIT=0
+check_feature_branch "$CURRENT_BRANCH" "$HAS_GIT" || BRANCH_EXIT=$?
+if [[ $BRANCH_EXIT -eq 2 ]]; then
+    # Multiple features — caller (skill) should present picker
+    FEATURES_JSON=$(list_features_json)
+    if $JSON_MODE || $PATHS_ONLY; then
+        printf '{"needs_selection":true,"features":%s}\n' "$FEATURES_JSON"
+    else
+        echo "NEEDS_SELECTION: true"
+        echo "Run: /iikit-core use <feature> to select a feature."
+    fi
+    exit 2
+elif [[ $BRANCH_EXIT -ne 0 ]]; then
+    exit 1
+fi
 
 # Now get all paths (will use SPECIFY_FEATURE if it was set by check_feature_branch)
 eval $(get_feature_paths)

@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/skills/iikit-core/scripts/bash/session-context-hook.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -278,6 +278,10 @@ if [ -f "$TEMPLATE" ]; then cp "$TEMPLATE" "$SPEC_FILE"; else touch "$SPEC_FILE"
 # Set the SPECIFY_FEATURE environment variable
 export SPECIFY_FEATURE="$BRANCH_NAME"
 
+# Write sticky active feature (survives restarts)
+source "$SCRIPT_DIR/common.sh"
+write_active_feature "$BRANCH_NAME" "$REPO_ROOT"
+
 if $JSON_MODE; then
     # Output HAS_GIT as proper JSON boolean (no quotes) for consistency with PowerShell
     printf '{"BRANCH_NAME":"%s","SPEC_FILE":"%s","FEATURE_NUM":"%s","HAS_GIT":%s}\n' "$BRANCH_NAME" "$SPEC_FILE" "$FEATURE_NUM" "$HAS_GIT"
@@ -285,5 +289,4 @@ else
     echo "BRANCH_NAME: $BRANCH_NAME"
     echo "SPEC_FILE: $SPEC_FILE"
     echo "FEATURE_NUM: $FEATURE_NUM"
-    echo "SPECIFY_FEATURE environment variable set to: $BRANCH_NAME"
 fi

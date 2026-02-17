@@ -40,7 +40,11 @@ $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $repoRoot = Get-RepoRoot
 $hasGit = Test-HasGit
 $currentBranch = Get-CurrentBranch
-if (-not (Test-FeatureBranch -Branch $currentBranch -HasGit $hasGit)) {
+$branchResult = Test-FeatureBranch -Branch $currentBranch -HasGit $hasGit
+if ($branchResult -eq "NEEDS_SELECTION") {
+    Write-Host "ERROR: Multiple features exist. Run: /iikit-core use <feature> to select one." -ForegroundColor Red
+    exit 2
+} elseif ($branchResult -eq "ERROR") {
     exit 1
 }
 
@@ -101,13 +105,13 @@ function Write-Err {
 function Validate-Environment {
     if (-not $CURRENT_BRANCH) {
         Write-Err 'Unable to determine current feature'
-        if ($HAS_GIT) { Write-Info "Make sure you're on a feature branch" } else { Write-Info 'Set SPECIFY_FEATURE environment variable or create a feature first' }
+        if ($HAS_GIT) { Write-Info "Make sure you're on a feature branch" } else { Write-Info 'Run /iikit-core use <feature> or create a new feature first' }
         exit 1
     }
     if (-not (Test-Path $NEW_PLAN)) {
         Write-Err "No plan.md found at $NEW_PLAN"
         Write-Info 'Ensure you are working on a feature with a corresponding spec directory'
-        if (-not $HAS_GIT) { Write-Info 'Use: $env:SPECIFY_FEATURE=your-feature-name or create a new feature first' }
+        if (-not $HAS_GIT) { Write-Info 'Run /iikit-core use <feature> or create a new feature first' }
         exit 1
     }
     if (-not (Test-Path $TEMPLATE_FILE)) {
