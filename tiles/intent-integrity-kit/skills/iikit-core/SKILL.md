@@ -80,9 +80,9 @@ Show constitution status, feature count, and suggest `/iikit-core status`.
 
 1. No constitution -> `/iikit-00-constitution`
 2. No feature -> `/iikit-01-specify <description>`
-3. Has spec, no plan -> `/iikit-03-plan`
-4. Has plan, no tasks -> `/iikit-06-tasks`
-5. Has tasks -> `/iikit-08-implement`
+3. Has spec, no plan -> suggest `/clear`, then `/iikit-03-plan` (clarify session may have consumed context)
+4. Has plan, no tasks -> suggest `/clear`, then `/iikit-06-tasks` (checklist session may have consumed context)
+5. Has tasks -> suggest `/clear`, then `/iikit-08-implement` (implementation is context-heavy)
 
 ## Subcommand: use
 
@@ -103,10 +103,10 @@ The `$ARGUMENTS` after `use` is the feature selector: a number (`1`, `001`), par
 2. Parse JSON for `active_feature` and `stage`.
 
 3. **Report**: confirm which feature is now active, its current stage, and suggest the appropriate next command based on stage:
-   - `specified` -> `/iikit-02-clarify` or `/iikit-03-plan`
-   - `planned` -> `/iikit-04-checklist` or `/iikit-06-tasks`
-   - `tasks-ready` -> `/iikit-08-implement`
-   - `implementing-NN%` -> `/iikit-08-implement` (resume)
+   - `specified` -> `/iikit-02-clarify` or suggest `/clear`, then `/iikit-03-plan`
+   - `planned` -> `/iikit-04-checklist` or suggest `/clear`, then `/iikit-06-tasks`
+   - `tasks-ready` -> suggest `/clear`, then `/iikit-08-implement`
+   - `implementing-NN%` -> suggest `/clear`, then `/iikit-08-implement` (resume)
    - `complete` -> All done
 
 ### Error Handling
