@@ -4,6 +4,8 @@ description: >-
   Resolve ambiguities in a feature specification — identifies underspecified areas, asks up to 5 targeted questions with option tables, and updates spec.md with answers linked to affected requirements (FR-XXX, SC-XXX).
   Use when requirements are unclear, the spec has gaps, details are missing, user stories need refinement, or you want to tighten acceptance criteria before planning.
 license: MIT
+metadata:
+  version: "1.6.4"
 ---
 
 # Intent Integrity Kit Clarify

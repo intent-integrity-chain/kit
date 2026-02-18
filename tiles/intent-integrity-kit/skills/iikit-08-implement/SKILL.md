@@ -4,6 +4,8 @@ description: >-
   Execute the implementation plan by coding each task from tasks.md — writes source files, runs tests, verifies assertion integrity, and validates output against constitutional principles.
   Use when ready to build the feature, start coding, develop from the task list, or resume a partially completed implementation.
 license: MIT
+metadata:
+  version: "1.6.4"
 ---
 
 # Intent Integrity Kit Implement

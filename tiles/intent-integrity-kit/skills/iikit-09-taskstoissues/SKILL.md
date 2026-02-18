@@ -4,6 +4,8 @@ description: >-
   Convert tasks from tasks.md into GitHub Issues with labels and dependencies.
   Use when exporting work items to GitHub, setting up project boards, or assigning tasks to team members.
 license: MIT
+metadata:
+  version: "1.6.4"
 ---
 
 # Intent Integrity Kit Tasks to Issues

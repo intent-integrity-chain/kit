@@ -4,6 +4,8 @@ description: >-
   Create a feature specification from a natural language description — generates user stories with Given/When/Then scenarios, functional requirements (FR-XXX), success criteria, and a quality checklist.
   Use when starting a new feature, writing a PRD, defining user stories, capturing acceptance criteria, or documenting requirements for a product idea.
 license: MIT
+metadata:
+  version: "1.6.4"
 ---
 
 # Intent Integrity Kit Specify

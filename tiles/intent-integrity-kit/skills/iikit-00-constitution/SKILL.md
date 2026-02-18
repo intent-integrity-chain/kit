@@ -4,6 +4,8 @@ description: >-
   Create or update a CONSTITUTION.md that defines project governance — establishes coding standards, quality gates, TDD policy, review requirements, and non-negotiable development principles with versioned amendment tracking.
   Use when defining project rules, setting up coding standards, establishing quality gates, configuring TDD requirements, or creating non-negotiable development principles.
 license: MIT
+metadata:
+  version: "1.6.4"
 ---
 
 # Intent Integrity Kit Constitution

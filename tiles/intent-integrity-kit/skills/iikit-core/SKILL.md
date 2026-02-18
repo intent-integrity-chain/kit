@@ -4,6 +4,8 @@ description: >-
   Initialize an IIKit project, check feature progress, select the active feature, and display the workflow command reference.
   Use when starting a new project, running init, checking status, switching between features, or looking up available commands and phases.
 license: MIT
+metadata:
+  version: "1.6.4"
 ---
 
 # Intent Integrity Kit Core

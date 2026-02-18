@@ -4,6 +4,8 @@ description: >-
   Validate cross-artifact consistency — checks that every spec requirement traces to tasks, plan tech stack matches task file paths, and constitution principles are satisfied across all artifacts.
   Use when running a consistency check, verifying requirements traceability, detecting conflicts between design docs, or auditing alignment before implementation begins.
 license: MIT
+metadata:
+  version: "1.6.4"
 ---
 
 # Intent Integrity Kit Analyze

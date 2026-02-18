@@ -4,6 +4,8 @@ description: >-
   Generate dependency-ordered task breakdown from plan and specification.
   Use when breaking features into implementable tasks, planning sprints, or creating work items with parallel markers.
 license: MIT
+metadata:
+  version: "1.6.4"
 ---
 
 # Intent Integrity Kit Tasks
