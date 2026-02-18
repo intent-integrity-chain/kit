@@ -3,8 +3,8 @@
 # Intent Integrity Kit Source Validation Tests
 #
 # Tests the source repository for documentation and skill consistency.
-# Single source of truth: tiles/intent-integrity-kit/skills/
-# .claude/skills/ is a symlink to the tile.
+# Single source of truth: .claude/skills/
+# tiles/intent-integrity-kit/skills is a symlink to .claude/skills/.
 #
 # Usage:
 #   ./tests/run-source-tests.sh
@@ -36,25 +36,33 @@ log_section() { echo -e "\n${BLUE}=== $1 ===${NC}"; }
 cd "$REPO_ROOT"
 
 # The single source of truth for skills
-SKILLS_DIR="tiles/intent-integrity-kit/skills"
+SKILLS_DIR=".claude/skills"
 
 # ─── Symlink Structure ───────────────────────────────────────────────────────
 
 test_symlink_structure() {
     log_section "Symlink Structure"
 
-    # .claude/skills must be a symlink to the tile
+    # .claude/skills must be a real directory (source of truth)
     ((TESTS_RUN++))
-    if [[ -L ".claude/skills" ]]; then
+    if [[ -d ".claude/skills" && ! -L ".claude/skills" ]]; then
+        log_pass ".claude/skills is a real directory (source of truth)"
+    else
+        log_fail ".claude/skills should be a real directory, not a symlink"
+    fi
+
+    # tiles/intent-integrity-kit/skills must be a symlink to .claude/skills
+    ((TESTS_RUN++))
+    if [[ -L "tiles/intent-integrity-kit/skills" ]]; then
         local target
-        target=$(readlink .claude/skills)
-        if [[ "$target" == *"tiles/intent-integrity-kit/skills"* ]]; then
-            log_pass ".claude/skills symlinks to tile ($target)"
+        target=$(readlink tiles/intent-integrity-kit/skills)
+        if [[ "$target" == *".claude/skills"* ]]; then
+            log_pass "tiles/intent-integrity-kit/skills symlinks to .claude/skills ($target)"
         else
-            log_fail ".claude/skills symlinks to wrong target: $target"
+            log_fail "tiles/intent-integrity-kit/skills symlinks to wrong target: $target"
         fi
     else
-        log_fail ".claude/skills is not a symlink"
+        log_fail "tiles/intent-integrity-kit/skills is not a symlink"
     fi
 
     # .tessl/tiles/tessl-labs/intent-integrity-kit must be a symlink to the tile

@@ -65,7 +65,12 @@ setup() {
 
     if [[ "$TILE_SOURCE" == "local" ]]; then
         log_info "Installing from local..."
-        tessl install "file:$ORIGINAL_DIR/tiles/intent-integrity-kit" 2>&1 | grep -v "^-"
+        # Resolve symlinks so tessl gets real files (skills/ may be a symlink)
+        local tile_copy
+        tile_copy=$(mktemp -d)
+        cp -RL "$ORIGINAL_DIR/tiles/intent-integrity-kit/" "$tile_copy/"
+        tessl install "file:$tile_copy" 2>&1 | grep -v "^-"
+        rm -rf "$tile_copy"
     else
         log_info "Installing from registry (latest)..."
         # Note: May need to specify version if recently published

@@ -65,14 +65,19 @@ jobs:
       - name: Resolve symlinks in tile directory
         if: steps.version.outputs.changed == 'true'
         run: |
-          # Replace symlinks with file copies so the archive contains real files
+          # Replace symlinks with real copies so the archive contains real files
           cd tiles/intent-integrity-kit
-          find . -type l | while read link; do
+          # Resolve directory symlinks first (e.g., skills -> ../../.claude/skills)
+          find . -maxdepth 3 -type l | while read link; do
             target=$(readlink -f "$link")
-            if [ -f "$target" ]; then
+            if [ -d "$target" ]; then
+              rm "$link"
+              cp -R "$target" "$link"
+              echo "Resolved dir symlink: $link"
+            elif [ -f "$target" ]; then
               rm "$link"
               cp "$target" "$link"
-              echo "Resolved symlink: $link"
+              echo "Resolved file symlink: $link"
             fi
           done
 
