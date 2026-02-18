@@ -40,6 +40,8 @@ tessl install tessl-labs/intent-integrity-kit
 
 > **Don't have Tessl?** Install it first: `npm install -g @tessl/cli`
 
+> **Note**: `tessl install` is the only supported installation method. During publish, shared reference and template files are copied into each skill for self-containment. Cloning the repo directly does not produce self-contained skills.
+
 ### Your First Project
 
 ```bash

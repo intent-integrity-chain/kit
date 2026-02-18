@@ -81,6 +81,44 @@ jobs:
             fi
           done
 
+      - name: Make skills self-contained
+        if: steps.version.outputs.changed == 'true'
+        run: |
+          cd tiles/intent-integrity-kit/skills
+          for skill_dir in iikit-*/; do
+            [ "$skill_dir" = "iikit-core/" ] && continue
+            skill_md="$skill_dir/SKILL.md"
+            [ ! -f "$skill_md" ] && continue
+
+            # Copy referenced files from iikit-core into this skill
+            for subdir in references templates; do
+              if grep -q "../iikit-core/$subdir/" "$skill_md"; then
+                mkdir -p "$skill_dir/$subdir"
+                # Copy only files actually referenced
+                grep -oP "(?<=\.\./iikit-core/$subdir/)[a-z-]+\.md" "$skill_md" | sort -u | while read file; do
+                  if [ -f "iikit-core/$subdir/$file" ]; then
+                    cp "iikit-core/$subdir/$file" "$skill_dir/$subdir/$file"
+                    echo "  Copied $subdir/$file → $skill_dir$subdir/"
+                  fi
+                done
+                # Rewrite links: ../iikit-core/subdir/file.md → ./subdir/file.md
+                sed -i "s|\.\./iikit-core/$subdir/|./$subdir/|g" "$skill_md"
+              fi
+            done
+            echo "✓ $skill_dir is self-contained"
+          done
+
+          # Clean up iikit-core: references/ fully distributed, remove to avoid orphans
+          rm -rf iikit-core/references
+          echo "✓ Removed iikit-core/references/ (fully distributed)"
+
+          # Remove templates only referenced from SKILL.md (now distributed as local copies)
+          # Keep templates referenced by scripts: agent-file-template.md, spec-template.md, plan-template.md
+          for tmpl in constitution-template.md checklist-template.md tasks-template.md testspec-template.md; do
+            rm -f "iikit-core/templates/$tmpl"
+          done
+          echo "✓ Removed distributed-only templates from iikit-core/templates/"
+
       - name: Sync SKILL.md versions to tile version
         if: steps.version.outputs.changed == 'true'
         run: |

@@ -152,6 +152,13 @@ Run /iikit-core status to see your current progress.
 
 Show help output.
 
+## Script Resources
+
+Templates used by core scripts at runtime:
+- [spec-template.md](templates/spec-template.md) — new feature scaffolding
+- [plan-template.md](templates/plan-template.md) — plan prerequisite validation
+- [agent-file-template.md](templates/agent-file-template.md) — agent context file generation
+
 ## Error Handling
 
 | Condition | Response |

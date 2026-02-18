@@ -668,17 +668,18 @@ test_skill_template_references() {
     local base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills"
 
     # Check that skill files reference correct template paths
-    # iikit-00-constitution should reference iikit-core/templates/
+    # Accepts both ../iikit-core/templates/ (dev/local) and ./templates/ (registry, after self-containment rewrite)
+    # iikit-00-constitution should reference constitution-template.md
     ((TESTS_RUN++))
-    if grep -q "iikit-core/templates/constitution-template.md" "$base/iikit-00-constitution/SKILL.md"; then
+    if grep -qE '(iikit-core|\.)/templates/constitution-template\.md' "$base/iikit-00-constitution/SKILL.md"; then
         log_pass "constitution skill references correct template path"
     else
         log_fail "constitution skill has wrong template path"
     fi
 
-    # iikit-01-specify should reference iikit-core/templates/
+    # iikit-01-specify should reference spec-template.md
     ((TESTS_RUN++))
-    if grep -q "iikit-core/templates/spec-template.md" "$base/iikit-01-specify/SKILL.md"; then
+    if grep -qE '(iikit-core|\.)/templates/spec-template\.md' "$base/iikit-01-specify/SKILL.md"; then
         log_pass "specify skill references correct template path"
     else
         log_fail "specify skill has wrong template path"
@@ -1001,7 +1002,7 @@ test_all_skill_template_refs() {
     log_section "All SKILL.md Template References"
     local base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills"
 
-    # All template references should use iikit-core/templates/
+    # All template references should use iikit-core/templates/ or ./templates/ (after self-containment)
     ((TESTS_RUN++))
     local wrong_template_refs
     wrong_template_refs=$(grep -rh "iikit-0[0-9]-[a-z]*/templates/" "$base"/iikit-*/SKILL.md 2>/dev/null | wc -l)
@@ -1012,14 +1013,60 @@ test_all_skill_template_refs() {
         grep -rn "iikit-0[0-9]-[a-z]*/templates/" "$base"/iikit-*/SKILL.md 2>/dev/null | head -5
     fi
 
-    # Count correct template references
+    # Count correct template references (iikit-core/templates/ or ./templates/)
     ((TESTS_RUN++))
     local correct_refs
-    correct_refs=$(grep -rh "iikit-core/templates/" "$base"/iikit-*/SKILL.md 2>/dev/null | wc -l)
+    correct_refs=$(grep -rEh '(iikit-core|\.)/templates/' "$base"/iikit-*/SKILL.md 2>/dev/null | wc -l)
     if [[ "$correct_refs" -gt 0 ]]; then
-        log_pass "skills use iikit-core/templates/ ($correct_refs refs)"
+        log_pass "skills use valid template paths ($correct_refs refs)"
     else
         log_warn "no template references found in skills (may be OK)"
+    fi
+}
+
+test_skill_self_containment() {
+    log_section "Skill Self-Containment"
+    local base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills"
+
+    # Test 1: No SKILL.md (outside iikit-core) should contain ../iikit-core/ references
+    ((TESTS_RUN++))
+    local illegal_refs=0
+    for skill in "$base"/iikit-*/SKILL.md; do
+        # Skip iikit-core itself
+        [[ "$skill" == *"iikit-core"* ]] && continue
+        if grep -q '\.\./iikit-core/' "$skill" 2>/dev/null; then
+            ((illegal_refs++))
+            local skill_name
+            skill_name=$(basename "$(dirname "$skill")")
+            log_info "  $skill_name still has ../iikit-core/ references"
+        fi
+    done
+    if [[ "$illegal_refs" -eq 0 ]]; then
+        log_pass "no skills have ../iikit-core/ references (self-contained)"
+    else
+        log_fail "$illegal_refs skills still have ../iikit-core/ references"
+    fi
+
+    # Test 2: Every ./references/ and ./templates/ link in a SKILL.md resolves to an existing file
+    ((TESTS_RUN++))
+    local broken_links=0
+    for skill in "$base"/iikit-*/SKILL.md; do
+        [[ "$skill" == *"iikit-core"* ]] && continue
+        local skill_dir
+        skill_dir=$(dirname "$skill")
+        # Extract ./references/*.md and ./templates/*.md paths
+        while IFS= read -r ref_path; do
+            local full_path="$skill_dir/$ref_path"
+            if [[ ! -f "$full_path" ]]; then
+                ((broken_links++))
+                log_info "  Broken link in $(basename "$skill_dir"): $ref_path"
+            fi
+        done < <(grep -oE '\.\/(references|templates)/[a-z-]+\.md' "$skill" 2>/dev/null | sort -u)
+    done
+    if [[ "$broken_links" -eq 0 ]]; then
+        log_pass "all ./references/ and ./templates/ links resolve"
+    else
+        log_fail "$broken_links local file links are broken"
     fi
 }
 
@@ -1123,6 +1170,7 @@ main() {
     test_bash_script_inner_template_refs
     test_powershell_script_inner_template_refs
     test_all_skill_template_refs
+    test_skill_self_containment
     test_documentation_path_consistency
     test_readme_path_consistency
     test_skill_numbering_consistency

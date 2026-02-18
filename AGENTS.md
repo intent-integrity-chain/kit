@@ -31,11 +31,12 @@ Read `FRAMEWORK-PRINCIPLES.md` for this framework's development principles.
 ## Project Structure
 
 ```text
-.claude/skills/              # Primary skills location (source of truth)
+.claude/skills/              # Development layout (source of truth)
   iikit-core/              # Core skill with scripts and templates
     scripts/bash/            # Bash scripts for all skills
     scripts/powershell/      # PowerShell scripts for Windows
     templates/               # Framework templates (do not edit)
+    references/              # Shared reference docs (do not edit)
   iikit-00-constitution/   # Constitution skill
   iikit-01-specify/        # Specification skill
   ...                        # Other iikit-XX-* skills
@@ -63,6 +64,8 @@ specs/                       # Feature specifications (created per feature)
     tests/                   # Test specifications (created by /iikit-05-testify)
       test-specs.md          # Generated test specifications
 ```
+
+> **Distribution note**: The `.claude/skills/` layout above is the development structure. In development, skills reference shared files in `iikit-core/` via `../iikit-core/` paths. During CI publish, these are copied into each skill and links are rewritten for self-containment. Use `tessl install tessl-labs/intent-integrity-kit` for correct setup — cloning the repo directly does not produce self-contained skills.
 
 ## Commands
 
