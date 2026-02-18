@@ -18,20 +18,20 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+> **Windows**: Replace `bash …/scripts/bash/*.sh` with `pwsh …/scripts/powershell/*.ps1` (same flags, `-PascalCase`).
+
 ## Constitution Loading
 
 Load constitution per [constitution-loading.md](../iikit-core/references/constitution-loading.md) (enforcement mode — extract rules, declare hard gate, validate before every file write).
 
 ## Prerequisites Check
 
-1. Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks`
+1. Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase 08 --json`
 2. Parse for `FEATURE_DIR` and `AVAILABLE_DOCS`. If missing tasks.md: ERROR.
 3. If JSON contains `needs_selection: true`: present the `features` array as a numbered table (name and stage columns). Follow the options presentation pattern in [conversation-guide.md](../iikit-core/references/conversation-guide.md). After user selects, run:
    ```bash
    bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selection>
    ```
-   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selection>`
-
    Then re-run the prerequisites check from step 1.
 
 ## Pre-Implementation Validation
@@ -40,21 +40,9 @@ Load constitution per [constitution-loading.md](../iikit-core/references/constit
 2. **Cross-artifact consistency**: spec FR-XXX -> tasks, plan tech stack -> task file paths, constitution -> plan compliance
 3. Report readiness: READY or BLOCKED
 
-## Checklist Gating (CRITICAL)
+## Checklist Gating
 
 Read each checklist in `FEATURE_DIR/checklists/`. All must be 100% complete. If incomplete: ask user to proceed or halt.
-
-## Launch Kanban Dashboard (Optional)
-
-```bash
-if command -v npx >/dev/null 2>&1; then
-  npx iikit-kanban . &
-fi
-```
-
-Windows: `Start-Process npx -ArgumentList "iikit-kanban", "." -NoNewWindow`
-
-Dashboard shows live kanban board. Continues without it if npx unavailable.
 
 ## Execution Flow
 
@@ -70,25 +58,18 @@ If `tests/test-specs.md` exists, verify assertion integrity:
 ```bash
 bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh comprehensive-check "FEATURE_DIR/tests/test-specs.md" "CONSTITUTION.md"
 ```
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/testify-tdd.ps1 comprehensive-check "FEATURE_DIR/tests/test-specs.md" "CONSTITUTION.md"`
 
 Parse JSON response: `PASS` (proceed), `BLOCKED` (halt, show remediation), `WARN` (proceed with caution).
 
 If TDD **mandatory** but test-specs.md missing: ERROR with `Run: /iikit-05-testify`.
 
-### 2.1 Test Execution Enforcement (CRITICAL)
+### 2.1 Test Execution Enforcement
 
-Tests MUST be run, not just written:
-- After writing test file: run immediately to verify it fails (red)
-- After implementing: run to verify pass (green)
-- Before marking test task complete: execution output required
-- If tests fail: fix code, not tests
+Tests **MUST** be run, not just written. After writing a test: run it immediately (expect red). After implementing: run it (expect green). If tests fail: fix code, not tests. Never mark a test task `[x]` without execution output.
 
-Verify execution with:
 ```bash
 bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/verify-test-execution.sh verify "FEATURE_DIR/tests/test-specs.md" "$(cat test-output.log)"
 ```
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/verify-test-execution.ps1 verify "FEATURE_DIR/tests/test-specs.md" (Get-Content test-output.log -Raw)`
 
 Block on any status other than `PASS`.
 
@@ -104,18 +85,17 @@ For scaffolding tools in existing directories, use force/overwrite flags. See [i
 
 **5.1 Task extraction**: parse tasks.md for phase, completion status (`[x]` = skip), dependencies, [P] markers, [USn] labels. Build in-memory task graph.
 
-**5.2 Execution strategy**: parallel mode (if subagents available) or sequential mode. Report per [formatting-guide.md](../iikit-core/references/formatting-guide.md) (Execution Mode Header).
+**5.2 Execution strategy — read [parallel-execution.md](references/parallel-execution.md) BEFORE proceeding**:
+If tasks.md contains `[P]` markers, you **MUST** use the `Task` tool to dispatch parallel batches as concurrent subagents (one worker per task). Only fall back to sequential execution if the runtime has no subagent dispatch mechanism. Report mode per [formatting-guide.md](../iikit-core/references/formatting-guide.md) (Execution Mode Header).
 
 **5.3 Phase-by-phase**:
 1. Collect eligible tasks (dependencies satisfied)
 2. Build parallel batches from [P] tasks with no mutual dependencies
-3. Dispatch (parallel: one subagent per task; sequential: one at a time)
+3. Dispatch — parallel: launch one `Task` tool subagent per `[P]` task in the batch; sequential: one at a time
 4. Collect results, checkpoint `[x]` in tasks.md per batch
 5. Repeat until phase complete
 
 Cross-story parallelism: independent stories can run as parallel workstreams after Phase 2 (verify no shared file modifications).
-
-See [parallel-execution.md](references/parallel-execution.md) for the full orchestrator/worker protocol.
 
 **5.4 Rules**: query Tessl tiles before library code, tests before code if TDD, run tests after writing them, only orchestrator updates tasks.md.
 
@@ -144,9 +124,7 @@ After completing bug fix tasks (tasks with `T-B` prefix pattern):
 
 ### 9. Completion
 
-Pre-completion: all tasks `[x]`, features validated against spec, ALL tests executed (not just written) with passing output, Tessl usage reported.
-
-Cannot declare complete if: tests exist but never run, tests failing, or test tasks marked complete without execution output.
+All tasks `[x]`, features validated against spec, test execution enforcement (§2.1) satisfied, Tessl usage reported.
 
 ## Error Handling
 

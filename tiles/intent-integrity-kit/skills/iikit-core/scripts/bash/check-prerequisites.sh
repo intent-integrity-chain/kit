@@ -1,95 +1,213 @@
 #!/usr/bin/env bash
 
-# Consolidated prerequisite checking script
+# Phase-aware prerequisite checking script
 #
-# This script provides unified prerequisite checking for Spec-Driven Development workflow.
-# It replaces the functionality previously spread across multiple scripts.
+# This script provides unified, phase-driven prerequisite checking for IIKit workflow.
+# Each phase declares exactly what it needs (constitution mode, spec, plan, tasks, etc.)
+# via a built-in state machine.
 #
-# Usage: ./check-prerequisites.sh [OPTIONS]
+# Usage: ./check-prerequisites.sh --phase <PHASE> [--json] [--project-root PATH]
+#
+# PHASES:
+#   00       Constitution (no validation)
+#   01       Specify (soft constitution)
+#   02       Clarify (soft constitution, requires spec)
+#   bugfix   Bug fix (soft constitution)
+#   03       Plan (hard constitution, requires spec, copies template)
+#   04       Checklist (basic constitution, requires spec + plan)
+#   05       Testify (basic constitution, requires spec + plan, soft checklist)
+#   06       Tasks (basic constitution, requires spec + plan, soft checklist)
+#   07       Analyze (hard constitution, requires spec + plan + tasks, soft checklist)
+#   08       Implement (hard constitution, requires spec + plan + tasks, hard checklist)
+#   09       Tasks to Issues (implicit constitution, requires spec + plan + tasks)
+#   core     Paths only (no validation)
+#
+# LEGACY FLAGS (deprecated, map to phases):
+#   --paths-only              -> --phase core
+#   --require-tasks           -> --phase 08
+#   --include-tasks           (used with --require-tasks)
 #
 # OPTIONS:
 #   --json              Output in JSON format
-#   --require-tasks     Require tasks.md to exist (for implementation phase)
-#   --include-tasks     Include tasks.md in AVAILABLE_DOCS list
-#   --paths-only        Only output path variables (no validation)
+#   --project-root PATH Override project root directory (for testing)
 #   --help, -h          Show help message
 #
-# OUTPUTS:
-#   JSON mode: {"FEATURE_DIR":"...", "AVAILABLE_DOCS":["..."]}
-#   Text mode: FEATURE_DIR:... \n AVAILABLE_DOCS: \n check/x file.md
-#   Paths only: REPO_ROOT: ... \n BRANCH: ... \n FEATURE_DIR: ... etc.
+# OUTPUTS (JSON mode):
+#   Enriched JSON with phase, paths, validated status, available docs, warnings.
+#   Top-level FEATURE_DIR and AVAILABLE_DOCS preserved for backward compat.
+#   needs_selection short-circuits all other output (same as before).
 
 set -e
 
 # Parse command line arguments
 JSON_MODE=false
-REQUIRE_TASKS=false
-INCLUDE_TASKS=false
-PATHS_ONLY=false
+PHASE=""
+PROJECT_ROOT_ARG=""
+LEGACY_PATHS_ONLY=false
+LEGACY_REQUIRE_TASKS=false
+LEGACY_INCLUDE_TASKS=false
 
-for arg in "$@"; do
-    case "$arg" in
+while [[ $# -gt 0 ]]; do
+    case "$1" in
         --json)
             JSON_MODE=true
+            shift
             ;;
-        --require-tasks)
-            REQUIRE_TASKS=true
+        --phase)
+            PHASE="$2"
+            shift 2
             ;;
-        --include-tasks)
-            INCLUDE_TASKS=true
+        --project-root)
+            PROJECT_ROOT_ARG="$2"
+            shift 2
             ;;
         --paths-only)
-            PATHS_ONLY=true
+            LEGACY_PATHS_ONLY=true
+            shift
+            ;;
+        --require-tasks)
+            LEGACY_REQUIRE_TASKS=true
+            shift
+            ;;
+        --include-tasks)
+            LEGACY_INCLUDE_TASKS=true
+            shift
             ;;
         --help|-h)
             cat << 'EOF'
-Usage: check-prerequisites.sh [OPTIONS]
+Usage: check-prerequisites.sh --phase <PHASE> [--json] [--project-root PATH]
 
-Consolidated prerequisite checking for Spec-Driven Development workflow.
+Phase-aware prerequisite checking for IIKit workflow.
+
+PHASES:
+  00       Constitution (no validation)
+  01       Specify (soft constitution)
+  02       Clarify (soft constitution, requires spec)
+  bugfix   Bug fix (soft constitution)
+  03       Plan (hard constitution, requires spec, copies template)
+  04       Checklist (basic constitution, requires spec + plan)
+  05       Testify (basic constitution, requires spec + plan, soft checklist)
+  06       Tasks (basic constitution, requires spec + plan, soft checklist)
+  07       Analyze (hard constitution, requires spec + plan + tasks, soft checklist)
+  08       Implement (hard constitution, requires spec + plan + tasks, hard checklist)
+  09       Tasks to Issues (implicit constitution, requires spec + plan + tasks)
+  core     Paths only (no validation)
 
 OPTIONS:
   --json              Output in JSON format
-  --require-tasks     Require tasks.md to exist (for implementation phase)
-  --include-tasks     Include tasks.md in AVAILABLE_DOCS list
-  --paths-only        Only output path variables (no prerequisite validation)
+  --project-root PATH Override project root directory (for testing)
   --help, -h          Show this help message
 
-EXAMPLES:
-  # Check task prerequisites (plan.md required)
-  ./check-prerequisites.sh --json
+LEGACY FLAGS (deprecated):
+  --paths-only        Use --phase core instead
+  --require-tasks     Use --phase 08 instead
+  --include-tasks     Use --phase 08 instead
 
-  # Check implementation prerequisites (plan.md + tasks.md required)
-  ./check-prerequisites.sh --json --require-tasks --include-tasks
+EXAMPLES:
+  # Check prerequisites for plan phase
+  ./check-prerequisites.sh --phase 03 --json
+
+  # Check prerequisites for implementation phase
+  ./check-prerequisites.sh --phase 08 --json
 
   # Get feature paths only (no validation)
-  ./check-prerequisites.sh --paths-only
+  ./check-prerequisites.sh --phase core --json
 
 EOF
             exit 0
             ;;
         *)
-            echo "ERROR: Unknown option '$arg'. Use --help for usage information." >&2
+            echo "ERROR: Unknown option '$1'. Use --help for usage information." >&2
             exit 1
             ;;
     esac
 done
 
+# Map legacy flags to phase (with deprecation warning to stderr)
+if [[ -z "$PHASE" ]]; then
+    if $LEGACY_PATHS_ONLY; then
+        echo "DEPRECATED: --paths-only is deprecated, use --phase core" >&2
+        PHASE="core"
+    elif $LEGACY_REQUIRE_TASKS; then
+        echo "DEPRECATED: --require-tasks/--include-tasks are deprecated, use --phase 08" >&2
+        PHASE="08"
+    else
+        # Default to phase 04 (backward compat with bare invocations)
+        PHASE="04"
+    fi
+fi
+
 # Source common functions
 SCRIPT_DIR="$(CDPATH="" cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
-# Check if we're on a proper feature branch FIRST (may set SPECIFY_FEATURE)
-# This must happen before get_feature_paths so it uses the corrected feature name
-REPO_ROOT=$(get_repo_root)
+# =============================================================================
+# PHASE CONFIGURATION
+# =============================================================================
+# Sets: P_CONST, P_SPEC, P_PLAN, P_TASKS, P_INCLUDE_TASKS, P_CHECKLIST, P_EXTRAS
+#
+# P_CONST modes:
+#   none     - skip constitution check
+#   soft     - warn if missing, continue
+#   basic    - error if missing
+#   hard     - error if missing, output signals enforcement mode
+#   implicit - error if missing, no extra output
+#
+# P_CHECKLIST modes:
+#   none - skip checklist check
+#   soft - warn if incomplete
+#   hard - warn strongly (must be 100% for implementation)
+
+configure_phase() {
+    local phase="$1"
+    case "$phase" in
+        00)      P_CONST=none;     P_SPEC=no;       P_PLAN=no;       P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=none; P_EXTRAS="" ;;
+        01)      P_CONST=soft;     P_SPEC=no;       P_PLAN=no;       P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=none; P_EXTRAS="" ;;
+        02)      P_CONST=soft;     P_SPEC=required; P_PLAN=no;       P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=none; P_EXTRAS="" ;;
+        bugfix)  P_CONST=soft;     P_SPEC=no;       P_PLAN=no;       P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=none; P_EXTRAS="" ;;
+        03)      P_CONST=hard;     P_SPEC=required; P_PLAN=no;       P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=none; P_EXTRAS="spec_quality,copy_plan_template" ;;
+        04)      P_CONST=basic;    P_SPEC=required; P_PLAN=required; P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=none; P_EXTRAS="" ;;
+        05)      P_CONST=basic;    P_SPEC=required; P_PLAN=required; P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=soft; P_EXTRAS="" ;;
+        06)      P_CONST=basic;    P_SPEC=required; P_PLAN=required; P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=soft; P_EXTRAS="" ;;
+        07)      P_CONST=hard;     P_SPEC=required; P_PLAN=required; P_TASKS=required; P_INCLUDE_TASKS=yes; P_CHECKLIST=soft; P_EXTRAS="" ;;
+        08)      P_CONST=hard;     P_SPEC=required; P_PLAN=required; P_TASKS=required; P_INCLUDE_TASKS=yes; P_CHECKLIST=hard; P_EXTRAS="" ;;
+        09)      P_CONST=implicit; P_SPEC=required; P_PLAN=required; P_TASKS=required; P_INCLUDE_TASKS=yes; P_CHECKLIST=none; P_EXTRAS="" ;;
+        core)    P_CONST=none;     P_SPEC=no;       P_PLAN=no;       P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=none; P_EXTRAS="paths_only" ;;
+        *)
+            echo "ERROR: Unknown phase '$phase'. Valid: 00 01 02 03 04 05 06 07 08 09 bugfix core" >&2
+            exit 1
+            ;;
+    esac
+}
+
+configure_phase "$PHASE"
+
+# Legacy --include-tasks override (for backward compat when used without --require-tasks)
+if $LEGACY_INCLUDE_TASKS && [[ "$P_INCLUDE_TASKS" == "no" ]]; then
+    P_INCLUDE_TASKS="yes"
+fi
+
+# =============================================================================
+# FEATURE DETECTION
+# =============================================================================
+
+# Get project root
+if [[ -n "$PROJECT_ROOT_ARG" ]]; then
+    REPO_ROOT="$PROJECT_ROOT_ARG"
+else
+    REPO_ROOT=$(get_repo_root)
+fi
 HAS_GIT="false"
 has_git && HAS_GIT="true"
 CURRENT_BRANCH=$(get_current_branch)
+
+# Check feature branch (may set SPECIFY_FEATURE, may exit 2 for needs_selection)
 BRANCH_EXIT=0
 check_feature_branch "$CURRENT_BRANCH" "$HAS_GIT" || BRANCH_EXIT=$?
 if [[ $BRANCH_EXIT -eq 2 ]]; then
-    # Multiple features — caller (skill) should present picker
+    # Multiple features, no active one — caller should present picker
     FEATURES_JSON=$(list_features_json)
-    if $JSON_MODE || $PATHS_ONLY; then
+    if $JSON_MODE; then
         printf '{"needs_selection":true,"features":%s}\n' "$FEATURES_JSON"
     else
         echo "NEEDS_SELECTION: true"
@@ -100,15 +218,30 @@ elif [[ $BRANCH_EXIT -ne 0 ]]; then
     exit 1
 fi
 
-# Now get all paths (will use SPECIFY_FEATURE if it was set by check_feature_branch)
+# Get all feature paths (uses SPECIFY_FEATURE if set by check_feature_branch)
 eval $(get_feature_paths)
 
-# If paths-only mode, output paths and exit (support JSON + paths-only combined)
-if $PATHS_ONLY; then
+# Override paths if --project-root was specified
+if [[ -n "$PROJECT_ROOT_ARG" ]]; then
+    REPO_ROOT="$PROJECT_ROOT_ARG"
+    FEATURE_DIR=$(find_feature_dir_by_prefix "$REPO_ROOT" "$CURRENT_BRANCH")
+    FEATURE_SPEC="$FEATURE_DIR/spec.md"
+    IMPL_PLAN="$FEATURE_DIR/plan.md"
+    TASKS="$FEATURE_DIR/tasks.md"
+    RESEARCH="$FEATURE_DIR/research.md"
+    DATA_MODEL="$FEATURE_DIR/data-model.md"
+    QUICKSTART="$FEATURE_DIR/quickstart.md"
+    CONTRACTS_DIR="$FEATURE_DIR/contracts"
+fi
+
+# =============================================================================
+# PATHS-ONLY SHORT CIRCUIT (core phase)
+# =============================================================================
+
+if [[ "$P_EXTRAS" == *"paths_only"* ]]; then
     if $JSON_MODE; then
-        # Minimal JSON paths payload (no validation performed)
-        printf '{"REPO_ROOT":"%s","BRANCH":"%s","FEATURE_DIR":"%s","FEATURE_SPEC":"%s","IMPL_PLAN":"%s","TASKS":"%s"}\n' \
-            "$REPO_ROOT" "$CURRENT_BRANCH" "$FEATURE_DIR" "$FEATURE_SPEC" "$IMPL_PLAN" "$TASKS"
+        printf '{"phase":"%s","constitution_mode":"%s","REPO_ROOT":"%s","BRANCH":"%s","HAS_GIT":%s,"FEATURE_DIR":"%s","FEATURE_SPEC":"%s","IMPL_PLAN":"%s","TASKS":"%s","AVAILABLE_DOCS":[],"validated":{"constitution":false,"spec":false,"plan":false,"tasks":false},"warnings":[]}\n' \
+            "$PHASE" "$P_CONST" "$REPO_ROOT" "$CURRENT_BRANCH" "$HAS_GIT" "$FEATURE_DIR" "$FEATURE_SPEC" "$IMPL_PLAN" "$TASKS"
     else
         echo "REPO_ROOT: $REPO_ROOT"
         echo "BRANCH: $CURRENT_BRANCH"
@@ -117,31 +250,127 @@ if $PATHS_ONLY; then
         echo "IMPL_PLAN: $IMPL_PLAN"
         echo "TASKS: $TASKS"
     fi
+    # Launch dashboard (idempotent, never fails)
+    bash "$SCRIPT_DIR/ensure-dashboard.sh"
     exit 0
 fi
 
-# Validate required directories and files
+# =============================================================================
+# VALIDATION
+# =============================================================================
+
+WARNINGS=()
+V_CONSTITUTION=false
+V_SPEC=false
+V_PLAN=false
+V_TASKS=false
+
+# Feature directory check (needed for any validation phase)
 if [[ ! -d "$FEATURE_DIR" ]]; then
     echo "ERROR: Feature directory not found: $FEATURE_DIR" >&2
     echo "Run /iikit-01-specify first to create the feature structure." >&2
     exit 1
 fi
 
-# VALIDATION: Check constitution exists
-validate_constitution "$REPO_ROOT" || exit 1
+# Constitution validation (per mode)
+case "$P_CONST" in
+    none)
+        # Skip
+        ;;
+    soft)
+        if [[ -f "$REPO_ROOT/CONSTITUTION.md" ]]; then
+            V_CONSTITUTION=true
+            # Check for completeness
+            if ! grep -q "^## .*Principles\|^# .*Constitution" "$REPO_ROOT/CONSTITUTION.md" 2>/dev/null; then
+                WARNINGS+=("Constitution may be incomplete - missing principles section")
+            fi
+        else
+            WARNINGS+=("Constitution not found; recommended: /iikit-00-constitution")
+        fi
+        ;;
+    basic|hard|implicit)
+        validate_constitution "$REPO_ROOT" || exit 1
+        V_CONSTITUTION=true
+        ;;
+esac
 
-# VALIDATION: Check spec.md with structure validation
-validate_spec "$FEATURE_SPEC" || exit 1
-
-# VALIDATION: Check plan.md with structure validation
-validate_plan "$IMPL_PLAN" || exit 1
-
-# Check for tasks.md if required (with structure validation)
-if $REQUIRE_TASKS; then
-    validate_tasks "$TASKS" || exit 1
+# Spec validation
+if [[ "$P_SPEC" == "required" ]]; then
+    validate_spec "$FEATURE_SPEC" || exit 1
+    V_SPEC=true
 fi
 
-# Build list of available documents
+# Phase 03 extras: spec quality
+SPEC_QUALITY=""
+if [[ "$P_EXTRAS" == *"spec_quality"* ]]; then
+    SPEC_QUALITY=$(calculate_spec_quality "$FEATURE_SPEC")
+    echo "Spec quality score: $SPEC_QUALITY/10" >&2
+    if [[ $SPEC_QUALITY -lt 6 ]]; then
+        WARNINGS+=("Spec quality is low ($SPEC_QUALITY/10). Consider running /iikit-02-clarify.")
+    fi
+fi
+
+# Plan validation
+if [[ "$P_PLAN" == "required" ]]; then
+    validate_plan "$IMPL_PLAN" || exit 1
+    V_PLAN=true
+fi
+
+# Phase 03 extras: copy plan template
+PLAN_TEMPLATE_COPIED=""
+if [[ "$P_EXTRAS" == *"copy_plan_template"* ]]; then
+    mkdir -p "$FEATURE_DIR"
+    TEMPLATE="$SCRIPT_DIR/../../templates/plan-template.md"
+    if [[ -f "$TEMPLATE" ]]; then
+        cp "$TEMPLATE" "$IMPL_PLAN"
+        echo "Copied plan template to $IMPL_PLAN" >&2
+        PLAN_TEMPLATE_COPIED=true
+    else
+        WARNINGS+=("Plan template not found at $TEMPLATE")
+        touch "$IMPL_PLAN"
+        PLAN_TEMPLATE_COPIED=false
+    fi
+fi
+
+# Tasks validation
+if [[ "$P_TASKS" == "required" ]]; then
+    validate_tasks "$TASKS" || exit 1
+    V_TASKS=true
+fi
+
+# Checklist gate
+CHECKLIST_CHECKED=0
+CHECKLIST_TOTAL=0
+if [[ "$P_CHECKLIST" != "none" ]]; then
+    checklists_dir="$FEATURE_DIR/checklists"
+    if [[ -d "$checklists_dir" ]]; then
+        for f in "$checklists_dir"/*.md; do
+            [[ -f "$f" ]] || continue
+            while IFS= read -r line; do
+                if [[ "$line" =~ ^-\ \[.\] ]]; then
+                    CHECKLIST_TOTAL=$((CHECKLIST_TOTAL + 1))
+                    if [[ "$line" =~ ^-\ \[[xX]\] ]]; then
+                        CHECKLIST_CHECKED=$((CHECKLIST_CHECKED + 1))
+                    fi
+                fi
+            done < "$f"
+        done
+    fi
+
+    if [[ "$CHECKLIST_TOTAL" -gt 0 && "$CHECKLIST_CHECKED" -lt "$CHECKLIST_TOTAL" ]]; then
+        checklist_pct=$(( (CHECKLIST_CHECKED * 100) / CHECKLIST_TOTAL ))
+        if [[ "$P_CHECKLIST" == "hard" ]]; then
+            WARNINGS+=("Checklists incomplete ($CHECKLIST_CHECKED/$CHECKLIST_TOTAL items, ${checklist_pct}%). Must be 100% for implementation.")
+        else
+            WARNINGS+=("Checklists incomplete ($CHECKLIST_CHECKED/$CHECKLIST_TOTAL items, ${checklist_pct}%). Recommend /iikit-04-checklist.")
+        fi
+    fi
+fi
+
+# =============================================================================
+# BUILD AVAILABLE DOCS
+# =============================================================================
+
 docs=()
 
 # Always check these optional docs
@@ -155,14 +384,17 @@ fi
 
 [[ -f "$QUICKSTART" ]] && docs+=("quickstart.md")
 
-# Include tasks.md if requested and it exists
-if $INCLUDE_TASKS && [[ -f "$TASKS" ]]; then
+# Include tasks.md if phase requires it and it exists
+if [[ "$P_INCLUDE_TASKS" == "yes" ]] && [[ -f "$TASKS" ]]; then
     docs+=("tasks.md")
 fi
 
-# Output results
+# =============================================================================
+# OUTPUT
+# =============================================================================
+
 if $JSON_MODE; then
-    # Build JSON array of documents
+    # Build JSON docs array
     if [[ ${#docs[@]} -eq 0 ]]; then
         json_docs="[]"
     else
@@ -170,9 +402,40 @@ if $JSON_MODE; then
         json_docs="[${json_docs%,}]"
     fi
 
-    printf '{"FEATURE_DIR":"%s","AVAILABLE_DOCS":%s}\n' "$FEATURE_DIR" "$json_docs"
+    # Build warnings array
+    if [[ ${#WARNINGS[@]} -eq 0 ]]; then
+        json_warnings="[]"
+    else
+        json_warnings=$(printf '"%s",' "${WARNINGS[@]}")
+        json_warnings="[${json_warnings%,}]"
+    fi
+
+    # Build validated object
+    json_validated=$(printf '{"constitution":%s,"spec":%s,"plan":%s,"tasks":%s}' \
+        "$V_CONSTITUTION" "$V_SPEC" "$V_PLAN" "$V_TASKS")
+
+    # Build base JSON
+    json_output=$(printf '{"phase":"%s","constitution_mode":"%s","FEATURE_DIR":"%s","FEATURE_SPEC":"%s","IMPL_PLAN":"%s","TASKS":"%s","BRANCH":"%s","HAS_GIT":%s,"REPO_ROOT":"%s","AVAILABLE_DOCS":%s,"validated":%s,"warnings":%s' \
+        "$PHASE" "$P_CONST" "$FEATURE_DIR" "$FEATURE_SPEC" "$IMPL_PLAN" "$TASKS" "$CURRENT_BRANCH" "$HAS_GIT" "$REPO_ROOT" "$json_docs" "$json_validated" "$json_warnings")
+
+    # Phase 03 extras
+    if [[ -n "$SPEC_QUALITY" ]]; then
+        json_output+=$(printf ',"spec_quality":%s' "$SPEC_QUALITY")
+    fi
+    if [[ -n "$PLAN_TEMPLATE_COPIED" ]]; then
+        json_output+=$(printf ',"plan_template_copied":%s' "$PLAN_TEMPLATE_COPIED")
+    fi
+
+    # Checklist info (when gate is active and checklists exist)
+    if [[ "$P_CHECKLIST" != "none" && "$CHECKLIST_TOTAL" -gt 0 ]]; then
+        json_output+=$(printf ',"checklist_checked":%s,"checklist_total":%s' "$CHECKLIST_CHECKED" "$CHECKLIST_TOTAL")
+    fi
+
+    json_output+='}'
+    printf '%s\n' "$json_output"
 else
     # Text output
+    echo "Phase: $PHASE"
     echo "FEATURE_DIR:$FEATURE_DIR"
     echo "AVAILABLE_DOCS:"
 
@@ -182,7 +445,22 @@ else
     check_dir "$CONTRACTS_DIR" "contracts/"
     check_file "$QUICKSTART" "quickstart.md"
 
-    if $INCLUDE_TASKS; then
+    if [[ "$P_INCLUDE_TASKS" == "yes" ]]; then
         check_file "$TASKS" "tasks.md"
     fi
+
+    if [[ ${#WARNINGS[@]} -gt 0 ]]; then
+        echo ""
+        echo "WARNINGS:"
+        for w in "${WARNINGS[@]}"; do
+            echo "  - $w"
+        done
+    fi
+
+    if [[ -n "$SPEC_QUALITY" ]]; then
+        echo "Spec quality score: $SPEC_QUALITY/10"
+    fi
 fi
+
+# Launch dashboard (idempotent, never fails)
+bash "$SCRIPT_DIR/ensure-dashboard.sh"

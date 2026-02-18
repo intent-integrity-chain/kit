@@ -43,6 +43,13 @@ If bug-fix intent is detected:
 4. If the user confirms it is a new feature: proceed to Step 1
 5. If the user wants bugfix: stop and suggest they run `/iikit-bugfix`
 
+### 0.1 Launch Dashboard (optional, never blocks)
+
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/ensure-dashboard.sh
+```
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/ensure-dashboard.ps1`
+
 ### 1. Generate Branch Name
 
 Create 2-4 word action-noun name from description:

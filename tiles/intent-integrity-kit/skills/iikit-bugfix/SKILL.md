@@ -26,6 +26,13 @@ Load constitution per [constitution-loading.md](../iikit-core/references/constit
 
 The text after `/iikit-bugfix` is either a `#number` (GitHub issue) or a text bug description.
 
+### 0. Launch Dashboard (optional, never blocks)
+
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/ensure-dashboard.sh
+```
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/ensure-dashboard.ps1`
+
 ### 1. Parse Input
 
 Determine the input type:

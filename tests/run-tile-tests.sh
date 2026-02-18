@@ -626,13 +626,13 @@ test_template_paths_resolve() {
         log_fail "create-new-feature.sh template not found: $template_path"
     fi
 
-    # setup-plan.sh -> plan-template.md
+    # check-prerequisites.sh --phase 03 -> plan-template.md
     ((TESTS_RUN++))
     template_path="$script_dir/../../templates/plan-template.md"
     if [[ -f "$template_path" ]]; then
-        log_pass "setup-plan.sh template path resolves"
+        log_pass "check-prerequisites.sh template path resolves"
     else
-        log_fail "setup-plan.sh template not found: $template_path"
+        log_fail "check-prerequisites.sh template not found: $template_path"
     fi
 
     # update-agent-context.sh -> agent-file-template.md
@@ -913,7 +913,7 @@ test_bash_script_inner_template_refs() {
     # Scripts that reference templates - verify they use relative ../../templates/ path
     local scripts_with_templates=(
         "create-new-feature.sh:spec-template.md"
-        "setup-plan.sh:plan-template.md"
+        "check-prerequisites.sh:plan-template.md"
         "update-agent-context.sh:agent-file-template.md"
     )
 
@@ -960,7 +960,7 @@ test_powershell_script_inner_template_refs() {
     # Scripts that reference templates
     local scripts_with_templates=(
         "create-new-feature.ps1:spec-template.md"
-        "setup-plan.ps1:plan-template.md"
+        "check-prerequisites.ps1:plan-template.md"
         "update-agent-context.ps1:agent-file-template.md"
     )
 

@@ -66,8 +66,9 @@ Show constitution status, feature count, and suggest `/iikit-core status`.
 
 1. **Get paths**:
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --json --paths-only
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase core --json
    ```
+   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/check-prerequisites.ps1 -Phase core -Json`
 
 2. **Check**: constitution exists, feature count, current feature artifacts (spec.md, plan.md, tasks.md, checklists/, test-specs.md)
 
