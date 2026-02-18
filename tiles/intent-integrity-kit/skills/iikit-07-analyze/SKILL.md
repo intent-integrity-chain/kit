@@ -5,7 +5,7 @@ description: >-
   Use when running a consistency check, verifying requirements traceability, detecting conflicts between design docs, or auditing alignment before implementation begins.
 license: MIT
 metadata:
-  version: "1.6.4"
+  version: "1.6.7"
 ---
 
 # Intent Integrity Kit Analyze

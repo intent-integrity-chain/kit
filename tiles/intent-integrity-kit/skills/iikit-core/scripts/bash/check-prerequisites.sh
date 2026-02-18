@@ -21,6 +21,7 @@
 #   08       Implement (hard constitution, requires spec + plan + tasks, hard checklist)
 #   09       Tasks to Issues (implicit constitution, requires spec + plan + tasks)
 #   core     Paths only (no validation)
+#   status   Deterministic status report (non-fatal validation, computes ready_for/next_step)
 #
 # LEGACY FLAGS (deprecated, map to phases):
 #   --paths-only              -> --phase core
@@ -92,6 +93,7 @@ PHASES:
   08       Implement (hard constitution, requires spec + plan + tasks, hard checklist)
   09       Tasks to Issues (implicit constitution, requires spec + plan + tasks)
   core     Paths only (no validation)
+  status   Deterministic status report (non-fatal, computes ready_for/next_step)
 
 OPTIONS:
   --json              Output in JSON format
@@ -173,8 +175,9 @@ configure_phase() {
         08)      P_CONST=hard;     P_SPEC=required; P_PLAN=required; P_TASKS=required; P_INCLUDE_TASKS=yes; P_CHECKLIST=hard; P_EXTRAS="" ;;
         09)      P_CONST=implicit; P_SPEC=required; P_PLAN=required; P_TASKS=required; P_INCLUDE_TASKS=yes; P_CHECKLIST=none; P_EXTRAS="" ;;
         core)    P_CONST=none;     P_SPEC=no;       P_PLAN=no;       P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=none; P_EXTRAS="paths_only" ;;
+        status)  P_CONST=none;     P_SPEC=no;       P_PLAN=no;       P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=none; P_EXTRAS="status_mode" ;;
         *)
-            echo "ERROR: Unknown phase '$phase'. Valid: 00 01 02 03 04 05 06 07 08 09 bugfix core" >&2
+            echo "ERROR: Unknown phase '$phase'. Valid: 00 01 02 03 04 05 06 07 08 09 bugfix core status" >&2
             exit 1
             ;;
     esac
@@ -202,6 +205,7 @@ has_git && HAS_GIT="true"
 CURRENT_BRANCH=$(get_current_branch)
 
 # Check feature branch (may set SPECIFY_FEATURE, may exit 2 for needs_selection)
+STATUS_NO_FEATURE=false
 BRANCH_EXIT=0
 check_feature_branch "$CURRENT_BRANCH" "$HAS_GIT" || BRANCH_EXIT=$?
 if [[ $BRANCH_EXIT -eq 2 ]]; then
@@ -215,23 +219,38 @@ if [[ $BRANCH_EXIT -eq 2 ]]; then
     fi
     exit 2
 elif [[ $BRANCH_EXIT -ne 0 ]]; then
-    exit 1
+    if [[ "$P_EXTRAS" == *"status_mode"* ]]; then
+        # Status mode: no feature branch is informational, not fatal
+        FEATURE_DIR=""
+        FEATURE_SPEC=""
+        IMPL_PLAN=""
+        TASKS=""
+        RESEARCH=""
+        DATA_MODEL=""
+        QUICKSTART=""
+        CONTRACTS_DIR=""
+        STATUS_NO_FEATURE=true
+    else
+        exit 1
+    fi
 fi
 
 # Get all feature paths (uses SPECIFY_FEATURE if set by check_feature_branch)
-eval $(get_feature_paths)
+if ! $STATUS_NO_FEATURE; then
+    eval $(get_feature_paths)
 
-# Override paths if --project-root was specified
-if [[ -n "$PROJECT_ROOT_ARG" ]]; then
-    REPO_ROOT="$PROJECT_ROOT_ARG"
-    FEATURE_DIR=$(find_feature_dir_by_prefix "$REPO_ROOT" "$CURRENT_BRANCH")
-    FEATURE_SPEC="$FEATURE_DIR/spec.md"
-    IMPL_PLAN="$FEATURE_DIR/plan.md"
-    TASKS="$FEATURE_DIR/tasks.md"
-    RESEARCH="$FEATURE_DIR/research.md"
-    DATA_MODEL="$FEATURE_DIR/data-model.md"
-    QUICKSTART="$FEATURE_DIR/quickstart.md"
-    CONTRACTS_DIR="$FEATURE_DIR/contracts"
+    # Override paths if --project-root was specified
+    if [[ -n "$PROJECT_ROOT_ARG" ]]; then
+        REPO_ROOT="$PROJECT_ROOT_ARG"
+        FEATURE_DIR=$(find_feature_dir_by_prefix "$REPO_ROOT" "$CURRENT_BRANCH")
+        FEATURE_SPEC="$FEATURE_DIR/spec.md"
+        IMPL_PLAN="$FEATURE_DIR/plan.md"
+        TASKS="$FEATURE_DIR/tasks.md"
+        RESEARCH="$FEATURE_DIR/research.md"
+        DATA_MODEL="$FEATURE_DIR/data-model.md"
+        QUICKSTART="$FEATURE_DIR/quickstart.md"
+        CONTRACTS_DIR="$FEATURE_DIR/contracts"
+    fi
 fi
 
 # =============================================================================
@@ -250,6 +269,235 @@ if [[ "$P_EXTRAS" == *"paths_only"* ]]; then
         echo "IMPL_PLAN: $IMPL_PLAN"
         echo "TASKS: $TASKS"
     fi
+    # Launch dashboard (idempotent, never fails)
+    bash "$SCRIPT_DIR/ensure-dashboard.sh"
+    exit 0
+fi
+
+# =============================================================================
+# STATUS MODE (deterministic status report)
+# =============================================================================
+
+if [[ "$P_EXTRAS" == *"status_mode"* ]]; then
+    # --- Artifact existence checks ---
+    A_CONSTITUTION=false
+    A_SPEC=false
+    A_PLAN=false
+    A_TASKS=false
+    A_CHECKLISTS=false
+    A_TEST_SPECS=false
+
+    [[ -f "$REPO_ROOT/CONSTITUTION.md" ]] && A_CONSTITUTION=true
+    [[ -n "$FEATURE_DIR" && -f "$FEATURE_DIR/spec.md" ]] && A_SPEC=true
+    [[ -n "$FEATURE_DIR" && -f "$FEATURE_DIR/plan.md" ]] && A_PLAN=true
+    [[ -n "$FEATURE_DIR" && -f "$FEATURE_DIR/tasks.md" ]] && A_TASKS=true
+    [[ -n "$FEATURE_DIR" && -d "$FEATURE_DIR/checklists" ]] && A_CHECKLISTS=true
+    [[ -n "$FEATURE_DIR" && -f "$FEATURE_DIR/tests/test-specs.md" ]] && A_TEST_SPECS=true
+
+    # --- Non-fatal validation ---
+    V_CONSTITUTION=false
+    V_SPEC=false
+    V_PLAN=false
+    V_TASKS=false
+    WARNINGS=()
+
+    if $A_CONSTITUTION; then
+        validate_constitution "$REPO_ROOT" 2>/dev/null && V_CONSTITUTION=true || V_CONSTITUTION=false
+    fi
+    if $A_SPEC; then
+        validate_spec "$FEATURE_SPEC" 2>/dev/null && V_SPEC=true || V_SPEC=false
+    fi
+    if $A_PLAN; then
+        validate_plan "$IMPL_PLAN" 2>/dev/null && V_PLAN=true || V_PLAN=false
+    fi
+    if $A_TASKS; then
+        validate_tasks "$TASKS" 2>/dev/null && V_TASKS=true || V_TASKS=false
+    fi
+
+    # --- Spec quality (non-fatal) ---
+    SPEC_QUALITY=0
+    if $A_SPEC; then
+        SPEC_QUALITY=$(calculate_spec_quality "$FEATURE_SPEC" 2>/dev/null) || SPEC_QUALITY=0
+    fi
+
+    # --- Checklist counting ---
+    CHECKLIST_CHECKED=0
+    CHECKLIST_TOTAL=0
+    CHECKLIST_COMPLETE=false
+    if $A_CHECKLISTS; then
+        for f in "$FEATURE_DIR/checklists/"*.md; do
+            [[ -f "$f" ]] || continue
+            while IFS= read -r line; do
+                if [[ "$line" =~ ^-\ \[.\] ]]; then
+                    CHECKLIST_TOTAL=$((CHECKLIST_TOTAL + 1))
+                    if [[ "$line" =~ ^-\ \[[xX]\] ]]; then
+                        CHECKLIST_CHECKED=$((CHECKLIST_CHECKED + 1))
+                    fi
+                fi
+            done < "$f"
+        done
+        if [[ "$CHECKLIST_TOTAL" -gt 0 && "$CHECKLIST_CHECKED" -eq "$CHECKLIST_TOTAL" ]]; then
+            CHECKLIST_COMPLETE=true
+        fi
+    fi
+
+    # --- Feature stage ---
+    FEATURE_STAGE="unknown"
+    if [[ -n "$FEATURE_DIR" && -d "$FEATURE_DIR" ]]; then
+        local_feature=$(basename "$FEATURE_DIR")
+        FEATURE_STAGE=$(get_feature_stage "$REPO_ROOT" "$local_feature")
+    elif $STATUS_NO_FEATURE; then
+        FEATURE_STAGE="no-feature"
+    fi
+
+    # --- Ready-for computation (walk phases in order) ---
+    # Each phase requires certain artifacts to be valid
+    READY_FOR="00"
+    # Phase 00: constitution (no prereqs)
+    # Phase 01: specify (soft constitution) — always passable
+    $V_CONSTITUTION || true  # 01 only needs soft constitution
+    READY_FOR="01"
+    # Phase 02: clarify (requires valid spec)
+    if $V_SPEC; then
+        READY_FOR="02"
+    fi
+    # Phase 03: plan (requires valid spec + hard constitution)
+    if $V_CONSTITUTION && $V_SPEC; then
+        READY_FOR="03"
+    fi
+    # Phase 04: checklist (requires valid spec + plan)
+    if $V_CONSTITUTION && $V_SPEC && $V_PLAN; then
+        READY_FOR="04"
+    fi
+    # Phase 05: testify (requires valid spec + plan, soft checklist)
+    if $V_CONSTITUTION && $V_SPEC && $V_PLAN; then
+        READY_FOR="05"
+    fi
+    # Phase 06: tasks (requires valid spec + plan, soft checklist)
+    if $V_CONSTITUTION && $V_SPEC && $V_PLAN; then
+        READY_FOR="06"
+    fi
+    # Phase 07: analyze (requires valid spec + plan + tasks)
+    if $V_CONSTITUTION && $V_SPEC && $V_PLAN && $V_TASKS; then
+        READY_FOR="07"
+    fi
+    # Phase 08: implement (requires valid spec + plan + tasks, hard checklist)
+    if $V_CONSTITUTION && $V_SPEC && $V_PLAN && $V_TASKS; then
+        READY_FOR="08"
+    fi
+    # Phase 09: tasks to issues (requires valid spec + plan + tasks)
+    if $V_CONSTITUTION && $V_SPEC && $V_PLAN && $V_TASKS; then
+        READY_FOR="09"
+    fi
+
+    # --- Next step + clear_before (deterministic) ---
+    NEXT_STEP=""
+    CLEAR_BEFORE=false
+    if ! $A_CONSTITUTION; then
+        NEXT_STEP="/iikit-00-constitution"
+        CLEAR_BEFORE=false
+    elif $STATUS_NO_FEATURE || [[ -z "$FEATURE_DIR" ]] || [[ ! -d "$FEATURE_DIR" ]]; then
+        NEXT_STEP="/iikit-01-specify <description>"
+        CLEAR_BEFORE=false
+    elif ! $V_SPEC; then
+        NEXT_STEP="/iikit-01-specify <description>"
+        CLEAR_BEFORE=false
+    elif ! $V_PLAN; then
+        NEXT_STEP="/iikit-03-plan"
+        CLEAR_BEFORE=true
+    elif $A_CHECKLISTS && [[ "$CHECKLIST_TOTAL" -gt 0 ]] && ! $CHECKLIST_COMPLETE; then
+        NEXT_STEP="/iikit-04-checklist"
+        CLEAR_BEFORE=false
+    elif ! $V_TASKS; then
+        NEXT_STEP="/iikit-06-tasks"
+        CLEAR_BEFORE=true
+    elif [[ "$FEATURE_STAGE" == "complete" ]]; then
+        NEXT_STEP=""
+        CLEAR_BEFORE=false
+    else
+        NEXT_STEP="/iikit-08-implement"
+        CLEAR_BEFORE=true
+    fi
+
+    # --- Available docs ---
+    docs=()
+    if [[ -n "$FEATURE_DIR" ]]; then
+        [[ -f "$FEATURE_DIR/research.md" ]] && docs+=("research.md")
+        [[ -f "$FEATURE_DIR/data-model.md" ]] && docs+=("data-model.md")
+        [[ -d "$FEATURE_DIR/contracts" ]] && [[ -n "$(ls -A "$FEATURE_DIR/contracts" 2>/dev/null)" ]] && docs+=("contracts/")
+        [[ -f "$FEATURE_DIR/quickstart.md" ]] && docs+=("quickstart.md")
+        [[ -f "$TASKS" ]] && docs+=("tasks.md")
+    fi
+
+    # --- Output ---
+    if $JSON_MODE; then
+        # Build JSON docs array
+        if [[ ${#docs[@]} -eq 0 ]]; then
+            json_docs="[]"
+        else
+            json_docs=$(printf '"%s",' "${docs[@]}")
+            json_docs="[${json_docs%,}]"
+        fi
+
+        # Build warnings array
+        if [[ ${#WARNINGS[@]} -eq 0 ]]; then
+            json_warnings="[]"
+        else
+            json_warnings=$(printf '"%s",' "${WARNINGS[@]}")
+            json_warnings="[${json_warnings%,}]"
+        fi
+
+        # Build validated object
+        json_validated=$(printf '{"constitution":%s,"spec":%s,"plan":%s,"tasks":%s}' \
+            "$V_CONSTITUTION" "$V_SPEC" "$V_PLAN" "$V_TASKS")
+
+        # Build artifacts object
+        json_artifacts=$(printf '{"constitution":{"exists":%s,"valid":%s},"spec":{"exists":%s,"valid":%s,"quality":%s},"plan":{"exists":%s,"valid":%s},"tasks":{"exists":%s,"valid":%s},"checklists":{"exists":%s,"checked":%s,"total":%s,"complete":%s},"test_specs":{"exists":%s}}' \
+            "$A_CONSTITUTION" "$V_CONSTITUTION" \
+            "$A_SPEC" "$V_SPEC" "$SPEC_QUALITY" \
+            "$A_PLAN" "$V_PLAN" \
+            "$A_TASKS" "$V_TASKS" \
+            "$A_CHECKLISTS" "$CHECKLIST_CHECKED" "$CHECKLIST_TOTAL" "$CHECKLIST_COMPLETE" \
+            "$A_TEST_SPECS")
+
+        # Build next_step (null or string)
+        if [[ -z "$NEXT_STEP" ]]; then
+            json_next_step="null"
+        else
+            json_next_step="\"$NEXT_STEP\""
+        fi
+
+        # Build base JSON
+        json_output=$(printf '{"phase":"status","FEATURE_DIR":"%s","FEATURE_SPEC":"%s","IMPL_PLAN":"%s","TASKS":"%s","BRANCH":"%s","HAS_GIT":%s,"REPO_ROOT":"%s","AVAILABLE_DOCS":%s,"validated":%s,"warnings":%s,"artifacts":%s,"feature_stage":"%s","ready_for":"%s","next_step":%s,"clear_before":%s,"checklist_checked":%s,"checklist_total":%s}' \
+            "$FEATURE_DIR" "$FEATURE_SPEC" "$IMPL_PLAN" "$TASKS" "$CURRENT_BRANCH" "$HAS_GIT" "$REPO_ROOT" \
+            "$json_docs" "$json_validated" "$json_warnings" "$json_artifacts" \
+            "$FEATURE_STAGE" "$READY_FOR" "$json_next_step" "$CLEAR_BEFORE" \
+            "$CHECKLIST_CHECKED" "$CHECKLIST_TOTAL")
+
+        printf '%s\n' "$json_output"
+    else
+        echo "Phase: status"
+        echo "Feature stage: $FEATURE_STAGE"
+        echo "Ready for: phase $READY_FOR"
+        if [[ -n "$NEXT_STEP" ]]; then
+            if $CLEAR_BEFORE; then
+                echo "Next step: /clear, then $NEXT_STEP"
+            else
+                echo "Next step: $NEXT_STEP"
+            fi
+        else
+            echo "Next step: (none - feature complete)"
+        fi
+        echo ""
+        echo "Artifacts:"
+        echo "  Constitution: $(if $A_CONSTITUTION; then echo "[Y]"; else echo "[N]"; fi) $(if $V_CONSTITUTION; then echo "(valid)"; elif $A_CONSTITUTION; then echo "(invalid)"; fi)"
+        echo "  Spec:         $(if $A_SPEC; then echo "[Y]"; else echo "[N]"; fi) $(if $V_SPEC; then echo "(valid, quality $SPEC_QUALITY/10)"; elif $A_SPEC; then echo "(invalid)"; fi)"
+        echo "  Plan:         $(if $A_PLAN; then echo "[Y]"; else echo "[N]"; fi) $(if $V_PLAN; then echo "(valid)"; elif $A_PLAN; then echo "(invalid)"; fi)"
+        echo "  Tasks:        $(if $A_TASKS; then echo "[Y]"; else echo "[N]"; fi) $(if $V_TASKS; then echo "(valid)"; elif $A_TASKS; then echo "(invalid)"; fi)"
+        echo "  Checklists:   $(if $A_CHECKLISTS; then echo "[Y] ($CHECKLIST_CHECKED/$CHECKLIST_TOTAL)"; else echo "[N]"; fi)"
+        echo "  Test specs:   $(if $A_TEST_SPECS; then echo "[Y]"; else echo "[N]"; fi)"
+    fi
+
     # Launch dashboard (idempotent, never fails)
     bash "$SCRIPT_DIR/ensure-dashboard.sh"
     exit 0

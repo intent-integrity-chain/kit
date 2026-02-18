@@ -44,6 +44,7 @@ PHASES:
   08       Implement (hard constitution, requires spec + plan + tasks, hard checklist)
   09       Tasks to Issues (implicit constitution, requires spec + plan + tasks)
   core     Paths only (no validation)
+  status   Deterministic status report (non-fatal, computes ready_for/next_step)
 
 OPTIONS:
   -Json          Output in JSON format
@@ -92,10 +93,11 @@ $phaseConfig = @{
     '08'     = @{ Const='hard';     Spec='required'; Plan='required'; Tasks='required'; IncTasks='yes'; Checklist='hard'; Extras='' }
     '09'     = @{ Const='implicit'; Spec='required'; Plan='required'; Tasks='required'; IncTasks='yes'; Checklist='none'; Extras='' }
     'core'   = @{ Const='none';     Spec='no';       Plan='no';       Tasks='no';       IncTasks='no';  Checklist='none'; Extras='paths_only' }
+    'status' = @{ Const='none';     Spec='no';       Plan='no';       Tasks='no';       IncTasks='no';  Checklist='none'; Extras='status_mode' }
 }
 
 if (-not $phaseConfig.ContainsKey($Phase)) {
-    Write-Error "Unknown phase '$Phase'. Valid: 00 01 02 03 04 05 06 07 08 09 bugfix core"
+    Write-Error "Unknown phase '$Phase'. Valid: 00 01 02 03 04 05 06 07 08 09 bugfix core status"
     exit 1
 }
 
@@ -117,6 +119,7 @@ if ($ProjectRoot) {
 }
 $hasGit = Test-HasGit
 $currentBranch = Get-CurrentBranch
+$statusNoFeature = $false
 $branchResult = Test-FeatureBranch -Branch $currentBranch -HasGit $hasGit
 if ($branchResult -eq "NEEDS_SELECTION") {
     $featuresJson = Get-FeaturesJson
@@ -128,23 +131,42 @@ if ($branchResult -eq "NEEDS_SELECTION") {
     }
     exit 2
 } elseif ($branchResult -eq "ERROR") {
-    exit 1
+    if ($cfg.Extras -match 'status_mode') {
+        $statusNoFeature = $true
+        $paths = [PSCustomObject]@{
+            REPO_ROOT      = $repoRoot
+            CURRENT_BRANCH = $currentBranch
+            HAS_GIT        = $hasGit
+            FEATURE_DIR    = ''
+            FEATURE_SPEC   = ''
+            IMPL_PLAN      = ''
+            TASKS          = ''
+            RESEARCH       = ''
+            DATA_MODEL     = ''
+            QUICKSTART     = ''
+            CONTRACTS_DIR  = ''
+        }
+    } else {
+        exit 1
+    }
 }
 
-# Get all feature paths
-$paths = Get-FeaturePathsEnv
+# Get all feature paths (skip if status mode with no feature)
+if (-not $statusNoFeature) {
+    $paths = Get-FeaturePathsEnv
 
-# Override paths if -ProjectRoot was specified
-if ($ProjectRoot) {
-    $paths.REPO_ROOT = $ProjectRoot
-    $paths.FEATURE_DIR = Find-FeatureDirByPrefix -RepoRoot $ProjectRoot -BranchName $currentBranch
-    $paths.FEATURE_SPEC = Join-Path $paths.FEATURE_DIR 'spec.md'
-    $paths.IMPL_PLAN = Join-Path $paths.FEATURE_DIR 'plan.md'
-    $paths.TASKS = Join-Path $paths.FEATURE_DIR 'tasks.md'
-    $paths.RESEARCH = Join-Path $paths.FEATURE_DIR 'research.md'
-    $paths.DATA_MODEL = Join-Path $paths.FEATURE_DIR 'data-model.md'
-    $paths.QUICKSTART = Join-Path $paths.FEATURE_DIR 'quickstart.md'
-    $paths.CONTRACTS_DIR = Join-Path $paths.FEATURE_DIR 'contracts'
+    # Override paths if -ProjectRoot was specified
+    if ($ProjectRoot) {
+        $paths.REPO_ROOT = $ProjectRoot
+        $paths.FEATURE_DIR = Find-FeatureDirByPrefix -RepoRoot $ProjectRoot -BranchName $currentBranch
+        $paths.FEATURE_SPEC = Join-Path $paths.FEATURE_DIR 'spec.md'
+        $paths.IMPL_PLAN = Join-Path $paths.FEATURE_DIR 'plan.md'
+        $paths.TASKS = Join-Path $paths.FEATURE_DIR 'tasks.md'
+        $paths.RESEARCH = Join-Path $paths.FEATURE_DIR 'research.md'
+        $paths.DATA_MODEL = Join-Path $paths.FEATURE_DIR 'data-model.md'
+        $paths.QUICKSTART = Join-Path $paths.FEATURE_DIR 'quickstart.md'
+        $paths.CONTRACTS_DIR = Join-Path $paths.FEATURE_DIR 'contracts'
+    }
 }
 
 # =============================================================================
@@ -176,6 +198,193 @@ if ($cfg.Extras -match 'paths_only') {
         Write-Output "IMPL_PLAN: $($paths.IMPL_PLAN)"
         Write-Output "TASKS: $($paths.TASKS)"
     }
+    # Launch dashboard
+    & "$PSScriptRoot/ensure-dashboard.ps1"
+    exit 0
+}
+
+# =============================================================================
+# STATUS MODE (deterministic status report)
+# =============================================================================
+
+if ($cfg.Extras -match 'status_mode') {
+    # --- Artifact existence checks ---
+    $aConstitution = Test-Path (Join-Path $repoRoot 'CONSTITUTION.md')
+    $aSpec = $paths.FEATURE_DIR -and (Test-Path $paths.FEATURE_SPEC -ErrorAction SilentlyContinue)
+    $aPlan = $paths.FEATURE_DIR -and (Test-Path $paths.IMPL_PLAN -ErrorAction SilentlyContinue)
+    $aTasks = $paths.FEATURE_DIR -and (Test-Path $paths.TASKS -ErrorAction SilentlyContinue)
+    $aChecklists = $paths.FEATURE_DIR -and (Test-Path (Join-Path $paths.FEATURE_DIR 'checklists') -PathType Container -ErrorAction SilentlyContinue)
+    $aTestSpecs = $paths.FEATURE_DIR -and (Test-Path (Join-Path $paths.FEATURE_DIR 'tests' 'test-specs.md') -ErrorAction SilentlyContinue)
+
+    # --- Non-fatal validation ---
+    $vConstitution = $false
+    $vSpec = $false
+    $vPlan = $false
+    $vTasks = $false
+    $warnings = @()
+
+    if ($aConstitution) {
+        try { $vConstitution = Test-Constitution -RepoRoot $repoRoot } catch { $vConstitution = $false }
+    }
+    if ($aSpec) {
+        try { $vSpec = Test-Spec -SpecFile $paths.FEATURE_SPEC } catch { $vSpec = $false }
+    }
+    if ($aPlan) {
+        try { $vPlan = Test-Plan -PlanFile $paths.IMPL_PLAN } catch { $vPlan = $false }
+    }
+    if ($aTasks) {
+        try { $vTasks = Test-Tasks -TasksFile $paths.TASKS } catch { $vTasks = $false }
+    }
+
+    # --- Spec quality (non-fatal) ---
+    $specQuality = 0
+    if ($aSpec) {
+        try { $specQuality = Get-SpecQualityScore -SpecFile $paths.FEATURE_SPEC } catch { $specQuality = 0 }
+    }
+
+    # --- Checklist counting ---
+    $checklistChecked = 0
+    $checklistTotal = 0
+    $checklistComplete = $false
+    if ($aChecklists) {
+        $checklistsDir = Join-Path $paths.FEATURE_DIR 'checklists'
+        Get-ChildItem -Path $checklistsDir -Filter '*.md' -ErrorAction SilentlyContinue | ForEach-Object {
+            $content = Get-Content -Path $_.FullName -ErrorAction SilentlyContinue
+            foreach ($line in $content) {
+                if ($line -match '^- \[.\]') {
+                    $checklistTotal++
+                    if ($line -match '^- \[[xX]\]') {
+                        $checklistChecked++
+                    }
+                }
+            }
+        }
+        if ($checklistTotal -gt 0 -and $checklistChecked -eq $checklistTotal) {
+            $checklistComplete = $true
+        }
+    }
+
+    # --- Feature stage ---
+    $featureStage = 'unknown'
+    if ($paths.FEATURE_DIR -and (Test-Path $paths.FEATURE_DIR -PathType Container -ErrorAction SilentlyContinue)) {
+        $localFeature = Split-Path $paths.FEATURE_DIR -Leaf
+        $featureStage = Get-FeatureStage -RepoRoot $repoRoot -Feature $localFeature
+    } elseif ($statusNoFeature) {
+        $featureStage = 'no-feature'
+    }
+
+    # --- Ready-for computation ---
+    $readyFor = '00'
+    $readyFor = '01'  # Phase 01 always passable (soft constitution)
+    if ($vSpec) { $readyFor = '02' }
+    if ($vConstitution -and $vSpec) { $readyFor = '03' }
+    if ($vConstitution -and $vSpec -and $vPlan) { $readyFor = '04' }
+    if ($vConstitution -and $vSpec -and $vPlan) { $readyFor = '05' }
+    if ($vConstitution -and $vSpec -and $vPlan) { $readyFor = '06' }
+    if ($vConstitution -and $vSpec -and $vPlan -and $vTasks) { $readyFor = '07' }
+    if ($vConstitution -and $vSpec -and $vPlan -and $vTasks) { $readyFor = '08' }
+    if ($vConstitution -and $vSpec -and $vPlan -and $vTasks) { $readyFor = '09' }
+
+    # --- Next step + clear_before ---
+    $nextStep = $null
+    $clearBefore = $false
+    if (-not $aConstitution) {
+        $nextStep = '/iikit-00-constitution'
+        $clearBefore = $false
+    } elseif ($statusNoFeature -or -not $paths.FEATURE_DIR -or -not (Test-Path $paths.FEATURE_DIR -PathType Container -ErrorAction SilentlyContinue)) {
+        $nextStep = '/iikit-01-specify <description>'
+        $clearBefore = $false
+    } elseif (-not $vSpec) {
+        $nextStep = '/iikit-01-specify <description>'
+        $clearBefore = $false
+    } elseif (-not $vPlan) {
+        $nextStep = '/iikit-03-plan'
+        $clearBefore = $true
+    } elseif ($aChecklists -and $checklistTotal -gt 0 -and -not $checklistComplete) {
+        $nextStep = '/iikit-04-checklist'
+        $clearBefore = $false
+    } elseif (-not $vTasks) {
+        $nextStep = '/iikit-06-tasks'
+        $clearBefore = $true
+    } elseif ($featureStage -eq 'complete') {
+        $nextStep = $null
+        $clearBefore = $false
+    } else {
+        $nextStep = '/iikit-08-implement'
+        $clearBefore = $true
+    }
+
+    # --- Available docs ---
+    $docs = @()
+    if ($paths.FEATURE_DIR) {
+        if (Test-Path $paths.RESEARCH -ErrorAction SilentlyContinue) { $docs += 'research.md' }
+        if (Test-Path $paths.DATA_MODEL -ErrorAction SilentlyContinue) { $docs += 'data-model.md' }
+        if ((Test-Path $paths.CONTRACTS_DIR -ErrorAction SilentlyContinue) -and (Get-ChildItem -Path $paths.CONTRACTS_DIR -ErrorAction SilentlyContinue | Select-Object -First 1)) {
+            $docs += 'contracts/'
+        }
+        if (Test-Path $paths.QUICKSTART -ErrorAction SilentlyContinue) { $docs += 'quickstart.md' }
+        if (Test-Path $paths.TASKS -ErrorAction SilentlyContinue) { $docs += 'tasks.md' }
+    }
+
+    # --- Output ---
+    if ($Json) {
+        $result = [ordered]@{
+            phase             = 'status'
+            FEATURE_DIR       = $paths.FEATURE_DIR
+            FEATURE_SPEC      = $paths.FEATURE_SPEC
+            IMPL_PLAN         = $paths.IMPL_PLAN
+            TASKS             = $paths.TASKS
+            BRANCH            = $paths.CURRENT_BRANCH
+            HAS_GIT           = $hasGit
+            REPO_ROOT         = $paths.REPO_ROOT
+            AVAILABLE_DOCS    = $docs
+            validated         = [ordered]@{
+                constitution  = [bool]$vConstitution
+                spec          = [bool]$vSpec
+                plan          = [bool]$vPlan
+                tasks         = [bool]$vTasks
+            }
+            warnings          = $warnings
+            artifacts         = [ordered]@{
+                constitution  = [ordered]@{ exists = [bool]$aConstitution; valid = [bool]$vConstitution }
+                spec          = [ordered]@{ exists = [bool]$aSpec; valid = [bool]$vSpec; quality = $specQuality }
+                plan          = [ordered]@{ exists = [bool]$aPlan; valid = [bool]$vPlan }
+                tasks         = [ordered]@{ exists = [bool]$aTasks; valid = [bool]$vTasks }
+                checklists    = [ordered]@{ exists = [bool]$aChecklists; checked = $checklistChecked; total = $checklistTotal; complete = [bool]$checklistComplete }
+                test_specs    = [ordered]@{ exists = [bool]$aTestSpecs }
+            }
+            feature_stage     = $featureStage
+            ready_for         = $readyFor
+            next_step         = $nextStep
+            clear_before      = [bool]$clearBefore
+            checklist_checked = $checklistChecked
+            checklist_total   = $checklistTotal
+        }
+        ($result | ConvertTo-Json -Compress -Depth 4)
+    } else {
+        Write-Output "Phase: status"
+        Write-Output "Feature stage: $featureStage"
+        Write-Output "Ready for: phase $readyFor"
+        if ($nextStep) {
+            if ($clearBefore) {
+                Write-Output "Next step: /clear, then $nextStep"
+            } else {
+                Write-Output "Next step: $nextStep"
+            }
+        } else {
+            Write-Output "Next step: (none - feature complete)"
+        }
+        Write-Output ""
+        Write-Output "Artifacts:"
+        $yOrN = { param($v) if ($v) { '[Y]' } else { '[N]' } }
+        Write-Output "  Constitution: $(& $yOrN $aConstitution) $(if ($vConstitution) { '(valid)' } elseif ($aConstitution) { '(invalid)' })"
+        Write-Output "  Spec:         $(& $yOrN $aSpec) $(if ($vSpec) { "(valid, quality $specQuality/10)" } elseif ($aSpec) { '(invalid)' })"
+        Write-Output "  Plan:         $(& $yOrN $aPlan) $(if ($vPlan) { '(valid)' } elseif ($aPlan) { '(invalid)' })"
+        Write-Output "  Tasks:        $(& $yOrN $aTasks) $(if ($vTasks) { '(valid)' } elseif ($aTasks) { '(invalid)' })"
+        Write-Output "  Checklists:   $(if ($aChecklists) { "[Y] ($checklistChecked/$checklistTotal)" } else { '[N]' })"
+        Write-Output "  Test specs:   $(& $yOrN $aTestSpecs)"
+    }
+
     # Launch dashboard
     & "$PSScriptRoot/ensure-dashboard.ps1"
     exit 0

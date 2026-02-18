@@ -5,7 +5,7 @@ description: >-
   Use when starting a new project, running init, checking status, switching between features, or looking up available commands and phases.
 license: MIT
 metadata:
-  version: "1.6.4"
+  version: "1.6.7"
 ---
 
 # Intent Integrity Kit Core
@@ -66,23 +66,21 @@ Show constitution status, feature count, and suggest `/iikit-core status`.
 
 ### Execution Flow
 
-1. **Get paths**:
+1. **Get deterministic status**:
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase core --json
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase status --json
    ```
-   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/check-prerequisites.ps1 -Phase core -Json`
+   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/check-prerequisites.ps1 -Phase status -Json`
 
-2. **Check**: constitution exists, feature count, current feature artifacts (spec.md, plan.md, tasks.md, checklists/, test-specs.md)
-
-3. **Report**: project name, constitution status, feature count, current feature artifact status, recommended next step
-
-### Next Step Logic
-
-1. No constitution -> `/iikit-00-constitution`
-2. No feature -> `/iikit-01-specify <description>`
-3. Has spec, no plan -> suggest `/clear`, then `/iikit-03-plan` (clarify session may have consumed context)
-4. Has plan, no tasks -> suggest `/clear`, then `/iikit-06-tasks` (checklist session may have consumed context)
-5. Has tasks -> suggest `/clear`, then `/iikit-08-implement` (implementation is context-heavy)
+2. **Present results** (pure presentation — all logic is in the script output):
+   - Parse the JSON response
+   - Show project name and `feature_stage`
+   - Show artifact status from `artifacts` object (exists/valid for each)
+   - Show checklist progress from `checklist_checked`/`checklist_total`
+   - Show `ready_for` phase
+   - Show `next_step` as the recommended next command
+   - If `clear_before` is true, prepend `/clear` suggestion before the next step command
+   - If `next_step` is null, report feature as complete
 
 ## Subcommand: use
 

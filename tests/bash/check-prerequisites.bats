@@ -442,3 +442,200 @@ teardown() {
     assert_contains "$result" "$alt_dir"
     rm -rf "$alt_dir"
 }
+
+# =============================================================================
+# Status phase tests
+# =============================================================================
+
+@test "check-prerequisites: --phase status returns valid JSON" {
+    create_mock_feature "001-test-feature"
+
+    result=$("$CHECK_SCRIPT" --phase status --json)
+
+    echo "$result" | jq . >/dev/null
+}
+
+@test "check-prerequisites: --phase status reports all artifact types" {
+    create_mock_feature "001-test-feature"
+
+    result=$("$CHECK_SCRIPT" --phase status --json)
+
+    # Check artifacts object has all expected keys
+    echo "$result" | jq '.artifacts.constitution' >/dev/null
+    echo "$result" | jq '.artifacts.spec' >/dev/null
+    echo "$result" | jq '.artifacts.plan' >/dev/null
+    echo "$result" | jq '.artifacts.tasks' >/dev/null
+    echo "$result" | jq '.artifacts.checklists' >/dev/null
+    echo "$result" | jq '.artifacts.test_specs' >/dev/null
+}
+
+@test "check-prerequisites: --phase status ready_for is 06 for spec+plan" {
+    create_mock_feature "001-test-feature"
+
+    result=$("$CHECK_SCRIPT" --phase status --json)
+
+    ready_for=$(echo "$result" | jq -r '.ready_for')
+    [[ "$ready_for" == "06" ]]
+}
+
+@test "check-prerequisites: --phase status ready_for is 09 for complete feature" {
+    create_complete_mock_feature "001-test-feature"
+
+    result=$("$CHECK_SCRIPT" --phase status --json)
+
+    ready_for=$(echo "$result" | jq -r '.ready_for')
+    [[ "$ready_for" == "09" ]]
+}
+
+@test "check-prerequisites: --phase status next_step is /iikit-06-tasks when plan exists but no tasks" {
+    create_mock_feature "001-test-feature"
+
+    result=$("$CHECK_SCRIPT" --phase status --json)
+
+    next_step=$(echo "$result" | jq -r '.next_step')
+    [[ "$next_step" == "/iikit-06-tasks" ]]
+}
+
+@test "check-prerequisites: --phase status next_step is /iikit-08-implement when tasks exist" {
+    create_complete_mock_feature "001-test-feature"
+
+    result=$("$CHECK_SCRIPT" --phase status --json)
+
+    next_step=$(echo "$result" | jq -r '.next_step')
+    [[ "$next_step" == "/iikit-08-implement" ]]
+}
+
+@test "check-prerequisites: --phase status next_step is /iikit-00-constitution when no constitution" {
+    create_mock_feature "001-test-feature"
+    rm -f "$TEST_DIR/CONSTITUTION.md"
+
+    result=$("$CHECK_SCRIPT" --phase status --json)
+
+    next_step=$(echo "$result" | jq -r '.next_step')
+    [[ "$next_step" == "/iikit-00-constitution" ]]
+}
+
+@test "check-prerequisites: --phase status next_step is /iikit-03-plan with spec but no plan" {
+    mkdir -p specs/001-test-feature
+    cp "$FIXTURES_DIR/spec.md" specs/001-test-feature/spec.md
+
+    result=$("$CHECK_SCRIPT" --phase status --json)
+
+    next_step=$(echo "$result" | jq -r '.next_step')
+    [[ "$next_step" == "/iikit-03-plan" ]]
+}
+
+@test "check-prerequisites: --phase status clear_before is true for plan transition" {
+    mkdir -p specs/001-test-feature
+    cp "$FIXTURES_DIR/spec.md" specs/001-test-feature/spec.md
+
+    result=$("$CHECK_SCRIPT" --phase status --json)
+
+    clear_before=$(echo "$result" | jq -r '.clear_before')
+    [[ "$clear_before" == "true" ]]
+}
+
+@test "check-prerequisites: --phase status clear_before is true for tasks transition" {
+    create_mock_feature "001-test-feature"
+
+    result=$("$CHECK_SCRIPT" --phase status --json)
+
+    clear_before=$(echo "$result" | jq -r '.clear_before')
+    [[ "$clear_before" == "true" ]]
+}
+
+@test "check-prerequisites: --phase status clear_before is true for implement transition" {
+    create_complete_mock_feature "001-test-feature"
+
+    result=$("$CHECK_SCRIPT" --phase status --json)
+
+    clear_before=$(echo "$result" | jq -r '.clear_before')
+    [[ "$clear_before" == "true" ]]
+}
+
+@test "check-prerequisites: --phase status never exits on missing artifacts" {
+    # Only constitution, no feature dir
+    run "$CHECK_SCRIPT" --phase status --json
+    [[ "$status" -eq 0 ]]
+}
+
+@test "check-prerequisites: --phase status still exits 2 for needs_selection" {
+    unset SPECIFY_FEATURE
+    rm -f "$TEST_DIR/.specify/active-feature"
+    mkdir -p "$TEST_DIR/specs/001-feature-a"
+    mkdir -p "$TEST_DIR/specs/002-feature-b"
+
+    run "$CHECK_SCRIPT" --phase status --json
+    [[ "$status" -eq 2 ]]
+    assert_contains "$output" "needs_selection"
+}
+
+@test "check-prerequisites: --phase status feature_stage matches get_feature_stage" {
+    create_complete_mock_feature "001-test-feature"
+
+    result=$("$CHECK_SCRIPT" --phase status --json)
+
+    stage=$(echo "$result" | jq -r '.feature_stage')
+    # Fixture tasks.md has 2/7 done = implementing-28%
+    [[ "$stage" == "implementing-28%" ]]
+}
+
+@test "check-prerequisites: --phase status reports spec quality in artifacts" {
+    create_mock_feature "001-test-feature"
+
+    result=$("$CHECK_SCRIPT" --phase status --json)
+
+    quality=$(echo "$result" | jq -r '.artifacts.spec.quality')
+    [[ "$quality" =~ ^[0-9]+$ ]]
+    [[ "$quality" -gt 0 ]]
+}
+
+@test "check-prerequisites: --phase status reports incomplete checklists" {
+    create_mock_feature "001-test-feature"
+    mkdir -p "$TEST_DIR/specs/001-test-feature/checklists"
+    printf -- '- [ ] Item 1\n- [x] Item 2\n- [ ] Item 3\n' > "$TEST_DIR/specs/001-test-feature/checklists/quality.md"
+
+    result=$("$CHECK_SCRIPT" --phase status --json)
+
+    checked=$(echo "$result" | jq -r '.checklist_checked')
+    total=$(echo "$result" | jq -r '.checklist_total')
+    complete=$(echo "$result" | jq -r '.artifacts.checklists.complete')
+    [[ "$checked" == "1" ]]
+    [[ "$total" == "3" ]]
+    [[ "$complete" == "false" ]]
+}
+
+@test "check-prerequisites: --phase status text mode output" {
+    create_mock_feature "001-test-feature"
+
+    result=$("$CHECK_SCRIPT" --phase status)
+
+    assert_contains "$result" "Phase: status"
+    assert_contains "$result" "Feature stage:"
+    assert_contains "$result" "Ready for:"
+    assert_contains "$result" "Next step:"
+    assert_contains "$result" "Artifacts:"
+}
+
+@test "check-prerequisites: --phase status has validated object (backward compat)" {
+    create_mock_feature "001-test-feature"
+
+    result=$("$CHECK_SCRIPT" --phase status --json)
+
+    # validated object should be present
+    echo "$result" | jq '.validated.constitution' >/dev/null
+    echo "$result" | jq '.validated.spec' >/dev/null
+    echo "$result" | jq '.validated.plan' >/dev/null
+    echo "$result" | jq '.validated.tasks' >/dev/null
+}
+
+@test "check-prerequisites: --phase status next_step is /iikit-04-checklist for incomplete checklists" {
+    create_mock_feature "001-test-feature"
+    mkdir -p "$TEST_DIR/specs/001-test-feature/checklists"
+    printf -- '- [ ] Item 1\n- [x] Item 2\n- [ ] Item 3\n' > "$TEST_DIR/specs/001-test-feature/checklists/quality.md"
+
+    result=$("$CHECK_SCRIPT" --phase status --json)
+
+    next_step=$(echo "$result" | jq -r '.next_step')
+    [[ "$next_step" == "/iikit-04-checklist" ]]
+}

@@ -5,7 +5,7 @@ description: >-
   Use when planning how to build a feature, writing a technical design doc, choosing libraries, defining database schemas, or setting up Tessl tiles for runtime library knowledge.
 license: MIT
 metadata:
-  version: "1.6.4"
+  version: "1.6.7"
 ---
 
 # Intent Integrity Kit Plan

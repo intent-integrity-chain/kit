@@ -5,7 +5,7 @@ description: >-
   Use when requirements are unclear, the spec has gaps, details are missing, user stories need refinement, or you want to tighten acceptance criteria before planning.
 license: MIT
 metadata:
-  version: "1.6.4"
+  version: "1.6.7"
 ---
 
 # Intent Integrity Kit Clarify

@@ -5,7 +5,7 @@ description: >-
   Use when ready to build the feature, start coding, develop from the task list, or resume a partially completed implementation.
 license: MIT
 metadata:
-  version: "1.6.4"
+  version: "1.6.7"
 ---
 
 # Intent Integrity Kit Implement
@@ -20,7 +20,7 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
-> **Windows**: Replace `bash …/scripts/bash/*.sh` with `pwsh …/scripts/powershell/*.ps1` (same flags, `-PascalCase`).
+> **Windows**: Replace `bash …/iikit-core/scripts/bash/*.sh` with `pwsh …/iikit-core/scripts/powershell/*.ps1` (same flags, `-PascalCase`).
 
 ## Constitution Loading
 
