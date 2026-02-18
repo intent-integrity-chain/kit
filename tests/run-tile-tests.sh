@@ -728,39 +728,51 @@ test_skill_script_references() {
     log_section "Skill Script References (Bash)"
     local base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills"
 
-    # CRITICAL: Verify all SKILL.md files reference scripts at iikit-core/scripts/
-    # This catches the bug where skills referenced iikit-01-specify/scripts/ instead
+    # After self-containment, each skill references scripts in its OWN directory.
+    # No skill should reference scripts in a DIFFERENT skill's directory.
 
-    # Check that script paths point to iikit-core, not individual skill directories
+    # Check no cross-skill script references exist
     ((TESTS_RUN++))
-    local wrong_script_refs
-    wrong_script_refs=$(grep -rh "iikit-0[0-9]-[a-z]*/scripts/" "$base"/*/SKILL.md 2>/dev/null | wc -l)
-    if [[ "$wrong_script_refs" -eq 0 ]]; then
-        log_pass "no skills reference scripts in wrong skill directory"
+    local cross_skill_refs=0
+    for skill in "$base"/iikit-*/SKILL.md; do
+        local skill_name
+        skill_name=$(basename "$(dirname "$skill")")
+        while IFS= read -r line; do
+            local ref_skill
+            ref_skill=$(echo "$line" | grep -oE 'iikit-[a-z0-9-]+/scripts/bash/' | head -1 | sed 's|/scripts/bash/||')
+            if [[ -n "$ref_skill" && "$ref_skill" != "$skill_name" ]]; then
+                ((cross_skill_refs++))
+                log_info "  $skill_name references scripts in $ref_skill"
+            fi
+        done < <(grep "scripts/bash/" "$skill" 2>/dev/null)
+    done
+    if [[ "$cross_skill_refs" -eq 0 ]]; then
+        log_pass "no skills reference scripts in another skill's directory"
     else
-        log_fail "found $wrong_script_refs references to scripts in wrong directory (should be iikit-core/scripts/)"
-        grep -rn "iikit-0[0-9]-[a-z]*/scripts/" "$base"/*/SKILL.md 2>/dev/null | head -5
+        log_fail "$cross_skill_refs cross-skill bash script references found"
     fi
 
-    # Verify scripts are referenced at iikit-core/scripts/bash/
+    # Verify scripts are referenced at own skill's scripts/bash/
     ((TESTS_RUN++))
     local skills_with_script_refs=0
     local skills_with_correct_refs=0
     for skill in "$base"/iikit-*/SKILL.md; do
+        local skill_name
+        skill_name=$(basename "$(dirname "$skill")")
         if grep -q "scripts/bash/" "$skill" 2>/dev/null; then
             ((skills_with_script_refs++))
-            if grep -q "iikit-core/scripts/bash/" "$skill" 2>/dev/null; then
+            if grep -q "$skill_name/scripts/bash/" "$skill" 2>/dev/null; then
                 ((skills_with_correct_refs++))
             fi
         fi
     done
     if [[ "$skills_with_script_refs" -eq "$skills_with_correct_refs" ]]; then
-        log_pass "all bash script references use iikit-core/scripts/bash/"
+        log_pass "all bash script references use own skill's scripts/bash/"
     else
-        log_fail "bash script path mismatch: $skills_with_correct_refs/$skills_with_script_refs use correct path"
+        log_fail "bash script path mismatch: $skills_with_correct_refs/$skills_with_script_refs use own path"
     fi
 
-    # Check specific critical scripts are referenced correctly
+    # Check specific critical scripts have no cross-skill references
     local critical_scripts=(
         "check-prerequisites.sh"
         "create-new-feature.sh"
@@ -770,12 +782,22 @@ test_skill_script_references() {
 
     for script in "${critical_scripts[@]}"; do
         ((TESTS_RUN++))
-        local wrong_refs
-        wrong_refs=$(grep -rh "$script" "$base"/*/SKILL.md 2>/dev/null | grep -v "iikit-core/scripts" | grep "scripts/bash" | wc -l)
+        local wrong_refs=0
+        for skill_md in "$base"/iikit-*/SKILL.md; do
+            local sn
+            sn=$(basename "$(dirname "$skill_md")")
+            while IFS= read -r line; do
+                local rs
+                rs=$(echo "$line" | grep -oE 'iikit-[a-z0-9-]+/scripts/bash/' | head -1 | sed 's|/scripts/bash/||')
+                if [[ -n "$rs" && "$rs" != "$sn" ]]; then
+                    ((wrong_refs++))
+                fi
+            done < <(grep "$script" "$skill_md" 2>/dev/null | grep "scripts/bash")
+        done
         if [[ "$wrong_refs" -eq 0 ]]; then
-            log_pass "$script references are correct"
+            log_pass "$script references are self-contained"
         else
-            log_fail "$script has $wrong_refs wrong path references"
+            log_fail "$script has $wrong_refs cross-skill references"
         fi
     done
 }
@@ -784,36 +806,51 @@ test_powershell_script_references() {
     log_section "Skill Script References (PowerShell)"
     local base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills"
 
-    # Check that PowerShell script paths point to iikit-core, not individual skill directories
+    # After self-containment, each skill references PowerShell scripts in its OWN directory.
+    # No skill should reference scripts in a DIFFERENT skill's directory.
+
+    # Check no cross-skill PowerShell script references exist
     ((TESTS_RUN++))
-    local wrong_ps_refs
-    wrong_ps_refs=$(grep -rh "iikit-0[0-9]-[a-z]*/scripts/powershell" "$base"/*/SKILL.md 2>/dev/null | wc -l)
-    if [[ "$wrong_ps_refs" -eq 0 ]]; then
-        log_pass "no skills reference PowerShell scripts in wrong directory"
+    local cross_skill_refs=0
+    for skill in "$base"/iikit-*/SKILL.md; do
+        local skill_name
+        skill_name=$(basename "$(dirname "$skill")")
+        while IFS= read -r line; do
+            local ref_skill
+            ref_skill=$(echo "$line" | grep -oE 'iikit-[a-z0-9-]+/scripts/powershell/' | head -1 | sed 's|/scripts/powershell/||')
+            if [[ -n "$ref_skill" && "$ref_skill" != "$skill_name" ]]; then
+                ((cross_skill_refs++))
+                log_info "  $skill_name references PowerShell scripts in $ref_skill"
+            fi
+        done < <(grep "scripts/powershell/" "$skill" 2>/dev/null)
+    done
+    if [[ "$cross_skill_refs" -eq 0 ]]; then
+        log_pass "no skills reference PowerShell scripts in another skill's directory"
     else
-        log_fail "found $wrong_ps_refs PowerShell references in wrong directory"
-        grep -rn "iikit-0[0-9]-[a-z]*/scripts/powershell" "$base"/*/SKILL.md 2>/dev/null | head -5
+        log_fail "$cross_skill_refs cross-skill PowerShell script references found"
     fi
 
-    # Verify PowerShell scripts are referenced at iikit-core/scripts/powershell/
+    # Verify PowerShell scripts are referenced at own skill's scripts/powershell/
     ((TESTS_RUN++))
     local skills_with_ps_refs=0
     local skills_with_correct_ps_refs=0
     for skill in "$base"/iikit-*/SKILL.md; do
+        local skill_name
+        skill_name=$(basename "$(dirname "$skill")")
         if grep -q "scripts/powershell/" "$skill" 2>/dev/null; then
             ((skills_with_ps_refs++))
-            if grep -q "iikit-core/scripts/powershell/" "$skill" 2>/dev/null; then
+            if grep -q "$skill_name/scripts/powershell/" "$skill" 2>/dev/null; then
                 ((skills_with_correct_ps_refs++))
             fi
         fi
     done
     if [[ "$skills_with_ps_refs" -eq "$skills_with_correct_ps_refs" ]]; then
-        log_pass "all PowerShell script references use iikit-core/scripts/powershell/"
+        log_pass "all PowerShell script references use own skill's scripts/powershell/"
     else
-        log_fail "PowerShell path mismatch: $skills_with_correct_ps_refs/$skills_with_ps_refs use correct path"
+        log_fail "PowerShell path mismatch: $skills_with_correct_ps_refs/$skills_with_ps_refs use own path"
     fi
 
-    # Check specific critical PowerShell scripts are referenced correctly
+    # Check specific critical PowerShell scripts have no cross-skill references
     local critical_ps_scripts=(
         "check-prerequisites.ps1"
         "create-new-feature.ps1"
@@ -823,12 +860,22 @@ test_powershell_script_references() {
 
     for script in "${critical_ps_scripts[@]}"; do
         ((TESTS_RUN++))
-        local wrong_refs
-        wrong_refs=$(grep -rh "$script" "$base"/*/SKILL.md 2>/dev/null | grep -v "iikit-core/scripts" | grep "scripts/powershell" | wc -l)
+        local wrong_refs=0
+        for skill_md in "$base"/iikit-*/SKILL.md; do
+            local sn
+            sn=$(basename "$(dirname "$skill_md")")
+            while IFS= read -r line; do
+                local rs
+                rs=$(echo "$line" | grep -oE 'iikit-[a-z0-9-]+/scripts/powershell/' | head -1 | sed 's|/scripts/powershell/||')
+                if [[ -n "$rs" && "$rs" != "$sn" ]]; then
+                    ((wrong_refs++))
+                fi
+            done < <(grep "$script" "$skill_md" 2>/dev/null | grep "scripts/powershell")
+        done
         if [[ "$wrong_refs" -eq 0 ]]; then
-            log_pass "$script references are correct"
+            log_pass "$script references are self-contained"
         else
-            log_fail "$script has $wrong_refs wrong path references"
+            log_fail "$script has $wrong_refs cross-skill references"
         fi
     done
 }
@@ -1087,6 +1134,53 @@ test_skill_self_containment() {
         log_pass "all ./references/ and ./templates/ links resolve"
     else
         log_fail "$broken_links local file links are broken"
+    fi
+
+    # Test 3: No non-core SKILL.md should reference iikit-core/scripts/
+    ((TESTS_RUN++))
+    local script_cross_refs=0
+    for skill in "$base"/iikit-*/SKILL.md; do
+        [[ "$skill" == *"iikit-core"* ]] && continue
+        if grep -q 'iikit-core/scripts/' "$skill" 2>/dev/null; then
+            ((script_cross_refs++))
+            local skill_name
+            skill_name=$(basename "$(dirname "$skill")")
+            log_info "  $skill_name still references iikit-core/scripts/"
+        fi
+    done
+    if [[ "$script_cross_refs" -eq 0 ]]; then
+        log_pass "no non-core skills reference iikit-core/scripts/ (scripts self-contained)"
+    else
+        log_fail "$script_cross_refs skills still reference iikit-core/scripts/"
+    fi
+
+    # Test 4: Per-skill script→template dependencies exist
+    # Scripts use $SCRIPT_DIR/../../templates/<tmpl> — verify templates are present
+    ((TESTS_RUN++))
+    local missing_script_templates=0
+    for skill_dir in "$base"/iikit-*/; do
+        [[ "$skill_dir" == *"iikit-core"* ]] && continue
+        [[ ! -d "$skill_dir/scripts/bash" ]] && continue
+        # check-prerequisites.sh → plan-template.md
+        if [[ -f "$skill_dir/scripts/bash/check-prerequisites.sh" && ! -f "$skill_dir/templates/plan-template.md" ]]; then
+            ((missing_script_templates++))
+            log_info "  $(basename "$skill_dir") missing plan-template.md for check-prerequisites.sh"
+        fi
+        # create-new-feature.sh → spec-template.md
+        if [[ -f "$skill_dir/scripts/bash/create-new-feature.sh" && ! -f "$skill_dir/templates/spec-template.md" ]]; then
+            ((missing_script_templates++))
+            log_info "  $(basename "$skill_dir") missing spec-template.md for create-new-feature.sh"
+        fi
+        # update-agent-context.sh → agent-file-template.md
+        if [[ -f "$skill_dir/scripts/bash/update-agent-context.sh" && ! -f "$skill_dir/templates/agent-file-template.md" ]]; then
+            ((missing_script_templates++))
+            log_info "  $(basename "$skill_dir") missing agent-file-template.md for update-agent-context.sh"
+        fi
+    done
+    if [[ "$missing_script_templates" -eq 0 ]]; then
+        log_pass "all per-skill script→template dependencies exist"
+    else
+        log_fail "$missing_script_templates script→template dependencies missing"
     fi
 }
 

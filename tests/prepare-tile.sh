@@ -47,10 +47,115 @@ for skill_dir in iikit-*/; do
             fi
         fi
     done
-    echo "✓ $skill_dir is self-contained"
+    echo "✓ $skill_dir references self-contained"
 done
 
-# Step 2: Clean up iikit-core — distributed files no longer needed in published tile
+# Step 2: Copy referenced scripts from iikit-core into each skill and rewrite paths
+for skill_dir in iikit-*/; do
+    [ "$skill_dir" = "iikit-core/" ] && continue
+    skill_md="$skill_dir/SKILL.md"
+    [ ! -f "$skill_md" ] && continue
+
+    skill_name="${skill_dir%/}"
+
+    # Extract bash script filenames referenced in SKILL.md
+    bash_scripts=$(grep -oE "iikit-core/scripts/bash/[a-z-]+\.sh" "$skill_md" | \
+        sed 's|iikit-core/scripts/bash/||' | sort -u) || true
+
+    # Extract powershell script filenames referenced in SKILL.md
+    ps_scripts=$(grep -oE "iikit-core/scripts/powershell/[a-z-]+\.ps1" "$skill_md" | \
+        sed 's|iikit-core/scripts/powershell/||' | sort -u) || true
+
+    # Skip if no scripts referenced
+    if [[ -z "$bash_scripts" && -z "$ps_scripts" ]]; then
+        continue
+    fi
+
+    # Always add common.sh/common.ps1 (sourced by every script via $SCRIPT_DIR/common.sh)
+    if [[ -n "$bash_scripts" ]] && ! echo "$bash_scripts" | grep -q "^common\.sh$"; then
+        bash_scripts="$bash_scripts
+common.sh"
+    fi
+    if [[ -n "$ps_scripts" ]] && ! echo "$ps_scripts" | grep -q "^common\.ps1$"; then
+        ps_scripts="$ps_scripts
+common.ps1"
+    fi
+
+    # Add ensure-dashboard when check-prerequisites is present (transitive dep —
+    # check-prerequisites.sh calls bash "$SCRIPT_DIR/ensure-dashboard.sh" at runtime)
+    if [[ -n "$bash_scripts" ]] && echo "$bash_scripts" | grep -q "^check-prerequisites\.sh$" && \
+       ! echo "$bash_scripts" | grep -q "^ensure-dashboard\.sh$"; then
+        bash_scripts="$bash_scripts
+ensure-dashboard.sh"
+    fi
+    if [[ -n "$ps_scripts" ]] && echo "$ps_scripts" | grep -q "^check-prerequisites\.ps1$" && \
+       ! echo "$ps_scripts" | grep -q "^ensure-dashboard\.ps1$"; then
+        ps_scripts="$ps_scripts
+ensure-dashboard.ps1"
+    fi
+
+    # Copy bash scripts
+    if [[ -n "$bash_scripts" ]]; then
+        mkdir -p "$skill_dir/scripts/bash"
+        echo "$bash_scripts" | while read -r script; do
+            [[ -z "$script" ]] && continue
+            if [ -f "iikit-core/scripts/bash/$script" ]; then
+                cp "iikit-core/scripts/bash/$script" "$skill_dir/scripts/bash/$script"
+                echo "  Copied scripts/bash/$script → ${skill_dir}scripts/bash/"
+            fi
+        done
+    fi
+
+    # Copy powershell scripts
+    if [[ -n "$ps_scripts" ]]; then
+        mkdir -p "$skill_dir/scripts/powershell"
+        echo "$ps_scripts" | while read -r script; do
+            [[ -z "$script" ]] && continue
+            if [ -f "iikit-core/scripts/powershell/$script" ]; then
+                cp "iikit-core/scripts/powershell/$script" "$skill_dir/scripts/powershell/$script"
+                echo "  Copied scripts/powershell/$script → ${skill_dir}scripts/powershell/"
+            fi
+        done
+    fi
+
+    # Copy script→template dependencies if not already present
+    # Scripts use $SCRIPT_DIR/../../templates/<tmpl> — must exist at <skill>/templates/
+    if echo "$bash_scripts" | grep -q "^check-prerequisites\.sh$"; then
+        if [[ -f "iikit-core/templates/plan-template.md" && ! -f "$skill_dir/templates/plan-template.md" ]]; then
+            mkdir -p "$skill_dir/templates"
+            cp "iikit-core/templates/plan-template.md" "$skill_dir/templates/plan-template.md"
+            echo "  Copied templates/plan-template.md → ${skill_dir}templates/ (script dep)"
+        fi
+    fi
+    if echo "$bash_scripts" | grep -q "^create-new-feature\.sh$"; then
+        if [[ -f "iikit-core/templates/spec-template.md" && ! -f "$skill_dir/templates/spec-template.md" ]]; then
+            mkdir -p "$skill_dir/templates"
+            cp "iikit-core/templates/spec-template.md" "$skill_dir/templates/spec-template.md"
+            echo "  Copied templates/spec-template.md → ${skill_dir}templates/ (script dep)"
+        fi
+    fi
+    if echo "$bash_scripts" | grep -q "^update-agent-context\.sh$"; then
+        if [[ -f "iikit-core/templates/agent-file-template.md" && ! -f "$skill_dir/templates/agent-file-template.md" ]]; then
+            mkdir -p "$skill_dir/templates"
+            cp "iikit-core/templates/agent-file-template.md" "$skill_dir/templates/agent-file-template.md"
+            echo "  Copied templates/agent-file-template.md → ${skill_dir}templates/ (script dep)"
+        fi
+    fi
+
+    # Rewrite SKILL.md: iikit-core/scripts/{bash,powershell}/ → <skill-name>/scripts/{bash,powershell}/
+    if sed --version 2>/dev/null | grep -q GNU; then
+        sed -i "s|iikit-core/scripts/bash/|$skill_name/scripts/bash/|g" "$skill_md"
+        sed -i "s|iikit-core/scripts/powershell/|$skill_name/scripts/powershell/|g" "$skill_md"
+    else
+        sed -i '' "s|iikit-core/scripts/bash/|$skill_name/scripts/bash/|g" "$skill_md"
+        sed -i '' "s|iikit-core/scripts/powershell/|$skill_name/scripts/powershell/|g" "$skill_md"
+    fi
+
+    echo "✓ $skill_dir scripts self-contained"
+done
+echo "✓ Scripts distributed to skills"
+
+# Step 3: Clean up iikit-core — distributed files no longer needed in published tile
 rm -rf iikit-core/references
 echo "✓ Removed iikit-core/references/ (fully distributed)"
 
