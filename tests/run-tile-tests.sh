@@ -101,11 +101,9 @@ test_scripts_exist() {
 }
 
 test_powershell_scripts_exist() {
-    log_section "PowerShell Scripts Exist (known: registry strips .ps1)"
+    log_section "PowerShell Scripts Exist"
     local ps_base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell"
 
-    # PowerShell scripts are stripped by the tessl registry on publish.
-    # This is a known limitation — warn instead of fail.
     local ps_scripts=(
         "check-prerequisites.ps1"
         "create-new-feature.ps1"
@@ -118,12 +116,7 @@ test_powershell_scripts_exist() {
     )
 
     for script in "${ps_scripts[@]}"; do
-        ((TESTS_RUN++))
-        if [[ -f "$ps_base/$script" ]]; then
-            log_pass "$script exists"
-        else
-            log_warn "$script missing (tessl registry strips .ps1 files)"
-        fi
+        run_test "$script exists" "[[ -f '$ps_base/$script' ]]"
     done
 }
 
@@ -975,7 +968,7 @@ test_powershell_script_inner_template_refs() {
         ((TESTS_RUN++))
 
         if [[ ! -f "$base/$script" ]]; then
-            log_warn "powershell script not found: $script (tessl registry strips .ps1)"
+            log_fail "powershell script not found: $script"
             continue
         fi
 
