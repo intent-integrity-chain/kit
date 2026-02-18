@@ -1,5 +1,20 @@
 # Changelog
 
+## v1.6.0
+
+- **Bugfix skill**: New `/iikit-bugfix` utility skill for reporting and fixing bugs without the full specify/clarify/plan/checklist workflow. Creates structured `bugs.md` records, generates fix tasks, and integrates with GitHub Issues (inbound import and outbound creation). Cross-platform scripts (bash + PowerShell).
+- **Multi-feature support**: Sticky feature selection via `.specify/active-feature` file that survives session restarts. Detection cascade: active-feature file > `SPECIFY_FEATURE` env > git branch > single feature auto-select.
+- **SessionStart hooks**: Hooks for Gemini CLI and OpenCode that set terminal title and load context on session start.
+- **Tessl eval integration**: `/iikit-03-plan` now queries Tessl evals for tech selection and dashboard metrics.
+- **Bug detection in specify**: `/iikit-01-specify` now detects bug-fix-like descriptions and suggests redirecting to `/iikit-bugfix`.
+- **Post-fix GitHub comments**: `/iikit-08-implement` comments on linked GitHub issues after completing bug fix tasks.
+- **Improved skill definitions**: Conciseness improvements and progressive disclosure across all skills.
+- **Unified docs**: Tile `index.md` symlinked to `README.md` for single source of truth.
+
+## v1.5.0
+
+- **Spec item references in clarifications**: Clarification Q&A entries now include spec item references (FR-xxx, US-x, SC-xxx) for full traceability from clarifications back to the spec items they affect.
+
 ## v1.4.1
 
 - **Publish action migration**: Migrated to official `tesslio/publish` GitHub Action.

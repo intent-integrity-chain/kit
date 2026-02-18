@@ -4,9 +4,12 @@
 
 An AI coding assistant toolkit that preserves your intent from idea to implementation, with cryptographic verification at each step. Compatible with Claude Code, OpenAI Codex, Google Gemini, and OpenCode.
 
-## What's New in v1.5.0
+## What's New in v1.6.0
 
-- **Spec item references in clarifications**: Clarification Q&A entries now include spec item references (FR-xxx, US-x, SC-xxx) for full traceability from clarifications back to the spec items they affect.
+- **`/iikit-bugfix` skill**: Report and fix bugs without the full specification workflow. Creates structured `bugs.md` records, generates fix tasks, integrates with GitHub Issues.
+- **Multi-feature support**: Sticky feature selection that survives session restarts.
+- **SessionStart hooks**: Context loading for Gemini CLI and OpenCode.
+- **Tessl eval integration**: Tech selection informed by Tessl eval dashboard.
 
 [Previous releases →](CHANGELOG.md)
 
