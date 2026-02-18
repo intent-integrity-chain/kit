@@ -46,7 +46,9 @@ jobs:
         id: version
         run: |
           NEW=$(jq -r .version tiles/intent-integrity-kit/tile.json)
-          OLD=$(git show HEAD~1:tiles/intent-integrity-kit/tile.json 2>/dev/null | jq -r .version 2>/dev/null || echo "")
+          # Compare against the version tag on the registry, not just HEAD~1
+          LATEST_TAG=$(git tag -l 'v*' --sort=-v:refname | head -1 | sed 's/^v//')
+          OLD=${LATEST_TAG:-$(git show HEAD~1:tiles/intent-integrity-kit/tile.json 2>/dev/null | jq -r .version 2>/dev/null || echo "")}
           echo "old=$OLD" >> "$GITHUB_OUTPUT"
           echo "new=$NEW" >> "$GITHUB_OUTPUT"
           if [[ "$NEW" != "$OLD" && -n "$OLD" ]]; then
@@ -56,6 +58,20 @@ jobs:
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "Version unchanged ($NEW), skipping publish"
           fi
+
+      - name: Resolve symlinks in tile directory
+        if: steps.version.outputs.changed == 'true'
+        run: |
+          # Replace symlinks with file copies so the archive contains real files
+          cd tiles/intent-integrity-kit
+          find . -type l | while read link; do
+            target=$(readlink -f "$link")
+            if [ -f "$target" ]; then
+              rm "$link"
+              cp "$target" "$link"
+              echo "Resolved symlink: $link"
+            fi
+          done
 
       - name: Publish tile v${{ steps.version.outputs.new }}
         if: steps.version.outputs.changed == 'true'
