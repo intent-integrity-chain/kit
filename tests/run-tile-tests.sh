@@ -64,11 +64,16 @@ setup() {
     echo '{"tiles":{}}' > tessl.json
 
     if [[ "$TILE_SOURCE" == "local" ]]; then
-        log_info "Installing from local..."
-        # Resolve symlinks so tessl gets real files (skills/ may be a symlink)
+        log_info "Installing from local (with CI-equivalent transforms)..."
         local tile_copy
         tile_copy=$(mktemp -d)
+        # Resolve symlinks so tessl gets real files (skills/ may be a symlink)
         cp -RL "$ORIGINAL_DIR/tiles/intent-integrity-kit/" "$tile_copy/"
+        # Run the same self-containment transforms that CI runs before publish
+        local prepare_script="$ORIGINAL_DIR/tests/prepare-tile.sh"
+        if [[ -f "$prepare_script" ]]; then
+            bash "$prepare_script" "$tile_copy/skills" 2>&1 | sed 's/^/  /'
+        fi
         tessl install "file:$tile_copy" 2>&1 | grep -v "^-"
         rm -rf "$tile_copy"
     else
@@ -158,14 +163,28 @@ test_scripts_executable() {
 
 test_templates_exist() {
     log_section "Templates Exist"
-    local base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/templates"
+    local skills=".tessl/tiles/tessl-labs/intent-integrity-kit/skills"
+    local core_tmpl="$skills/iikit-core/templates"
 
-    run_test "constitution-template.md" "[[ -f '$base/constitution-template.md' ]]"
-    run_test "spec-template.md" "[[ -f '$base/spec-template.md' ]]"
-    run_test "plan-template.md" "[[ -f '$base/plan-template.md' ]]"
-    run_test "tasks-template.md" "[[ -f '$base/tasks-template.md' ]]"
-    run_test "checklist-template.md" "[[ -f '$base/checklist-template.md' ]]"
-    run_test "testspec-template.md" "[[ -f '$base/testspec-template.md' ]]"
+    # Templates may be in iikit-core/templates/ (dev/local) or distributed to skill templates/ dirs (registry)
+    # Each template must exist in at least one location
+    local templates=(
+        "constitution-template.md"
+        "spec-template.md"
+        "plan-template.md"
+        "tasks-template.md"
+        "checklist-template.md"
+        "testspec-template.md"
+    )
+
+    for tmpl in "${templates[@]}"; do
+        ((TESTS_RUN++))
+        if [[ -f "$core_tmpl/$tmpl" ]] || find "$skills"/iikit-*/templates -name "$tmpl" 2>/dev/null | grep -q .; then
+            log_pass "$tmpl"
+        else
+            log_fail "$tmpl not found anywhere"
+        fi
+    done
 }
 
 test_skills_exist() {
@@ -642,7 +661,8 @@ test_template_paths_resolve() {
         log_fail "update-agent-context.sh template not found: $template_path"
     fi
 
-    # Verify all expected templates exist
+    # Verify all expected templates exist (in iikit-core or distributed to skills)
+    local skills_base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills"
     local expected_templates=(
         "spec-template.md"
         "plan-template.md"
@@ -655,7 +675,7 @@ test_template_paths_resolve() {
 
     for tmpl in "${expected_templates[@]}"; do
         ((TESTS_RUN++))
-        if [[ -f "$templates_dir/$tmpl" ]]; then
+        if [[ -f "$templates_dir/$tmpl" ]] || find "$skills_base"/iikit-*/templates -name "$tmpl" 2>/dev/null | grep -q .; then
             log_pass "template exists: $tmpl"
         else
             log_fail "template missing: $tmpl"
