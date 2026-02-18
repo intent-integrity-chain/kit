@@ -5,7 +5,7 @@ description: >-
   Use when running a consistency check, verifying requirements traceability, detecting conflicts between design docs, or auditing alignment before implementation begins.
 license: MIT
 metadata:
-  version: "1.6.4"
+  version: "1.7.0"
 ---
 
 # Intent Integrity Kit Analyze
@@ -14,7 +14,7 @@ Non-destructive cross-artifact consistency analysis across spec.md, plan.md, and
 
 ## Operating Constraints
 
-- **READ-ONLY** (exception: writes `analysis.md`). Never modify spec, plan, or task files.
+- **READ-ONLY** (exceptions: writes `analysis.md` and `.specify/score-history.json`). Never modify spec, plan, or task files.
 - **Constitution is non-negotiable**: conflicts are automatically CRITICAL.
 
 ## User Input
@@ -88,7 +88,33 @@ Output to console AND write to `FEATURE_DIR/analysis.md`:
 **Coverage Summary**: requirement key -> has task? -> task IDs
 **Phase Separation Violations**: artifact, line, violation, severity
 **Metrics**: total requirements, total tasks, coverage %, ambiguity count, critical issues
+
+**Health Score**: <score>/100 (<trend>)
+
+## Score History
+
+| Run | Score | Coverage | Critical | High | Medium | Low | Total |
+|-----|-------|----------|----------|------|--------|-----|-------|
+| <timestamp> | <score> | <coverage>% | <critical> | <high> | <medium> | <low> | <total_findings> |
 ```
+
+### 5b. Score History
+
+After computing **Metrics** in step 5, persist the health score:
+
+1. **Compute health score**: `score = 100 - (critical*20 + high*5 + medium*2 + low*0.5)`, floored at 0, rounded to nearest integer.
+2. **Read** `.specify/score-history.json`. If the file does not exist, initialize with `{}`.
+3. **Append** a new entry for the current feature (keyed by feature directory name, e.g. `001-user-auth`):
+   ```json
+   { "timestamp": "<ISO-8601 UTC>", "score": <n>, "coverage_pct": <n>, "critical": <n>, "high": <n>, "medium": <n>, "low": <n>, "total_findings": <n> }
+   ```
+4. **Write** the updated object back to `.specify/score-history.json`.
+5. **Determine trend** by comparing the new score to the previous entry (if any):
+   - Score increased → `↑ improving`
+   - Score decreased → `↓ declining`
+   - Score unchanged or no previous entry → `→ stable`
+6. **Display** in console output: `Health Score: <score>/100 (<trend>)`
+7. **Include** the full `score_history` array for the current feature in `analysis.md` under the **Health Score** line and **Score History** table added in step 5.
 
 ### 6. Next Actions
 
