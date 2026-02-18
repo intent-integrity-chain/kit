@@ -91,8 +91,8 @@ ACTION: [auto-fixing / requiring manual fix]
 For analysis and validation:
 
 ```markdown
-| Requirement Key | Has Task? | Task IDs | Notes |
-|-----------------|-----------|----------|-------|
+| Requirement Key | Has Task? | Task IDs | Has Plan? | Plan Refs | Notes |
+|-----------------|-----------|----------|-----------|-----------|-------|
 ```
 
 ## Execution Mode Header (implement)

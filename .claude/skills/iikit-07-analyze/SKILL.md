@@ -5,7 +5,7 @@ description: >-
   Use when running a consistency check, verifying requirements traceability, detecting conflicts between design docs, or auditing alignment before implementation begins.
 license: MIT
 metadata:
-  version: "1.7.1"
+  version: "1.7.6"
 ---
 
 # Intent Integrity Kit Analyze
@@ -56,6 +56,7 @@ From tasks.md: task IDs, descriptions, phases, [P] markers, file paths.
 - Requirements inventory (functional + non-functional)
 - User story/action inventory with acceptance criteria
 - Task coverage mapping (task -> requirements/stories)
+- Plan coverage mapping (requirement ID → plan.md sections where referenced)
 - Constitution rule set
 
 ### 3. Detection Passes (limit 50 findings)
@@ -65,7 +66,10 @@ From tasks.md: task IDs, descriptions, phases, [P] markers, file paths.
 **C. Underspecification**: requirements missing objects/outcomes; stories without acceptance criteria; tasks referencing undefined components
 **D. Constitution Alignment**: conflicts with MUST principles; missing mandated sections
 **E. Phase Separation Violations**: per [phase-separation-rules.md](../iikit-core/references/phase-separation-rules.md) — tech in constitution, implementation in spec, governance in plan
-**F. Coverage Gaps**: requirements with zero tasks; tasks with no mapped requirement; non-functional requirements not in tasks
+**F. Coverage Gaps**: requirements with zero tasks; tasks with no mapped requirement; non-functional requirements not in tasks; requirements not referenced in plan.md
+
+> **Plan coverage detection**: Scan plan.md for each requirement ID (FR-xxx, SC-xxx). A requirement is "covered by plan" if its ID appears anywhere in plan.md. Collect contextual refs (KDD-x, section headers) where found.
+
 **G. Inconsistency**: terminology drift; entities in plan but not spec; conflicting requirements
 
 ### 4. Severity
@@ -85,7 +89,7 @@ Output to console AND write to `FEATURE_DIR/analysis.md`:
 | ID | Category | Severity | Location(s) | Summary | Recommendation |
 |----|----------|----------|-------------|---------|----------------|
 
-**Coverage Summary**: requirement key -> has task? -> task IDs
+**Coverage Summary**: requirement key -> has task? -> task IDs -> has plan? -> plan refs
 **Phase Separation Violations**: artifact, line, violation, severity
 **Metrics**: total requirements, total tasks, coverage %, ambiguity count, critical issues
 
