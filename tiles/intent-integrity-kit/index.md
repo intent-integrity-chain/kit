@@ -1,1 +1,257 @@
-../../README.md
+# Intent Integrity Kit
+
+**Closing the intent-to-code chasm**
+
+An AI coding assistant toolkit that preserves your intent from idea to implementation, with cryptographic verification at each step. Compatible with Claude Code, OpenAI Codex, Google Gemini, and OpenCode.
+
+## What's New in v1.6.0
+
+- **`/iikit-bugfix` skill**: Report and fix bugs without the full specification workflow. Creates structured `bugs.md` records, generates fix tasks, integrates with GitHub Issues.
+- **Multi-feature support**: Sticky feature selection that survives session restarts.
+- **SessionStart hooks**: Context loading for Gemini CLI and OpenCode.
+- **Tessl eval integration**: Tech selection informed by Tessl eval dashboard.
+
+[Previous releases →](CHANGELOG.md)
+
+## What is Intent Integrity?
+
+When you tell an AI what you want, there's a gap between your *intent* and the *code* it produces. Requirements get lost, assumptions slip in, tests get modified to match bugs. The **Intent Integrity Chain** is a methodology to close that chasm.
+
+IIKit implements this chain:
+
+```
+Intent ──▶ Spec ──▶ Test ──▶ Code
+       ↑       ↑        ↑
+       │       │        └── hash verified (no tampering)
+       │       └─────────── Given/When/Then locked
+       └─────────────────── clarified until aligned
+```
+
+**Key principle**: No part of the chain validates itself. Tests are locked before implementation. If tests need to change, you go back to the spec.
+
+## Quick Start
+
+### Installation
+
+```bash
+# Install via Tessl
+tessl install tessl-labs/intent-integrity-kit
+```
+
+> **Don't have Tessl?** Install it first: `npm install -g @tessl/cli`
+
+### Your First Project
+
+```bash
+# 1. Launch your AI assistant
+claude          # or: codex, gemini, opencode
+
+# 2. Initialize the project
+/iikit-core init
+
+# 3. Define project governance
+/iikit-00-constitution
+
+# 4. Specify a feature
+/iikit-01-specify Build a CLI task manager with add, list, complete commands
+
+# 5. Plan the implementation
+/iikit-03-plan
+
+# 6. Generate tests from requirements
+/iikit-05-testify
+
+# 7. Break into tasks
+/iikit-06-tasks
+
+# 8. Implement (with integrity verification)
+/iikit-08-implement
+```
+
+## The Workflow
+
+Each phase builds on the previous. Never skip phases.
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│  /iikit-core              →  Initialize project, status, help              │
+├────────────────────────────────────────────────────────────────────────────┤
+│  0. /iikit-00-constitution  →  Project governance (tech-agnostic)          │
+│  1. /iikit-01-specify       →  Feature specification (WHAT, not HOW)       │
+│  2. /iikit-02-clarify       →  Resolve ambiguities (max 5 questions)       │
+│  3. /iikit-03-plan          →  Technical plan (HOW - frameworks, etc.)     │
+│  4. /iikit-04-checklist     →  Quality checklists (unit tests for English) │
+│  5. /iikit-05-testify       →  Test specs from requirements (TDD)          │
+│  6. /iikit-06-tasks         →  Task breakdown                              │
+│  7. /iikit-07-analyze       →  Cross-artifact consistency check            │
+│  8. /iikit-08-implement     →  Execute with integrity verification         │
+│  9. /iikit-09-taskstoissues →  Export to GitHub Issues                     │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+## Assertion Integrity: How Tests Stay Locked
+
+The core of IIKit is preventing circular verification - where AI modifies tests to match buggy code.
+
+### How It Works
+
+1. **`/iikit-05-testify`** generates tests from your spec's Given/When/Then scenarios
+2. A SHA256 hash of all assertions is stored in `context.json` and as a git note
+3. **`/iikit-08-implement`** verifies the hash before writing any code
+4. If assertions were modified, implementation is **blocked**
+
+```
+╭─────────────────────────────────────────────────────────────────────────╮
+│  ASSERTION INTEGRITY CHECK                                              │
+├─────────────────────────────────────────────────────────────────────────┤
+│  Context hash:  valid                                                   │
+│  Git note:      valid                                                   │
+│  Git diff:      clean                                                   │
+│  TDD status:    mandatory                                               │
+├─────────────────────────────────────────────────────────────────────────┤
+│  Overall:       PASS                                                    │
+╰─────────────────────────────────────────────────────────────────────────╯
+```
+
+### If Requirements Change
+
+1. Update `spec.md` with new requirements
+2. Re-run `/iikit-05-testify` to regenerate tests
+3. New hash is stored, implementation proceeds
+
+This ensures test changes are **intentional** and traceable to requirement changes.
+
+## Iterating on Specs and Plans
+
+The workflow is linear *the first time through*. After that, you'll often go back to refine things. Here's how.
+
+### Changing requirements (spec.md)
+
+**Option A — Re-run the skill:** `/iikit-01-specify` with updated description. It detects the existing spec.md, shows a semantic diff (added/removed/changed requirements), warns about downstream impact, and asks before overwriting.
+
+**Option B — Edit directly:** Open `specs/NNN-feature/spec.md` and edit the markdown. This is fine for small tweaks (rewording a requirement, adding an edge case). Then re-run downstream phases to propagate changes.
+
+**What to re-run after:**
+
+| What changed | Re-run |
+|--------------|--------|
+| Added/removed requirements | `/iikit-03-plan` then `/iikit-06-tasks` |
+| Changed acceptance criteria (Given/When/Then) | `/iikit-05-testify` (re-locks assertions) |
+| Clarified wording only | Nothing — downstream artifacts still valid |
+
+### Changing the technical plan (plan.md, research.md)
+
+**Option A — Re-run:** `/iikit-03-plan` detects the existing plan.md, shows a semantic diff of tech stack and architecture changes, and flags breaking changes with downstream impact.
+
+**Option B — Edit directly:** Edit `plan.md` or `research.md` for targeted changes (swap a library, update a version, add a design decision).
+
+**What to re-run after:**
+
+| What changed | Re-run |
+|--------------|--------|
+| Swapped a framework/library | `/iikit-06-tasks` (tasks may differ) |
+| Changed data model | `/iikit-05-testify` then `/iikit-06-tasks` |
+| Added a design constraint | `/iikit-04-checklist` (new quality checks) |
+| Minor version bump | Nothing |
+
+### Changing tasks (tasks.md)
+
+Re-run `/iikit-06-tasks`. It preserves `[x]` completion status on existing tasks, maps old task IDs to new ones by similarity, and warns about changes to already-completed tasks.
+
+### Quick reference: "I want to change X, what do I run?"
+
+```
+Changed requirements?        → edit spec.md → /iikit-03-plan → /iikit-06-tasks
+Changed acceptance criteria?  → edit spec.md → /iikit-05-testify
+Changed tech stack?           → /iikit-03-plan (or edit plan.md) → /iikit-06-tasks
+Changed a library?            → edit research.md → /iikit-06-tasks
+Need more quality checks?     → /iikit-04-checklist
+Everything looks wrong?       → /iikit-07-analyze (finds inconsistencies)
+```
+
+**Rule of thumb:** Edit the artifact directly for small changes. Re-run the skill for significant changes — it shows you the diff and warns about downstream impact. Then cascade forward through the phases that depend on what you changed.
+
+## Phase Separation
+
+Understanding what belongs where is critical:
+
+| Content Type | Constitution | Specify | Plan |
+|--------------|:------------:|:-------:|:----:|
+| Governance principles | ✓ | | |
+| Quality standards | ✓ | | |
+| User stories | | ✓ | |
+| Requirements (functional) | | ✓ | |
+| Acceptance criteria (Given/When/Then) | | ✓ | |
+| **Technology stack** | | | ✓ |
+| **Framework choices** | | | ✓ |
+| Data models | | | ✓ |
+| Architecture decisions | | | ✓ |
+
+**Constitution is spec-agnostic.** It transcends individual features - that's why it lives at the root, not in `/specs`.
+
+## Powered by Tessl
+
+IIKit is distributed as a [Tessl](https://tessl.io) tile - a versioned package of AI-optimized context.
+
+**What Tessl provides:**
+
+- **Installation**: `tessl install tessl-labs/intent-integrity-kit` adds IIKit to any project
+- **Runtime knowledge**: During implementation, IIKit queries the Tessl registry for current library APIs - so the AI uses 2025 React patterns, not 2021 training data
+- **2000+ tiles**: Documentation, rules, and skills for major frameworks and libraries
+
+**How IIKit uses Tessl:**
+
+| Phase | What happens |
+|-------|--------------|
+| `/iikit-03-plan` | Discovers and installs tiles for your tech stack |
+| `/iikit-08-implement` | Queries `mcp__tessl__query_library_docs` before writing library code |
+
+## Project Structure
+
+```
+your-project/
+├── CONSTITUTION.md              # Project governance (spec-agnostic)
+├── AGENTS.md                    # Agent instructions
+├── tessl.json                   # Installed tiles
+├── .specify/                    # IIKit working directory
+│   └── context.json             # Feature state
+└── specs/
+    └── NNN-feature-name/
+        ├── spec.md              # Feature specification
+        ├── plan.md              # Implementation plan
+        ├── tasks.md             # Task breakdown
+        ├── research.md          # Tech research + tiles
+        ├── data-model.md        # Data structures
+        ├── contracts/           # API contracts
+        ├── checklists/          # Quality checklists
+        └── tests/
+            └── test-specs.md    # Locked test specifications
+```
+
+## Supported Agents
+
+| Agent | Instructions File |
+|-------|-------------------|
+| Claude Code | `CLAUDE.md` -> `AGENTS.md` |
+| OpenAI Codex | `AGENTS.md` |
+| Google Gemini | `GEMINI.md` -> `AGENTS.md` |
+| OpenCode | `AGENTS.md` |
+
+## Acknowledgments
+
+IIKit builds on [GitHub Spec-Kit](https://github.com/github/spec-kit), which pioneered specification-driven development for AI coding assistants. The phased workflow, artifact structure, and checklist gating concepts originate from Spec-Kit.
+
+IIKit extends Spec-Kit with:
+- **Assertion integrity** - Cryptographic verification to prevent circular validation
+- **Intent Integrity Chain** - Theoretical framework connecting intent to implementation
+- **Tessl integration** - Distribution via tile registry plus runtime library knowledge during implementation
+
+## Learn More
+
+- [GitHub Spec-Kit](https://github.com/github/spec-kit) - The original specification-driven development framework
+- [Intent Integrity Chain explained](https://github.com/jbaruch/intent-integrity-chain) - The methodology behind IIKit
+- [Back to the Future of Software](https://speaking.jbaru.ch/DVCzoZ/back-to-the-future-of-software-how-to-survive-ai-with-intent-integrity-chain) - Conference talk on IIC
+
+## License
+
+MIT License - See [LICENSE](https://github.com/intent-integrity-chain/kit/blob/main/LICENSE) for details.
