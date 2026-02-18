@@ -448,10 +448,14 @@ test_tdd_assessment() {
 test_assertion_hash_integrity() {
     log_section "Assertion Hash Integrity"
     local script=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh"
-    local tmp_test_specs
-    local tmp_context
-    tmp_test_specs=$(mktemp)
-    tmp_context=$(mktemp)
+
+    # store-hash/verify-hash derive context.json from test-specs path:
+    #   test-specs at <feature>/tests/test-specs.md → context at <feature>/context.json
+    # So we need a proper directory structure, not flat temp files.
+    local tmp_feature_dir
+    tmp_feature_dir=$(mktemp -d)
+    mkdir -p "$tmp_feature_dir/tests"
+    local tmp_test_specs="$tmp_feature_dir/tests/test-specs.md"
 
     # Create test specs with assertions
     cat > "$tmp_test_specs" << 'EOF'
@@ -475,10 +479,9 @@ EOF
 
     # Test store and verify cycle
     ((TESTS_RUN++))
-    echo '{}' > "$tmp_context"
-    bash "$script" store-hash "$tmp_test_specs" "$tmp_context" >/dev/null 2>&1
+    bash "$script" store-hash "$tmp_test_specs" >/dev/null 2>&1
     local verify_result
-    verify_result=$(bash "$script" verify-hash "$tmp_test_specs" "$tmp_context" 2>&1)
+    verify_result=$(bash "$script" verify-hash "$tmp_test_specs" 2>&1)
     if [[ "$verify_result" == "valid" ]]; then
         log_pass "store-hash and verify-hash work together"
     else
@@ -488,19 +491,22 @@ EOF
     # Test that modified assertions are detected
     ((TESTS_RUN++))
     echo "**Then**: They see an error message" >> "$tmp_test_specs"
-    verify_result=$(bash "$script" verify-hash "$tmp_test_specs" "$tmp_context" 2>&1)
+    verify_result=$(bash "$script" verify-hash "$tmp_test_specs" 2>&1)
     if [[ "$verify_result" == "invalid" ]]; then
         log_pass "modified assertions detected as invalid"
     else
         log_fail "failed to detect modified assertions (got: $verify_result)"
     fi
 
-    rm -f "$tmp_test_specs" "$tmp_context"
+    rm -rf "$tmp_feature_dir"
 }
 
 test_multiple_feature_warning() {
     log_section "Multiple Feature Directory Warning"
     local prereq_script=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh"
+
+    # Clear sticky active-feature from previous tests so multi-feature detection triggers
+    rm -f .specify/active-feature
 
     # Create multiple feature directories
     mkdir -p specs/002-another-feature
@@ -516,11 +522,11 @@ test_multiple_feature_warning() {
 As a user, I want another thing.
 SPEC
 
-    # We're on main branch with multiple features - should warn
+    # We're on main branch with multiple features - should indicate selection needed
     ((TESTS_RUN++))
     local output
     output=$(bash "$prereq_script" --paths-only 2>&1) || true
-    if echo "$output" | grep -qi "WARNING\|multiple\|SPECIFY_FEATURE"; then
+    if echo "$output" | grep -qi "WARNING\|multiple\|SPECIFY_FEATURE\|needs_selection\|NEEDS_SELECTION"; then
         log_pass "warns about multiple feature directories"
     else
         log_fail "no warning for multiple features (output: ${output:0:100}...)"

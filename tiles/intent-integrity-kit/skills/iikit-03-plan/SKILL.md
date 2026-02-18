@@ -105,6 +105,7 @@ If plan.md exists: compare tech stack, architecture, dependencies. Show diff per
 ```
 Plan complete! Next steps:
 - /iikit-04-checklist - (Recommended) Generate quality checklists
-- /iikit-05-testify - Generate test specifications (REQUIRED if TDD mandated)
+- /iikit-05-testify - (REQUIRED by constitution) Generate test specifications [if TDD mandatory]
+- /iikit-05-testify - (Optional) Generate test specifications for TDD [if TDD not mandatory]
 - /iikit-06-tasks - Generate task breakdown from plan
 ```
