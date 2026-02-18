@@ -11,7 +11,7 @@ An AI coding assistant toolkit that preserves your intent from idea to implement
 - **SessionStart hooks**: Context loading for Gemini CLI and OpenCode.
 - **Tessl eval integration**: Tech selection informed by Tessl eval dashboard.
 
-[Previous releases →](CHANGELOG.md)
+[Previous releases →](https://github.com/intent-integrity-chain/kit/blob/main/CHANGELOG.md)
 
 ## What is Intent Integrity?
 

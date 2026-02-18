@@ -1,8 +1,8 @@
 ---
 name: iikit-05-testify
 description: >-
-  Generate test specifications from requirements before implementation for TDD.
-  Use when writing tests first, locking acceptance criteria, or creating hash-verified test assertions.
+  Generate test specifications from requirements before implementation — produces Given/When/Then test cases, computes assertion integrity hashes, and locks acceptance criteria for test-driven development.
+  Use when writing tests first, doing TDD, creating test cases from a spec, locking acceptance criteria, or setting up red-green-refactor with hash-verified assertions.
 license: MIT
 ---
 

@@ -1,8 +1,8 @@
 ---
 name: iikit-03-plan
 description: >-
-  Create technical implementation plan from feature specification.
-  Use when choosing tech stack, designing architecture, planning implementation approach, or setting up Tessl tiles for a feature.
+  Generate a technical design document from a feature spec — selects frameworks, defines data models, produces API contracts, and creates a dependency-ordered implementation strategy.
+  Use when planning how to build a feature, writing a technical design doc, choosing libraries, defining database schemas, or setting up Tessl tiles for runtime library knowledge.
 license: MIT
 ---
 

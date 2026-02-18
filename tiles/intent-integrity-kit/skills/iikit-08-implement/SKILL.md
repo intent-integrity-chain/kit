@@ -1,8 +1,8 @@
 ---
 name: iikit-08-implement
 description: >-
-  Execute implementation by processing all tasks in tasks.md with constitution compliance.
-  Use when ready to write code, implement the feature plan, or resume partially completed implementation.
+  Execute the implementation plan by coding each task from tasks.md — writes source files, runs tests, verifies assertion integrity, and validates output against constitutional principles.
+  Use when ready to build the feature, start coding, develop from the task list, or resume a partially completed implementation.
 license: MIT
 ---
 

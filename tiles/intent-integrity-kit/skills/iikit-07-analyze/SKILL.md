@@ -1,8 +1,8 @@
 ---
 name: iikit-07-analyze
 description: >-
-  Validate cross-artifact consistency between spec, plan, and tasks.
-  Use when checking for requirement gaps, detecting conflicts, or verifying alignment before implementation.
+  Validate cross-artifact consistency — checks that every spec requirement traces to tasks, plan tech stack matches task file paths, and constitution principles are satisfied across all artifacts.
+  Use when running a consistency check, verifying requirements traceability, detecting conflicts between design docs, or auditing alignment before implementation begins.
 license: MIT
 ---
 

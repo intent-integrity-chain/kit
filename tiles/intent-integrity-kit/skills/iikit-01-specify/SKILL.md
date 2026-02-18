@@ -1,8 +1,8 @@
 ---
 name: iikit-01-specify
 description: >-
-  Create feature specification from natural language description.
-  Use when starting a new feature, writing requirements, defining user stories, or capturing acceptance criteria.
+  Create a feature specification from a natural language description — generates user stories with Given/When/Then scenarios, functional requirements (FR-XXX), success criteria, and a quality checklist.
+  Use when starting a new feature, writing a PRD, defining user stories, capturing acceptance criteria, or documenting requirements for a product idea.
 license: MIT
 ---
 
