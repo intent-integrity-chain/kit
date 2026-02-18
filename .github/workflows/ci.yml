@@ -40,18 +40,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Check if tile version changed
         id: version
         run: |
           NEW=$(jq -r .version tiles/intent-integrity-kit/tile.json)
-          # Compare against the version tag on the registry, not just HEAD~1
+          # Compare against latest release tag to handle multi-commit pushes
           LATEST_TAG=$(git tag -l 'v*' --sort=-v:refname | head -1 | sed 's/^v//')
-          OLD=${LATEST_TAG:-$(git show HEAD~1:tiles/intent-integrity-kit/tile.json 2>/dev/null | jq -r .version 2>/dev/null || echo "")}
+          OLD=${LATEST_TAG:-""}
           echo "old=$OLD" >> "$GITHUB_OUTPUT"
           echo "new=$NEW" >> "$GITHUB_OUTPUT"
-          if [[ "$NEW" != "$OLD" && -n "$OLD" ]]; then
+          if [[ -z "$OLD" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "No previous tag found, publishing $NEW"
+          elif [[ "$NEW" != "$OLD" ]]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
             echo "Version changed: $OLD → $NEW"
           else
