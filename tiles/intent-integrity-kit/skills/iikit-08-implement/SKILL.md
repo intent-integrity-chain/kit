@@ -5,7 +5,7 @@ description: >-
   Use when ready to build the feature, start coding, develop from the task list, or resume a partially completed implementation.
 license: MIT
 metadata:
-  version: "1.6.7"
+  version: "1.6.4"
 ---
 
 # Intent Integrity Kit Implement

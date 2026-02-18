@@ -5,7 +5,7 @@ description: >-
   Use when writing tests first, doing TDD, creating test cases from a spec, locking acceptance criteria, or setting up red-green-refactor with hash-verified assertions.
 license: MIT
 metadata:
-  version: "1.6.7"
+  version: "1.6.4"
 ---
 
 # Intent Integrity Kit Testify

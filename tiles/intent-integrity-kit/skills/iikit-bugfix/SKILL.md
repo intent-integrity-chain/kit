@@ -5,7 +5,7 @@ description: >-
   Use when fixing a bug, reporting a defect, importing a GitHub issue into the workflow, or triaging an error without running the full specification process.
 license: MIT
 metadata:
-  version: "1.6.7"
+  version: "1.6.4"
 ---
 
 # Intent Integrity Kit Bugfix

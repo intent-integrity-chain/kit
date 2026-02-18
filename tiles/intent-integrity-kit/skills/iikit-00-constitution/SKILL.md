@@ -5,7 +5,7 @@ description: >-
   Use when defining project rules, setting up coding standards, establishing quality gates, configuring TDD requirements, or creating non-negotiable development principles.
 license: MIT
 metadata:
-  version: "1.6.7"
+  version: "1.6.4"
 ---
 
 # Intent Integrity Kit Constitution
