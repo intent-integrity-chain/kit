@@ -76,6 +76,17 @@ jobs:
             fi
           done
 
+      - name: Sync SKILL.md versions to tile version
+        if: steps.version.outputs.changed == 'true'
+        run: |
+          VERSION=${{ steps.version.outputs.new }}
+          for skill in tiles/intent-integrity-kit/skills/*/SKILL.md; do
+            if grep -q 'version:' "$skill"; then
+              sed -i "s/version: \".*\"/version: \"$VERSION\"/" "$skill"
+              echo "Synced $skill to $VERSION"
+            fi
+          done
+
       - name: Publish tile v${{ steps.version.outputs.new }}
         if: steps.version.outputs.changed == 'true'
         uses: tesslio/publish@main
