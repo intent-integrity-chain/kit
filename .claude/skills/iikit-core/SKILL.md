@@ -43,7 +43,7 @@ The `$ARGUMENTS` after `init` may include an optional path or URL to a PRD/SDD d
 
 ```bash
 bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/git-setup.sh --json
-# Windows: pwsh .../scripts/powershell/git-setup.ps1 -Json
+# Windows: pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/git-setup.ps1 -Json
 ```
 
 JSON fields: `git_available`, `is_git_repo`, `has_remote`, `remote_url`, `is_github_remote`, `gh_available`, `gh_authenticated`, `has_iikit_artifacts`.
@@ -72,7 +72,7 @@ If `git_available` is false, only C is available. Note that git is required for 
 
 ```bash
 bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/init-project.sh --json
-# Windows: pwsh .../scripts/powershell/init-project.ps1 -Json
+# Windows: pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/init-project.ps1 -Json
 ```
 
 Installs pre-commit (assertion validation) and post-commit (hash storage) hooks.
@@ -115,7 +115,7 @@ Show constitution status, feature count, and suggest `/iikit-core status`.
 1. Run:
    ```bash
    bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase status --json
-   # Windows: pwsh .../scripts/powershell/check-prerequisites.ps1 -Phase status -Json
+   # Windows: pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/check-prerequisites.ps1 -Phase status -Json
    ```
 
 2. **Present results** (all logic is in script output — just display):
@@ -135,7 +135,7 @@ The `$ARGUMENTS` after `use` is the feature selector: a number (`1`, `001`), par
 1. Run:
    ```bash
    bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selector>
-   # Windows: pwsh .../scripts/powershell/set-active-feature.ps1 -Json <selector>
+   # Windows: pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selector>
    ```
    Parse JSON for `active_feature` and `stage`.
 
