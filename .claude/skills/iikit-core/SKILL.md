@@ -31,38 +31,34 @@ If no subcommand is provided, show help.
 
 ## Subcommand: init
 
-Initialize intent-integrity-kit in the current directory. Handles the full project bootstrap: git init, optional GitHub repo creation, or cloning an existing repo.
+Initialize intent-integrity-kit in the current directory. Handles the full project bootstrap: git init, optional GitHub repo creation, or cloning an existing repo. Optionally seeds the project backlog from an existing PRD/SDD document.
+
+### Argument Parsing
+
+The `$ARGUMENTS` after `init` may include an optional path or URL to a PRD/SDD document (e.g., `/iikit-core init ./docs/prd.md` or `/iikit-core init https://example.com/prd.md`). If present, store it as `prd_source` for use in Step 6.
 
 ### Execution Flow
 
 #### Step 0 — Detect environment
 
-Run the detection script to probe git/GitHub state:
-
-**Unix/macOS/Linux:**
 ```bash
 bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/git-setup.sh --json
-```
-**Windows (PowerShell):**
-```powershell
-pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/git-setup.ps1 -Json
+# Windows: pwsh .../scripts/powershell/git-setup.ps1 -Json
 ```
 
-Parse the JSON result. The fields are: `git_available`, `is_git_repo`, `has_remote`, `remote_url`, `is_github_remote`, `gh_available`, `gh_authenticated`, `has_iikit_artifacts`.
+JSON fields: `git_available`, `is_git_repo`, `has_remote`, `remote_url`, `is_github_remote`, `gh_available`, `gh_authenticated`, `has_iikit_artifacts`.
 
 #### Step 1 — Git/GitHub setup
 
 **Auto-skip**: If `is_git_repo` is true AND `has_remote` is true, skip straight to Step 2. Report: "Git repo with remote detected (`<remote_url>`), proceeding with IIKit init."
 
-Otherwise, present applicable options to the user. Hide options whose prerequisites aren't met.
+Otherwise, present applicable options (hide those whose prerequisites aren't met):
 
-| Option | Label | Prerequisites | Action |
-|--------|-------|---------------|--------|
-| **A** | Initialize here | `git_available` is true | Run `git init` in the current directory. If `gh_available` AND `gh_authenticated`, also offer to create a GitHub repo (`gh repo create <project-name> --private --source . --push`). Private by default; ask the user if they want public. |
-| **B** | Clone existing repo | `gh_available` AND `gh_authenticated` | Ask the user for the repo (owner/name or URL). Run `gh repo clone <repo>`. If the clone target differs from cwd, inform the user they must `cd` into it and re-run `/iikit-core init`. |
-| **C** | Skip git setup | _(always available)_ | Proceed without git. Warn that assertion integrity hooks will not be installed. |
+- **A) Initialize here** (requires `git_available`): `git init`. If `gh_available` + `gh_authenticated`, offer `gh repo create <name> --private --source . --push` (ask public/private).
+- **B) Clone existing repo** (requires `gh_available` + `gh_authenticated`): Ask for repo. `gh repo clone <repo>`. If clone target differs from cwd, tell user to `cd` into it and re-run init.
+- **C) Skip git setup** (always available): Proceed without git. Warn that assertion integrity hooks won't be installed.
 
-If `git_available` is false, only option C is available. Inform the user that git is required for full functionality.
+If `git_available` is false, only C is available. Note that git is required for full functionality.
 
 #### Step 2 — Check if already initialized
 
@@ -74,24 +70,39 @@ If `git_available` is false, only option C is available. Inform the user that gi
 
 #### Step 4 — Initialize hooks
 
-**Unix/macOS/Linux:**
 ```bash
 bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/init-project.sh --json
-```
-**Windows (PowerShell):**
-```powershell
-pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/init-project.ps1 -Json
+# Windows: pwsh .../scripts/powershell/init-project.ps1 -Json
 ```
 
-The script installs two git hooks:
-- **Pre-commit**: validates assertion integrity before each commit
-- **Post-commit**: stores assertion hashes as tamper-resistant git notes
-
-Both use three installation modes: direct install, update existing IIKit hook, or install alongside existing non-IIKit hook.
+Installs pre-commit (assertion validation) and post-commit (hash storage) hooks.
 
 #### Step 5 — Report
 
-Directories created, hook status, suggest `/iikit-00-constitution`.
+Directories created, hook status. If PRD seeding will follow (Step 6 conditions are met), note that backlog seeding is next. Otherwise, suggest `/iikit-00-constitution`.
+
+#### Step 6 — Seed backlog from PRD
+
+**Gate**: Requires `is_github_remote` and `gh_authenticated` from Step 0 detection. If not met, skip with a note: "PRD seeding requires a GitHub remote and authenticated `gh` CLI. Skipping backlog seeding." Proceed to final report.
+
+**Input resolution**:
+- If `prd_source` was set from the init argument, use that.
+- If no argument was provided, ask the user: "Start from scratch or seed from an existing requirements document?"
+  - **A) From scratch** — Skip to final report.
+  - **B) From existing document** — Ask the user for a file path or URL.
+
+**Read document**: Read the file (local path via `Read` tool) or fetch the URL (via `WebFetch` tool). Support common formats: Markdown, plain text, PDF, HTML.
+
+**Extract features**: Parse the document and extract distinct features/epics. For each feature, extract:
+- A short title (imperative, max 80 chars)
+- A 1-3 sentence description
+- Priority if mentioned (P1/P2/P3), default P2
+
+**Present extraction**: Show the extracted features as a numbered table with columns: #, Title, Description, Priority. Ask the user to confirm, remove any that don't belong, or add missing ones. Wait for user confirmation before proceeding.
+
+**Create labels and issues**: Follow the commands and body template in [prd-issue-template.md](templates/prd-issue-template.md). Create labels first (idempotent), then one issue per confirmed feature.
+
+**Final report**: List all created issues with their numbers and titles. Suggest `/iikit-00-constitution` as the next step, then `/iikit-01-specify #<issue-number>` to start specifying individual features.
 
 ### If Already Initialized
 
@@ -101,21 +112,15 @@ Show constitution status, feature count, and suggest `/iikit-core status`.
 
 ### Execution Flow
 
-1. **Get deterministic status**:
+1. Run:
    ```bash
    bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase status --json
+   # Windows: pwsh .../scripts/powershell/check-prerequisites.ps1 -Phase status -Json
    ```
-   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/check-prerequisites.ps1 -Phase status -Json`
 
-2. **Present results** (pure presentation — all logic is in the script output):
-   - Parse the JSON response
-   - Show project name and `feature_stage`
-   - Show artifact status from `artifacts` object (exists/valid for each)
-   - Show checklist progress from `checklist_checked`/`checklist_total`
-   - Show `ready_for` phase
-   - Show `next_step` as the recommended next command
-   - If `clear_before` is true, prepend `/clear` suggestion before the next step command
-   - If `next_step` is null, report feature as complete
+2. **Present results** (all logic is in script output — just display):
+   - Project name, `feature_stage`, artifact status (`artifacts` object), checklist progress (`checklist_checked`/`checklist_total`), `ready_for` phase, `next_step`
+   - If `clear_before` is true, prepend `/clear` suggestion. If `next_step` is null, report feature as complete.
 
 ## Subcommand: use
 
@@ -127,77 +132,27 @@ The `$ARGUMENTS` after `use` is the feature selector: a number (`1`, `001`), par
 
 ### Execution Flow
 
-1. **Run**:
+1. Run:
    ```bash
    bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selector>
+   # Windows: pwsh .../scripts/powershell/set-active-feature.ps1 -Json <selector>
    ```
-   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selector>`
+   Parse JSON for `active_feature` and `stage`.
 
-2. Parse JSON for `active_feature` and `stage`.
+2. **Report** active feature, stage, and suggest next command: `specified` → `/iikit-02-clarify` or `/iikit-03-plan` | `planned` → `/iikit-04-checklist` or `/iikit-06-tasks` | `tasks-ready` → `/iikit-08-implement` | `implementing-NN%` → `/iikit-08-implement` (resume) | `complete` → done. Suggest `/clear` before next skill when appropriate.
 
-3. **Report**: confirm which feature is now active, its current stage, and suggest the appropriate next command based on stage:
-   - `specified` -> `/iikit-02-clarify` or suggest `/clear`, then `/iikit-03-plan`
-   - `planned` -> `/iikit-04-checklist` or suggest `/clear`, then `/iikit-06-tasks`
-   - `tasks-ready` -> suggest `/clear`, then `/iikit-08-implement`
-   - `implementing-NN%` -> suggest `/clear`, then `/iikit-08-implement` (resume)
-   - `complete` -> All done
+If no selector, no match, or ambiguous match: show available features with stages and ask user to pick.
 
-### Error Handling
+## Subcommand: help (also default when no subcommand)
 
-| Condition | Response |
-|-----------|----------|
-| No selector provided | Show available features with stages, ask user to pick |
-| No match | Show available features |
-| Ambiguous match | Show matching features, ask to be more specific |
+Display the workflow reference from [help-reference.md](references/help-reference.md) verbatim.
 
-## Subcommand: help
+## Resources
 
-Display the complete workflow reference:
-
-```
-Phase 0: Foundation
-  /iikit-core init        Initialize project
-  /iikit-core use         Select active feature
-  /iikit-00-constitution  Define governance principles
-
-Phase 1: Specification
-  /iikit-01-specify       Create feature spec
-  /iikit-02-clarify       Resolve ambiguities
-
-Phase 2: Planning
-  /iikit-03-plan          Create implementation plan
-  /iikit-04-checklist     Generate quality checklists
-
-Phase 3: Testing (optional unless constitutionally required)
-  /iikit-05-testify       Generate test specifications
-
-Phase 4: Task Breakdown
-  /iikit-06-tasks         Generate task breakdown
-  /iikit-07-analyze       Validate consistency
-
-Phase 5: Implementation
-  /iikit-08-implement     Execute implementation
-  /iikit-09-taskstoissues Export to GitHub Issues
-
-Each command validates its prerequisites automatically.
-Run /iikit-core status to see your current progress.
-```
-
-## Default (No Subcommand)
-
-Show help output.
-
-## Script Resources
-
-Templates used by core scripts at runtime:
-- [spec-template.md](templates/spec-template.md) — new feature scaffolding
-- [plan-template.md](templates/plan-template.md) — plan prerequisite validation
-- [agent-file-template.md](templates/agent-file-template.md) — agent context file generation
+- [spec-template.md](templates/spec-template.md), [plan-template.md](templates/plan-template.md), [agent-file-template.md](templates/agent-file-template.md) — feature scaffolding
+- [prd-issue-template.md](templates/prd-issue-template.md) — PRD backlog seeding
+- [help-reference.md](references/help-reference.md) — workflow command reference
 
 ## Error Handling
 
-| Condition | Response |
-|-----------|----------|
-| Unknown subcommand | Show help with error message |
-| Not in a project directory | Suggest running `init` |
-| Git not available | Warning but continue |
+Unknown subcommand → show help. Not in a project → suggest `init`. Git unavailable → warn but continue.
