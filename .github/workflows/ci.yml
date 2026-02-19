@@ -29,6 +29,11 @@ jobs:
       - name: Run source validation tests
         run: tests/run-source-tests.sh
 
+      - name: Lint tile manifest
+        run: |
+          npm install -g @tessl/cli
+          tessl tile lint tiles/intent-integrity-kit
+
   publish:
     name: Publish & Verify
     runs-on: ubuntu-latest
