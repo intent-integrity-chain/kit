@@ -176,12 +176,15 @@ If TDD is mandatory (`determination` = `mandatory`):
    - Given: the conditions that trigger the bug
    - When: the action that causes the incorrect behavior
    - Then: the expected correct behavior
-4. Re-hash test-specs.md:
+4. Re-hash test-specs.md (atomic — single command computes and stores):
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh compute-hash "<feature_dir>/tests/test-specs.md"
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh store-hash "<feature_dir>/tests/test-specs.md" "<hash>"
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh rehash "<feature_dir>/tests/test-specs.md"
    ```
-5. Continue to Step 11 with TDD task variant
+5. **Verify hash was stored** — if result is NOT `valid`, STOP and report error:
+   ```bash
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh verify-hash "<feature_dir>/tests/test-specs.md"
+   ```
+6. Continue to Step 11 with TDD task variant
 
 ### 11. Generate Bug Fix Tasks
 
@@ -244,8 +247,8 @@ Files modified:
   - <feature_dir>/tasks.md (appended)
   - <feature_dir>/tests/test-specs.md (appended, TDD only)
 
-Next steps:
-  - /iikit-08-implement - Implement the bug fix tasks
+Next step:
+  - /iikit-08-implement — runs in bugfix mode (relaxed gates: no checklist or plan required, traces to bugs.md instead of spec)
 ```
 
 ## Error Handling

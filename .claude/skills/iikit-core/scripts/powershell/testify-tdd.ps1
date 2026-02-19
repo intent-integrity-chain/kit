@@ -519,9 +519,9 @@ switch ($Command) {
         }
         Get-AssertionHash -TestSpecsFile $FilePath
     }
-    "store-hash" {
+    { $_ -in "store-hash", "rehash" } {
         if (-not $FilePath) {
-            Write-Error "Usage: testify-tdd.ps1 store-hash <test-specs-file>"
+            Write-Error "Usage: testify-tdd.ps1 rehash <test-specs-file>"
             exit 1
         }
         Set-AssertionHash -TestSpecsFile $FilePath
@@ -574,7 +574,7 @@ switch ($Command) {
         Write-Host "  Hash-based Integrity (context.json auto-derived from test-specs path):"
         Write-Host "    extract-assertions <test-specs-file>  - Extract assertion lines"
         Write-Host "    compute-hash <test-specs-file>        - Compute SHA256 hash"
-        Write-Host "    store-hash <test-specs-file>          - Store hash in feature's context.json"
+        Write-Host "    store-hash|rehash <test-specs-file>   - Atomic compute + store hash in feature's context.json"
         Write-Host "    verify-hash <test-specs-file>         - Verify against feature's context.json"
         Write-Host "  Git-based Integrity (tamper-resistant):"
         Write-Host "    store-git-note <test-specs-file>      - Store hash as git note"

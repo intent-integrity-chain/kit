@@ -510,9 +510,9 @@ if [[ $# -gt 0 ]]; then
             fi
             compute_assertion_hash "$2"
             ;;
-        store-hash)
+        store-hash|rehash)
             if [[ $# -lt 2 ]]; then
-                echo "Usage: $0 store-hash <test-specs-file>"
+                echo "Usage: $0 rehash <test-specs-file>"
                 exit 1
             fi
             store_assertion_hash "$2"
@@ -564,7 +564,7 @@ if [[ $# -gt 0 ]]; then
             echo "  Hash-based Integrity (context.json auto-derived from test-specs path):"
             echo "    extract-assertions <test-specs-file>  - Extract assertion lines"
             echo "    compute-hash <test-specs-file>        - Compute SHA256 hash"
-            echo "    store-hash <test-specs-file>          - Store hash in feature's context.json"
+            echo "    store-hash|rehash <test-specs-file>   - Atomic compute + store hash in feature's context.json"
             echo "    verify-hash <test-specs-file>         - Verify against feature's context.json"
             echo "  Git-based Integrity (tamper-resistant):"
             echo "    store-git-note <test-specs-file>      - Store hash as git note"

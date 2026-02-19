@@ -36,13 +36,25 @@ Load constitution per [constitution-loading.md](../iikit-core/references/constit
    ```
    Then re-run the prerequisites check from step 1.
 
+## Bugfix Detection
+
+Scan tasks.md for unchecked tasks (`[ ]`). If **every** unchecked task has a `T-B` prefix (bugfix tasks from `/iikit-bugfix`), this is a **bugfix-only run**. Set `BUGFIX_ONLY=true` for gate relaxation below.
+
 ## Pre-Implementation Validation
 
+**Standard mode** (`BUGFIX_ONLY=false`):
 1. **Artifact completeness**: constitution.md, spec.md (requirements + criteria), plan.md (tech context), tasks.md (has tasks), checklists/*.md (at least one)
 2. **Cross-artifact consistency**: spec FR-XXX -> tasks, plan tech stack -> task file paths, constitution -> plan compliance
 3. Report readiness: READY or BLOCKED
 
+**Bugfix mode** (`BUGFIX_ONLY=true`):
+1. **Artifact completeness**: tasks.md (has T-B tasks), bugs.md (has matching BUG-NNN entries). plan.md, checklists, and spec.md are NOT required.
+2. **Cross-artifact consistency**: skip (bugfix tasks trace to bugs.md, not spec FR-XXX)
+3. Report readiness: READY or BLOCKED
+
 ## Checklist Gating
+
+**Skip entirely if `BUGFIX_ONLY=true`** — bugfix tasks are not gated on checklists.
 
 Read each checklist in `FEATURE_DIR/checklists/`. All must be 100% complete. If incomplete: ask user to proceed or halt.
 
@@ -50,8 +62,9 @@ Read each checklist in `FEATURE_DIR/checklists/`. All must be 100% complete. If 
 
 ### 1. Load Context
 
-- **Required**: `tasks.md`, `plan.md`
-- **Optional**: `data-model.md`, `contracts/`, `research.md`, `quickstart.md`, `tests/test-specs.md`
+**Standard mode**: Required: `tasks.md`, `plan.md`. Optional: `data-model.md`, `contracts/`, `research.md`, `quickstart.md`, `tests/test-specs.md`
+
+**Bugfix mode**: Required: `tasks.md`, `bugs.md`. Optional: `plan.md`, `tests/test-specs.md` (present if TDD)
 
 ### 2. TDD Support Check
 
@@ -132,7 +145,8 @@ All tasks `[x]`, features validated against spec, test execution enforcement (§
 
 | Condition | Response |
 |-----------|----------|
-| Tasks/plan missing | STOP with run instructions |
+| Tasks missing | STOP with run instructions |
+| Plan missing (standard mode) | STOP with run instructions |
 | Constitution violation | STOP, explain, suggest alternative |
 | Checklist incomplete | Ask user, STOP if declined |
 | Task/parallel failure | Report, halt (see 5.5) |

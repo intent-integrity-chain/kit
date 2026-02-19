@@ -168,6 +168,48 @@ teardown() {
 }
 
 # =============================================================================
+# Rehash alias tests
+# =============================================================================
+
+@test "rehash: works as alias for store-hash" {
+    mkdir -p "$TEST_DIR/specs/001-test-feature/tests"
+    cp "$FIXTURES_DIR/test-specs.md" "$TEST_DIR/specs/001-test-feature/tests/test-specs.md"
+    local test_specs="$TEST_DIR/specs/001-test-feature/tests/test-specs.md"
+
+    result=$("$TESTIFY_SCRIPT" rehash "$test_specs")
+
+    local context_file="$TEST_DIR/specs/001-test-feature/context.json"
+    [[ -f "$context_file" ]]
+    assert_contains "$(cat "$context_file")" '"assertion_hash"'
+}
+
+@test "rehash: produces hash that passes verify-hash" {
+    mkdir -p "$TEST_DIR/specs/001-test-feature/tests"
+    cp "$FIXTURES_DIR/test-specs.md" "$TEST_DIR/specs/001-test-feature/tests/test-specs.md"
+    local test_specs="$TEST_DIR/specs/001-test-feature/tests/test-specs.md"
+
+    "$TESTIFY_SCRIPT" rehash "$test_specs"
+
+    result=$("$TESTIFY_SCRIPT" verify-hash "$test_specs")
+    [[ "$result" == "valid" ]]
+}
+
+@test "rehash: returns same hash as compute-hash" {
+    mkdir -p "$TEST_DIR/specs/001-test-feature/tests"
+    cp "$FIXTURES_DIR/test-specs.md" "$TEST_DIR/specs/001-test-feature/tests/test-specs.md"
+    local test_specs="$TEST_DIR/specs/001-test-feature/tests/test-specs.md"
+
+    rehash_result=$("$TESTIFY_SCRIPT" rehash "$test_specs")
+    compute_result=$("$TESTIFY_SCRIPT" compute-hash "$test_specs")
+    [[ "$rehash_result" == "$compute_result" ]]
+}
+
+@test "rehash: errors without file argument" {
+    run "$TESTIFY_SCRIPT" rehash
+    [[ "$status" -ne 0 ]]
+}
+
+# =============================================================================
 # Comprehensive check tests
 # =============================================================================
 
