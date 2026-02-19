@@ -10,7 +10,7 @@ Intent Integrity Kit (IIKit) preserves your intent from idea to implementation t
 
 This project uses specification-driven development. The phases are:
 
-**Utility:** `/iikit-core` - Initialize project, check status, select active feature, show help (run `init` before starting)
+**Utility:** `/iikit-core` - Initialize project (git/GitHub setup, PRD seeding), check status, select active feature, show help (run `init` before starting)
 **Utility:** `/iikit-bugfix` - Report and fix bugs without full specification workflow
 
 0. `/iikit-00-constitution` - Define project governance principles
@@ -73,6 +73,9 @@ specs/                       # Feature specifications (created per feature)
 # Make scripts executable (if needed)
 chmod +x .claude/skills/iikit-core/scripts/bash/*.sh
 
+# Detect git/GitHub environment
+.claude/skills/iikit-core/scripts/bash/git-setup.sh --json
+
 # Check prerequisites for a feature
 .claude/skills/iikit-core/scripts/bash/check-prerequisites.sh --json
 
@@ -87,7 +90,7 @@ chmod +x .claude/skills/iikit-core/scripts/bash/*.sh
 
 | Skill | Command | Description |
 |-------|---------|-------------|
-| Core | `/iikit-core` | Initialize project, check status, select feature, show help |
+| Core | `/iikit-core` | Initialize project (git/GitHub setup, PRD seeding), check status, select feature, show help |
 | Bugfix | `/iikit-bugfix` | Report and fix bugs without full specification workflow |
 | Constitution | `/iikit-00-constitution` | Create project governance principles |
 | Specify | `/iikit-01-specify` | Create feature spec from description |

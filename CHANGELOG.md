@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.9.0
+
+- **Git/GitHub setup in init**: `/iikit-core init` now detects the git environment (repo, remotes, `gh` CLI) and offers git init, `gh repo create`, or clone before bootstrapping IIKit.
+- **PRD seeding**: `/iikit-core init [doc]` reads an existing PRD/SDD document, extracts features, and creates labeled GitHub issues as a backlog.
+- **Auto-commit per task**: `/iikit-08-implement` commits after each completed task with Conventional Commits format (`feat(<feature-id>): <task-id> <desc>`) and `iikit-feature`/`iikit-task` trailers for spec-to-commit traceability.
+
 ## v1.6.0
 
 - **Bugfix skill**: New `/iikit-bugfix` utility skill for reporting and fixing bugs without the full specify/clarify/plan/checklist workflow. Creates structured `bugs.md` records, generates fix tasks, and integrates with GitHub Issues (inbound import and outbound creation). Cross-platform scripts (bash + PowerShell).

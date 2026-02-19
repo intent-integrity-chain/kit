@@ -107,7 +107,7 @@ If tasks.md contains `[P]` markers, you **MUST** use the `Task` tool to dispatch
 1. Collect eligible tasks (dependencies satisfied)
 2. Build parallel batches from [P] tasks with no mutual dependencies
 3. Dispatch — parallel: launch one `Task` tool subagent per `[P]` task in the batch; sequential: one at a time
-4. Collect results, checkpoint `[x]` in tasks.md per batch
+4. Collect results, checkpoint `[x]` in tasks.md per batch, then commit per task (§5.6)
 5. Repeat until phase complete
 
 Cross-story parallelism: independent stories can run as parallel workstreams after Phase 2 (verify no shared file modifications).
@@ -115,6 +115,13 @@ Cross-story parallelism: independent stories can run as parallel workstreams aft
 **5.4 Rules**: query Tessl tiles before library code, tests before code if TDD, run tests after writing them, only orchestrator updates tasks.md.
 
 **5.5 Failure handling**: let in-flight siblings finish, mark successes, report failures, halt phase. Constitutional violations in workers: worker stops, reports to orchestrator, treated as task failure.
+
+**5.6 Task Commits**: After each task is marked `[x]`, stage its changed files (`git add` specific files, NOT `-A`) and commit:
+
+- `<feature-id>` = `FEATURE_DIR` with `specs/` prefix and trailing `/` stripped (e.g. `001-user-auth`)
+- Subject: `feat(<feature-id>): <task-id> <task description>` (use `fix(…)` for `T-B` tasks)
+- Trailers: `iikit-feature: <feature-id>` and `iikit-task: <task-id>`
+- Skip if no files changed; for parallel batches commit each task individually after batch completes
 
 ### 6. Output Validation
 
@@ -158,6 +165,6 @@ All tasks `[x]`, features validated against spec, test execution enforcement (§
 ```
 Implementation complete!
 - Run tests to verify
-- Commit and push
+- Push commits
 - /iikit-09-taskstoissues - (Optional) Export to GitHub Issues
 ```

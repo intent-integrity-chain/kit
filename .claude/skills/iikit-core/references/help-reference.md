@@ -4,7 +4,7 @@ Display this verbatim when the user runs `/iikit-core help` or `/iikit-core` wit
 
 ```
 Phase 0: Foundation
-  /iikit-core init        Initialize project
+  /iikit-core init [doc]  Initialize project (git/GitHub setup, optional PRD seeding)
   /iikit-core use         Select active feature
   /iikit-00-constitution  Define governance principles
 
