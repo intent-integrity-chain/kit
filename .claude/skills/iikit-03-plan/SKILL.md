@@ -82,11 +82,58 @@ For each NEEDS CLARIFICATION item and dependency: research, document findings in
    ```
    Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/update-agent-context.ps1 -AgentType claude`
 
-### 5. Constitution Check (Post-Design)
+### 5. Pre-compute Dashboard Data
+
+After the plan is complete, write pre-computed data to `.specify/context.json` for static dashboard generation. Use `jq` to merge into the existing file (create if missing).
+
+#### 5a. Architecture Node Classifications
+
+If plan.md contains an architecture diagram (ASCII box-drawing), classify each named component as one of: `client`, `server`, `storage`, `external`.
+
+Write to `.specify/context.json` under `planview.nodeClassifications`:
+
+```bash
+# Read existing or start fresh
+CONTEXT_FILE=".specify/context.json"
+[[ -f "$CONTEXT_FILE" ]] || echo '{}' > "$CONTEXT_FILE"
+
+# Merge node classifications (replace example with actual nodes from the plan diagram)
+jq --argjson nodes '{
+  "Browser SPA": "client",
+  "API Gateway": "server",
+  "PostgreSQL": "storage",
+  "Stripe API": "external"
+}' '.planview.nodeClassifications = $nodes' "$CONTEXT_FILE" > "$CONTEXT_FILE.tmp" && mv "$CONTEXT_FILE.tmp" "$CONTEXT_FILE"
+```
+
+Classification rules:
+- **client**: browsers, CLIs, mobile apps, desktop apps — anything that initiates requests
+- **server**: APIs, gateways, workers, middleware, backend services — anything that processes requests
+- **storage**: databases, caches, queues, file stores, object storage — anything that persists data
+- **external**: third-party APIs, SaaS services, payment providers — anything outside the project boundary
+
+If no architecture diagram exists in the plan, skip this step.
+
+#### 5b. Tessl Eval Scores
+
+If Tessl tiles were installed in step 2, collect eval scores from the `fetch-tile-evals.sh` outputs and write a summary to `context.json`:
+
+```bash
+# Merge eval scores (replace example with actual tile names and scores from step 2)
+jq --argjson evals '{
+  "workspace/tile-name": {"score": 85, "pct": 85, "scenarios": 3, "scored_at": "2026-01-15T10:00:00Z"}
+}' '.planview.evalScores = $evals' "$CONTEXT_FILE" > "$CONTEXT_FILE.tmp" && mv "$CONTEXT_FILE.tmp" "$CONTEXT_FILE"
+```
+
+Use the JSON output from each `fetch-tile-evals.sh --json` call (already run in step 2 via tessl-tile-discovery.md). Extract `score`, `pct`, `scenarios`, and `scored_at` fields for each tile.
+
+If no Tessl tiles were installed, skip this step.
+
+### 6. Constitution Check (Post-Design)
 
 Re-validate all technical decisions against constitutional principles. On violation: STOP, state violation, suggest compliant alternative.
 
-### 6. Phase Separation Validation
+### 7. Phase Separation Validation
 
 Scan plan for governance content per [phase-separation-rules.md](../iikit-core/references/phase-separation-rules.md) (Plan section). Auto-fix by replacing with constitution references, re-validate.
 
@@ -96,7 +143,7 @@ Before writing any artifact: review against each constitutional principle. On vi
 
 ## Report
 
-Output: branch name, plan path, generated artifacts (research.md, data-model.md, contracts/*, quickstart.md), agent file update status, Tessl integration status (tiles installed, skills available, technologies without tiles, eval results saved).
+Output: branch name, plan path, generated artifacts (research.md, data-model.md, contracts/*, quickstart.md), agent file update status, Tessl integration status (tiles installed, skills available, technologies without tiles, eval results saved), dashboard pre-computed data status (node classifications written, eval scores written).
 
 ## Semantic Diff on Re-run
 
