@@ -31,32 +31,67 @@ If no subcommand is provided, show help.
 
 ## Subcommand: init
 
-Initialize intent-integrity-kit in the current directory.
+Initialize intent-integrity-kit in the current directory. Handles the full project bootstrap: git init, optional GitHub repo creation, or cloning an existing repo.
 
 ### Execution Flow
 
-1. **Check if already initialized**: `test -f "CONSTITUTION.md"`
+#### Step 0 — Detect environment
 
-2. **Create directory structure**: `mkdir -p .specify specs`
+Run the detection script to probe git/GitHub state:
 
-3. **Initialize Git and install hooks**:
+**Unix/macOS/Linux:**
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/git-setup.sh --json
+```
+**Windows (PowerShell):**
+```powershell
+pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/git-setup.ps1 -Json
+```
 
-   **Unix/macOS/Linux:**
-   ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/init-project.sh --json
-   ```
-   **Windows (PowerShell):**
-   ```powershell
-   pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/init-project.ps1 -Json
-   ```
+Parse the JSON result. The fields are: `git_available`, `is_git_repo`, `has_remote`, `remote_url`, `is_github_remote`, `gh_available`, `gh_authenticated`, `has_iikit_artifacts`.
 
-   The script installs two git hooks:
-   - **Pre-commit**: validates assertion integrity before each commit
-   - **Post-commit**: stores assertion hashes as tamper-resistant git notes
+#### Step 1 — Git/GitHub setup
 
-   Both use three installation modes: direct install, update existing IIKit hook, or install alongside existing non-IIKit hook.
+**Auto-skip**: If `is_git_repo` is true AND `has_remote` is true, skip straight to Step 2. Report: "Git repo with remote detected (`<remote_url>`), proceeding with IIKit init."
 
-4. **Report**: directories created, hook status, suggest `/iikit-00-constitution`
+Otherwise, present applicable options to the user. Hide options whose prerequisites aren't met.
+
+| Option | Label | Prerequisites | Action |
+|--------|-------|---------------|--------|
+| **A** | Initialize here | `git_available` is true | Run `git init` in the current directory. If `gh_available` AND `gh_authenticated`, also offer to create a GitHub repo (`gh repo create <project-name> --private --source . --push`). Private by default; ask the user if they want public. |
+| **B** | Clone existing repo | `gh_available` AND `gh_authenticated` | Ask the user for the repo (owner/name or URL). Run `gh repo clone <repo>`. If the clone target differs from cwd, inform the user they must `cd` into it and re-run `/iikit-core init`. |
+| **C** | Skip git setup | _(always available)_ | Proceed without git. Warn that assertion integrity hooks will not be installed. |
+
+If `git_available` is false, only option C is available. Inform the user that git is required for full functionality.
+
+#### Step 2 — Check if already initialized
+
+`test -f "CONSTITUTION.md"`
+
+#### Step 3 — Create directory structure
+
+`mkdir -p .specify specs`
+
+#### Step 4 — Initialize hooks
+
+**Unix/macOS/Linux:**
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/init-project.sh --json
+```
+**Windows (PowerShell):**
+```powershell
+pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/init-project.ps1 -Json
+```
+
+The script installs two git hooks:
+- **Pre-commit**: validates assertion integrity before each commit
+- **Post-commit**: stores assertion hashes as tamper-resistant git notes
+
+Both use three installation modes: direct install, update existing IIKit hook, or install alongside existing non-IIKit hook.
+
+#### Step 5 — Report
+
+Directories created, hook status, suggest `/iikit-00-constitution`.
 
 ### If Already Initialized
 
