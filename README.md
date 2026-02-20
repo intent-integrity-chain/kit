@@ -4,11 +4,12 @@
 
 An AI coding assistant toolkit that preserves your intent from idea to implementation, with cryptographic verification at each step. Compatible with Claude Code, OpenAI Codex, Google Gemini, and OpenCode.
 
-## What's New in v1.9.0
+## What's New in v2.0.0
 
-- **Git/GitHub setup in init**: `/iikit-core init` now detects your git environment and offers git init, `gh repo create`, or clone before bootstrapping.
-- **PRD seeding**: `/iikit-core init [doc]` extracts features from an existing PRD/SDD and creates GitHub issues as a backlog.
-- **Auto-commit per task**: `/iikit-08-implement` commits after each completed task with Conventional Commits format and `iikit-feature`/`iikit-task` trailers for full traceability.
+- **PREMISE.md**: App-wide context document — what you're building, who it's for, and why. All skills load it automatically.
+- **No clarify question limit**: Clarification continues until all ambiguities are resolved, not after an arbitrary 5.
+- **Agent-aware model suggestions**: Skills suggest the optimal model for the next phase with agent-specific switch commands.
+- **No `gh` CLI hard dependency**: All GitHub operations fall back to `curl` when `gh` is unavailable.
 
 [Previous releases →](https://github.com/intent-integrity-chain/kit/blob/main/CHANGELOG.md)
 

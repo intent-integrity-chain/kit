@@ -1,8 +1,8 @@
 {
   "name": "tessl-labs/intent-integrity-kit",
-  "version": "1.9.4",
+  "version": "2.0.0",
   "summary": "Closing the intent-to-code chasm - specification-driven development with cryptographic verification",
-  "description": "Intent Integrity Kit (IIKit) preserves your intent from idea to implementation through specification-driven development. Features 10 workflow phases with assertion integrity hashing to prevent circular verification. Compatible with Claude Code, Codex, Gemini, and OpenCode.\n\nWhat's new in v1.9.0: Init now handles git/GitHub setup (git init, gh repo create, clone) and seeds backlogs from existing PRD/SDD documents. Implement skill auto-commits after each task with structured Conventional Commits messages and IIKit trailers for full spec-to-commit traceability.",
+  "description": "Intent Integrity Kit (IIKit) preserves your intent from idea to implementation through specification-driven development. Features 10 workflow phases with assertion integrity hashing to prevent circular verification. Compatible with Claude Code, Codex, Gemini, and OpenCode.\n\nWhat's new in v2.0.0: PREMISE.md for app-wide context. No clarify question limit. Agent-aware model suggestions with auto-refreshing cache. No gh CLI hard dependency — falls back to GitHub API. Auto-close bugfix issues. Feature branch merge offers. Feature-scoped issue titles. Parallel issue creation.",
   "entrypoint": "README.md",
   "private": false,
   "repository": "https://github.com/intent-integrity-chain/kit",
