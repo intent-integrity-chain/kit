@@ -168,4 +168,7 @@ Implementation complete!
 - Run tests to verify
 - Push commits
 - /iikit-09-taskstoissues - (Optional) Export to GitHub Issues
+- Merge feature branch into main (if on a feature branch)
 ```
+
+If on a feature branch, offer to merge: push the branch, create a PR via `gh pr create`, or merge directly via `gh pr create --fill && gh pr merge --merge`. Ask the user which approach they prefer before proceeding.

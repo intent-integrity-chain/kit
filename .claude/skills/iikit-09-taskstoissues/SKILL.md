@@ -112,3 +112,5 @@ Output: number of issues created, issue numbers with titles, errors encountered,
 ## Next Steps
 
 After creating issues: review in GitHub, assign team members, add to project boards.
+
+If on a feature branch, offer to merge: push the branch, create a PR via `gh pr create`, or merge directly via `gh pr create --fill && gh pr merge --merge`. Ask the user which approach they prefer before proceeding.
