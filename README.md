@@ -4,7 +4,7 @@
 
 An AI coding assistant toolkit that preserves your intent from idea to implementation, with cryptographic verification at each step. Compatible with Claude Code, OpenAI Codex, Google Gemini, and OpenCode.
 
-## What's New in v2.0.0
+## What's New in v1.10.0
 
 - **PREMISE.md**: App-wide context document — what you're building, who it's for, and why. All skills load it automatically.
 - **No clarify question limit**: Clarification continues until all ambiguities are resolved, not after an arbitrary 5.

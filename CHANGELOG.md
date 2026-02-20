@@ -1,6 +1,6 @@
 # Changelog
 
-## v2.0.0
+## v1.10.0
 
 - **PREMISE.md**: New app-wide context document (what/who/why/domain/scope). Drafted from PRD during init, confirmed by constitution skill. All skills load it automatically.
 - **No clarify question limit**: Removed the artificial 5-question cap. Clarification continues until all critical ambiguities are resolved.
