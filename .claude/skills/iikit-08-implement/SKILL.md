@@ -141,6 +141,7 @@ After completing bug fix tasks (tasks with `T-B` prefix pattern):
    - If a GitHub issue is linked (e.g., `#42`):
      - Post a comment via `gh issue comment <number> --body "<comment>"`
      - Comment content: root cause from bugs.md, list of completed fix tasks, and fix reference (current branch or latest commit)
+     - Close the issue: `gh issue close <number>`
    - If no GitHub issue is linked: skip silently
 3. If `gh` CLI is unavailable: skip silently
 
