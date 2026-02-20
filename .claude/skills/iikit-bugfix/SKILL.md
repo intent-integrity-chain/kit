@@ -47,9 +47,8 @@ If input contains BOTH `#number` and text, prioritize the `#number` and warn tha
 
 ### 2a. GitHub Inbound Flow
 
-1. Check `gh` CLI availability: `which gh` / `Get-Command gh`
-2. If unavailable: ERROR with remediation: "Install GitHub CLI: https://cli.github.com/ or use text description instead."
-3. Fetch issue: `gh issue view <number> --json title,body,labels`
+1. Fetch issue: use `gh issue view <number> --json title,body,labels` if available, otherwise `curl` the GitHub API (`GET /repos/{owner}/{repo}/issues/{number}`)
+2. If fetch fails (issue not found, auth error, no GitHub remote): ERROR with clear message and suggest using text description instead.
 4. If fetch fails (issue not found, auth error): ERROR with clear message and remediation.
 5. Map fields:
    - `title` → bug description
@@ -146,10 +145,9 @@ If `bugs.md` does not exist, create it with the header `# Bug Reports: <feature-
 
 For text-input bugs only (NOT for GitHub inbound — issue already exists):
 
-1. Check `gh` CLI availability and remote configuration
-2. If available: create issue via `gh issue create --title "<description>" --body "<bugs.md entry content>" --label "bug"`
-3. Store returned issue number in the bugs.md GitHub Issue field
-4. If `gh` unavailable or no remote: warn that GitHub issue creation was skipped, proceed with local workflow
+1. Create issue: use `gh issue create --title "<description>" --body "<bugs.md entry content>" --label "bug"` if `gh` available, otherwise `curl` the GitHub API (`POST /repos/{owner}/{repo}/issues`)
+2. Store returned issue number in the bugs.md GitHub Issue field
+3. If no GitHub remote configured: warn that GitHub issue creation was skipped, proceed with local workflow
 
 ### 9. Assess TDD Requirements
 
@@ -258,8 +256,7 @@ Next step:
 | Empty input | ERROR with usage example |
 | No features found | ERROR: "Run `/iikit-01-specify` first" |
 | Feature validation failed | ERROR with specific message |
-| `gh` CLI unavailable (inbound) | ERROR with install instructions |
-| `gh` CLI unavailable (outbound) | WARN and skip, proceed locally |
+| GitHub API unreachable | Fall back: `gh` → `curl` GitHub API → skip with WARN |
 | GitHub issue not found | ERROR with "verify issue number" |
 | TDD required, no test-specs.md | ERROR: "Run `/iikit-05-testify` first" |
 | Existing bugs.md | Append without modifying existing entries |

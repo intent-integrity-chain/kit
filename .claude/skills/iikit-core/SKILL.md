@@ -83,7 +83,7 @@ Directories created, hook status. If PRD seeding will follow (Step 6 conditions 
 
 #### Step 6 — Seed backlog from PRD
 
-**Gate**: Requires `is_github_remote` and `gh_authenticated` from Step 0 detection. If not met, skip with a note: "PRD seeding requires a GitHub remote and authenticated `gh` CLI. Skipping backlog seeding." Proceed to final report.
+**Gate**: Requires `is_github_remote` from Step 0 detection. If not met, skip with a note: "PRD seeding requires a GitHub remote. Skipping backlog seeding." Proceed to final report. For GitHub operations, use `gh` if available, otherwise fall back to `curl` with the GitHub API.
 
 **Input resolution**:
 - If `prd_source` was set from the init argument, use that.

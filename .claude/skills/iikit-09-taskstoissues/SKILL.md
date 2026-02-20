@@ -84,9 +84,12 @@ Extract: Task IDs, descriptions, phase groupings, parallel markers [P], user sto
 
 **Labels** (create if needed): `iikit`, `phase-N`, `us-N`, `parallel`
 
-### 3. Create Issues via gh CLI
+### 3. Create Issues
+
+Use `gh issue create` if available, otherwise `curl` the GitHub API (`POST /repos/{owner}/{repo}/issues`).
 
 ```bash
+# Preferred:
 gh issue create --title "[T012] [US1] Create User model" --body "..." --label "iikit,phase-3,us-1"
 ```
 
@@ -113,4 +116,7 @@ Output: number of issues created, issue numbers with titles, errors encountered,
 
 After creating issues: review in GitHub, assign team members, add to project boards.
 
-If on a feature branch, offer to merge: push the branch, create a PR via `gh pr create`, or merge directly via `gh pr create --fill && gh pr merge --merge`. Ask the user which approach they prefer before proceeding.
+If on a feature branch, offer to merge. Ask the user which approach they prefer:
+- **A) Merge locally**: `git checkout main && git merge <branch>`
+- **B) Create PR**: `gh pr create` if available, otherwise provide the GitHub URL to create one manually
+- **C) Skip**: user will handle it

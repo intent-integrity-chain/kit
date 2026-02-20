@@ -4,15 +4,18 @@ Used by Step 6 (Seed backlog from PRD) when creating GitHub issues from extracte
 
 ## Labels
 
-Create before issues (idempotent):
+Create before issues (idempotent). Use `gh` if available, otherwise `curl` the GitHub API.
 ```bash
+# Preferred:
 gh label create feature --description "Feature extracted from PRD" --color 0E8A16 --force
 gh label create iikit --description "Intent Integrity Kit" --color 1D76DB --force
 ```
 
 ## Issue Command
 
+Use `gh` if available, otherwise `curl` the GitHub API (`POST /repos/{owner}/{repo}/issues`).
 ```bash
+# Preferred:
 gh issue create --title "<feature title>" --body "<body>" --label "iikit,feature"
 ```
 

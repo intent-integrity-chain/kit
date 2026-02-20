@@ -131,7 +131,7 @@ Before writing ANY file: review against constitutional principles. On violation:
 
 Report after each task/batch. Mark completed `[x]` in tasks.md. Halt on failure.
 
-### 8. Post-Fix GitHub Comment (Bug Fix Tasks)
+### 8. Post-Fix GitHub Integration (Bug Fix Tasks)
 
 After completing bug fix tasks (tasks with `T-B` prefix pattern):
 
@@ -139,11 +139,9 @@ After completing bug fix tasks (tasks with `T-B` prefix pattern):
 2. For each completed bug (all T-BNNN tasks for a BUG-NNN marked `[x]`):
    - Read the `GitHub Issue` field from the bug's entry in bugs.md
    - If a GitHub issue is linked (e.g., `#42`):
-     - Post a comment via `gh issue comment <number> --body "<comment>"`
-     - Comment content: root cause from bugs.md, list of completed fix tasks, and fix reference (current branch or latest commit)
-     - Close the issue: `gh issue close <number>`
+     - **Close via commit**: include `Fixes #<number>` in the last task's commit message (§5.6) — GitHub auto-closes the issue when pushed/merged
+     - **Post a comment**: use `gh issue comment` if available, otherwise `curl` the GitHub API (`POST /repos/{owner}/{repo}/issues/{number}/comments`). Comment content: root cause from bugs.md, completed fix tasks, and fix reference
    - If no GitHub issue is linked: skip silently
-3. If `gh` CLI is unavailable: skip silently
 
 ### 9. Completion
 
@@ -171,4 +169,7 @@ Implementation complete!
 - Merge feature branch into main (if on a feature branch)
 ```
 
-If on a feature branch, offer to merge: push the branch, create a PR via `gh pr create`, or merge directly via `gh pr create --fill && gh pr merge --merge`. Ask the user which approach they prefer before proceeding.
+If on a feature branch, offer to merge. Ask the user which approach they prefer:
+- **A) Merge locally**: `git checkout main && git merge <branch>`
+- **B) Create PR**: `gh pr create` if available, otherwise provide the GitHub URL to create one manually
+- **C) Skip**: user will handle it
