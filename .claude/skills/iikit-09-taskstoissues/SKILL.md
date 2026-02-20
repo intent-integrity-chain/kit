@@ -53,13 +53,15 @@ Extract: Task IDs, descriptions, phase groupings, parallel markers [P], user sto
 
 ### 2. Create GitHub Issues
 
-**Title format**: `[TaskID] [Story] Description`
+**Title format**: `[FeatureID/TaskID] [Story] Description`
+
+Extract `<feature-id>` from `FEATURE_DIR` (strip `specs/` prefix and trailing `/`, e.g. `001-user-auth`). This prevents naming conflicts when multiple features share the same task numbering.
 
 **Body template**:
 ```markdown
 ## Task Details
 
-**Task ID**: T012
+**Task ID**: 001-user-auth/T012
 **Phase**: Phase 3: User Story 1
 **User Story**: US1
 **Parallel**: Yes/No
@@ -84,16 +86,21 @@ Extract: Task IDs, descriptions, phase groupings, parallel markers [P], user sto
 
 **Labels** (create if needed): `iikit`, `phase-N`, `us-N`, `parallel`
 
-### 3. Create Issues
+### 3. Create Issues (parallel)
 
-Use `gh issue create` if available, otherwise `curl` the GitHub API (`POST /repos/{owner}/{repo}/issues`).
+Use the `Task` tool to dispatch issue creation in parallel — one subagent per chunk of tasks (split by phase or user story). Each subagent receives:
+- The chunk of tasks to create issues for
+- The feature-id, repo owner/name, and label set
+- Instructions to use `gh issue create` if available, otherwise `curl` the GitHub API
 
 ```bash
 # Preferred:
-gh issue create --title "[T012] [US1] Create User model" --body "..." --label "iikit,phase-3,us-1"
+gh issue create --title "[001-user-auth/T012] [US1] Create User model" --body "..." --label "iikit,phase-3,us-1"
 ```
 
-**CRITICAL**: Never create issues in repositories that don't match the remote URL. Verify before each create.
+**CRITICAL**: Never create issues in repositories that don't match the remote URL. Verify before dispatching.
+
+Collect all created issue numbers from subagents before proceeding.
 
 ### 4. Link Dependencies
 
@@ -108,8 +115,6 @@ Output: number of issues created, issue numbers with titles, errors encountered,
 | Condition | Response |
 |-----------|----------|
 | Not a GitHub remote | STOP with error |
-| gh CLI not installed | STOP with install instructions |
-| gh not authenticated | STOP with auth instructions |
 | Issue creation fails | Report error, continue with next |
 
 ## Next Steps

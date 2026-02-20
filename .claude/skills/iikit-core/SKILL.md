@@ -54,8 +54,8 @@ JSON fields: `git_available`, `is_git_repo`, `has_remote`, `remote_url`, `is_git
 
 Otherwise, present applicable options (hide those whose prerequisites aren't met):
 
-- **A) Initialize here** (requires `git_available`): `git init`. If `gh_available` + `gh_authenticated`, offer `gh repo create <name> --private --source . --push` (ask public/private).
-- **B) Clone existing repo** (requires `gh_available` + `gh_authenticated`): Ask for repo. `gh repo clone <repo>`. If clone target differs from cwd, tell user to `cd` into it and re-run init.
+- **A) Initialize here** (requires `git_available`): `git init`. Then offer to create a GitHub repo: use `gh repo create` if available, otherwise `curl` the GitHub API (`POST /user/repos`). Ask public/private. Add remote and push.
+- **B) Clone existing repo** (requires `git_available`): Ask for repo URL or `owner/name`. Use `gh repo clone` if available, otherwise `git clone <url>`. If clone target differs from cwd, tell user to `cd` into it and re-run init.
 - **C) Skip git setup** (always available): Proceed without git. Warn that assertion integrity hooks won't be installed.
 
 If `git_available` is false, only C is available. Note that git is required for full functionality.
