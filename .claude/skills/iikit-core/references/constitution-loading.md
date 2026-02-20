@@ -35,3 +35,13 @@ In addition to basic loading:
 Constitution is recommended but not required for specify:
 - If missing: WARNING recommending `/iikit-00-constitution`, then proceed
 - If exists: parse and validate against principles
+
+## Model Suggestions (all skills with Next Steps)
+
+When suggesting the next step, also suggest the appropriate model per [model-recommendations.md](model-recommendations.md):
+
+1. **Check expiration**: read the `Expires` date in model-recommendations.md. If expired, do a web search for current model rankings (speed, reasoning, cost) for each agent, update the file, and set a new expiration (+2 weeks).
+2. **Detect agent**: check env vars (`CLAUDECODE=1`, `GEMINI_CLI=1`, etc.) to determine which agent is running.
+3. **Look up the next phase's tier** (light/medium/heavy) and the agent-specific model + switch command.
+4. **Append a model hint** to the Next Steps output, e.g.: `Tip: /iikit-03-plan benefits from deep reasoning. Switch to Opus: /model opus`
+5. If the agent is unknown, show a generic suggestion: "Consider using a stronger model for this phase."

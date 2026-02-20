@@ -47,6 +47,12 @@ for skill_dir in iikit-*/; do
             fi
         fi
     done
+    # Transitive ref dep: constitution-loading.md references model-recommendations.md
+    if [[ -f "$skill_dir/references/constitution-loading.md" && -f "iikit-core/references/model-recommendations.md" ]]; then
+        cp "iikit-core/references/model-recommendations.md" "$skill_dir/references/model-recommendations.md"
+        echo "  Copied references/model-recommendations.md → ${skill_dir}references/ (transitive dep)"
+    fi
+
     echo "✓ $skill_dir references self-contained"
 done
 
