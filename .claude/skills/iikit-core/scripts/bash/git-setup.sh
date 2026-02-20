@@ -80,7 +80,7 @@ fi
 
 # --- Probe IIKit artifacts ---
 HAS_IIKIT_ARTIFACTS=false
-if [ -d ".specify" ] || [ -f "CONSTITUTION.md" ]; then
+if [ -d ".specify" ] || [ -f "CONSTITUTION.md" ] || [ -f "PREMISE.md" ]; then
     HAS_IIKIT_ARTIFACTS=true
 fi
 

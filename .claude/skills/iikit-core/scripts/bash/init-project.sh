@@ -130,7 +130,10 @@ CONSTITUTION_COMMITTED=false
 if [ "$COMMIT_CONSTITUTION" = true ] && [ -f "$PROJECT_ROOT/CONSTITUTION.md" ]; then
     cd "$PROJECT_ROOT"
     git add CONSTITUTION.md
-    # Also add README if it exists
+    # Also add PREMISE.md and README if they exist
+    if [ -f "$PROJECT_ROOT/PREMISE.md" ]; then
+        git add PREMISE.md
+    fi
     if [ -f "$PROJECT_ROOT/README.md" ]; then
         git add README.md
     fi

@@ -12,7 +12,7 @@ The development workflow follows these phases:
 
 1. `/iikit-constitution` - Define project governance principles
 2. `/iikit-specify` - Create feature specification from natural language
-3. `/iikit-clarify` - Resolve ambiguities (max 5 questions)
+3. `/iikit-clarify` - Resolve ambiguities until spec is clear
 4. `/iikit-plan` - Create technical implementation plan
 5. `/iikit-checklist` - Generate domain-specific quality checklists
 6. `/iikit-tasks` - Generate task breakdown

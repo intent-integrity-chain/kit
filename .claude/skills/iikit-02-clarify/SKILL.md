@@ -1,7 +1,7 @@
 ---
 name: iikit-02-clarify
 description: >-
-  Resolve ambiguities in a feature specification — identifies underspecified areas, asks up to 5 targeted questions with option tables, and updates spec.md with answers linked to affected requirements (FR-XXX, SC-XXX).
+  Resolve ambiguities in a feature specification — identifies underspecified areas, asks targeted questions with option tables, and updates spec.md with answers linked to affected requirements (FR-XXX, SC-XXX).
   Use when requirements are unclear, the spec has gaps, details are missing, user stories need refinement, or you want to tighten acceptance criteria before planning.
 license: MIT
 metadata:
@@ -10,7 +10,7 @@ metadata:
 
 # Intent Integrity Kit Clarify
 
-Ask up to 5 targeted clarification questions to reduce ambiguity in the active feature spec, then encode answers back into the spec.
+Ask targeted clarification questions to reduce ambiguity in the active feature spec until all critical areas are clear, then encode answers back into the spec.
 
 ## User Input
 
@@ -53,7 +53,7 @@ Load spec and perform structured scan using this taxonomy. Mark each: Clear / Pa
 - **Terminology**: canonical terms, deprecated synonyms
 - **Completion Signals**: acceptance criteria testability, measurable DoD
 
-### 2. Generate Question Queue (max 5)
+### 2. Generate Question Queue
 
 **Constraints**:
 - Each answerable with multiple-choice (2-5 options) OR short phrase (<=5 words)
@@ -69,7 +69,7 @@ Present ONE question at a time.
 
 **After answer**: validate against constraints, record, move to next.
 
-**Stop when**: all critical ambiguities resolved, user signals done, or 5 questions asked.
+**Stop when**: all critical ambiguities resolved or user signals done.
 
 ### 4. Integration After Each Answer
 
@@ -87,7 +87,6 @@ See [clarification-format.md](references/clarification-format.md) for format det
 After each write and final pass:
 - One bullet per accepted answer, each ending with `[refs]`
 - All referenced IDs exist in spec
-- Total questions <= 5
 - No vague placeholders or contradictions remain
 
 ### 6. Report
@@ -97,7 +96,7 @@ Output: questions asked/answered, path to updated spec, sections touched, tracea
 ## Behavior Rules
 
 - No meaningful ambiguities found: "No critical ambiguities detected." and suggest proceeding
-- Never exceed 5 questions
+- Continue until all critical ambiguities are resolved
 - Avoid speculative tech stack questions unless absence blocks functional clarity
 - Respect early termination signals ("stop", "done", "proceed")
 

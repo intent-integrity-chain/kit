@@ -281,6 +281,7 @@ fi
 if [[ "$P_EXTRAS" == *"status_mode"* ]]; then
     # --- Artifact existence checks ---
     A_CONSTITUTION=false
+    A_PREMISE=false
     A_SPEC=false
     A_PLAN=false
     A_TASKS=false
@@ -288,6 +289,7 @@ if [[ "$P_EXTRAS" == *"status_mode"* ]]; then
     A_TEST_SPECS=false
 
     [[ -f "$REPO_ROOT/CONSTITUTION.md" ]] && A_CONSTITUTION=true
+    [[ -f "$REPO_ROOT/PREMISE.md" ]] && A_PREMISE=true
     [[ -n "$FEATURE_DIR" && -f "$FEATURE_DIR/spec.md" ]] && A_SPEC=true
     [[ -n "$FEATURE_DIR" && -f "$FEATURE_DIR/plan.md" ]] && A_PLAN=true
     [[ -n "$FEATURE_DIR" && -f "$FEATURE_DIR/tasks.md" ]] && A_TASKS=true
@@ -452,8 +454,9 @@ if [[ "$P_EXTRAS" == *"status_mode"* ]]; then
             "$V_CONSTITUTION" "$V_SPEC" "$V_PLAN" "$V_TASKS")
 
         # Build artifacts object
-        json_artifacts=$(printf '{"constitution":{"exists":%s,"valid":%s},"spec":{"exists":%s,"valid":%s,"quality":%s},"plan":{"exists":%s,"valid":%s},"tasks":{"exists":%s,"valid":%s},"checklists":{"exists":%s,"checked":%s,"total":%s,"complete":%s},"test_specs":{"exists":%s}}' \
+        json_artifacts=$(printf '{"constitution":{"exists":%s,"valid":%s},"premise":{"exists":%s},"spec":{"exists":%s,"valid":%s,"quality":%s},"plan":{"exists":%s,"valid":%s},"tasks":{"exists":%s,"valid":%s},"checklists":{"exists":%s,"checked":%s,"total":%s,"complete":%s},"test_specs":{"exists":%s}}' \
             "$A_CONSTITUTION" "$V_CONSTITUTION" \
+            "$A_PREMISE" \
             "$A_SPEC" "$V_SPEC" "$SPEC_QUALITY" \
             "$A_PLAN" "$V_PLAN" \
             "$A_TASKS" "$V_TASKS" \
@@ -491,6 +494,7 @@ if [[ "$P_EXTRAS" == *"status_mode"* ]]; then
         echo ""
         echo "Artifacts:"
         echo "  Constitution: $(if $A_CONSTITUTION; then echo "[Y]"; else echo "[N]"; fi) $(if $V_CONSTITUTION; then echo "(valid)"; elif $A_CONSTITUTION; then echo "(invalid)"; fi)"
+        echo "  Premise:      $(if $A_PREMISE; then echo "[Y]"; else echo "[N]"; fi)"
         echo "  Spec:         $(if $A_SPEC; then echo "[Y]"; else echo "[N]"; fi) $(if $V_SPEC; then echo "(valid, quality $SPEC_QUALITY/10)"; elif $A_SPEC; then echo "(invalid)"; fi)"
         echo "  Plan:         $(if $A_PLAN; then echo "[Y]"; else echo "[N]"; fi) $(if $V_PLAN; then echo "(valid)"; elif $A_PLAN; then echo "(invalid)"; fi)"
         echo "  Tasks:        $(if $A_TASKS; then echo "[Y]"; else echo "[N]"; fi) $(if $V_TASKS; then echo "(valid)"; elif $A_TASKS; then echo "(invalid)"; fi)"

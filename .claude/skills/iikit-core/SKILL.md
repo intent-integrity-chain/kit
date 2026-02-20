@@ -93,14 +93,25 @@ Directories created, hook status. If PRD seeding will follow (Step 6 conditions 
 
 **Read document**: Read the file (local path via `Read` tool) or fetch the URL (via `WebFetch` tool). Support common formats: Markdown, plain text, PDF, HTML.
 
-**Extract features**: Parse the document and extract distinct features/epics. For each feature, extract:
+**Draft PREMISE.md**: Before extracting features, synthesize the document into a `PREMISE.md` at the project root. Include:
+- **What**: one-paragraph description of the application/system
+- **Who**: target users/personas
+- **Why**: the problem being solved and the value proposition
+- **Domain**: the business/technical domain and key terminology
+- **High-level scope**: major system boundaries and components
+
+Write the draft to `PREMISE.md`. Note to the user that `/iikit-00-constitution` will review and finalize it.
+
+**Extract and order features**: Parse the document and extract distinct features/epics. For each feature, extract:
 - A short title (imperative, max 80 chars)
 - A 1-3 sentence description
 - Priority if mentioned (P1/P2/P3), default P2
 
-**Present extraction**: Show the extracted features as a numbered table with columns: #, Title, Description, Priority. Ask the user to confirm, remove any that don't belong, or add missing ones. Wait for user confirmation before proceeding.
+Order features in logical implementation sequence: foundational/core features first (data models, auth, shared services), then backend, then frontend, then integration/polish. Features that other features depend on come earlier.
 
-**Create labels and issues**: Follow the commands and body template in [prd-issue-template.md](templates/prd-issue-template.md). Create labels first (idempotent), then one issue per confirmed feature.
+**Present for reordering**: Show the ordered features as a numbered table with columns: #, Title, Description, Priority, Rationale (why this position). Ask the user to confirm the order, reorder, remove, or add features. Wait for explicit confirmation before proceeding.
+
+**Create labels and issues**: Follow the commands and body template in [prd-issue-template.md](templates/prd-issue-template.md). Create labels first (idempotent), then one issue per confirmed feature in the confirmed order.
 
 **Final report**: List all created issues with their numbers and titles. Suggest `/iikit-00-constitution` as the next step, then `/iikit-01-specify #<issue-number>` to start specifying individual features.
 

@@ -79,7 +79,7 @@ Each phase builds on the previous. Never skip phases.
 ├────────────────────────────────────────────────────────────────────────────┤
 │  0. /iikit-00-constitution  →  Project governance (tech-agnostic)          │
 │  1. /iikit-01-specify       →  Feature specification (WHAT, not HOW)       │
-│  2. /iikit-02-clarify       →  Resolve ambiguities (max 5 questions)       │
+│  2. /iikit-02-clarify       →  Resolve ambiguities until spec is clear     │
 │  3. /iikit-03-plan          →  Technical plan (HOW - frameworks, etc.)     │
 │  4. /iikit-04-checklist     →  Quality checklists (unit tests for English) │
 │  5. /iikit-05-testify       →  Test specs from requirements (TDD)          │

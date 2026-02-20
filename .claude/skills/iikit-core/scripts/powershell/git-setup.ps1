@@ -76,7 +76,7 @@ if ($ghAvailable) {
 }
 
 # --- Probe IIKit artifacts ---
-$hasIikitArtifacts = (Test-Path '.specify') -or (Test-Path 'CONSTITUTION.md')
+$hasIikitArtifacts = (Test-Path '.specify') -or (Test-Path 'CONSTITUTION.md') -or (Test-Path 'PREMISE.md')
 
 # --- Output ---
 if ($Json) {

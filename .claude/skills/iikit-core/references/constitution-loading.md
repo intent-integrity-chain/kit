@@ -1,6 +1,10 @@
-# Constitution Loading Procedure
+# Constitution & Premise Loading Procedure
 
-## Basic Loading (most skills)
+## Premise Loading (all skills)
+
+Read `PREMISE.md` if it exists. This provides app-wide context: what the project is, who it's for, the domain, and the high-level vision. Use it to inform decisions across all phases — feature scoping, architectural choices, naming conventions, and priority judgments. If missing: proceed without it (not required, but strongly recommended).
+
+## Constitution Loading (most skills)
 
 1. Read `CONSTITUTION.md` — if missing, ERROR with `Run: /iikit-00-constitution`
 2. Parse all principles, constraints, and governance rules

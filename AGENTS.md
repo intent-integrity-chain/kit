@@ -15,7 +15,7 @@ This project uses specification-driven development. The phases are:
 
 0. `/iikit-00-constitution` - Define project governance principles
 1. `/iikit-01-specify` - Create feature specification from natural language
-2. `/iikit-02-clarify` - Resolve ambiguities (max 5 questions)
+2. `/iikit-02-clarify` - Resolve ambiguities until spec is clear
 3. `/iikit-03-plan` - Create technical implementation plan
 4. `/iikit-04-checklist` - Generate domain-specific quality checklists
 5. `/iikit-05-testify` - Generate test specifications (TDD support, optional unless constitutionally required)
@@ -44,7 +44,8 @@ Read `FRAMEWORK-PRINCIPLES.md` for this framework's development principles.
 .gemini/skills/              # Symlink -> .claude/skills
 .opencode/skills/            # Symlink -> .claude/skills
 
-CONSTITUTION.md              # Project governance (spec-agnostic, lives at root)
+CONSTITUTION.md              # Project governance (content-agnostic, lives at root)
+PREMISE.md                   # App-wide context: what, who, why, domain, scope
 
 .specify/
   context.json               # Feature state between skill invocations
