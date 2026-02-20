@@ -220,12 +220,14 @@ test_templates_exist() {
 
     local templates=(
         "constitution-template.md"
+        "premise-template.md"
         "spec-template.md"
         "plan-template.md"
         "tasks-template.md"
         "checklist-template.md"
         "testspec-template.md"
         "agent-file-template.md"
+        "prd-issue-template.md"
     )
 
     for template in "${templates[@]}"; do
@@ -415,6 +417,197 @@ test_parallel_execution() {
     fi
 }
 
+# ─── PREMISE.md Support ──────────────────────────────────────────────────────
+
+test_premise_support() {
+    log_section "PREMISE.md Support"
+
+    # premise-template.md exists
+    ((TESTS_RUN++))
+    if [[ -f "$SKILLS_DIR/iikit-core/templates/premise-template.md" ]]; then
+        log_pass "premise-template.md exists"
+    else
+        log_fail "premise-template.md missing"
+    fi
+
+    # constitution skill references premise-template.md
+    ((TESTS_RUN++))
+    if grep -q 'premise-template.md' "$SKILLS_DIR/iikit-00-constitution/SKILL.md"; then
+        log_pass "constitution skill references premise template"
+    else
+        log_fail "constitution skill does not reference premise template"
+    fi
+
+    # constitution-loading.md mentions premise
+    ((TESTS_RUN++))
+    if grep -qi 'premise' "$SKILLS_DIR/iikit-core/references/constitution-loading.md"; then
+        log_pass "constitution-loading.md includes premise loading"
+    else
+        log_fail "constitution-loading.md missing premise loading"
+    fi
+
+    # check-prerequisites.sh detects PREMISE.md
+    ((TESTS_RUN++))
+    if grep -q 'PREMISE.md' "$SKILLS_DIR/iikit-core/scripts/bash/check-prerequisites.sh"; then
+        log_pass "check-prerequisites.sh detects PREMISE.md"
+    else
+        log_fail "check-prerequisites.sh does not detect PREMISE.md"
+    fi
+
+    # git-setup.sh detects PREMISE.md
+    ((TESTS_RUN++))
+    if grep -q 'PREMISE.md' "$SKILLS_DIR/iikit-core/scripts/bash/git-setup.sh"; then
+        log_pass "git-setup.sh detects PREMISE.md"
+    else
+        log_fail "git-setup.sh does not detect PREMISE.md"
+    fi
+
+    # init skill drafts PREMISE.md from PRD
+    ((TESTS_RUN++))
+    if grep -q 'Draft PREMISE.md' "$SKILLS_DIR/iikit-core/SKILL.md"; then
+        log_pass "init skill drafts PREMISE.md from PRD"
+    else
+        log_fail "init skill does not draft PREMISE.md from PRD"
+    fi
+
+    # AGENTS.md documents PREMISE.md
+    ((TESTS_RUN++))
+    if grep -q 'PREMISE.md' "AGENTS.md"; then
+        log_pass "AGENTS.md documents PREMISE.md"
+    else
+        log_fail "AGENTS.md does not document PREMISE.md"
+    fi
+
+    # prepare-tile.sh cleans premise-template.md
+    ((TESTS_RUN++))
+    if grep -q 'premise-template.md' "tests/prepare-tile.sh"; then
+        log_pass "prepare-tile.sh includes premise-template.md in cleanup"
+    else
+        log_fail "prepare-tile.sh missing premise-template.md in cleanup"
+    fi
+}
+
+# ─── Task Commits ────────────────────────────────────────────────────────────
+
+test_task_commits() {
+    log_section "Task Commits (§5.6)"
+    local impl="$SKILLS_DIR/iikit-08-implement/SKILL.md"
+    local ref="$SKILLS_DIR/iikit-08-implement/references/parallel-execution.md"
+
+    # Section 5.6 exists in implement skill
+    ((TESTS_RUN++))
+    if grep -q '5.6 Task Commits' "$impl"; then
+        log_pass "section 5.6 Task Commits present"
+    else
+        log_fail "section 5.6 Task Commits missing"
+    fi
+
+    # Commit message format specified
+    ((TESTS_RUN++))
+    if grep -q 'feat(<feature-id>)' "$impl"; then
+        log_pass "commit message format specified"
+    else
+        log_fail "commit message format missing"
+    fi
+
+    # Bugfix prefix documented
+    ((TESTS_RUN++))
+    if grep -q 'fix(.*T-B' "$impl"; then
+        log_pass "bugfix commit prefix documented"
+    else
+        log_fail "bugfix commit prefix not documented"
+    fi
+
+    # parallel-execution.md references §5.6
+    ((TESTS_RUN++))
+    if grep -q '§5.6' "$ref"; then
+        log_pass "parallel-execution.md references §5.6"
+    else
+        log_fail "parallel-execution.md does not reference §5.6"
+    fi
+
+    # Next Steps says "Push commits" not "Commit and push"
+    ((TESTS_RUN++))
+    if grep -q 'Push commits' "$impl" && ! grep -q 'Commit and push' "$impl"; then
+        log_pass "Next Steps: Push commits (not Commit and push)"
+    else
+        log_fail "Next Steps still says Commit and push"
+    fi
+}
+
+# ─── GitHub API Fallback ────────────────────────────────────────────────────
+
+test_github_fallback() {
+    log_section "GitHub API Fallback (no gh hard dependency)"
+
+    # implement skill: uses Fixes #N for closing
+    ((TESTS_RUN++))
+    if grep -q 'Fixes #' "$SKILLS_DIR/iikit-08-implement/SKILL.md"; then
+        log_pass "implement: closes issues via Fixes #N in commit"
+    else
+        log_fail "implement: missing Fixes #N commit pattern"
+    fi
+
+    # implement skill: curl fallback for comments
+    ((TESTS_RUN++))
+    if grep -q 'curl.*GitHub API\|curl.*github' "$SKILLS_DIR/iikit-08-implement/SKILL.md"; then
+        log_pass "implement: curl fallback for GitHub comments"
+    else
+        log_fail "implement: no curl fallback for GitHub comments"
+    fi
+
+    # bugfix skill: curl fallback for issue operations
+    ((TESTS_RUN++))
+    if grep -q 'curl.*GitHub API\|curl.*github' "$SKILLS_DIR/iikit-bugfix/SKILL.md"; then
+        log_pass "bugfix: curl fallback for GitHub operations"
+    else
+        log_fail "bugfix: no curl fallback for GitHub operations"
+    fi
+
+    # taskstoissues: curl fallback
+    ((TESTS_RUN++))
+    if grep -q 'curl.*GitHub API\|curl.*github' "$SKILLS_DIR/iikit-09-taskstoissues/SKILL.md"; then
+        log_pass "taskstoissues: curl fallback for issue creation"
+    else
+        log_fail "taskstoissues: no curl fallback for issue creation"
+    fi
+
+    # No skill should skip GitHub operations just because gh is missing
+    ((TESTS_RUN++))
+    local skip_gh_count
+    skip_gh_count=$(grep -rl 'gh.*unavailable.*skip\|skip.*gh.*unavail\|If.*gh.*CLI.*unavailable.*skip' "$SKILLS_DIR"/iikit-*/SKILL.md 2>/dev/null | wc -l)
+    skip_gh_count="${skip_gh_count//[^0-9]/}"
+    if [[ "$skip_gh_count" -eq 0 ]]; then
+        log_pass "no skills skip GitHub operations due to missing gh"
+    else
+        log_fail "$skip_gh_count skill(s) still skip operations when gh missing"
+        grep -rl 'gh.*unavailable.*skip\|skip.*gh.*unavail\|If.*gh.*CLI.*unavailable.*skip' "$SKILLS_DIR"/iikit-*/SKILL.md 2>/dev/null
+    fi
+}
+
+# ─── Clarify No Question Limit ──────────────────────────────────────────────
+
+test_clarify_no_limit() {
+    log_section "Clarify: No Artificial Question Limit"
+    local clarify="$SKILLS_DIR/iikit-02-clarify/SKILL.md"
+
+    # No "max 5" or "5 questions" in clarify skill
+    ((TESTS_RUN++))
+    if grep -qi 'max 5\|5 question\|never exceed 5' "$clarify"; then
+        log_fail "clarify skill still has 5-question limit"
+    else
+        log_pass "clarify skill has no artificial question limit"
+    fi
+
+    # Stop condition is ambiguity-driven, not count-driven
+    ((TESTS_RUN++))
+    if grep -q 'all critical ambiguities resolved' "$clarify"; then
+        log_pass "clarify stop condition: ambiguity-driven"
+    else
+        log_fail "clarify stop condition: not ambiguity-driven"
+    fi
+}
+
 # ─── Documentation Consistency ───────────────────────────────────────────────
 
 test_documentation() {
@@ -482,6 +675,10 @@ main() {
     test_scripts_exist
     test_templates_exist
     test_parallel_execution
+    test_premise_support
+    test_task_commits
+    test_github_fallback
+    test_clarify_no_limit
     test_documentation
     test_tile_json
 
