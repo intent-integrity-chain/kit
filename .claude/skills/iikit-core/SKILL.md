@@ -48,6 +48,8 @@ bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash
 
 JSON fields: `git_available`, `is_git_repo`, `has_remote`, `remote_url`, `is_github_remote`, `gh_available`, `gh_authenticated`, `has_iikit_artifacts`.
 
+If `gh_available` is false, suggest: "GitHub CLI (`gh`) is not installed. Install it from https://cli.github.com/ for the best experience. Proceeding with `curl` fallback for GitHub operations."
+
 #### Step 1 — Git/GitHub setup
 
 **Auto-skip**: If `is_git_repo` is true AND `has_remote` is true, skip straight to Step 2. Report: "Git repo with remote detected (`<remote_url>`), proceeding with IIKit init."
