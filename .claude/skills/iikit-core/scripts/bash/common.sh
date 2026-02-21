@@ -50,10 +50,12 @@ get_feature_stage() {
     if [[ -f "$feature_dir/tasks.md" ]]; then
         local total=0
         local done=0
+        local re_task='^- \[[ xX]\]'
+        local re_done='^- \[[xX]\]'
         while IFS= read -r line; do
-            if [[ "$line" =~ ^-\ \[.\] ]]; then
+            if [[ "$line" =~ $re_task ]]; then
                 total=$((total + 1))
-                if [[ "$line" =~ ^-\ \[[xX]\] ]]; then
+                if [[ "$line" =~ $re_done ]]; then
                     done=$((done + 1))
                 fi
             fi

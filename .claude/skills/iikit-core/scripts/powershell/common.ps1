@@ -55,7 +55,7 @@ function Get-FeatureStage {
         $total = 0
         $done = 0
         foreach ($line in $content) {
-            if ($line -match '^- \[.\]') {
+            if ($line -match '^- \[[ xX]\]') {
                 $total++
                 if ($line -match '^- \[[xX]\]') {
                     $done++

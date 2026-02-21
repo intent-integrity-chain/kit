@@ -337,6 +337,13 @@ teardown() {
     [[ "$result" == "complete" ]]
 }
 
+@test "get_feature_stage: ignores [P] markers in task count" {
+    mkdir -p "$TEST_DIR/specs/001-test"
+    printf '%s\n%s\n%s\n' '- [x] T001 Done' '- [x] T002 Also done' '- [P] tasks = different files, no dependencies' > "$TEST_DIR/specs/001-test/tasks.md"
+    result=$(get_feature_stage "$TEST_DIR" "001-test")
+    [[ "$result" == "complete" ]]
+}
+
 @test "get_feature_stage: returns unknown for nonexistent feature" {
     result=$(get_feature_stage "$TEST_DIR" "999-nope")
     [[ "$result" == "unknown" ]]
