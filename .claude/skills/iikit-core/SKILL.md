@@ -52,15 +52,15 @@ If `gh_available` is false, suggest: "GitHub CLI (`gh`) is not installed. Instal
 
 #### Step 1 — Git/GitHub setup
 
-**Auto-skip**: If `is_git_repo` is true AND `has_remote` is true, skip straight to Step 2. Report: "Git repo with remote detected (`<remote_url>`), proceeding with IIKit init."
+**Auto-skip**: If `is_git_repo` + `has_remote`, skip to Step 2.
 
-Otherwise, present applicable options (hide those whose prerequisites aren't met):
+| Option | Requires | Action |
+|--------|----------|--------|
+| A) Init here | `git_available` | `git init`, then offer GitHub repo create (`gh` or API). Ask public/private. |
+| B) Clone | `git_available` | Ask for URL/`owner/name`. `gh repo clone` or `git clone`. |
+| C) Skip | — | Proceed without git. Warn: no assertion integrity hooks. |
 
-- **A) Initialize here** (requires `git_available`): `git init`. Then offer to create a GitHub repo: use `gh repo create` if available, otherwise `curl` the GitHub API (`POST /user/repos`). Ask public/private. Add remote and push.
-- **B) Clone existing repo** (requires `git_available`): Ask for repo URL or `owner/name`. Use `gh repo clone` if available, otherwise `git clone <url>`. If clone target differs from cwd, tell user to `cd` into it and re-run init.
-- **C) Skip git setup** (always available): Proceed without git. Warn that assertion integrity hooks won't be installed.
-
-If `git_available` is false, only C is available. Note that git is required for full functionality.
+Hide options whose prerequisites aren't met. If `git_available` is false, only C is available.
 
 #### Step 2 — Check if already initialized
 
@@ -85,37 +85,9 @@ Directories created, hook status. If PRD seeding will follow (Step 6 conditions 
 
 #### Step 6 — Seed backlog from PRD
 
-**Gate**: Requires `is_github_remote` from Step 0 detection. If not met, skip with a note: "PRD seeding requires a GitHub remote. Skipping backlog seeding." Proceed to final report. For GitHub operations, use `gh` if available, otherwise fall back to `curl` with the GitHub API.
+**Gate**: Requires `is_github_remote`. If not met, skip with note and proceed to final report.
 
-**Input resolution**:
-- If `prd_source` was set from the init argument, use that.
-- If no argument was provided, ask the user: "Start from scratch or seed from an existing requirements document?"
-  - **A) From scratch** — Skip to final report.
-  - **B) From existing document** — Ask the user for a file path or URL.
-
-**Read document**: Read the file (local path via `Read` tool) or fetch the URL (via `WebFetch` tool). Support common formats: Markdown, plain text, PDF, HTML.
-
-**Draft PREMISE.md**: Before extracting features, synthesize the document into a `PREMISE.md` at the project root. Include:
-- **What**: one-paragraph description of the application/system
-- **Who**: target users/personas
-- **Why**: the problem being solved and the value proposition
-- **Domain**: the business/technical domain and key terminology
-- **High-level scope**: major system boundaries and components
-
-Write the draft to `PREMISE.md`. Note to the user that `/iikit-00-constitution` will review and finalize it.
-
-**Extract and order features**: Parse the document and extract distinct features/epics. For each feature, extract:
-- A short title (imperative, max 80 chars)
-- A 1-3 sentence description
-- Priority if mentioned (P1/P2/P3), default P2
-
-Order features in logical implementation sequence: foundational/core features first (data models, auth, shared services), then backend, then frontend, then integration/polish. Features that other features depend on come earlier.
-
-**Present for reordering**: Show the ordered features as a numbered table with columns: #, Title, Description, Priority, Rationale (why this position). Ask the user to confirm the order, reorder, remove, or add features. Wait for explicit confirmation before proceeding.
-
-**Create labels and issues**: Follow the commands and body template in [prd-issue-template.md](templates/prd-issue-template.md). Create labels first (idempotent), then one issue per confirmed feature in the confirmed order.
-
-**Final report**: List all created issues with their numbers and titles. Suggest `/iikit-00-constitution` as the next step, then `/iikit-01-specify #<issue-number>` to start specifying individual features.
+Follow the detailed procedure in [prd-seeding.md](references/prd-seeding.md): resolve input → read document → draft PREMISE.md → extract and order features → present for user confirmation → create GitHub issues.
 
 ### If Already Initialized
 
