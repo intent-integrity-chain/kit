@@ -608,6 +608,53 @@ test_clarify_no_limit() {
     fi
 }
 
+# ─── Script Distribution (prepare-tile) ──────────────────────────────────────
+
+test_script_distribution() {
+    log_section "Script Distribution (prepare-tile dry run)"
+
+    # Build a temp tile and verify all scripts referenced in SKILL.md exist
+    local tmpdir
+    tmpdir=$(mktemp -d)
+    cp -R "$SKILLS_DIR"/* "$tmpdir/"
+    bash "$REPO_ROOT/tests/prepare-tile.sh" "$tmpdir" >/dev/null 2>&1
+
+    local missing=0
+    for skill_md in "$tmpdir"/iikit-*/SKILL.md; do
+        [[ ! -f "$skill_md" ]] && continue
+        local skill_name
+        skill_name=$(basename "$(dirname "$skill_md")")
+
+        # Extract bash script references (skill_name/scripts/bash/*.sh after rewrite)
+        while IFS= read -r script; do
+            local script_path="$tmpdir/$script"
+            if [[ ! -f "$script_path" ]]; then
+                ((missing++))
+                log_fail "missing after prepare-tile: $script"
+            fi
+        done < <(grep -oE "$skill_name/scripts/bash/[a-z-]+\.sh" "$skill_md" 2>/dev/null | sort -u)
+
+        # Extract reference doc links (./references/*.md after rewrite)
+        while IFS= read -r ref; do
+            local ref_path
+            ref_path="$(dirname "$skill_md")/${ref#./}"
+            if [[ ! -f "$ref_path" ]]; then
+                ((missing++))
+                log_fail "missing after prepare-tile: $skill_name/$ref"
+            fi
+        done < <(grep -oE '\./references/[a-z-]+\.md' "$skill_md" 2>/dev/null | sort -u)
+    done
+
+    ((TESTS_RUN++))
+    if [[ "$missing" -eq 0 ]]; then
+        log_pass "all scripts and references exist after prepare-tile"
+    else
+        log_fail "$missing file(s) missing after prepare-tile"
+    fi
+
+    rm -rf "$tmpdir"
+}
+
 # ─── Documentation Consistency ───────────────────────────────────────────────
 
 test_documentation() {
@@ -679,6 +726,7 @@ main() {
     test_task_commits
     test_github_fallback
     test_clarify_no_limit
+    test_script_distribution
     test_documentation
     test_tile_json
 
