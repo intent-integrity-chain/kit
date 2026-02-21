@@ -464,7 +464,7 @@ test_premise_support() {
 
     # init skill drafts PREMISE.md from PRD
     ((TESTS_RUN++))
-    if grep -q 'Draft PREMISE.md' "$SKILLS_DIR/iikit-core/SKILL.md"; then
+    if grep -qi 'draft PREMISE.md' "$SKILLS_DIR/iikit-core/SKILL.md"; then
         log_pass "init skill drafts PREMISE.md from PRD"
     else
         log_fail "init skill does not draft PREMISE.md from PRD"
