@@ -103,4 +103,4 @@ Next steps:
 
 If deferred items remain, warn that downstream skills will flag incomplete checklists.
 
-Consult [model-recommendations.md](../iikit-core/references/model-recommendations.md) and suggest a model switch if the next phase requires a different tier.
+You MUST read [model-recommendations.md](../iikit-core/references/model-recommendations.md), check the expiration date (refresh via web search if expired), detect the agent via env vars, and include a model switch tip in the output above if the next phase needs a different model tier. Add `Tip: <suggestion>` as the last line inside the code block.

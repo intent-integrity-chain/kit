@@ -115,10 +115,11 @@ If spec.md already exists: extract semantic elements (stories, requirements, cri
 
 ## Next Steps
 
+You MUST read [model-recommendations.md](../iikit-core/references/model-recommendations.md), check the expiration date (refresh via web search if expired), detect the agent via env vars, and include a model switch tip in the output below if the next phase needs a different model tier.
+
 ```
 Specification complete! Next steps:
 - /iikit-02-clarify - (Recommended) Resolve ambiguities
 - /iikit-03-plan - Create technical implementation plan
+Tip: <model switch suggestion if tier mismatch, omit if already on the right model>
 ```
-
-Consult [model-recommendations.md](../iikit-core/references/model-recommendations.md) and suggest a model switch if the next phase requires a different tier.

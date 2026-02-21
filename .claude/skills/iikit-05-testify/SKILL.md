@@ -132,9 +132,10 @@ Output: TDD determination, test counts by source (acceptance/contract/validation
 
 ## Next Steps
 
+You MUST read [model-recommendations.md](../iikit-core/references/model-recommendations.md), check the expiration date (refresh via web search if expired), detect the agent via env vars, and include a model switch tip in the output below if the next phase needs a different model tier.
+
 ```
 Test specifications generated!
 - /iikit-06-tasks - Generate task breakdown (tasks can now reference test specs)
+Tip: <model switch suggestion if tier mismatch, omit if already on the right model>
 ```
-
-Consult [model-recommendations.md](../iikit-core/references/model-recommendations.md) and suggest a model switch if the next phase requires a different tier.

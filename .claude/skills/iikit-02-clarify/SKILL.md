@@ -102,8 +102,10 @@ Output: questions asked/answered, path to updated spec, sections touched, tracea
 
 ## Next Steps
 
-Suggest the user run `/clear` before proceeding — the interactive Q&A session consumed significant context, and planning benefits from a fresh context window. State is preserved in spec.md and `.specify/context.json`.
+You MUST read [model-recommendations.md](../iikit-core/references/model-recommendations.md), check the expiration date (refresh via web search if expired), detect the agent via env vars, and include a model switch tip in the output below if the next phase needs a different model tier.
 
-Run `/iikit-03-plan` to create the technical implementation plan.
-
-Consult [model-recommendations.md](../iikit-core/references/model-recommendations.md) and suggest a model switch if the next phase requires a different tier.
+```
+Clarification complete! Next: /clear then /iikit-03-plan
+(Q&A consumed significant context — /clear before planning is recommended)
+Tip: <model switch suggestion if tier mismatch, omit if already on the right model>
+```

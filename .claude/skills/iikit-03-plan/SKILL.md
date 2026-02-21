@@ -151,12 +151,13 @@ If plan.md exists: compare tech stack, architecture, dependencies. Show diff per
 
 ## Next Steps
 
+You MUST read [model-recommendations.md](../iikit-core/references/model-recommendations.md), check the expiration date (refresh via web search if expired), detect the agent via env vars, and include a model switch tip in the output below if the next phase needs a different model tier.
+
 ```
 Plan complete! Next steps:
 - /iikit-04-checklist - (Recommended) Generate quality checklists
 - /iikit-05-testify - (REQUIRED by constitution) Generate test specifications [if TDD mandatory]
 - /iikit-05-testify - (Optional) Generate test specifications for TDD [if TDD not mandatory]
 - /iikit-06-tasks - Generate task breakdown from plan
+Tip: <model switch suggestion if tier mismatch, omit if already on the right model>
 ```
-
-Consult [model-recommendations.md](../iikit-core/references/model-recommendations.md) and suggest a model switch if the next phase requires a different tier.

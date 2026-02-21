@@ -80,6 +80,9 @@ Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/sc
 
 ## Next Steps
 
-Run `/iikit-01-specify` to create a feature specification. The constitution is loaded and validated by all other iikit skills.
+You MUST read [model-recommendations.md](../iikit-core/references/model-recommendations.md), check the expiration date (refresh via web search if expired), detect the agent via env vars, and include a model switch tip in the output below if the next phase needs a different model tier.
 
-Consult [model-recommendations.md](../iikit-core/references/model-recommendations.md) and suggest a model switch if the next phase requires a different tier.
+```
+Constitution ready! Next: /iikit-01-specify
+Tip: <model switch suggestion if tier mismatch, omit if already on the right model>
+```

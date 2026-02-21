@@ -138,7 +138,11 @@ Ask: "Suggest concrete remediation edits for the top N issues?" Do NOT apply aut
 
 ## Next Steps
 
-- CRITICAL issues: resolve, then re-run `/iikit-07-analyze`
-- No CRITICAL: suggest the user run `/clear` before `/iikit-08-implement` — implementation is the heaviest skill and benefits from maximum context budget. All state is preserved on disk.
+You MUST read [model-recommendations.md](../iikit-core/references/model-recommendations.md), check the expiration date (refresh via web search if expired), detect the agent via env vars, and include a model switch tip in the output below if the next phase needs a different model tier.
 
-Consult [model-recommendations.md](../iikit-core/references/model-recommendations.md) and suggest a model switch if the next phase requires a different tier.
+```
+Analysis complete!
+- CRITICAL issues found: resolve, then re-run /iikit-07-analyze
+- No CRITICAL: /clear then /iikit-08-implement (implementation benefits from max context)
+Tip: <model switch suggestion if tier mismatch, omit if already on the right model>
+```

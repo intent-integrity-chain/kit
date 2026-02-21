@@ -120,10 +120,11 @@ If tasks.md exists: preserve `[x]` completion status, map old IDs to new by simi
 
 ## Next Steps
 
+You MUST read [model-recommendations.md](../iikit-core/references/model-recommendations.md), check the expiration date (refresh via web search if expired), detect the agent via env vars, and include a model switch tip in the output below if the next phase needs a different model tier.
+
 ```
 Tasks generated! Next steps:
 - /iikit-07-analyze - (Recommended) Validate consistency
 - /iikit-08-implement - Execute implementation (requires 100% checklist completion)
+Tip: <model switch suggestion if tier mismatch, omit if already on the right model>
 ```
-
-Consult [model-recommendations.md](../iikit-core/references/model-recommendations.md) and suggest a model switch if the next phase requires a different tier.
