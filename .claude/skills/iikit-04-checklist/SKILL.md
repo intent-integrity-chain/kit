@@ -102,3 +102,5 @@ Next steps:
 ```
 
 If deferred items remain, warn that downstream skills will flag incomplete checklists.
+
+Consult [model-recommendations.md](../iikit-core/references/model-recommendations.md) and suggest a model switch if the next phase requires a different tier.

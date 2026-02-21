@@ -140,3 +140,5 @@ Ask: "Suggest concrete remediation edits for the top N issues?" Do NOT apply aut
 
 - CRITICAL issues: resolve, then re-run `/iikit-07-analyze`
 - No CRITICAL: suggest the user run `/clear` before `/iikit-08-implement` — implementation is the heaviest skill and benefits from maximum context budget. All state is preserved on disk.
+
+Consult [model-recommendations.md](../iikit-core/references/model-recommendations.md) and suggest a model switch if the next phase requires a different tier.

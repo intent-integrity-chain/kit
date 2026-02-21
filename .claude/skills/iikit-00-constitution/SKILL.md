@@ -81,3 +81,5 @@ Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/sc
 ## Next Steps
 
 Run `/iikit-01-specify` to create a feature specification. The constitution is loaded and validated by all other iikit skills.
+
+Consult [model-recommendations.md](../iikit-core/references/model-recommendations.md) and suggest a model switch if the next phase requires a different tier.

@@ -125,3 +125,5 @@ Tasks generated! Next steps:
 - /iikit-07-analyze - (Recommended) Validate consistency
 - /iikit-08-implement - Execute implementation (requires 100% checklist completion)
 ```
+
+Consult [model-recommendations.md](../iikit-core/references/model-recommendations.md) and suggest a model switch if the next phase requires a different tier.

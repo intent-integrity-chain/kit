@@ -105,3 +105,5 @@ Output: questions asked/answered, path to updated spec, sections touched, tracea
 Suggest the user run `/clear` before proceeding — the interactive Q&A session consumed significant context, and planning benefits from a fresh context window. State is preserved in spec.md and `.specify/context.json`.
 
 Run `/iikit-03-plan` to create the technical implementation plan.
+
+Consult [model-recommendations.md](../iikit-core/references/model-recommendations.md) and suggest a model switch if the next phase requires a different tier.

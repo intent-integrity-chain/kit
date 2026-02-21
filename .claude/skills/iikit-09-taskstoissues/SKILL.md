@@ -125,3 +125,5 @@ If on a feature branch, offer to merge. Ask the user which approach they prefer:
 - **A) Merge locally**: `git checkout main && git merge <branch>`
 - **B) Create PR**: `gh pr create` if available, otherwise provide the GitHub URL to create one manually
 - **C) Skip**: user will handle it
+
+Consult [model-recommendations.md](../iikit-core/references/model-recommendations.md) and suggest a model switch if the next phase requires a different tier.

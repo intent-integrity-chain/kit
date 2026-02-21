@@ -136,3 +136,5 @@ Output: TDD determination, test counts by source (acceptance/contract/validation
 Test specifications generated!
 - /iikit-06-tasks - Generate task breakdown (tasks can now reference test specs)
 ```
+
+Consult [model-recommendations.md](../iikit-core/references/model-recommendations.md) and suggest a model switch if the next phase requires a different tier.

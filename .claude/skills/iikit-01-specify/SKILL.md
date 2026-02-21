@@ -120,3 +120,5 @@ Specification complete! Next steps:
 - /iikit-02-clarify - (Recommended) Resolve ambiguities
 - /iikit-03-plan - Create technical implementation plan
 ```
+
+Consult [model-recommendations.md](../iikit-core/references/model-recommendations.md) and suggest a model switch if the next phase requires a different tier.

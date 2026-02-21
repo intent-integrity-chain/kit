@@ -158,3 +158,5 @@ Plan complete! Next steps:
 - /iikit-05-testify - (Optional) Generate test specifications for TDD [if TDD not mandatory]
 - /iikit-06-tasks - Generate task breakdown from plan
 ```
+
+Consult [model-recommendations.md](../iikit-core/references/model-recommendations.md) and suggest a model switch if the next phase requires a different tier.
