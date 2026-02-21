@@ -17,7 +17,6 @@ fi
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
@@ -43,55 +42,29 @@ for skill_dir in "$SKILLS_DIR"/iikit-*/; do
     skill_name=$(basename "$skill_dir")
     ((TOTAL++))
 
-    # Run review and capture JSON (stderr may contain progress or errors)
-    local stderr_file
-    stderr_file=$(mktemp)
-    json_output=$(tessl skill review --json "$skill_md" 2>"$stderr_file") || true
+    # Run review and capture full output (human-readable)
+    review_output=$(tessl skill review "$skill_md" 2>&1) || true
 
-    if [[ -z "$json_output" ]]; then
-        local err_msg
-        err_msg=$(cat "$stderr_file")
-        echo -e "${RED}[FAIL]${NC} $skill_name — review returned empty output${err_msg:+ ($err_msg)}"
-        rm -f "$stderr_file"
-        ((FAILED++))
-        BELOW_THRESHOLD+=("$skill_name: empty output")
-        continue
-    fi
-    rm -f "$stderr_file"
+    # Parse "Average Score: NN%" from output
+    avg_pct=$(echo "$review_output" | sed -n 's/.*Average Score: \([0-9]*\)%.*/\1/p')
 
-    # Parse scores
-    scores=$(echo "$json_output" | python3 -c "
-import sys, json
-try:
-    d = json.load(sys.stdin)
-    desc = d['descriptionJudge']['normalizedScore']
-    cont = d['contentJudge']['normalizedScore']
-    avg = (desc + cont) / 2
-    print(f'{desc:.4f} {cont:.4f} {avg:.4f}')
-except Exception as e:
-    print(f'ERROR {e}', file=sys.stderr)
-    sys.exit(1)
-" 2>&1)
-
-    if [[ $? -ne 0 || "$scores" == ERROR* ]]; then
-        echo -e "${RED}[FAIL]${NC} $skill_name — failed to parse scores: $scores"
+    if [[ -z "$avg_pct" ]]; then
+        echo -e "${RED}[FAIL]${NC} $skill_name — could not parse score from review output"
+        echo "$review_output" | tail -3
         ((FAILED++))
         BELOW_THRESHOLD+=("$skill_name: parse error")
         continue
     fi
 
-    read desc_score cont_score avg_score <<< "$scores"
-
-    # Convert to percentage (integer)
-    avg_pct=$(python3 -c "print(int(round($avg_score * 100)))")
-    desc_pct=$(python3 -c "print(int(round($desc_score * 100)))")
-    cont_pct=$(python3 -c "print(int(round($cont_score * 100)))")
+    # Parse description and content scores
+    desc_pct=$(echo "$review_output" | sed -n 's/.*Description: \([0-9]*\)%.*/\1/p')
+    cont_pct=$(echo "$review_output" | sed -n 's/.*Content: \([0-9]*\)%.*/\1/p')
 
     if [[ "$avg_pct" -ge "$THRESHOLD" ]]; then
-        echo -e "${GREEN}[PASS]${NC} $skill_name — ${avg_pct}% (desc: ${desc_pct}%, content: ${cont_pct}%)"
+        echo -e "${GREEN}[PASS]${NC} $skill_name — ${avg_pct}%${desc_pct:+ (desc: ${desc_pct}%, content: ${cont_pct}%)}"
         ((PASSED++))
     else
-        echo -e "${RED}[FAIL]${NC} $skill_name — ${avg_pct}% < ${THRESHOLD}% (desc: ${desc_pct}%, content: ${cont_pct}%)"
+        echo -e "${RED}[FAIL]${NC} $skill_name — ${avg_pct}% < ${THRESHOLD}%${desc_pct:+ (desc: ${desc_pct}%, content: ${cont_pct}%)}"
         ((FAILED++))
         BELOW_THRESHOLD+=("$skill_name: ${avg_pct}%")
     fi
