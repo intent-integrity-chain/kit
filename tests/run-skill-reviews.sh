@@ -43,15 +43,21 @@ for skill_dir in "$SKILLS_DIR"/iikit-*/; do
     skill_name=$(basename "$skill_dir")
     ((TOTAL++))
 
-    # Run review and capture JSON
-    json_output=$(tessl skill review --json "$skill_md" 2>/dev/null)
+    # Run review and capture JSON (stderr may contain progress or errors)
+    local stderr_file
+    stderr_file=$(mktemp)
+    json_output=$(tessl skill review --json "$skill_md" 2>"$stderr_file") || true
 
     if [[ -z "$json_output" ]]; then
-        echo -e "${RED}[FAIL]${NC} $skill_name — review returned empty output"
+        local err_msg
+        err_msg=$(cat "$stderr_file")
+        echo -e "${RED}[FAIL]${NC} $skill_name — review returned empty output${err_msg:+ ($err_msg)}"
+        rm -f "$stderr_file"
         ((FAILED++))
         BELOW_THRESHOLD+=("$skill_name: empty output")
         continue
     fi
+    rm -f "$stderr_file"
 
     # Parse scores
     scores=$(echo "$json_output" | python3 -c "
