@@ -147,5 +147,5 @@ You MUST read [model-recommendations.md](../iikit-core/references/model-recommen
 Feature files generated!
 - /iikit-06-tasks - Generate task breakdown (tasks can now reference .feature scenarios)
 Tip: <model switch suggestion if tier mismatch, omit if already on the right model>
-- Dashboard: open .specify/dashboard.html to view progress
+- Dashboard: file://REPO_ROOT/.specify/dashboard.html
 ```

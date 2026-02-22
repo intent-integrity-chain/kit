@@ -93,7 +93,7 @@ Output: number of issues created, issue numbers with titles, errors encountered,
 After creating issues: review in GitHub, assign team members, add to project boards.
 
 ```
-- Dashboard: open .specify/dashboard.html to view progress
+- Dashboard: file://REPO_ROOT/.specify/dashboard.html
 ```
 
 If on a feature branch, offer to merge. Ask the user which approach they prefer:

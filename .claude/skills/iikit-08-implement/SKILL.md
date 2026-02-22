@@ -62,7 +62,7 @@ Read each checklist in `FEATURE_DIR/checklists/`. All must be 100% complete. If 
 
 Suggest the user open the dashboard to watch implementation progress in real time:
 ```
-Dashboard: open .specify/dashboard.html — updates live as tasks complete
+Dashboard: file://REPO_ROOT/.specify/dashboard.html — updates live as tasks complete
 ```
 
 ## Execution Flow

@@ -164,5 +164,5 @@ Analysis complete!
 - CRITICAL issues found: resolve, then re-run /iikit-07-analyze
 - No CRITICAL: /clear then /iikit-08-implement (implementation benefits from max context)
 Tip: <model switch suggestion if tier mismatch, omit if already on the right model>
-- Dashboard: open .specify/dashboard.html to view progress
+- Dashboard: file://REPO_ROOT/.specify/dashboard.html
 ```
