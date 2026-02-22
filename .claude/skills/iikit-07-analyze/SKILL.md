@@ -72,6 +72,22 @@ From tasks.md: task IDs, descriptions, phases, [P] markers, file paths.
 
 **G. Inconsistency**: terminology drift; entities in plan but not spec; conflicting requirements
 
+**H. Feature File Traceability** (when `FEATURE_DIR/tests/features/` exists):
+Parse all `.feature` files in `tests/features/` and extract Gherkin tags:
+- `@FR-XXX` — functional requirement references
+- `@US-XXX` — user story references
+- `@TS-XXX` — test specification IDs
+
+**H1. Untested requirements**: For each FR-XXX in spec.md, check if at least one `.feature` file has a corresponding `@FR-XXX` tag. Flag any FR-XXX without a matching tag as "untested requirement" (severity: HIGH).
+
+**H2. Orphaned tags**: For each `@FR-XXX` tag found in `.feature` files, verify the referenced ID exists in spec.md. Flag tags referencing non-existent IDs as "orphaned traceability tag" (severity: MEDIUM).
+
+**H3. Step definition coverage** (optional): If `tests/step_definitions/` exists alongside `tests/features/`, run `verify-steps.sh` to check for undefined steps:
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/verify-steps.sh --json "FEATURE_DIR/tests/features" "FEATURE_DIR/plan.md"
+```
+If status is BLOCKED, report undefined steps as findings (severity: HIGH). If DEGRADED, note in report but do not flag as finding.
+
 ### 4. Severity
 
 - **CRITICAL**: constitution MUST violations, phase separation, missing core artifact, zero-coverage blocking requirement

@@ -213,6 +213,143 @@ EOF
 }
 
 # =============================================================================
+# .feature file — valid hash tests
+# =============================================================================
+
+@test "hook: exit 0 when .feature files staged with valid hash" {
+    # Create feature with .feature files
+    mkdir -p "$TEST_DIR/specs/001-feature/tests/features"
+    cat > "$TEST_DIR/specs/001-feature/tests/features/login.feature" << 'EOF'
+Feature: Test
+  Scenario: Test scenario
+    Given a test precondition
+    When a test action occurs
+    Then a test result is observed
+EOF
+
+    # Store hash via testify-tdd.sh store-hash on the features directory
+    "$TESTIFY_SCRIPT" store-hash "$TEST_DIR/specs/001-feature/tests/features" > /dev/null
+
+    # Stage and commit the initial state
+    git -C "$TEST_DIR" add -A >/dev/null 2>&1
+    git -C "$TEST_DIR" commit -m "add feature files with hash" >/dev/null 2>&1
+
+    # Re-stage unchanged .feature files (no-op edit, re-add)
+    git -C "$TEST_DIR" add specs/001-feature/tests/features/login.feature
+
+    # Hook should pass
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    [ "$status" -eq 0 ]
+}
+
+# =============================================================================
+# .feature file — tampered assertions tests
+# =============================================================================
+
+@test "hook: exit 1 when .feature file assertions tampered" {
+    # Create .feature files
+    mkdir -p "$TEST_DIR/specs/001-feature/tests/features"
+    cat > "$TEST_DIR/specs/001-feature/tests/features/login.feature" << 'EOF'
+Feature: Test
+  Scenario: Test scenario
+    Given a test precondition
+    When a test action occurs
+    Then a test result is observed
+EOF
+
+    # Store hash
+    "$TESTIFY_SCRIPT" store-hash "$TEST_DIR/specs/001-feature/tests/features" > /dev/null
+
+    # Commit original state
+    git -C "$TEST_DIR" add -A >/dev/null 2>&1
+    git -C "$TEST_DIR" commit -m "add feature files" >/dev/null 2>&1
+
+    # Modify a step line in the .feature file (tamper with assertions)
+    cat > "$TEST_DIR/specs/001-feature/tests/features/login.feature" << 'EOF'
+Feature: Test
+  Scenario: Test scenario
+    Given a test precondition
+    When a test action occurs
+    Then a DIFFERENT result is observed
+EOF
+
+    # Stage modified .feature file
+    git -C "$TEST_DIR" add specs/001-feature/tests/features/login.feature
+
+    # Hook should BLOCK
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    [ "$status" -eq 1 ]
+    assert_contains "$output" "ASSERTION INTEGRITY CHECK FAILED"
+}
+
+# =============================================================================
+# .feature file — missing hash tests
+# =============================================================================
+
+@test "hook: exit 0 when .feature files have no stored hash" {
+    # Create .feature files without storing hash
+    mkdir -p "$TEST_DIR/specs/001-feature/tests/features"
+    cat > "$TEST_DIR/specs/001-feature/tests/features/login.feature" << 'EOF'
+Feature: Test
+  Scenario: Test scenario
+    Given a test precondition
+    When a test action occurs
+    Then a test result is observed
+EOF
+
+    # Stage them (no hash stored, no context.json)
+    git -C "$TEST_DIR" add specs/001-feature/tests/features/login.feature
+
+    # Hook should pass (missing hash doesn't block)
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    [ "$status" -eq 0 ]
+}
+
+# =============================================================================
+# .feature file — whitespace-only changes tests
+# =============================================================================
+
+@test "hook: exit 0 when .feature whitespace-only changes" {
+    # Create .feature files
+    mkdir -p "$TEST_DIR/specs/001-feature/tests/features"
+    cat > "$TEST_DIR/specs/001-feature/tests/features/login.feature" << 'EOF'
+Feature: Test
+  Scenario: Test scenario
+    Given a test precondition
+    When a test action occurs
+    Then a test result is observed
+EOF
+
+    # Store hash
+    "$TESTIFY_SCRIPT" store-hash "$TEST_DIR/specs/001-feature/tests/features" > /dev/null
+
+    # Commit original state
+    git -C "$TEST_DIR" add -A >/dev/null 2>&1
+    git -C "$TEST_DIR" commit -m "add feature files" >/dev/null 2>&1
+
+    # Change only indentation/comments (whitespace-only, step content unchanged)
+    cat > "$TEST_DIR/specs/001-feature/tests/features/login.feature" << 'EOF'
+Feature: Test
+  # Added a comment here
+  Scenario: Test scenario
+      Given a test precondition
+      When a test action occurs
+      Then a test result is observed
+EOF
+
+    # Stage modified .feature file
+    git -C "$TEST_DIR" add specs/001-feature/tests/features/login.feature
+
+    # Hook should pass — step content unchanged (whitespace normalized)
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    [ "$status" -eq 0 ]
+}
+
+# =============================================================================
 # Scripts not found tests
 # =============================================================================
 

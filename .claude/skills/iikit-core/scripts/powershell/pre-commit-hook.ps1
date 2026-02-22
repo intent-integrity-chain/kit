@@ -45,13 +45,14 @@ if (-not $scriptsDir) {
 $testifyScript = Join-Path $scriptsDir "testify-tdd.ps1"
 
 # ============================================================================
-# FAST PATH — exit immediately if no test-specs.md is staged
+# FAST PATH — exit immediately if no .feature files or test-specs.md staged
 # ============================================================================
 
 $stagedFiles = git diff --cached --name-only 2>$null
+$stagedFeatureFiles = $stagedFiles | Where-Object { $_ -match 'tests/features/.*\.feature$' }
 $stagedTestSpecs = $stagedFiles | Where-Object { $_ -match 'test-specs\.md$' }
 
-if (-not $stagedTestSpecs) {
+if (-not $stagedFeatureFiles -and -not $stagedTestSpecs) {
     exit 0
 }
 
@@ -78,6 +79,123 @@ $blockMessages = @()
 
 # Capture all staged files once for context.json co-staging detection
 $allStagedFiles = git diff --cached --name-only 2>$null
+
+# ============================================================================
+# .feature file verification (new format)
+# Groups staged .feature files by feature directory, computes combined hash
+# ============================================================================
+
+if ($stagedFeatureFiles) {
+    # Group staged .feature files by feature directory
+    $featureDirsMap = @{}
+    foreach ($stagedPath in $stagedFeatureFiles) {
+        if ([string]::IsNullOrEmpty($stagedPath)) { continue }
+        # Derive feature dir: specs/NNN/tests/features/x.feature -> specs/NNN
+        $featuresDir = Split-Path $stagedPath -Parent       # tests/features
+        $testsDir = Split-Path $featuresDir -Parent          # tests
+        $featDir = Split-Path $testsDir -Parent              # specs/NNN-feature
+        $featureDirsMap[$featDir] = $true
+    }
+
+    foreach ($featDir in $featureDirsMap.Keys) {
+        $featuresDirAbs = Join-Path $repoRoot "$featDir/tests/features"
+        $contextFile = Join-Path $repoRoot "$featDir/context.json"
+        $contextRelPath = "$featDir/context.json"
+
+        # Extract all staged .feature files for this feature to temp dir
+        $tempFeaturesDir = Join-Path ([System.IO.Path]::GetTempPath()) ([System.IO.Path]::GetRandomFileName())
+        New-Item -ItemType Directory -Path $tempFeaturesDir -Force | Out-Null
+
+        $stagedForFeat = $stagedFeatureFiles | Where-Object { $_ -match "^$([regex]::Escape($featDir))/" }
+        foreach ($sf in $stagedForFeat) {
+            if ([string]::IsNullOrEmpty($sf)) { continue }
+            $basename = Split-Path $sf -Leaf
+            try {
+                $content = git show ":$sf" 2>$null
+                if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrEmpty($content)) {
+                    $content | Out-File -FilePath (Join-Path $tempFeaturesDir $basename) -Encoding utf8
+                }
+            } catch { continue }
+        }
+
+        # Compute combined hash of staged .feature files
+        $currentHash = & $testifyScript compute-hash $tempFeaturesDir
+        Remove-Item -Recurse -Force $tempFeaturesDir -ErrorAction SilentlyContinue
+
+        if ($currentHash -eq "NO_ASSERTIONS") {
+            continue
+        }
+
+        # Check if context.json is also being staged
+        $contextStaged = $allStagedFiles | Where-Object { $_ -eq $contextRelPath -or $_ -eq ($contextRelPath -replace '\\', '/') }
+
+        # Read context.json (staged or committed version)
+        $contextStatus = "missing"
+        $contextJson = $null
+        if ($contextStaged -and (Test-Path $contextFile)) {
+            $contextJson = Get-Content $contextFile -Raw -ErrorAction SilentlyContinue
+        } else {
+            try {
+                $contextJson = git show "HEAD:$($contextRelPath -replace '\\', '/')" 2>$null
+                if ($LASTEXITCODE -ne 0) { $contextJson = $null }
+            } catch { $contextJson = $null }
+        }
+
+        if (-not [string]::IsNullOrEmpty($contextJson)) {
+            try {
+                $context = $contextJson | ConvertFrom-Json
+                if ($context.testify -and $context.testify.assertion_hash) {
+                    $storedHash = $context.testify.assertion_hash
+                    $storedDir = if ($context.testify.PSObject.Properties.Name -contains 'features_dir') { $context.testify.features_dir } else { "" }
+
+                    if (-not [string]::IsNullOrEmpty($storedHash) -and -not [string]::IsNullOrEmpty($storedDir)) {
+                        if ($storedHash -eq $currentHash) {
+                            $contextStatus = "valid"
+                        } else {
+                            $contextStatus = "invalid"
+                        }
+                    }
+                }
+            } catch {
+                # Invalid JSON or missing fields — treat as missing
+            }
+        }
+
+        # Combine results (git notes skipped for directory-based .feature files)
+        $hashStatus = "missing"
+        if ($contextStaged -and $contextStatus -eq "valid") {
+            $hashStatus = "valid"
+        } elseif ($contextStatus -eq "invalid") {
+            $hashStatus = "invalid"
+        } elseif ($contextStatus -eq "valid") {
+            $hashStatus = "valid"
+        }
+
+        # Decision logic
+        switch ($hashStatus) {
+            "valid" {
+                # PASS — silent
+            }
+            "invalid" {
+                $blocked = $true
+                $blockMessages += "BLOCKED: $featDir/tests/features/ - .feature assertion integrity check failed"
+                $blockMessages += "  .feature file assertions have been modified since /iikit-05-testify generated them."
+                $blockMessages += "  Re-run /iikit-05-testify to regenerate .feature files."
+            }
+            "missing" {
+                if ($tddDetermination -eq "mandatory") {
+                    Write-Warning "[iikit] $featDir/tests/features/ - no stored assertion hash found (TDD is mandatory)"
+                    Write-Warning "[iikit]   If this is the initial testify commit, this is expected."
+                    Write-Warning "[iikit]   Otherwise, run /iikit-05-testify to generate integrity hashes."
+                }
+            }
+        }
+    }
+}
+
+# ============================================================================
+# Legacy test-specs.md verification (backward compatibility)
+# ============================================================================
 
 foreach ($stagedPath in $stagedTestSpecs) {
     if ([string]::IsNullOrEmpty($stagedPath)) { continue }

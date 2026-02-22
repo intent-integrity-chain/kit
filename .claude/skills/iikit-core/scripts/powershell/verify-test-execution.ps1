@@ -15,22 +15,33 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-# Count expected tests from test-specs.md
+# Count expected tests from test-specs.md or .feature files
 function Get-ExpectedTestCount {
-    param([string]$TestSpecsFile)
+    param([string]$InputPath)
 
-    if (-not (Test-Path $TestSpecsFile)) {
+    if (Test-Path $InputPath -PathType Container) {
+        # Directory: count Scenario: lines across .feature files
+        $count = 0
+        $featureFiles = Get-ChildItem "$InputPath/*.feature" -ErrorAction SilentlyContinue
+        foreach ($f in $featureFiles) {
+            $fileMatches = [regex]::Matches((Get-Content $f -Raw), '(?m)^\s*(Scenario:|Scenario Outline:)')
+            $count += $fileMatches.Count
+        }
+        return $count
+    }
+
+    if (-not (Test-Path $InputPath)) {
         return 0
     }
 
-    $content = Get-Content $TestSpecsFile -Raw
-    # Count TS-XXX patterns (test spec IDs)
-    $matches = [regex]::Matches($content, '(?m)^###\s+TS-[0-9]+')
-    return $matches.Count
+    $content = Get-Content $InputPath -Raw
+    # Legacy: count TS-XXX patterns in test-specs.md
+    $tsMatches = [regex]::Matches($content, '(?m)^###\s+TS-[0-9]+')
+    return $tsMatches.Count
 }
 
 # Parse test count from common test runner outputs
-# Supports: Jest, Vitest, Pytest, Go test, Playwright, Mocha
+# Supports: Jest, Vitest, Pytest, Go test, Playwright, Mocha, Behave, Cucumber.js, Godog
 function Get-TestOutputCounts {
     param([string]$Output)
 
@@ -38,8 +49,32 @@ function Get-TestOutputCounts {
     $failed = 0
     $total = 0
 
+    # Behave: "X scenario passed" or "X scenarios passed, Y failed"
+    if ($Output -match '\d+\s+scenario') {
+        if ($Output -match '(\d+)\s+scenarios?\s+passed') {
+            $passed = [int]$Matches[1]
+        }
+        if ($Output -match '(\d+)\s+scenarios?\s+failed') {
+            $failed = [int]$Matches[1]
+        }
+        $total = $passed + $failed
+    }
+    # Cucumber.js: "X scenarios (Y passed)" or "X scenarios (Y passed, Z failed)"
+    elseif ($Output -match '\d+\s+scenarios?') {
+        if ($Output -match '(\d+)\s+passed') {
+            $passed = [int]$Matches[1]
+        }
+        if ($Output -match '(\d+)\s+failed') {
+            $failed = [int]$Matches[1]
+        }
+        if ($Output -match '(\d+)\s+scenarios?') {
+            $total = [int]$Matches[1]
+        } else {
+            $total = $passed + $failed
+        }
+    }
     # Jest/Vitest: "Tests: X passed, Y failed, Z total"
-    if ($Output -match 'Tests:.*passed') {
+    elseif ($Output -match 'Tests:.*passed') {
         if ($Output -match '(\d+)\s+passed') {
             $passed = [int]$Matches[1]
         }
@@ -173,6 +208,6 @@ switch ($Command) {
         Write-Host "  parse-output <output-string>         Parse test runner output for counts"
         Write-Host "  verify <specs-file> <output>         Compare expected vs actual"
         Write-Host ""
-        Write-Host "Supported test runners: Jest, Vitest, Pytest, Go test, Playwright, Mocha"
+        Write-Host "Supported test runners: Jest, Vitest, Pytest, Go test, Playwright, Mocha, Behave, Cucumber.js"
     }
 }

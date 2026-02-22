@@ -6,41 +6,68 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Count expected tests from test-specs.md
+# Count expected tests from test-specs.md or .feature files
 count_expected_tests() {
-    local test_specs_file="$1"
+    local input_path="$1"
 
-    if [[ ! -f "$test_specs_file" ]]; then
+    if [[ -d "$input_path" ]]; then
+        # Directory: count @TS-XXX tags or Scenario: lines across .feature files
+        local count=0
+        local f
+        for f in "$input_path"/*.feature 2>/dev/null; do
+            [[ -f "$f" ]] || continue
+            local file_count
+            file_count=$(grep -cE "^\s*(Scenario:|Scenario Outline:)" "$f" 2>/dev/null) || true
+            count=$((count + ${file_count:-0}))
+        done
+        echo "$count"
+        return
+    fi
+
+    if [[ ! -f "$input_path" ]]; then
         echo "0"
         return
     fi
 
-    # Count TS-XXX patterns (test spec IDs)
-    # Note: grep -c returns 0 count with exit 1 when no matches, so capture output first
+    # Legacy: count TS-XXX patterns in test-specs.md
     local count
-    count=$(grep -cE "^###[[:space:]]+TS-[0-9]+" "$test_specs_file" 2>/dev/null) || true
+    count=$(grep -cE "^###[[:space:]]+TS-[0-9]+" "$input_path" 2>/dev/null) || true
     echo "${count:-0}"
 }
 
 # Parse test count from common test runner outputs
-# Supports: Jest, Vitest, Pytest, Go test, Playwright, Mocha
+# Supports: Jest, Vitest, Pytest, Go test, Playwright, Mocha, Behave, Cucumber.js, Godog
 parse_test_output() {
     local output="$1"
     local passed=0
     local failed=0
     local total=0
 
+    # Behave: "X features passed, Y failed" or "X scenarios passed, Y failed, Z skipped"
+    if echo "$output" | grep -qE "[0-9]+ scenario"; then
+        passed=$(echo "$output" | grep -oE "([0-9]+) scenario.*passed" | grep -oE "[0-9]+" | head -1) || passed=0
+        failed=$(echo "$output" | grep -oE "([0-9]+) scenario.*failed" | grep -oE "[0-9]+" | head -1) || failed=0
+        if [[ "$passed" -eq 0 ]] && [[ "$failed" -eq 0 ]]; then
+            # Alternative: "X scenarios passed"
+            passed=$(echo "$output" | grep -oE "([0-9]+) scenarios? passed" | grep -oE "[0-9]+" | head -1) || passed=0
+        fi
+        total=$((passed + failed))
+    # Cucumber.js: "X scenarios (Y passed)" or "X scenarios (Y passed, Z failed)"
+    elif echo "$output" | grep -qE "[0-9]+ scenarios?"; then
+        passed=$(echo "$output" | grep -oE "([0-9]+) passed" | grep -oE "[0-9]+" | tail -1) || passed=0
+        failed=$(echo "$output" | grep -oE "([0-9]+) failed" | grep -oE "[0-9]+" | tail -1) || failed=0
+        total=$(echo "$output" | grep -oE "([0-9]+) scenarios?" | grep -oE "[0-9]+" | head -1) || total=$((passed + failed))
     # Jest/Vitest: "Tests: X passed, Y failed, Z total"
-    if echo "$output" | grep -qE "Tests:.*passed"; then
+    elif echo "$output" | grep -qE "Tests:.*passed"; then
         passed=$(echo "$output" | grep -oE "([0-9]+) passed" | grep -oE "[0-9]+" | tail -1) || passed=0
         failed=$(echo "$output" | grep -oE "([0-9]+) failed" | grep -oE "[0-9]+" | tail -1) || failed=0
         total=$((passed + failed))
-    # Pytest: "X passed" or "X passed, Y failed"
+    # Pytest/pytest-bdd: "X passed" or "X passed, Y failed"
     elif echo "$output" | grep -qE "[0-9]+ passed"; then
         passed=$(echo "$output" | grep -oE "([0-9]+) passed" | grep -oE "[0-9]+" | tail -1) || passed=0
         failed=$(echo "$output" | grep -oE "([0-9]+) failed" | grep -oE "[0-9]+" | tail -1) || failed=0
         total=$((passed + failed))
-    # Go test: "ok" or "FAIL" with test counts, or "--- PASS:" counts
+    # Go test/godog: "ok" or "FAIL" with test counts, or "--- PASS:" counts
     # Note: Use -- to prevent "--- PASS:" from being interpreted as options
     elif echo "$output" | grep -qE -- "(^ok[[:space:]]|^FAIL[[:space:]]|--- PASS:|--- FAIL:)"; then
         passed=$(echo "$output" | grep -cE -- "--- PASS:" 2>/dev/null) || true

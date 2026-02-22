@@ -91,31 +91,69 @@ function Get-TddAssessment {
 # ASSERTION INTEGRITY FUNCTIONS
 # =============================================================================
 
-# Extract assertion content from test-specs.md for hashing
-# Extracts ONLY the Given/When/Then lines which contain expected values
-# Output is sorted and normalized for deterministic hashing
+# Extract assertion content for hashing
+# Accepts: directory path (tests/features/), single .feature file, or legacy test-specs.md
+# For .feature files: extracts Given/When/Then/And/But step lines in document order
+#   - Files sorted by name for determinism, lines in document order within each file
+#   - Whitespace normalized: leading stripped, internal collapsed, trailing stripped
+# For test-specs.md (legacy): extracts **Given**:/**When**:/**Then**: lines, sorted
 function Get-AssertionContent {
-    param([string]$TestSpecsFile)
+    param([string]$InputPath)
 
-    if (-not (Test-Path $TestSpecsFile)) {
+    if (Test-Path -Path $InputPath -PathType Container) {
+        # Directory input: glob all .feature files, sorted by name
+        $files = Get-ChildItem "$InputPath/*.feature" -ErrorAction SilentlyContinue | Sort-Object Name
+
+        if (-not $files -or $files.Count -eq 0) {
+            return ""
+        }
+
+        # Extract step lines in document order per file, normalize whitespace
+        $allLines = @()
+        foreach ($f in $files) {
+            $lines = Get-Content $f.FullName | Where-Object { $_ -match '^\s*(Given|When|Then|And|But) ' }
+            foreach ($line in $lines) {
+                # Normalize: strip leading whitespace, collapse internal whitespace, trim trailing
+                $normalized = $line.Trim() -replace '\s{2,}', ' '
+                $allLines += $normalized
+            }
+        }
+
+        return ($allLines -join "`n")
+    }
+    elseif (Test-Path -Path $InputPath -PathType Leaf) {
+        if ($InputPath -like "*.feature") {
+            # Single .feature file input
+            $content = Get-Content $InputPath
+            $allLines = @()
+            $lines = $content | Where-Object { $_ -match '^\s*(Given|When|Then|And|But) ' }
+            foreach ($line in $lines) {
+                $normalized = $line.Trim() -replace '\s{2,}', ' '
+                $allLines += $normalized
+            }
+            return ($allLines -join "`n")
+        }
+        else {
+            # Legacy test-specs.md input: extract **Given**:/**When**:/**Then**: lines
+            $content = Get-Content $InputPath
+            $assertions = $content | Where-Object { $_ -match '^\*\*(Given|When|Then)\*\*:' } |
+                ForEach-Object { $_.TrimEnd() } |
+                Sort-Object
+            return ($assertions -join "`n")
+        }
+    }
+    else {
         return ""
     }
-
-    $content = Get-Content $TestSpecsFile
-
-    # Extract Given/When/Then lines, trim whitespace, sort for determinism
-    $assertions = $content | Where-Object { $_ -match '^\*\*(Given|When|Then)\*\*:' } |
-        ForEach-Object { $_.TrimEnd() } |
-        Sort-Object
-
-    return ($assertions -join "`n")
 }
 
 # Compute SHA256 hash of assertion content
+# Accepts: directory path (tests/features/), single .feature file, or legacy test-specs.md
+# Returns just the hash string, or NO_ASSERTIONS if no step lines found
 function Get-AssertionHash {
-    param([string]$TestSpecsFile)
+    param([string]$InputPath)
 
-    $assertions = Get-AssertionContent -TestSpecsFile $TestSpecsFile
+    $assertions = Get-AssertionContent -InputPath $InputPath
 
     if ([string]::IsNullOrEmpty($assertions)) {
         return "NO_ASSERTIONS"
@@ -130,26 +168,48 @@ function Get-AssertionHash {
     return $hash.ToLower()
 }
 
-# Derive context.json path from test-specs.md path
-# test-specs.md lives at specs/NNN-feature/tests/test-specs.md
-# context.json lives at specs/NNN-feature/context.json
+# Derive context.json path from input path
+# Supports:
+#   Directory: tests/features/ -> tests/ -> feature_dir/ -> context.json (2 levels up)
+#   .feature file: tests/features/x.feature -> tests/features/ -> tests/ -> feature_dir/ (3 levels up)
+#   Legacy .md: tests/test-specs.md -> tests/ -> feature_dir/ -> context.json (2 levels up)
 function Get-ContextPath {
-    param([string]$TestSpecsFile)
-    $testsDir = Split-Path $TestSpecsFile -Parent    # specs/NNN-feature/tests
-    $featureDir = Split-Path $testsDir -Parent        # specs/NNN-feature
-    return Join-Path $featureDir "context.json"
+    param([string]$InputPath)
+
+    if (Test-Path -Path $InputPath -PathType Container) {
+        # Directory input: tests/features/ -> go up 2 levels
+        $parentDir = Split-Path $InputPath -Parent       # tests/
+        $featureDir = Split-Path $parentDir -Parent       # specs/NNN-feature/
+        return Join-Path $featureDir "context.json"
+    }
+    elseif ($InputPath -like "*.feature") {
+        # Single .feature file: tests/features/x.feature -> go up 3 levels
+        $featuresDir = Split-Path $InputPath -Parent      # tests/features/
+        $testsDir = Split-Path $featuresDir -Parent       # tests/
+        $featureDir = Split-Path $testsDir -Parent        # specs/NNN-feature/
+        return Join-Path $featureDir "context.json"
+    }
+    else {
+        # Legacy: tests/test-specs.md -> go up 2 levels
+        $testsDir = Split-Path $InputPath -Parent         # tests/
+        $featureDir = Split-Path $testsDir -Parent        # specs/NNN-feature/
+        return Join-Path $featureDir "context.json"
+    }
 }
 
 # Store assertion hash in context.json
-# context.json path is derived from test-specs.md location (not caller-specified)
+# Creates or updates the testify section
+# context.json path is derived from input location (not caller-specified)
+# For directory input: stores features_dir and file_count
+# For legacy file input: stores test_specs_file (backward compat)
 function Set-AssertionHash {
     param(
-        [string]$TestSpecsFile,
+        [string]$InputPath,
         [string]$ContextFile  # Legacy param — ignored, path is derived
     )
-    $ContextFile = Get-ContextPath -TestSpecsFile $TestSpecsFile
+    $ContextFile = Get-ContextPath -InputPath $InputPath
 
-    $hash = Get-AssertionHash -TestSpecsFile $TestSpecsFile
+    $hash = Get-AssertionHash -InputPath $InputPath
     $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
 
     # Create context file if it doesn't exist
@@ -160,11 +220,24 @@ function Set-AssertionHash {
     # Read existing context
     $context = Get-Content $ContextFile -Raw | ConvertFrom-Json
 
-    # Add or update testify section
-    $testifyData = @{
-        assertion_hash = $hash
-        generated_at = $timestamp
-        test_specs_file = $TestSpecsFile
+    # Build testify data based on input type
+    if (Test-Path -Path $InputPath -PathType Container) {
+        # Directory input: store features_dir and file_count
+        $fileCount = (Get-ChildItem "$InputPath/*.feature" -ErrorAction SilentlyContinue).Count
+        $testifyData = @{
+            assertion_hash = $hash
+            generated_at = $timestamp
+            features_dir = $InputPath
+            file_count = $fileCount
+        }
+    }
+    else {
+        # Legacy file input: store test_specs_file
+        $testifyData = @{
+            assertion_hash = $hash
+            generated_at = $timestamp
+            test_specs_file = $InputPath
+        }
     }
 
     # Handle PSCustomObject conversion
@@ -180,13 +253,14 @@ function Set-AssertionHash {
 }
 
 # Verify assertion hash matches stored value
-# context.json path is derived from test-specs.md location
+# Returns: "valid", "invalid", or "missing"
+# context.json path is derived from input location
 function Test-AssertionHash {
     param(
-        [string]$TestSpecsFile,
+        [string]$InputPath,
         [string]$ContextFile  # Legacy param — ignored, path is derived
     )
-    $ContextFile = Get-ContextPath -TestSpecsFile $TestSpecsFile
+    $ContextFile = Get-ContextPath -InputPath $InputPath
 
     # Check if context file exists
     if (-not (Test-Path $ContextFile)) {
@@ -204,7 +278,7 @@ function Test-AssertionHash {
     $storedHash = $context.testify.assertion_hash
 
     # Compute current hash
-    $currentHash = Get-AssertionHash -TestSpecsFile $TestSpecsFile
+    $currentHash = Get-AssertionHash -InputPath $InputPath
 
     if ($storedHash -eq $currentHash) {
         return "valid"
@@ -231,20 +305,20 @@ function Test-GitRepo {
 
 # Store assertion hash as a git note on the current HEAD
 function Set-GitNote {
-    param([string]$TestSpecsFile)
+    param([string]$InputPath)
 
     if (-not (Test-GitRepo)) {
         return "ERROR:NOT_GIT_REPO"
     }
 
-    $hash = Get-AssertionHash -TestSpecsFile $TestSpecsFile
+    $hash = Get-AssertionHash -InputPath $InputPath
     $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
 
     # Create note content
     $noteContent = @"
 testify-hash: $hash
 generated-at: $timestamp
-test-specs-file: $TestSpecsFile
+test-specs-file: $InputPath
 "@
 
     # Store as git note on HEAD
@@ -262,7 +336,7 @@ test-specs-file: $TestSpecsFile
 
 # Verify assertion hash against git note
 function Test-GitNote {
-    param([string]$TestSpecsFile)
+    param([string]$InputPath)
 
     if (-not (Test-GitRepo)) {
         return "ERROR:NOT_GIT_REPO"
@@ -286,7 +360,7 @@ function Test-GitNote {
     }
 
     # Compute current hash
-    $currentHash = Get-AssertionHash -TestSpecsFile $TestSpecsFile
+    $currentHash = Get-AssertionHash -InputPath $InputPath
 
     if ($storedHash -eq $currentHash) {
         return "valid"
@@ -299,21 +373,21 @@ function Test-GitNote {
 # GIT DIFF INTEGRITY CHECK
 # =============================================================================
 
-# Check if test-specs.md has uncommitted assertion changes
+# Check if input file has uncommitted assertion changes
 function Test-GitDiff {
-    param([string]$TestSpecsFile)
+    param([string]$InputPath)
 
     if (-not (Test-GitRepo)) {
         return "ERROR:NOT_GIT_REPO"
     }
 
-    if (-not (Test-Path $TestSpecsFile)) {
+    if (-not (Test-Path $InputPath)) {
         return "ERROR:FILE_NOT_FOUND"
     }
 
     # Check if file is tracked by git
     try {
-        $null = git ls-files --error-unmatch $TestSpecsFile 2>$null
+        $null = git ls-files --error-unmatch $InputPath 2>$null
         if ($LASTEXITCODE -ne 0) {
             return "untracked"
         }
@@ -323,7 +397,7 @@ function Test-GitDiff {
 
     # Get diff of the file against HEAD
     try {
-        $diffOutput = git diff HEAD -- $TestSpecsFile 2>$null
+        $diffOutput = git diff HEAD -- $InputPath 2>$null
         if ($LASTEXITCODE -ne 0) {
             return "ERROR:GIT_DIFF_FAILED"
         }
@@ -345,13 +419,15 @@ function Test-GitDiff {
 }
 
 # Comprehensive integrity check combining all methods
+# Accepts: features directory, single .feature file, or legacy test-specs.md
+# Returns JSON with status from each check method
 function Get-ComprehensiveIntegrityCheck {
     param(
-        [string]$TestSpecsFile,
+        [string]$InputPath,
         [string]$ContextFile,  # Legacy param — ignored, path is derived
         [string]$ConstitutionFile
     )
-    $ContextFile = Get-ContextPath -TestSpecsFile $TestSpecsFile
+    $ContextFile = Get-ContextPath -InputPath $InputPath
 
     $hashResult = "skipped"
     $gitNoteResult = "skipped"
@@ -371,15 +447,22 @@ function Get-ComprehensiveIntegrityCheck {
 
     # Check context.json hash
     if (Test-Path $ContextFile) {
-        $hashResult = Test-AssertionHash -TestSpecsFile $TestSpecsFile -ContextFile $ContextFile
+        $hashResult = Test-AssertionHash -InputPath $InputPath -ContextFile $ContextFile
     } else {
         $hashResult = "missing"
     }
 
-    # Check git-based integrity (if in git repo)
+    # Check git-based integrity (if in git repo and input is a file)
+    # Git note/diff checks only apply to individual files, not directories
     if (Test-GitRepo) {
-        $gitNoteResult = Test-GitNote -TestSpecsFile $TestSpecsFile
-        $gitDiffResult = Test-GitDiff -TestSpecsFile $TestSpecsFile
+        if (Test-Path -Path $InputPath -PathType Leaf) {
+            $gitNoteResult = Test-GitNote -InputPath $InputPath
+            $gitDiffResult = Test-GitDiff -InputPath $InputPath
+        } else {
+            # For directory input, git note/diff not applicable (multiple files)
+            $gitNoteResult = "skipped"
+            $gitDiffResult = "skipped"
+        }
     }
 
     # Determine overall status
@@ -390,7 +473,7 @@ function Get-ComprehensiveIntegrityCheck {
         $overallStatus = "BLOCKED"
         $blockReason = "Uncommitted changes to assertions detected"
     } elseif ($tddDetermination -eq "mandatory") {
-        if ($hashResult -eq "missing" -and $gitNoteResult -eq "missing") {
+        if ($hashResult -eq "missing" -and $gitNoteResult -ne "valid") {
             $overallStatus = "BLOCKED"
             $blockReason = "TDD is mandatory but no integrity hash found"
         } else {
@@ -399,7 +482,7 @@ function Get-ComprehensiveIntegrityCheck {
     } else {
         if ($hashResult -eq "valid" -or $gitNoteResult -eq "valid") {
             $overallStatus = "PASS"
-        } elseif ($hashResult -eq "missing" -and $gitNoteResult -eq "missing") {
+        } elseif ($hashResult -eq "missing" -and $gitNoteResult -ne "valid") {
             $overallStatus = "WARN"
             $blockReason = "No integrity hash found (TDD is optional)"
         } else {
@@ -507,59 +590,59 @@ switch ($Command) {
     }
     "extract-assertions" {
         if (-not $FilePath) {
-            Write-Error "Usage: testify-tdd.ps1 extract-assertions <test-specs-file>"
+            Write-Error "Usage: testify-tdd.ps1 extract-assertions <features-dir-or-file>"
             exit 1
         }
-        Get-AssertionContent -TestSpecsFile $FilePath
+        Get-AssertionContent -InputPath $FilePath
     }
     "compute-hash" {
         if (-not $FilePath) {
-            Write-Error "Usage: testify-tdd.ps1 compute-hash <test-specs-file>"
+            Write-Error "Usage: testify-tdd.ps1 compute-hash <features-dir-or-file>"
             exit 1
         }
-        Get-AssertionHash -TestSpecsFile $FilePath
+        Get-AssertionHash -InputPath $FilePath
     }
     { $_ -in "store-hash", "rehash" } {
         if (-not $FilePath) {
-            Write-Error "Usage: testify-tdd.ps1 rehash <test-specs-file>"
+            Write-Error "Usage: testify-tdd.ps1 store-hash <features-dir-or-file>"
             exit 1
         }
-        Set-AssertionHash -TestSpecsFile $FilePath
+        Set-AssertionHash -InputPath $FilePath
     }
     "verify-hash" {
         if (-not $FilePath) {
-            Write-Error "Usage: testify-tdd.ps1 verify-hash <test-specs-file>"
+            Write-Error "Usage: testify-tdd.ps1 verify-hash <features-dir-or-file>"
             exit 1
         }
-        Test-AssertionHash -TestSpecsFile $FilePath
+        Test-AssertionHash -InputPath $FilePath
     }
     "store-git-note" {
         if (-not $FilePath) {
             Write-Error "Usage: testify-tdd.ps1 store-git-note <test-specs-file>"
             exit 1
         }
-        Set-GitNote -TestSpecsFile $FilePath
+        Set-GitNote -InputPath $FilePath
     }
     "verify-git-note" {
         if (-not $FilePath) {
             Write-Error "Usage: testify-tdd.ps1 verify-git-note <test-specs-file>"
             exit 1
         }
-        Test-GitNote -TestSpecsFile $FilePath
+        Test-GitNote -InputPath $FilePath
     }
     "check-git-diff" {
         if (-not $FilePath) {
             Write-Error "Usage: testify-tdd.ps1 check-git-diff <test-specs-file>"
             exit 1
         }
-        Test-GitDiff -TestSpecsFile $FilePath
+        Test-GitDiff -InputPath $FilePath
     }
     "comprehensive-check" {
         if (-not $FilePath -or -not $ContextFile) {
-            Write-Error "Usage: testify-tdd.ps1 comprehensive-check <test-specs-file> <constitution-file>"
+            Write-Error "Usage: testify-tdd.ps1 comprehensive-check <features-dir-or-file> <constitution-file>"
             exit 1
         }
-        Get-ComprehensiveIntegrityCheck -TestSpecsFile $FilePath -ConstitutionFile $ContextFile
+        Get-ComprehensiveIntegrityCheck -InputPath $FilePath -ConstitutionFile $ContextFile
     }
     default {
         Write-Host "Unknown command: $Command"
@@ -571,17 +654,17 @@ switch ($Command) {
         Write-Host "  Scenario Counting:"
         Write-Host "    count-scenarios <spec-file>           - Count acceptance scenarios"
         Write-Host "    has-scenarios <spec-file>             - Check if scenarios exist"
-        Write-Host "  Hash-based Integrity (context.json auto-derived from test-specs path):"
-        Write-Host "    extract-assertions <test-specs-file>  - Extract assertion lines"
-        Write-Host "    compute-hash <test-specs-file>        - Compute SHA256 hash"
-        Write-Host "    store-hash|rehash <test-specs-file>   - Atomic compute + store hash in feature's context.json"
-        Write-Host "    verify-hash <test-specs-file>         - Verify against feature's context.json"
+        Write-Host "  Hash-based Integrity (context.json auto-derived from input path):"
+        Write-Host "    extract-assertions <dir-or-file>      - Extract step lines (.feature dir/file or legacy .md)"
+        Write-Host "    compute-hash <dir-or-file>            - Compute SHA256 hash"
+        Write-Host "    store-hash|rehash <dir-or-file>       - Atomic compute + store hash in feature's context.json"
+        Write-Host "    verify-hash <dir-or-file>             - Verify against feature's context.json"
         Write-Host "  Git-based Integrity (tamper-resistant):"
         Write-Host "    store-git-note <test-specs-file>      - Store hash as git note"
         Write-Host "    verify-git-note <test-specs-file>     - Verify against git note"
         Write-Host "    check-git-diff <test-specs-file>      - Check uncommitted changes"
         Write-Host "  Comprehensive:"
-        Write-Host "    comprehensive-check <test-specs-file> <constitution-file>"
+        Write-Host "    comprehensive-check <dir-or-file> <constitution-file>"
         exit 1
     }
 }

@@ -44,13 +44,14 @@ if (-not $scriptsDir) {
 $testifyScript = Join-Path $scriptsDir "testify-tdd.ps1"
 
 # ============================================================================
-# FAST PATH — exit if no test-specs.md in the commit that just landed
+# FAST PATH — exit if no .feature files or test-specs.md in the commit
 # ============================================================================
 
 $committedFiles = git diff-tree --no-commit-id --name-only -r HEAD 2>$null
+$committedFeatureFiles = $committedFiles | Where-Object { $_ -match 'tests/features/.*\.feature$' }
 $committedTestSpecs = $committedFiles | Where-Object { $_ -match 'test-specs\.md$' }
 
-if (-not $committedTestSpecs) {
+if (-not $committedFeatureFiles -and -not $committedTestSpecs) {
     exit 0
 }
 
@@ -66,6 +67,90 @@ try {
 } catch { $existingNote = "" }
 $fullNote = $existingNote
 
+# --- .feature files: group by feature directory, compute combined hash ---
+if ($committedFeatureFiles) {
+    $committedFeatDirs = @{}
+    foreach ($committedPath in $committedFeatureFiles) {
+        if ([string]::IsNullOrEmpty($committedPath)) { continue }
+        $featuresDir = Split-Path $committedPath -Parent    # tests/features
+        $testsDir = Split-Path $featuresDir -Parent          # tests
+        $featDir = Split-Path $testsDir -Parent              # specs/NNN-feature
+        $committedFeatDirs[$featDir] = $true
+    }
+
+    foreach ($featDir in $committedFeatDirs.Keys) {
+        # Extract all committed .feature files for this feature to temp dir
+        $tempFeaturesDir = Join-Path ([System.IO.Path]::GetTempPath()) ([System.IO.Path]::GetRandomFileName())
+        New-Item -ItemType Directory -Path $tempFeaturesDir -Force | Out-Null
+
+        $featFiles = $committedFeatureFiles | Where-Object { $_ -match "^$([regex]::Escape($featDir))/" }
+        foreach ($cf in $featFiles) {
+            if ([string]::IsNullOrEmpty($cf)) { continue }
+            $basename = Split-Path $cf -Leaf
+            try {
+                $content = git show "HEAD:$cf" 2>$null
+                if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrEmpty($content)) {
+                    $content | Out-File -FilePath (Join-Path $tempFeaturesDir $basename) -Encoding utf8
+                }
+            } catch { continue }
+        }
+
+        $currentHash = & $testifyScript compute-hash $tempFeaturesDir
+        Remove-Item -Recurse -Force $tempFeaturesDir -ErrorAction SilentlyContinue
+
+        if ($currentHash -eq "NO_ASSERTIONS") {
+            continue
+        }
+
+        $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+        $featuresRelPath = "$featDir/tests/features"
+        $entry = "testify-hash: $currentHash`ngenerated-at: $timestamp`nfeatures-dir: $featuresRelPath"
+
+        # Remove any existing entry for this features dir
+        if (-not [string]::IsNullOrEmpty($fullNote)) {
+            $lines = $fullNote -split "`n"
+            $filtered = @()
+            $skip = $false
+            $currentBlock = @()
+            foreach ($line in $lines) {
+                if ($line -match '^testify-hash:') {
+                    if ($currentBlock.Count -gt 0 -and -not $skip) {
+                        $filtered += $currentBlock
+                    }
+                    $currentBlock = @($line)
+                    $skip = $false
+                } elseif ($line -eq '---') {
+                    if (-not $skip) {
+                        $currentBlock += $line
+                        $filtered += $currentBlock
+                    }
+                    $currentBlock = @()
+                    $skip = $false
+                } else {
+                    if ($line -match "^features-dir:.*$([regex]::Escape($featuresRelPath))") {
+                        $skip = $true
+                    }
+                    $currentBlock += $line
+                }
+            }
+            if ($currentBlock.Count -gt 0 -and -not $skip) {
+                $filtered += $currentBlock
+            }
+            $fullNote = ($filtered -join "`n").Trim()
+        }
+
+        # Append new entry
+        if (-not [string]::IsNullOrEmpty($fullNote)) {
+            $fullNote = "$fullNote`n---`n$entry"
+        } else {
+            $fullNote = $entry
+        }
+
+        Write-Host "[iikit] Assertion hash stored as git note for $featuresRelPath" -ForegroundColor Green
+    }
+}
+
+# --- Legacy test-specs.md files ---
 foreach ($committedPath in $committedTestSpecs) {
     if ([string]::IsNullOrEmpty($committedPath)) { continue }
 
