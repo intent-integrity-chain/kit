@@ -127,4 +127,5 @@ Tasks generated! Next steps:
 - /iikit-07-analyze - (Recommended) Validate consistency
 - /iikit-08-implement - Execute implementation (requires 100% checklist completion)
 Tip: <model switch suggestion if tier mismatch, omit if already on the right model>
+- Dashboard: open .specify/dashboard.html to view progress
 ```

@@ -35,17 +35,6 @@ fi
 # Generate dashboard
 node "$GENERATOR" "$PROJECT_DIR" 2>/dev/null || exit 0
 
-# Open in browser on first generation (if dashboard.html is new)
-if [[ -f "$OUTPUT_FILE" ]] && [[ ! -f "$PROJECT_DIR/.specify/.dashboard-opened" ]]; then
-    # Mark as opened so we don't re-open on every skill invocation
-    touch "$PROJECT_DIR/.specify/.dashboard-opened"
-
-    # Platform-specific open
-    if command -v open >/dev/null 2>&1; then
-        open "$OUTPUT_FILE" 2>/dev/null || true
-    elif command -v xdg-open >/dev/null 2>&1; then
-        xdg-open "$OUTPUT_FILE" 2>/dev/null || true
-    fi
-fi
+# Dashboard generated — the skill will suggest the user open it
 
 exit 0

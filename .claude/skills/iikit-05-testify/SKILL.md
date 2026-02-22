@@ -82,7 +82,7 @@ Feature-level tags for shared metadata:
 
 **From spec.md — Acceptance Tests**: For each Given/When/Then scenario, generate a Gherkin scenario.
 
-For transformation examples, advanced constructs (Background, Scenario Outline, Rule), and syntax validation rules, see [gherkin-reference.md](references/gherkin-reference.md).
+Use [testspec-template.md](../iikit-core/templates/testspec-template.md) as the Gherkin file template. For transformation examples, advanced constructs (Background, Scenario Outline, Rule), and syntax validation rules, see [gherkin-reference.md](references/gherkin-reference.md).
 
 ### 3. Add DO NOT MODIFY Markers
 
@@ -147,4 +147,5 @@ You MUST read [model-recommendations.md](../iikit-core/references/model-recommen
 Feature files generated!
 - /iikit-06-tasks - Generate task breakdown (tasks can now reference .feature scenarios)
 Tip: <model switch suggestion if tier mismatch, omit if already on the right model>
+- Dashboard: open .specify/dashboard.html to view progress
 ```

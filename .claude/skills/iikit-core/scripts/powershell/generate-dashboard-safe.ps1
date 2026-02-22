@@ -39,18 +39,6 @@ try {
 }
 if ($LASTEXITCODE -ne 0) { exit 0 }
 
-# Open in browser on first generation
-$OpenedMarker = Join-Path $ProjectDir ".specify" ".dashboard-opened"
-if ((Test-Path $OutputFile) -and -not (Test-Path $OpenedMarker)) {
-    New-Item -ItemType File -Path $OpenedMarker -Force | Out-Null
-
-    if ($IsWindows) {
-        Start-Process $OutputFile -ErrorAction SilentlyContinue
-    } elseif ($IsMacOS) {
-        & open $OutputFile 2>$null
-    } elseif ($IsLinux) {
-        & xdg-open $OutputFile 2>$null
-    }
-}
+# Dashboard generated — the skill will suggest the user open it
 
 exit 0

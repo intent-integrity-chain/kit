@@ -85,4 +85,5 @@ You MUST read [model-recommendations.md](../iikit-core/references/model-recommen
 ```
 Constitution ready! Next: /iikit-01-specify
 Tip: <model switch suggestion if tier mismatch, omit if already on the right model>
+- Dashboard: open .specify/dashboard.html to view progress
 ```

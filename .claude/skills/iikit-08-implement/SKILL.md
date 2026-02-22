@@ -58,6 +58,13 @@ Scan tasks.md for unchecked tasks (`[ ]`). If **every** unchecked task has a `T-
 
 Read each checklist in `FEATURE_DIR/checklists/`. All must be 100% complete. If incomplete: ask user to proceed or halt.
 
+## Dashboard
+
+Suggest the user open the dashboard to watch implementation progress in real time:
+```
+Dashboard: open .specify/dashboard.html — updates live as tasks complete
+```
+
 ## Execution Flow
 
 ### 1. Load Context

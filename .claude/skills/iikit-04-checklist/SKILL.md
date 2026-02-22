@@ -99,6 +99,7 @@ Checklist complete! (100%)
 Next steps:
 - /iikit-05-testify - (Optional) Generate test specifications for TDD
 - /iikit-06-tasks - Generate task breakdown from plan
+- Dashboard: open .specify/dashboard.html to view progress
 ```
 
 If deferred items remain, warn that downstream skills will flag incomplete checklists.

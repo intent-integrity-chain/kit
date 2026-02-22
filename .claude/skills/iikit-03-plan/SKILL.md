@@ -160,4 +160,5 @@ Plan complete! Next steps:
 - /iikit-05-testify - (Optional) Generate test specifications for TDD [if TDD not mandatory]
 - /iikit-06-tasks - Generate task breakdown from plan
 Tip: <model switch suggestion if tier mismatch, omit if already on the right model>
+- Dashboard: open .specify/dashboard.html to view progress
 ```
