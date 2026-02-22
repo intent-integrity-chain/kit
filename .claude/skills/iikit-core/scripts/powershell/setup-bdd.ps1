@@ -3,6 +3,8 @@
 # Usage: setup-bdd.ps1 [--json] <features-dir> <plan-file>
 
 param(
+    [switch]$json,
+
     [Parameter(Position = 0)]
     [string]$Arg1,
 
@@ -23,7 +25,11 @@ $JsonMode = $false
 $FeaturesDir = ""
 $PlanFile = ""
 
-if ($Arg1 -eq "--json") {
+if ($json) {
+    $JsonMode = $true
+    $FeaturesDir = $Arg1
+    $PlanFile = $Arg2
+} elseif ($Arg1 -eq "--json") {
     $JsonMode = $true
     $FeaturesDir = $Arg2
     $PlanFile = $Arg3

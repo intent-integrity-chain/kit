@@ -628,8 +628,18 @@ EOF
 JSON_MODE=false
 [[ "${1:-}" == "--json" ]] && { JSON_MODE=true; shift; }
 
-STEP_DEFS_DIR="${1:?Usage: verify-step-quality.sh [--json] <step-definitions-dir> <language>}"
-LANGUAGE="${2:?Usage: verify-step-quality.sh [--json] <step-definitions-dir> <language>}"
+STEP_DEFS_DIR="${1:-}"
+LANGUAGE="${2:-}"
+
+# Validate required arguments
+if [[ -z "$STEP_DEFS_DIR" ]] || [[ -z "$LANGUAGE" ]]; then
+    if $JSON_MODE; then
+        echo '{"status":"ERROR","language":"unknown","parser":"none","error":"Usage: verify-step-quality.sh [--json] <step-definitions-dir> <language>","total_steps":0,"quality_pass":0,"quality_fail":0,"details":[]}'
+    else
+        echo "Usage: verify-step-quality.sh [--json] <step-definitions-dir> <language>" >&2
+    fi
+    exit 1
+fi
 
 # Validate directory exists
 if [[ ! -d "$STEP_DEFS_DIR" ]]; then

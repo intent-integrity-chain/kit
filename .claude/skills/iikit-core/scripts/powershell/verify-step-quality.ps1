@@ -4,6 +4,8 @@
 # Usage: verify-step-quality.ps1 [--json] <step-definitions-dir> <language>
 
 param(
+    [switch]$json,
+
     [Parameter(Position = 0)]
     [string]$Arg1,
 
@@ -16,12 +18,16 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-# Parse arguments
+# Parse arguments: handle --json switch or positional --json string
 $JsonMode = $false
 $StepDefsDir = ""
 $Language = ""
 
-if ($Arg1 -eq "--json") {
+if ($json) {
+    $JsonMode = $true
+    $StepDefsDir = $Arg1
+    $Language = $Arg2
+} elseif ($Arg1 -eq "--json") {
     $JsonMode = $true
     $StepDefsDir = $Arg2
     $Language = $Arg3
