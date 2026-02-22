@@ -51,9 +51,9 @@ Report readiness per [formatting-guide.md](../iikit-core/references/formatting-g
 ### 1. Load Documents
 
 - **Required**: `plan.md`, `spec.md`
-- **Optional**: `data-model.md`, `contracts/`, `research.md`, `quickstart.md`, `tests/test-specs.md`
+- **Optional**: `data-model.md`, `contracts/`, `research.md`, `quickstart.md`, `tests/features/` (.feature files)
 
-If test-specs.md exists, tasks reference specific test IDs (e.g., "T012 [US1] Implement to pass TS-001").
+If .feature files exist (or legacy test-specs.md), tasks reference specific test IDs (e.g., "T012 [US1] Implement to pass TS-001").
 
 ### 2. Tessl Convention Consultation
 

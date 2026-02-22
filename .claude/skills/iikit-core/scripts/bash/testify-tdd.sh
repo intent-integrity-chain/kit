@@ -237,6 +237,8 @@ store_assertion_hash() {
 # Verify assertion hash matches stored value
 # Returns: "valid", "invalid", or "missing"
 # context.json path is derived from input location
+# When a single .feature file is passed but hash was stored from a directory,
+# automatically resolves to the parent directory for correct hash comparison
 verify_assertion_hash() {
     local input_path="$1"
     # Accept legacy second arg for backwards compat, but always derive the correct path
@@ -258,9 +260,21 @@ verify_assertion_hash() {
         return
     fi
 
+    # If input is a single .feature file but hash was stored from a directory,
+    # resolve to the parent directory for correct comparison
+    local hash_input="$input_path"
+    if [[ -f "$input_path" ]] && [[ "$input_path" == *.feature ]]; then
+        local stored_dir
+        stored_dir=$(jq -r '.testify.features_dir // ""' "$context_file" 2>/dev/null)
+        if [[ -n "$stored_dir" ]]; then
+            # Hash was stored from a directory — use the parent dir of this .feature file
+            hash_input=$(dirname "$input_path")
+        fi
+    fi
+
     # Compute current hash
     local current_hash
-    current_hash=$(compute_assertion_hash "$input_path")
+    current_hash=$(compute_assertion_hash "$hash_input")
 
     if [[ "$stored_hash" == "$current_hash" ]]; then
         echo "valid"
@@ -353,10 +367,10 @@ verify_git_note() {
 # GIT DIFF INTEGRITY CHECK
 # =============================================================================
 
-# Check if test-specs.md has uncommitted assertion changes
+# Check if assertion files have uncommitted assertion changes
 # Returns: "clean", "modified", "untracked", or "error:*"
 check_git_diff() {
-    local test_specs_file="$1"
+    local input_path="$1"
 
     # Check if we're in a git repo
     if ! git rev-parse --git-dir >/dev/null 2>&1; then
@@ -365,13 +379,13 @@ check_git_diff() {
     fi
 
     # Check if file exists
-    if [[ ! -f "$test_specs_file" ]]; then
+    if [[ ! -f "$input_path" ]]; then
         echo "ERROR:FILE_NOT_FOUND"
         return
     fi
 
     # Check if file is tracked by git
-    if ! git ls-files --error-unmatch "$test_specs_file" >/dev/null 2>&1; then
+    if ! git ls-files --error-unmatch "$input_path" >/dev/null 2>&1; then
         echo "untracked"
         return
     fi
@@ -379,7 +393,7 @@ check_git_diff() {
     # Check for uncommitted changes to assertion lines specifically
     # Get diff of the file against HEAD
     local diff_output
-    diff_output=$(git diff HEAD -- "$test_specs_file" 2>/dev/null) || {
+    diff_output=$(git diff HEAD -- "$input_path" 2>/dev/null) || {
         echo "ERROR:GIT_DIFF_FAILED"
         return
     }
@@ -390,9 +404,13 @@ check_git_diff() {
         return
     fi
 
-    # Check if any Given/When/Then lines were modified
-    # Look for added (+) or removed (-) assertion lines
+    # Check if any assertion lines were modified
+    # Look for added (+) or removed (-) assertion lines in either format:
+    # Legacy test-specs.md: **Given**:, **When**:, **Then**:
+    # Gherkin .feature: Given ..., When ..., Then ..., And ..., But ...
     if echo "$diff_output" | grep -qE '^[+-]\*\*(Given|When|Then)\*\*:'; then
+        echo "modified"
+    elif echo "$diff_output" | grep -qE '^[+-][[:space:]]*(Given|When|Then|And|But) '; then
         echo "modified"
     else
         # Changes exist but not to assertions (e.g., formatting, comments)
@@ -647,7 +665,7 @@ if [[ $# -gt 0 ]]; then
             echo "    verify-git-note <test-specs-file>     - Verify against git note"
             echo "    check-git-diff <test-specs-file>      - Check uncommitted changes"
             echo "  Comprehensive:"
-            echo "    comprehensive-check <test-specs-file> <constitution-file>"
+            echo "    comprehensive-check <dir-or-file> <constitution-file>"
             exit 1
             ;;
     esac

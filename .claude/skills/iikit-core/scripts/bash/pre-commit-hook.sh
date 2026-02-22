@@ -104,18 +104,31 @@ if [[ -n "$STAGED_FEATURE_FILES" ]]; then
         CONTEXT_FILE="$REPO_ROOT/$FEAT_DIR/context.json"
         CONTEXT_REL_PATH="$FEAT_DIR/context.json"
 
-        # Extract all staged .feature files for this feature to temp dir
+        # Reconstruct the full features directory for hash computation:
+        # 1. Start with all committed .feature files from HEAD
+        # 2. Overlay any staged changes on top
+        # This handles partial staging correctly (only some files staged)
         TEMP_FEATURES_DIR=$(mktemp -d)
         trap "rm -rf $TEMP_FEATURES_DIR" EXIT
 
-        STAGED_FOR_FEAT=$(echo "$STAGED_FEATURE_FILES" | grep "^$FEAT_DIR/")
+        FEATURES_REL="$FEAT_DIR/tests/features"
+
+        # Step 1: Get ALL committed .feature files from HEAD
+        COMMITTED_FEATURES=$(git ls-tree --name-only "HEAD:$FEATURES_REL" 2>/dev/null | grep '\.feature$') || true
+        while IFS= read -r fname; do
+            [[ -z "$fname" ]] && continue
+            git show "HEAD:$FEATURES_REL/$fname" > "$TEMP_FEATURES_DIR/$fname" 2>/dev/null || true
+        done <<< "$COMMITTED_FEATURES"
+
+        # Step 2: Overlay staged versions (these take precedence over HEAD)
+        STAGED_FOR_FEAT=$(echo "$STAGED_FEATURE_FILES" | grep "^$FEAT_DIR/") || true
         while IFS= read -r staged_path; do
             [[ -z "$staged_path" ]] && continue
             BASENAME=$(basename "$staged_path")
             git show ":$staged_path" > "$TEMP_FEATURES_DIR/$BASENAME" 2>/dev/null || continue
         done <<< "$STAGED_FOR_FEAT"
 
-        # Compute combined hash of staged .feature files
+        # Compute combined hash of the full reconstructed directory
         CURRENT_HASH=$(compute_assertion_hash "$TEMP_FEATURES_DIR")
         rm -rf "$TEMP_FEATURES_DIR"
 
