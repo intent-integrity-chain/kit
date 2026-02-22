@@ -11,10 +11,10 @@ count_expected_tests() {
     local input_path="$1"
 
     if [[ -d "$input_path" ]]; then
-        # Directory: count @TS-XXX tags or Scenario: lines across .feature files
+        # Directory: count Scenario: lines across .feature files
         local count=0
         local f
-        for f in "$input_path"/*.feature 2>/dev/null; do
+        for f in "$input_path"/*.feature; do
             [[ -f "$f" ]] || continue
             local file_count
             file_count=$(grep -cE "^\s*(Scenario:|Scenario Outline:)" "$f" 2>/dev/null) || true

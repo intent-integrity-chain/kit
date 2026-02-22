@@ -12,6 +12,11 @@ DASHBOARD_DIR="$SCRIPT_DIR/../dashboard"
 GENERATOR="$DASHBOARD_DIR/generate-dashboard.js"
 OUTPUT_FILE="$PROJECT_DIR/.specify/dashboard.html"
 
+# Skip in test environments
+if [[ -n "${BATS_TEST_FILENAME:-}" ]] || [[ -n "${BATS_TMPDIR:-}" ]]; then
+    exit 0
+fi
+
 # Check if node is available
 if ! command -v node >/dev/null 2>&1; then
     exit 0
