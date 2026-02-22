@@ -86,6 +86,15 @@ VIOLATION DETECTED: [violation type]
 ACTION: [auto-fixing / requiring manual fix]
 ```
 
+## Constitution Alignment Table (analyze)
+
+```markdown
+| Principle | Status | Notes |
+|-----------|--------|-------|
+```
+
+Status values: `ALIGNED` (principle satisfied) or `VIOLATION` (principle violated, auto-CRITICAL).
+
 ## Coverage Tables
 
 For analysis and validation:

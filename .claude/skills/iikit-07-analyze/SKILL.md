@@ -64,7 +64,9 @@ From tasks.md: task IDs, descriptions, phases, [P] markers, file paths.
 **A. Duplication**: near-duplicate requirements -> consolidate
 **B. Ambiguity**: vague terms (fast, scalable, secure) without measurable criteria; unresolved placeholders
 **C. Underspecification**: requirements missing objects/outcomes; stories without acceptance criteria; tasks referencing undefined components
-**D. Constitution Alignment**: conflicts with MUST principles; missing mandated sections
+**D. Constitution Alignment**: conflicts with MUST principles; missing mandated sections. For each principle, report status using these exact values:
+- `ALIGNED` — principle satisfied across all artifacts
+- `VIOLATION` — principle violated (auto-CRITICAL severity)
 **E. Phase Separation Violations**: per [phase-separation-rules.md](../iikit-core/references/phase-separation-rules.md) — tech in constitution, implementation in spec, governance in plan
 **F. Coverage Gaps**: requirements with zero tasks; tasks with no mapped requirement; non-functional requirements not in tasks; requirements not referenced in plan.md
 
@@ -105,6 +107,7 @@ Output to console AND write to `FEATURE_DIR/analysis.md`:
 | ID | Category | Severity | Location(s) | Summary | Recommendation |
 |----|----------|----------|-------------|---------|----------------|
 
+**Constitution Alignment**: principle name -> status (ALIGNED | VIOLATION) -> notes
 **Coverage Summary**: requirement key -> has task? -> task IDs -> has plan? -> plan refs
 **Phase Separation Violations**: artifact, line, violation, severity
 **Metrics**: total requirements, total tasks, coverage %, ambiguity count, critical issues
