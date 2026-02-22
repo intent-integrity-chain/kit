@@ -4,12 +4,12 @@
 
 An AI coding assistant toolkit that preserves your intent from idea to implementation, with cryptographic verification at each step. Compatible with Claude Code, OpenAI Codex, Google Gemini, and OpenCode.
 
-## What's New in v1.10.0
+## What's New in v2.0.0
 
-- **PREMISE.md**: App-wide context document — what you're building, who it's for, and why. All skills load it automatically.
-- **No clarify question limit**: Clarification continues until all ambiguities are resolved, not after an arbitrary 5.
-- **Agent-aware model suggestions**: Skills suggest the optimal model for the next phase with agent-specific switch commands.
-- **No `gh` CLI hard dependency**: All GitHub operations fall back to `curl` when `gh` is unavailable.
+- **BDD verification chain**: Testify generates standard Gherkin `.feature` files (replaces `test-specs.md`). The implement skill enforces a full red-green-verify cycle: hash integrity → step coverage → RED → GREEN → step quality.
+- **3 new verification scripts**: `verify-steps.sh` (dry-run coverage for 8 BDD frameworks), `verify-step-quality.sh` (AST-based analysis detecting empty/tautological assertions), `setup-bdd.sh` (auto-scaffolding).
+- **Static dashboard**: Real-time kanban board as a static HTML file (replaces the old server process). No ports, no pidfiles, no `npx`.
+- **Cross-artifact traceability**: Analyze skill verifies `@FR-XXX` tags in `.feature` files trace to `spec.md` requirements.
 
 [Previous releases →](https://github.com/intent-integrity-chain/kit/blob/main/CHANGELOG.md)
 
@@ -20,14 +20,15 @@ When you tell an AI what you want, there's a gap between your *intent* and the *
 IIKit implements this chain:
 
 ```
-Intent ──▶ Spec ──▶ Test ──▶ Code
-       ↑       ↑        ↑
-       │       │        └── hash verified (no tampering)
-       │       └─────────── Given/When/Then locked
-       └─────────────────── clarified until aligned
+Intent ──▶ Spec ──▶ .feature ──▶ Steps ──▶ Code
+       ↑       ↑          ↑          ↑
+       │       │          │          └── step quality verified (no assert True)
+       │       │          └────────────── hash locked (no tampering)
+       │       └───────────────────────── @FR-XXX tags traced
+       └───────────────────────────────── clarified until aligned
 ```
 
-**Key principle**: No part of the chain validates itself. Tests are locked before implementation. If tests need to change, you go back to the spec.
+**Key principle**: No part of the chain validates itself. `.feature` files are locked before implementation. Step definitions are verified for coverage and quality. If requirements change, you go back to the spec.
 
 ## Quick Start
 
@@ -83,7 +84,7 @@ Each phase builds on the previous. Never skip phases.
 │  2. /iikit-02-clarify       →  Resolve ambiguities until spec is clear     │
 │  3. /iikit-03-plan          →  Technical plan (HOW - frameworks, etc.)     │
 │  4. /iikit-04-checklist     →  Quality checklists (unit tests for English) │
-│  5. /iikit-05-testify       →  Test specs from requirements (TDD)          │
+│  5. /iikit-05-testify       →  Gherkin .feature files from requirements     │
 │  6. /iikit-06-tasks         →  Task breakdown                              │
 │  7. /iikit-07-analyze       →  Cross-artifact consistency check            │
 │  8. /iikit-08-implement     →  Execute with integrity verification         │
@@ -91,34 +92,38 @@ Each phase builds on the previous. Never skip phases.
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Assertion Integrity: How Tests Stay Locked
+## BDD Verification Chain: How Tests Stay Locked
 
-The core of IIKit is preventing circular verification - where AI modifies tests to match buggy code.
+The core of IIKit is preventing circular verification — where AI modifies tests to match buggy code.
 
 ### How It Works
 
-1. **`/iikit-05-testify`** generates tests from your spec's Given/When/Then scenarios
-2. A SHA256 hash of all assertions is stored in `context.json` and as a git note
-3. **`/iikit-08-implement`** verifies the hash before writing any code
-4. If assertions were modified, implementation is **blocked**
+1. **`/iikit-05-testify`** generates Gherkin `.feature` files from your spec's Given/When/Then scenarios
+2. A SHA256 hash of all step lines (across all `.feature` files) is stored in `context.json` and as a git note
+3. **`/iikit-08-implement`** enforces the full BDD chain before marking any task complete:
+   - **Hash check**: `.feature` files not tampered since testify
+   - **Step coverage**: `verify-steps.sh` — all Gherkin steps have matching step definitions (dry-run)
+   - **RED phase**: Tests must fail before production code is written
+   - **GREEN phase**: Tests must pass after production code is written
+   - **Step quality**: `verify-step-quality.sh` — no empty bodies, no `assert True`, no missing assertions
 
 ```
 ╭─────────────────────────────────────────────────────────────────────────╮
-│  ASSERTION INTEGRITY CHECK                                              │
+│  BDD VERIFICATION CHAIN                                                 │
 ├─────────────────────────────────────────────────────────────────────────┤
-│  Context hash:  valid                                                   │
-│  Git note:      valid                                                   │
-│  Git diff:      clean                                                   │
-│  TDD status:    mandatory                                               │
+│  .feature hash:    valid                                                │
+│  Step coverage:    PASS (24/24 steps defined)                           │
+│  Step quality:     PASS (0 empty, 0 tautological)                       │
+│  TDD status:       mandatory                                            │
 ├─────────────────────────────────────────────────────────────────────────┤
-│  Overall:       PASS                                                    │
+│  Overall:          PASS                                                 │
 ╰─────────────────────────────────────────────────────────────────────────╯
 ```
 
 ### If Requirements Change
 
 1. Update `spec.md` with new requirements
-2. Re-run `/iikit-05-testify` to regenerate tests
+2. Re-run `/iikit-05-testify` to regenerate `.feature` files
 3. New hash is stored, implementation proceeds
 
 This ensures test changes are **intentional** and traceable to requirement changes.
@@ -138,7 +143,7 @@ The workflow is linear *the first time through*. After that, you'll often go bac
 | What changed | Re-run |
 |--------------|--------|
 | Added/removed requirements | `/iikit-03-plan` then `/iikit-06-tasks` |
-| Changed acceptance criteria (Given/When/Then) | `/iikit-05-testify` (re-locks assertions) |
+| Changed acceptance criteria (Given/When/Then) | `/iikit-05-testify` (re-generates .feature files, re-locks hash) |
 | Clarified wording only | Nothing — downstream artifacts still valid |
 
 ### Changing the technical plan (plan.md, research.md)
@@ -198,7 +203,7 @@ IIKit is distributed as a [Tessl](https://tessl.io) tile - a versioned package o
 **What Tessl provides:**
 
 - **Installation**: `tessl install tessl-labs/intent-integrity-kit` adds IIKit to any project
-- **Runtime knowledge**: During implementation, IIKit queries the Tessl registry for current library APIs - so the AI uses 2025 React patterns, not 2021 training data
+- **Runtime knowledge**: During implementation, IIKit queries the Tessl registry for current library APIs — so the AI uses 2026 React patterns, not 2023 training data
 - **2000+ tiles**: Documentation, rules, and skills for major frameworks and libraries
 
 **How IIKit uses Tessl:**
@@ -227,7 +232,7 @@ your-project/
         ├── contracts/           # API contracts
         ├── checklists/          # Quality checklists
         └── tests/
-            └── test-specs.md    # Locked test specifications
+            └── features/        # Locked Gherkin .feature files
 ```
 
 ## Supported Agents
