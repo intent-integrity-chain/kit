@@ -45,12 +45,12 @@ If bug-fix intent is detected:
 4. If the user confirms it is a new feature: proceed to Step 1
 5. If the user wants bugfix: stop and suggest they run `/iikit-bugfix`
 
-### 0.1 Launch Dashboard (optional, never blocks)
+### 0.1 Generate Dashboard (optional, never blocks)
 
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/ensure-dashboard.sh
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
 ```
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/ensure-dashboard.ps1`
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
 
 ### 1. Generate Branch Name
 

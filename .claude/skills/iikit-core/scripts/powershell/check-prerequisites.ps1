@@ -199,7 +199,7 @@ if ($cfg.Extras -match 'paths_only') {
         Write-Output "TASKS: $($paths.TASKS)"
     }
     # Launch dashboard
-    & "$PSScriptRoot/ensure-dashboard.ps1"
+    & "$PSScriptRoot/generate-dashboard-safe.ps1"
     exit 0
 }
 
@@ -386,7 +386,7 @@ if ($cfg.Extras -match 'status_mode') {
     }
 
     # Launch dashboard
-    & "$PSScriptRoot/ensure-dashboard.ps1"
+    & "$PSScriptRoot/generate-dashboard-safe.ps1"
     exit 0
 }
 
@@ -595,4 +595,4 @@ if ($Json) {
 }
 
 # Launch dashboard (idempotent, never fails)
-& "$PSScriptRoot/ensure-dashboard.ps1"
+& "$PSScriptRoot/generate-dashboard-safe.ps1"

@@ -270,7 +270,7 @@ if [[ "$P_EXTRAS" == *"paths_only"* ]]; then
         echo "TASKS: $TASKS"
     fi
     # Launch dashboard (idempotent, never fails)
-    bash "$SCRIPT_DIR/ensure-dashboard.sh"
+    bash "$SCRIPT_DIR/generate-dashboard-safe.sh"
     exit 0
 fi
 
@@ -503,7 +503,7 @@ if [[ "$P_EXTRAS" == *"status_mode"* ]]; then
     fi
 
     # Launch dashboard (idempotent, never fails)
-    bash "$SCRIPT_DIR/ensure-dashboard.sh"
+    bash "$SCRIPT_DIR/generate-dashboard-safe.sh"
     exit 0
 fi
 
@@ -715,4 +715,4 @@ else
 fi
 
 # Launch dashboard (idempotent, never fails)
-bash "$SCRIPT_DIR/ensure-dashboard.sh"
+bash "$SCRIPT_DIR/generate-dashboard-safe.sh"

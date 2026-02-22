@@ -44,11 +44,11 @@ The premise is content-specific (what we're building); the constitution is conte
 
 1. **Load existing constitution** — identify placeholder tokens `[ALL_CAPS_IDENTIFIER]`. Adapt to user's needs (more or fewer principles than template).
 
-1.1. **Launch Dashboard** (optional, never blocks):
+1.1. **Generate Dashboard** (optional, never blocks):
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/ensure-dashboard.sh
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
 ```
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/ensure-dashboard.ps1`
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
 
 2. **Collect values for placeholders**:
    - From user input, or infer from repo context
