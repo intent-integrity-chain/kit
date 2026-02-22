@@ -71,34 +71,34 @@ gh issue create --title "[001-user-auth/T012] [US1] Create User model" --body ".
 
 **CRITICAL**: Never create issues in repositories that don't match the remote URL. Verify before dispatching.
 
-Collect all created issue numbers from subagents before proceeding.
+Collect all created issue numbers from subagents. Verify all returned successfully before proceeding. If some failed: report failures, continue with successful issues only.
 
 ### 4. Link Dependencies
 
-After all issues exist, edit bodies to add cross-references using `#NNN` syntax.
+After all issues exist, edit bodies to add cross-references using `#NNN` syntax. Skip dependency links for any issues that failed to create.
 
 ## Report
 
-Output: number of issues created, issue numbers with titles, errors encountered, link to repo issues list.
+Output: issues created (count + numbers), failures (count + details), link to repo issues list.
 
 ## Error Handling
 
 | Condition | Response |
 |-----------|----------|
 | Not a GitHub remote | STOP with error |
-| Issue creation fails | Report error, continue with next |
+| Issue creation fails | Report, continue with remaining issues |
+| Partial failure | Link dependencies for successful issues only |
 
 ## Next Steps
 
-After creating issues: review in GitHub, assign team members, add to project boards.
-
 ```
+Issues exported! Review in GitHub, assign team members, add to project boards.
 - Dashboard: file://REPO_ROOT/.specify/dashboard.html
 ```
 
-If on a feature branch, offer to merge. Ask the user which approach they prefer:
+If on a feature branch, offer to merge:
 - **A) Merge locally**: `git checkout main && git merge <branch>`
-- **B) Create PR**: `gh pr create` if available, otherwise provide the GitHub URL to create one manually
+- **B) Create PR**: `gh pr create`
 - **C) Skip**: user will handle it
 
 You MUST read [model-recommendations.md](../iikit-core/references/model-recommendations.md), check the expiration date (refresh via web search if expired), detect the agent via env vars, and include a `Tip:` line in the Issues created output above if the next phase needs a different model tier.
