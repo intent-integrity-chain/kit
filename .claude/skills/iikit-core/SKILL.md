@@ -39,6 +39,8 @@ The `$ARGUMENTS` after `init` may include an optional path or URL to a PRD/SDD d
 
 ### Execution Flow
 
+> **Working directory**: All script paths below are relative to the project root. Before running any script, verify you are in the project root directory (`pwd` should show the directory containing `tessl.json` or `.tessl/`). If the script path doesn't resolve, find it: `find . -path "*/iikit-core/scripts/bash/git-setup.sh" 2>/dev/null || find ~/.tessl -path "*/iikit-core/scripts/bash/git-setup.sh" 2>/dev/null`
+
 #### Step 0 — Detect environment
 
 ```bash
