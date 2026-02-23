@@ -456,8 +456,10 @@ describe('Watch mode', () => {
         // Touch a file to trigger re-generation
         setTimeout(() => {
           const specPath = path.join(tmpDir, 'specs', '001-test-feature', 'spec.md');
-          fs.writeFileSync(specPath, '# Updated Spec\n');
-        }, 500);
+          if (fs.existsSync(path.dirname(specPath))) {
+            fs.writeFileSync(specPath, '# Updated Spec\n');
+          }
+        }, 1000);
       }
       // Check for re-generation message
       if (generated && (stdout.match(/dashboard\.html/g) || []).length >= 2) {
@@ -499,8 +501,9 @@ describe('Watch mode', () => {
       if (!initialDone && stdout.includes('dashboard.html')) {
         initialDone = true;
         // Write a file that should NOT trigger regeneration (e.g., a .txt file in root)
-        const genCount = (stdout.match(/dashboard\.html/g) || []).length;
-        fs.writeFileSync(path.join(tmpDir, 'random.txt'), 'ignored');
+        if (fs.existsSync(tmpDir)) {
+          fs.writeFileSync(path.join(tmpDir, 'random.txt'), 'ignored');
+        }
         // Wait for debounce period + buffer
         setTimeout(() => {
           const newCount = (stdout.match(/dashboard\.html/g) || []).length;
