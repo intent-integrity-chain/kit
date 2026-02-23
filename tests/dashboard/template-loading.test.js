@@ -81,6 +81,10 @@ describe('loadTemplate resolution (src/generate-dashboard.js)', () => {
     const tmpDir = createTestProject();
     try {
       const result = runGenerator(SRC_GENERATOR, tmpDir);
+      if (result.status !== 0) {
+        console.error('Generator stderr:', result.stderr);
+        console.error('Generator stdout:', result.stdout);
+      }
       expect(result.status).toBe(0);
       const html = fs.readFileSync(path.join(tmpDir, '.specify', 'dashboard.html'), 'utf-8');
       expect(typeof html).toBe('string');
