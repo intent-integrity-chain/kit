@@ -37,11 +37,11 @@ jobs:
         working-directory: tests/dashboard
         run: npx jest --config jest.config.js --no-cache
 
-      - name: Install Playwright browsers
+      - name: Install test dependencies
         working-directory: tests/dashboard
         run: |
           npm init -y > /dev/null 2>&1
-          npm install --save-dev @playwright/test > /dev/null 2>&1
+          npm install --save-dev @playwright/test chokidar > /dev/null 2>&1
           npx playwright install chromium --with-deps
 
       - name: Run Playwright basic dashboard tests

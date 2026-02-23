@@ -437,11 +437,7 @@ describe('Template loading', () => {
 });
 
 // T010: Watch mode tests (TS-005, TS-007)
-// These require chokidar (optional dep for --watch mode)
-let hasChokidar = false;
-try { require.resolve('chokidar'); hasChokidar = true; } catch {}
-const describeWatch = hasChokidar ? describe : describe.skip;
-describeWatch('Watch mode', () => {
+describe('Watch mode', () => {
   test('--watch flag starts watcher and re-generates on file change', (done) => {
     const tmpDir = createTestProject(os.tmpdir());
     const { spawn } = require('child_process');
