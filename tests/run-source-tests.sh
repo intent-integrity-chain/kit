@@ -430,12 +430,12 @@ test_premise_support() {
         log_fail "premise-template.md missing"
     fi
 
-    # constitution skill references premise-template.md
+    # constitution skill validates PREMISE.md via script
     ((TESTS_RUN++))
-    if grep -q 'premise-template.md' "$SKILLS_DIR/iikit-00-constitution/SKILL.md"; then
-        log_pass "constitution skill references premise template"
+    if grep -q 'validate-premise' "$SKILLS_DIR/iikit-00-constitution/SKILL.md"; then
+        log_pass "constitution skill validates PREMISE.md via script"
     else
-        log_fail "constitution skill does not reference premise template"
+        log_fail "constitution skill does not validate PREMISE.md"
     fi
 
     # constitution-loading.md mentions premise
