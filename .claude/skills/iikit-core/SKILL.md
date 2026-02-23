@@ -79,15 +79,26 @@ bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash
 
 Installs pre-commit (assertion validation) and post-commit (hash storage) hooks.
 
-#### Step 5 — Report
+#### Step 5 — Create PREMISE.md
 
-Directories created, hook status. If PRD seeding will follow (Step 6 conditions are met), note that backlog seeding is next. Otherwise, suggest `/iikit-00-constitution`.
+If `PREMISE.md` does not exist, create it from the user's input using [premise-template.md](templates/premise-template.md). Extract from the user's init description:
+- **What**: project description (from the user's input text)
+- **Who**: target users (infer from context, or ask)
+- **Why**: problem being solved (infer from context, or ask)
+- **Domain**: business/technical domain
+- **Scope**: system boundaries
 
-#### Step 6 — Seed backlog from PRD
+Replace ALL bracket placeholders `[PLACEHOLDER]` with actual content. This is MANDATORY — init is not complete without PREMISE.md.
 
-**Gate**: Requires `is_github_remote`. If not met, skip with note and proceed to final report.
+#### Step 6 — Report
 
-Follow the detailed procedure in [prd-seeding.md](references/prd-seeding.md): resolve input → read document → draft PREMISE.md → extract and order features → present for user confirmation → create GitHub issues.
+Directories created, hook status, PREMISE.md status. Suggest `/iikit-00-constitution`.
+
+#### Step 7 — Seed backlog from PRD (optional)
+
+**Gate**: Requires `is_github_remote` AND user provided a PRD/SDD document. If not met, skip silently.
+
+Follow the detailed procedure in [prd-seeding.md](references/prd-seeding.md): resolve input → read document → extract and order features → present for user confirmation → create GitHub issues.
 
 ### If Already Initialized
 
