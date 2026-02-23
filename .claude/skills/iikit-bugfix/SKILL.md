@@ -247,7 +247,7 @@ Files modified:
 
 Next step:
   - /iikit-08-implement — runs in bugfix mode (relaxed gates: no checklist or plan required, traces to bugs.md instead of spec)
-  - Dashboard: file://REPO_ROOT/.specify/dashboard.html
+  - Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
 ```
 
 ## Error Handling

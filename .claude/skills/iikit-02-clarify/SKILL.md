@@ -108,5 +108,5 @@ You MUST read [model-recommendations.md](../iikit-core/references/model-recommen
 Clarification complete! Next: /clear then /iikit-03-plan
 (Q&A consumed significant context — /clear before planning is recommended)
 Tip: <model switch suggestion if tier mismatch, omit if already on the right model>
-- Dashboard: file://REPO_ROOT/.specify/dashboard.html
+- Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
 ```

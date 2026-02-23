@@ -85,5 +85,5 @@ You MUST read [model-recommendations.md](../iikit-core/references/model-recommen
 ```
 Constitution ready! Next: /iikit-01-specify
 Tip: <model switch suggestion if tier mismatch, omit if already on the right model>
-- Dashboard: file://REPO_ROOT/.specify/dashboard.html
+- Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
 ```

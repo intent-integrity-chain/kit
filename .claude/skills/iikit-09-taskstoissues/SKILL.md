@@ -93,7 +93,7 @@ Output: issues created (count + numbers), failures (count + details), link to re
 
 ```
 Issues exported! Review in GitHub, assign team members, add to project boards.
-- Dashboard: file://REPO_ROOT/.specify/dashboard.html
+- Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
 ```
 
 If on a feature branch, offer to merge:

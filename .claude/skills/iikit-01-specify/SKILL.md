@@ -122,5 +122,5 @@ Specification complete! Next steps:
 - /iikit-02-clarify - (Recommended) Resolve ambiguities
 - /iikit-03-plan - Create technical implementation plan
 Tip: <model switch suggestion if tier mismatch, omit if already on the right model>
-- Dashboard: file://REPO_ROOT/.specify/dashboard.html
+- Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
 ```
