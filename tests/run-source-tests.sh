@@ -462,12 +462,12 @@ test_premise_support() {
         log_fail "git-setup.sh does not detect PREMISE.md"
     fi
 
-    # init skill drafts PREMISE.md from PRD
+    # init skill creates PREMISE.md (mandatory Step 5)
     ((TESTS_RUN++))
-    if grep -qi 'draft PREMISE.md' "$SKILLS_DIR/iikit-core/SKILL.md"; then
-        log_pass "init skill drafts PREMISE.md from PRD"
+    if grep -qi 'PREMISE.md' "$SKILLS_DIR/iikit-core/SKILL.md" && grep -qi 'validate-premise' "$SKILLS_DIR/iikit-core/SKILL.md"; then
+        log_pass "init skill creates and validates PREMISE.md"
     else
-        log_fail "init skill does not draft PREMISE.md from PRD"
+        log_fail "init skill does not create/validate PREMISE.md"
     fi
 
     # AGENTS.md documents PREMISE.md
