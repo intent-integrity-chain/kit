@@ -1,0 +1,37 @@
+{
+  "tag": "div",
+  "children": [
+    {
+      "tag": "div",
+      "classes": [
+        "clarify-view"
+      ],
+      "ariaAttrs": {
+        "aria-label": "Clarifications"
+      },
+      "role": "region",
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "clarify-empty"
+          ],
+          "children": [
+            {
+              "tag": "div",
+              "classes": [
+                "placeholder-view-title"
+              ]
+            },
+            {
+              "tag": "div",
+              "classes": [
+                "placeholder-view-text"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

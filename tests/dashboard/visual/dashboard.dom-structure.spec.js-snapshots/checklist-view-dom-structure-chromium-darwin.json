@@ -1,0 +1,839 @@
+{
+  "tag": "div",
+  "children": [
+    {
+      "tag": "div",
+      "classes": [
+        "checklist-view"
+      ],
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "gate-indicator"
+          ],
+          "ariaAttrs": {
+            "aria-live": "polite"
+          },
+          "role": "status",
+          "children": [
+            {
+              "tag": "div",
+              "classes": [
+                "gate-dot",
+                "yellow"
+              ]
+            },
+            {
+              "tag": "span",
+              "classes": [
+                "blocked-yellow",
+                "gate-label"
+              ]
+            }
+          ]
+        },
+        {
+          "tag": "div",
+          "classes": [
+            "checklist-rings"
+          ],
+          "children": [
+            {
+              "tag": "div",
+              "classes": [
+                "checklist-ring-wrapper"
+              ],
+              "dataAttrs": {
+                "data-filename": "api.md"
+              },
+              "ariaAttrs": {
+                "aria-expanded": "false",
+                "aria-controls": "checklist-detail-api.md",
+                "aria-label": "Api: 5 of 5 items complete, 100%"
+              },
+              "role": "button",
+              "children": [
+                {
+                  "tag": "svg",
+                  "classes": [
+                    "checklist-ring-svg"
+                  ],
+                  "ariaAttrs": {
+                    "aria-label": "Api: 5 of 5 items complete, 100%"
+                  },
+                  "role": "img",
+                  "children": [
+                    {
+                      "tag": "circle",
+                      "classes": [
+                        "checklist-ring-track"
+                      ]
+                    },
+                    {
+                      "tag": "circle",
+                      "classes": [
+                        "checklist-ring-fill",
+                        "green"
+                      ]
+                    },
+                    {
+                      "tag": "text",
+                      "classes": [
+                        "checklist-ring-pct"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-ring-name"
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-ring-fraction"
+                  ]
+                }
+              ]
+            },
+            {
+              "tag": "div",
+              "classes": [
+                "checklist-ring-wrapper"
+              ],
+              "dataAttrs": {
+                "data-filename": "security.md"
+              },
+              "ariaAttrs": {
+                "aria-expanded": "false",
+                "aria-controls": "checklist-detail-security.md",
+                "aria-label": "Security: 5 of 8 items complete, 63%"
+              },
+              "role": "button",
+              "children": [
+                {
+                  "tag": "svg",
+                  "classes": [
+                    "checklist-ring-svg"
+                  ],
+                  "ariaAttrs": {
+                    "aria-label": "Security: 5 of 8 items complete, 63%"
+                  },
+                  "role": "img",
+                  "children": [
+                    {
+                      "tag": "circle",
+                      "classes": [
+                        "checklist-ring-track"
+                      ]
+                    },
+                    {
+                      "tag": "circle",
+                      "classes": [
+                        "checklist-ring-fill",
+                        "yellow"
+                      ]
+                    },
+                    {
+                      "tag": "text",
+                      "classes": [
+                        "checklist-ring-pct"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-ring-name"
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-ring-fraction"
+                  ]
+                }
+              ]
+            },
+            {
+              "tag": "div",
+              "classes": [
+                "checklist-ring-wrapper"
+              ],
+              "dataAttrs": {
+                "data-filename": "ux.md"
+              },
+              "ariaAttrs": {
+                "aria-expanded": "false",
+                "aria-controls": "checklist-detail-ux.md",
+                "aria-label": "Ux: 8 of 9 items complete, 89%"
+              },
+              "role": "button",
+              "children": [
+                {
+                  "tag": "svg",
+                  "classes": [
+                    "checklist-ring-svg"
+                  ],
+                  "ariaAttrs": {
+                    "aria-label": "Ux: 8 of 9 items complete, 89%"
+                  },
+                  "role": "img",
+                  "children": [
+                    {
+                      "tag": "circle",
+                      "classes": [
+                        "checklist-ring-track"
+                      ]
+                    },
+                    {
+                      "tag": "circle",
+                      "classes": [
+                        "checklist-ring-fill",
+                        "green"
+                      ]
+                    },
+                    {
+                      "tag": "text",
+                      "classes": [
+                        "checklist-ring-pct"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-ring-name"
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-ring-fraction"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "tag": "div",
+          "classes": [
+            "cross-link-tip"
+          ]
+        },
+        {
+          "tag": "div",
+          "classes": [
+            "checklist-detail"
+          ],
+          "children": [
+            {
+              "tag": "div",
+              "classes": [
+                "checklist-detail-inner"
+              ],
+              "children": [
+                {
+                  "tag": "h4",
+                  "classes": [
+                    "checklist-category"
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-item"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checked",
+                        "checklist-item-icon"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-id"
+                      ]
+                    },
+                    {
+                      "tag": "span"
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-item"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checked",
+                        "checklist-item-icon"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-id"
+                      ]
+                    },
+                    {
+                      "tag": "span"
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-item"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checked",
+                        "checklist-item-icon"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-id"
+                      ]
+                    },
+                    {
+                      "tag": "span"
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-item"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checked",
+                        "checklist-item-icon"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-id"
+                      ]
+                    },
+                    {
+                      "tag": "span"
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-item"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checked",
+                        "checklist-item-icon"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-id"
+                      ]
+                    },
+                    {
+                      "tag": "span"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "tag": "div",
+          "classes": [
+            "checklist-detail"
+          ],
+          "children": [
+            {
+              "tag": "div",
+              "classes": [
+                "checklist-detail-inner"
+              ],
+              "children": [
+                {
+                  "tag": "h4",
+                  "classes": [
+                    "checklist-category"
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-item"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checked",
+                        "checklist-item-icon"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-id"
+                      ]
+                    },
+                    {
+                      "tag": "span"
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-item"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checked",
+                        "checklist-item-icon"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-id"
+                      ]
+                    },
+                    {
+                      "tag": "span"
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-item"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checked",
+                        "checklist-item-icon"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-id"
+                      ]
+                    },
+                    {
+                      "tag": "span"
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-item"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-icon",
+                        "unchecked"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-id"
+                      ]
+                    },
+                    {
+                      "tag": "span"
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-item"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-icon",
+                        "unchecked"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-id"
+                      ]
+                    },
+                    {
+                      "tag": "span"
+                    }
+                  ]
+                },
+                {
+                  "tag": "h4",
+                  "classes": [
+                    "checklist-category"
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-item"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checked",
+                        "checklist-item-icon"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-id"
+                      ]
+                    },
+                    {
+                      "tag": "span"
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-item"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checked",
+                        "checklist-item-icon"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-id"
+                      ]
+                    },
+                    {
+                      "tag": "span"
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-item"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-icon",
+                        "unchecked"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-id"
+                      ]
+                    },
+                    {
+                      "tag": "span"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "tag": "div",
+          "classes": [
+            "checklist-detail"
+          ],
+          "children": [
+            {
+              "tag": "div",
+              "classes": [
+                "checklist-detail-inner"
+              ],
+              "children": [
+                {
+                  "tag": "h4",
+                  "classes": [
+                    "checklist-category"
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-item"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checked",
+                        "checklist-item-icon"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-id"
+                      ]
+                    },
+                    {
+                      "tag": "span"
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-item"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checked",
+                        "checklist-item-icon"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-id"
+                      ]
+                    },
+                    {
+                      "tag": "span"
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-item"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checked",
+                        "checklist-item-icon"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-id"
+                      ]
+                    },
+                    {
+                      "tag": "span"
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-item"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checked",
+                        "checklist-item-icon"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-id"
+                      ]
+                    },
+                    {
+                      "tag": "span"
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-item"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-icon",
+                        "unchecked"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-id"
+                      ]
+                    },
+                    {
+                      "tag": "span"
+                    }
+                  ]
+                },
+                {
+                  "tag": "h4",
+                  "classes": [
+                    "checklist-category"
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-item"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checked",
+                        "checklist-item-icon"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-id"
+                      ]
+                    },
+                    {
+                      "tag": "span"
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-item"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checked",
+                        "checklist-item-icon"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-id"
+                      ]
+                    },
+                    {
+                      "tag": "span"
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-item"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checked",
+                        "checklist-item-icon"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-id"
+                      ]
+                    },
+                    {
+                      "tag": "span"
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "checklist-item"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checked",
+                        "checklist-item-icon"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "checklist-item-id"
+                      ]
+                    },
+                    {
+                      "tag": "span"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

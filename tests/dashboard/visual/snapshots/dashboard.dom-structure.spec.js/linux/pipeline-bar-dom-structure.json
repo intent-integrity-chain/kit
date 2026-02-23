@@ -1,0 +1,375 @@
+{
+  "tag": "nav",
+  "classes": [
+    "pipeline-bar"
+  ],
+  "ariaAttrs": {
+    "aria-label": "IIKit workflow pipeline"
+  },
+  "role": "navigation",
+  "children": [
+    {
+      "tag": "button",
+      "classes": [
+        "pipeline-node"
+      ],
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "complete",
+            "pipeline-dot"
+          ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "pipeline-label",
+            "pipeline-label-multiline"
+          ],
+          "children": [
+            {
+              "tag": "span",
+              "classes": [
+                "pipeline-label-line"
+              ]
+            },
+            {
+              "tag": "span",
+              "classes": [
+                "pipeline-label-line"
+              ]
+            }
+          ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "pipeline-progress"
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "div",
+      "classes": [
+        "complete",
+        "pipeline-connector"
+      ]
+    },
+    {
+      "tag": "button",
+      "classes": [
+        "pipeline-node"
+      ],
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "complete",
+            "pipeline-dot"
+          ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "pipeline-label"
+          ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "pipeline-progress"
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "div",
+      "classes": [
+        "complete",
+        "pipeline-connector"
+      ]
+    },
+    {
+      "tag": "button",
+      "classes": [
+        "optional",
+        "pipeline-node"
+      ],
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "not_started",
+            "pipeline-dot"
+          ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "pipeline-label"
+          ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "pipeline-progress"
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "div",
+      "classes": [
+        "pipeline-connector"
+      ]
+    },
+    {
+      "tag": "button",
+      "classes": [
+        "pipeline-node"
+      ],
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "not_started",
+            "pipeline-dot"
+          ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "pipeline-label"
+          ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "pipeline-progress"
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "div",
+      "classes": [
+        "pipeline-connector"
+      ]
+    },
+    {
+      "tag": "button",
+      "classes": [
+        "pipeline-node"
+      ],
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "not_started",
+            "pipeline-dot"
+          ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "pipeline-label"
+          ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "pipeline-progress"
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "div",
+      "classes": [
+        "pipeline-connector"
+      ]
+    },
+    {
+      "tag": "button",
+      "classes": [
+        "pipeline-node"
+      ],
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "not_started",
+            "pipeline-dot"
+          ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "pipeline-label"
+          ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "pipeline-progress"
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "div",
+      "classes": [
+        "pipeline-connector"
+      ]
+    },
+    {
+      "tag": "button",
+      "classes": [
+        "pipeline-node"
+      ],
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "complete",
+            "pipeline-dot"
+          ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "pipeline-label"
+          ],
+          "children": [
+            {
+              "tag": "span",
+              "classes": [
+                "pipeline-redirect"
+              ]
+            }
+          ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "pipeline-progress"
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "div",
+      "classes": [
+        "complete",
+        "pipeline-connector"
+      ]
+    },
+    {
+      "tag": "button",
+      "classes": [
+        "pipeline-node"
+      ],
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "not_started",
+            "pipeline-dot"
+          ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "pipeline-label"
+          ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "pipeline-progress"
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "div",
+      "classes": [
+        "pipeline-connector"
+      ]
+    },
+    {
+      "tag": "button",
+      "classes": [
+        "active",
+        "pipeline-node"
+      ],
+      "ariaAttrs": {
+        "aria-current": "true"
+      },
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "not_started",
+            "pipeline-dot"
+          ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "pipeline-label"
+          ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "pipeline-progress"
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "div",
+      "classes": [
+        "pipeline-bugs-gap"
+      ]
+    },
+    {
+      "tag": "button",
+      "classes": [
+        "bugs-tab",
+        "muted"
+      ],
+      "dataAttrs": {
+        "data-view": "bugs"
+      },
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "bugs-dot",
+            "pipeline-dot"
+          ],
+          "children": [
+            {
+              "tag": "svg",
+              "children": [
+                {
+                  "tag": "path"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "pipeline-label"
+          ]
+        }
+      ]
+    }
+  ]
+}

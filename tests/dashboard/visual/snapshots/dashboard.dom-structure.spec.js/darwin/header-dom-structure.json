@@ -1,0 +1,126 @@
+{
+  "tag": "header",
+  "classes": [
+    "header"
+  ],
+  "role": "banner",
+  "children": [
+    {
+      "tag": "div",
+      "classes": [
+        "header-left"
+      ],
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "logo"
+          ],
+          "children": [
+            {
+              "tag": "div",
+              "classes": [
+                "logo-icon"
+              ],
+              "ariaAttrs": {
+                "aria-hidden": "true"
+              }
+            },
+            {
+              "tag": "span"
+            }
+          ]
+        },
+        {
+          "tag": "div",
+          "classes": [
+            "project-label"
+          ]
+        },
+        {
+          "tag": "div",
+          "classes": [
+            "feature-selector"
+          ],
+          "ariaAttrs": {
+            "aria-label": "Feature selector"
+          },
+          "role": "navigation",
+          "children": [
+            {
+              "tag": "select",
+              "ariaAttrs": {
+                "aria-label": "Select feature to display"
+              },
+              "children": [
+                {
+                  "tag": "option"
+                },
+                {
+                  "tag": "option"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "div",
+      "classes": [
+        "header-right"
+      ],
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "integrity-badge",
+            "missing"
+          ],
+          "ariaAttrs": {
+            "aria-label": "Test integrity: no hash data available"
+          },
+          "role": "status",
+          "children": [
+            {
+              "tag": "span",
+              "classes": [
+                "integrity-dot"
+              ],
+              "ariaAttrs": {
+                "aria-hidden": "true"
+              }
+            },
+            {
+              "tag": "span",
+              "classes": [
+                "integrity-text"
+              ]
+            }
+          ]
+        },
+        {
+          "tag": "button",
+          "classes": [
+            "theme-toggle"
+          ],
+          "ariaAttrs": {
+            "aria-label": "Theme: System (click for Light)"
+          },
+          "children": [
+            {
+              "tag": "span"
+            }
+          ]
+        },
+        {
+          "tag": "div",
+          "ariaAttrs": {
+            "aria-label": "Agent activity: idle"
+          },
+          "role": "status"
+        }
+      ]
+    }
+  ]
+}

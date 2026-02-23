@@ -1,0 +1,36 @@
+{
+  "tag": "div",
+  "children": [
+    {
+      "tag": "div",
+      "classes": [
+        "checklist-empty"
+      ],
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "checklist-empty-icon"
+          ]
+        },
+        {
+          "tag": "div",
+          "classes": [
+            "checklist-empty-title"
+          ]
+        },
+        {
+          "tag": "div",
+          "classes": [
+            "checklist-empty-text"
+          ],
+          "children": [
+            {
+              "tag": "code"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

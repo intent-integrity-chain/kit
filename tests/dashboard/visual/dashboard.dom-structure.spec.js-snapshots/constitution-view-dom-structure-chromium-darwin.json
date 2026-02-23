@@ -1,0 +1,365 @@
+{
+  "tag": "div",
+  "children": [
+    {
+      "tag": "div",
+      "classes": [
+        "constitution-view"
+      ],
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "premise-section"
+          ],
+          "children": [
+            {
+              "tag": "h3",
+              "classes": [
+                "premise-title"
+              ]
+            },
+            {
+              "tag": "p",
+              "classes": [
+                "premise-text"
+              ]
+            }
+          ]
+        },
+        {
+          "tag": "div",
+          "classes": [
+            "constitution-layout"
+          ],
+          "children": [
+            {
+              "tag": "div",
+              "classes": [
+                "constitution-left"
+              ],
+              "children": [
+                {
+                  "tag": "div",
+                  "classes": [
+                    "radar-container"
+                  ],
+                  "children": [
+                    {
+                      "tag": "svg",
+                      "ariaAttrs": {
+                        "aria-label": "Radar chart showing 5 constitution principles: Test-First Development (MUST), Real-Time Feedback (SHOULD), Specification Traceability (MUST), Incremental Delivery (SHOULD), Documentation as Code (MAY)"
+                      },
+                      "role": "img",
+                      "children": [
+                        {
+                          "tag": "polygon"
+                        },
+                        {
+                          "tag": "polygon"
+                        },
+                        {
+                          "tag": "polygon"
+                        },
+                        {
+                          "tag": "line"
+                        },
+                        {
+                          "tag": "line"
+                        },
+                        {
+                          "tag": "line"
+                        },
+                        {
+                          "tag": "line"
+                        },
+                        {
+                          "tag": "line"
+                        },
+                        {
+                          "tag": "polygon"
+                        },
+                        {
+                          "tag": "g",
+                          "classes": [
+                            "radar-axis"
+                          ],
+                          "ariaAttrs": {
+                            "aria-label": "Test-First Development (MUST)"
+                          },
+                          "role": "button",
+                          "children": [
+                            {
+                              "tag": "circle"
+                            },
+                            {
+                              "tag": "circle"
+                            },
+                            {
+                              "tag": "text"
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "g",
+                          "classes": [
+                            "radar-axis"
+                          ],
+                          "ariaAttrs": {
+                            "aria-label": "Real-Time Feedback (SHOULD)"
+                          },
+                          "role": "button",
+                          "children": [
+                            {
+                              "tag": "circle"
+                            },
+                            {
+                              "tag": "circle"
+                            },
+                            {
+                              "tag": "text"
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "g",
+                          "classes": [
+                            "radar-axis"
+                          ],
+                          "ariaAttrs": {
+                            "aria-label": "Specification Traceability (MUST)"
+                          },
+                          "role": "button",
+                          "children": [
+                            {
+                              "tag": "circle"
+                            },
+                            {
+                              "tag": "circle"
+                            },
+                            {
+                              "tag": "text"
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "g",
+                          "classes": [
+                            "radar-axis"
+                          ],
+                          "ariaAttrs": {
+                            "aria-label": "Incremental Delivery (SHOULD)"
+                          },
+                          "role": "button",
+                          "children": [
+                            {
+                              "tag": "circle"
+                            },
+                            {
+                              "tag": "circle"
+                            },
+                            {
+                              "tag": "text"
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "g",
+                          "classes": [
+                            "radar-axis"
+                          ],
+                          "ariaAttrs": {
+                            "aria-label": "Documentation as Code (MAY)"
+                          },
+                          "role": "button",
+                          "children": [
+                            {
+                              "tag": "circle"
+                            },
+                            {
+                              "tag": "circle"
+                            },
+                            {
+                              "tag": "text"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "tag": "div",
+              "classes": [
+                "constitution-right"
+              ],
+              "children": [
+                {
+                  "tag": "div",
+                  "classes": [
+                    "constitution-summary"
+                  ],
+                  "children": [
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "constitution-summary-item"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "principle-num"
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "level-badge",
+                            "must"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "constitution-summary-item"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "principle-num"
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "level-badge",
+                            "should"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "constitution-summary-item"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "principle-num"
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "level-badge",
+                            "must"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "constitution-summary-item"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "principle-num"
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "level-badge",
+                            "should"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "constitution-summary-item"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "principle-num"
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "level-badge",
+                            "may"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "tag": "div",
+          "classes": [
+            "amendment-timeline"
+          ],
+          "children": [
+            {
+              "tag": "div",
+              "classes": [
+                "amendment-timeline-label"
+              ]
+            },
+            {
+              "tag": "div",
+              "classes": [
+                "amendment-timeline-content"
+              ],
+              "children": [
+                {
+                  "tag": "div",
+                  "classes": [
+                    "amendment-timeline-dot"
+                  ]
+                },
+                {
+                  "tag": "span"
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "amendment-timeline-line"
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "amendment-timeline-dot"
+                  ]
+                },
+                {
+                  "tag": "span"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

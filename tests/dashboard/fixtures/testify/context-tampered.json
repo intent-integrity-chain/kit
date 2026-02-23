@@ -1,0 +1,7 @@
+{
+  "testify": {
+    "assertion_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "generated_at": "2026-02-17T00:00:00Z",
+    "test_specs_file": "tests/test-specs.md"
+  }
+}

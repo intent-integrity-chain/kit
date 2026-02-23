@@ -1,0 +1,915 @@
+{
+  "tag": "div",
+  "children": [
+    {
+      "tag": "div",
+      "classes": [
+        "storymap-view"
+      ],
+      "ariaAttrs": {
+        "aria-label": "Spec Story Map"
+      },
+      "role": "region",
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "storymap-main"
+          ],
+          "children": [
+            {
+              "tag": "div",
+              "classes": [
+                "cross-link-tip"
+              ]
+            },
+            {
+              "tag": "div",
+              "classes": [
+                "storymap-section-title"
+              ]
+            },
+            {
+              "tag": "div",
+              "classes": [
+                "swim-lanes"
+              ],
+              "ariaAttrs": {
+                "aria-label": "User stories by priority"
+              },
+              "role": "list",
+              "children": [
+                {
+                  "tag": "div",
+                  "classes": [
+                    "swim-lane"
+                  ],
+                  "role": "listitem",
+                  "children": [
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "p1",
+                        "swim-lane-label"
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "swim-lane-cards"
+                      ],
+                      "children": [
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "story-card"
+                          ],
+                          "dataAttrs": {
+                            "data-story-id": "US1",
+                            "data-cross-target": "implement",
+                            "data-cross-id": "US1"
+                          },
+                          "ariaAttrs": {
+                            "aria-label": "Login with Email"
+                          },
+                          "role": "button",
+                          "children": [
+                            {
+                              "tag": "div",
+                              "classes": [
+                                "story-card-header"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "story-card-id"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "p1",
+                                    "story-card-priority"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "div",
+                              "classes": [
+                                "story-card-title"
+                              ]
+                            },
+                            {
+                              "tag": "div",
+                              "classes": [
+                                "story-card-meta"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "scenarios",
+                                    "story-card-badge"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "story-card"
+                          ],
+                          "dataAttrs": {
+                            "data-story-id": "US2",
+                            "data-cross-target": "implement",
+                            "data-cross-id": "US2"
+                          },
+                          "ariaAttrs": {
+                            "aria-label": "Password Reset"
+                          },
+                          "role": "button",
+                          "children": [
+                            {
+                              "tag": "div",
+                              "classes": [
+                                "story-card-header"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "story-card-id"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "p1",
+                                    "story-card-priority"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "div",
+                              "classes": [
+                                "story-card-title"
+                              ]
+                            },
+                            {
+                              "tag": "div",
+                              "classes": [
+                                "story-card-meta"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "scenarios",
+                                    "story-card-badge"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "swim-lane"
+                  ],
+                  "role": "listitem",
+                  "children": [
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "p2",
+                        "swim-lane-label"
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "swim-lane-cards"
+                      ],
+                      "children": [
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "story-card"
+                          ],
+                          "dataAttrs": {
+                            "data-story-id": "US3",
+                            "data-cross-target": "implement",
+                            "data-cross-id": "US3"
+                          },
+                          "ariaAttrs": {
+                            "aria-label": "OAuth Integration"
+                          },
+                          "role": "button",
+                          "children": [
+                            {
+                              "tag": "div",
+                              "classes": [
+                                "story-card-header"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "story-card-id"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "p2",
+                                    "story-card-priority"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "div",
+                              "classes": [
+                                "story-card-title"
+                              ]
+                            },
+                            {
+                              "tag": "div",
+                              "classes": [
+                                "story-card-meta"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "scenarios",
+                                    "story-card-badge"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "story-card"
+                          ],
+                          "dataAttrs": {
+                            "data-story-id": "US4",
+                            "data-cross-target": "implement",
+                            "data-cross-id": "US4"
+                          },
+                          "ariaAttrs": {
+                            "aria-label": "Session Management"
+                          },
+                          "role": "button",
+                          "children": [
+                            {
+                              "tag": "div",
+                              "classes": [
+                                "story-card-header"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "story-card-id"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "p2",
+                                    "story-card-priority"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "div",
+                              "classes": [
+                                "story-card-title"
+                              ]
+                            },
+                            {
+                              "tag": "div",
+                              "classes": [
+                                "story-card-meta"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "scenarios",
+                                    "story-card-badge"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "swim-lane"
+                  ],
+                  "role": "listitem",
+                  "children": [
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "p3",
+                        "swim-lane-label"
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "swim-lane-cards"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "tag": "div",
+              "classes": [
+                "storymap-section-title"
+              ]
+            },
+            {
+              "tag": "div",
+              "classes": [
+                "graph-container"
+              ],
+              "children": [
+                {
+                  "tag": "svg",
+                  "classes": [
+                    "graph-svg"
+                  ],
+                  "ariaAttrs": {
+                    "aria-label": "Requirements relationship graph"
+                  },
+                  "children": [
+                    {
+                      "tag": "line",
+                      "classes": [
+                        "graph-edge"
+                      ],
+                      "dataAttrs": {
+                        "data-from": "US4",
+                        "data-to": "FR-001"
+                      }
+                    },
+                    {
+                      "tag": "line",
+                      "classes": [
+                        "graph-edge"
+                      ],
+                      "dataAttrs": {
+                        "data-from": "US4",
+                        "data-to": "FR-002"
+                      }
+                    },
+                    {
+                      "tag": "line",
+                      "classes": [
+                        "graph-edge"
+                      ],
+                      "dataAttrs": {
+                        "data-from": "US4",
+                        "data-to": "FR-003"
+                      }
+                    },
+                    {
+                      "tag": "line",
+                      "classes": [
+                        "graph-edge"
+                      ],
+                      "dataAttrs": {
+                        "data-from": "US4",
+                        "data-to": "FR-004"
+                      }
+                    },
+                    {
+                      "tag": "line",
+                      "classes": [
+                        "graph-edge"
+                      ],
+                      "dataAttrs": {
+                        "data-from": "US4",
+                        "data-to": "FR-005"
+                      }
+                    },
+                    {
+                      "tag": "line",
+                      "classes": [
+                        "graph-edge"
+                      ],
+                      "dataAttrs": {
+                        "data-from": "US4",
+                        "data-to": "FR-006"
+                      }
+                    },
+                    {
+                      "tag": "line",
+                      "classes": [
+                        "graph-edge"
+                      ],
+                      "dataAttrs": {
+                        "data-from": "US4",
+                        "data-to": "FR-007"
+                      }
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "graph-node",
+                        "graph-node-us"
+                      ],
+                      "dataAttrs": {
+                        "data-id": "US1",
+                        "data-desc": "Login with Email",
+                        "data-cross-target": "implement",
+                        "data-cross-id": "US1"
+                      },
+                      "ariaAttrs": {
+                        "aria-label": "US1: Login with Email"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "circle"
+                        },
+                        {
+                          "tag": "text"
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "graph-node",
+                        "graph-node-us"
+                      ],
+                      "dataAttrs": {
+                        "data-id": "US2",
+                        "data-desc": "Password Reset",
+                        "data-cross-target": "implement",
+                        "data-cross-id": "US2"
+                      },
+                      "ariaAttrs": {
+                        "aria-label": "US2: Password Reset"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "circle"
+                        },
+                        {
+                          "tag": "text"
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "graph-node",
+                        "graph-node-us"
+                      ],
+                      "dataAttrs": {
+                        "data-id": "US3",
+                        "data-desc": "OAuth Integration",
+                        "data-cross-target": "implement",
+                        "data-cross-id": "US3"
+                      },
+                      "ariaAttrs": {
+                        "aria-label": "US3: OAuth Integration"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "circle"
+                        },
+                        {
+                          "tag": "text"
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "graph-node",
+                        "graph-node-us"
+                      ],
+                      "dataAttrs": {
+                        "data-id": "US4",
+                        "data-desc": "Session Management",
+                        "data-cross-target": "implement",
+                        "data-cross-id": "US4"
+                      },
+                      "ariaAttrs": {
+                        "aria-label": "US4: Session Management"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "circle"
+                        },
+                        {
+                          "tag": "text"
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "graph-node",
+                        "graph-node-fr"
+                      ],
+                      "dataAttrs": {
+                        "data-id": "FR-001",
+                        "data-desc": "System MUST authenticate users via email and password",
+                        "data-cross-target": "testify",
+                        "data-cross-id": "FR-001"
+                      },
+                      "ariaAttrs": {
+                        "aria-label": "FR-001: System MUST authenticate users via email and password"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "circle"
+                        },
+                        {
+                          "tag": "text"
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "graph-node",
+                        "graph-node-fr"
+                      ],
+                      "dataAttrs": {
+                        "data-id": "FR-002",
+                        "data-desc": "System MUST support password reset via email",
+                        "data-cross-target": "testify",
+                        "data-cross-id": "FR-002"
+                      },
+                      "ariaAttrs": {
+                        "aria-label": "FR-002: System MUST support password reset via email"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "circle"
+                        },
+                        {
+                          "tag": "text"
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "graph-node",
+                        "graph-node-fr"
+                      ],
+                      "dataAttrs": {
+                        "data-id": "FR-003",
+                        "data-desc": "System MUST integrate Google and GitHub OAuth providers",
+                        "data-cross-target": "testify",
+                        "data-cross-id": "FR-003"
+                      },
+                      "ariaAttrs": {
+                        "aria-label": "FR-003: System MUST integrate Google and GitHub OAuth providers"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "circle"
+                        },
+                        {
+                          "tag": "text"
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "graph-node",
+                        "graph-node-fr"
+                      ],
+                      "dataAttrs": {
+                        "data-id": "FR-004",
+                        "data-desc": "System MUST maintain user sessions with configurable TTL",
+                        "data-cross-target": "testify",
+                        "data-cross-id": "FR-004"
+                      },
+                      "ariaAttrs": {
+                        "aria-label": "FR-004: System MUST maintain user sessions with configurable TTL"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "circle"
+                        },
+                        {
+                          "tag": "text"
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "graph-node",
+                        "graph-node-fr"
+                      ],
+                      "dataAttrs": {
+                        "data-id": "FR-005",
+                        "data-desc": "System MUST hash passwords using bcrypt with cost factor 12",
+                        "data-cross-target": "testify",
+                        "data-cross-id": "FR-005"
+                      },
+                      "ariaAttrs": {
+                        "aria-label": "FR-005: System MUST hash passwords using bcrypt with cost factor 12"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "circle"
+                        },
+                        {
+                          "tag": "text"
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "graph-node",
+                        "graph-node-fr"
+                      ],
+                      "dataAttrs": {
+                        "data-id": "FR-006",
+                        "data-desc": "System MUST rate-limit login attempts to 5 per minute per IP",
+                        "data-cross-target": "testify",
+                        "data-cross-id": "FR-006"
+                      },
+                      "ariaAttrs": {
+                        "aria-label": "FR-006: System MUST rate-limit login attempts to 5 per minute per IP"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "circle"
+                        },
+                        {
+                          "tag": "text"
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "graph-node",
+                        "graph-node-fr"
+                      ],
+                      "dataAttrs": {
+                        "data-id": "FR-007",
+                        "data-desc": "System SHOULD log all authentication events for audit",
+                        "data-cross-target": "testify",
+                        "data-cross-id": "FR-007"
+                      },
+                      "ariaAttrs": {
+                        "aria-label": "FR-007: System SHOULD log all authentication events for audit"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "circle"
+                        },
+                        {
+                          "tag": "text"
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "graph-node",
+                        "graph-node-sc"
+                      ],
+                      "dataAttrs": {
+                        "data-id": "SC-001",
+                        "data-desc": "Login completes in under 3 seconds (p95)",
+                        "data-cross-target": "testify",
+                        "data-cross-id": "SC-001"
+                      },
+                      "ariaAttrs": {
+                        "aria-label": "SC-001: Login completes in under 3 seconds (p95)"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "circle"
+                        },
+                        {
+                          "tag": "text"
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "graph-node",
+                        "graph-node-sc"
+                      ],
+                      "dataAttrs": {
+                        "data-id": "SC-002",
+                        "data-desc": "Password reset email sent within 30 seconds",
+                        "data-cross-target": "testify",
+                        "data-cross-id": "SC-002"
+                      },
+                      "ariaAttrs": {
+                        "aria-label": "SC-002: Password reset email sent within 30 seconds"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "circle"
+                        },
+                        {
+                          "tag": "text"
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "graph-node",
+                        "graph-node-sc"
+                      ],
+                      "dataAttrs": {
+                        "data-id": "SC-003",
+                        "data-desc": "OAuth flow completes in under 5 seconds",
+                        "data-cross-target": "testify",
+                        "data-cross-id": "SC-003"
+                      },
+                      "ariaAttrs": {
+                        "aria-label": "SC-003: OAuth flow completes in under 5 seconds"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "circle"
+                        },
+                        {
+                          "tag": "text"
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "graph-node",
+                        "graph-node-sc"
+                      ],
+                      "dataAttrs": {
+                        "data-id": "SC-004",
+                        "data-desc": "Session persistence works across browser restarts",
+                        "data-cross-target": "testify",
+                        "data-cross-id": "SC-004"
+                      },
+                      "ariaAttrs": {
+                        "aria-label": "SC-004: Session persistence works across browser restarts"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "circle"
+                        },
+                        {
+                          "tag": "text"
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "graph-node",
+                        "graph-node-sc"
+                      ],
+                      "dataAttrs": {
+                        "data-id": "SC-005",
+                        "data-desc": "Failed login attempts are properly rate-limited",
+                        "data-cross-target": "testify",
+                        "data-cross-id": "SC-005"
+                      },
+                      "ariaAttrs": {
+                        "aria-label": "SC-005: Failed login attempts are properly rate-limited"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "circle"
+                        },
+                        {
+                          "tag": "text"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "graph-tooltip"
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "graph-legend"
+                  ],
+                  "children": [
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "graph-legend-item"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "graph-legend-dot",
+                            "us"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "graph-legend-item"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "fr",
+                            "graph-legend-dot"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "graph-legend-item"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "graph-legend-dot",
+                            "sc"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "div",
+      "classes": [
+        "detail-panel-slot"
+      ]
+    }
+  ]
+}

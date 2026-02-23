@@ -1,0 +1,1423 @@
+{
+  "tag": "div",
+  "children": [
+    {
+      "tag": "div",
+      "classes": [
+        "planview-view"
+      ],
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "planview-section"
+          ],
+          "children": [
+            {
+              "tag": "div",
+              "classes": [
+                "planview-section-title"
+              ]
+            },
+            {
+              "tag": "div",
+              "classes": [
+                "badge-wall"
+              ],
+              "children": [
+                {
+                  "tag": "div",
+                  "classes": [
+                    "tech-badge"
+                  ],
+                  "role": "listitem",
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "tech-badge-label"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "tech-badge-value"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "tech-badge"
+                  ],
+                  "role": "listitem",
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "tech-badge-label"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "tech-badge-value"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "tech-badge"
+                  ],
+                  "role": "listitem",
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "tech-badge-label"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "tech-badge-value"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "tech-badge"
+                  ],
+                  "role": "listitem",
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "tech-badge-label"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "tech-badge-value"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "tech-badge"
+                  ],
+                  "role": "listitem",
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "tech-badge-label"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "tech-badge-value"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "tech-badge"
+                  ],
+                  "role": "listitem",
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "tech-badge-label"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "tech-badge-value"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "tech-badge"
+                  ],
+                  "role": "listitem",
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "tech-badge-label"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "tech-badge-value"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "tech-badge"
+                  ],
+                  "role": "listitem",
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "tech-badge-label"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "tech-badge-value"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "tag": "div",
+          "classes": [
+            "planview-section"
+          ],
+          "children": [
+            {
+              "tag": "div",
+              "classes": [
+                "planview-section-title"
+              ]
+            },
+            {
+              "tag": "div",
+              "classes": [
+                "file-tree"
+              ],
+              "ariaAttrs": {
+                "aria-label": "Project file structure"
+              },
+              "role": "tree",
+              "children": [
+                {
+                  "tag": "div",
+                  "classes": [
+                    "file-tree-entry"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "file-tree-indent"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "file-tree-chevron"
+                      ],
+                      "dataAttrs": {
+                        "data-target": "tree-0-src"
+                      }
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "dir",
+                        "file-tree-file-icon"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "file-tree-label"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-name"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "file-tree-children"
+                  ],
+                  "children": [
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "file-tree-entry"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-indent"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-guide"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-chevron"
+                          ],
+                          "dataAttrs": {
+                            "data-target": "tree-1-routes"
+                          }
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "dir",
+                            "file-tree-file-icon"
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-label"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-name"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "file-tree-children"
+                      ],
+                      "children": [
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "file-tree-entry"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-indent"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-guide"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-guide"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-chevron-spacer"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-js",
+                                "file-tree-file-icon"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-label"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-name",
+                                    "planned"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-status",
+                                    "planned-tag"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "file-tree-entry"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-indent"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-guide"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-guide"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-chevron-spacer"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-js",
+                                "file-tree-file-icon"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-label"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-name",
+                                    "planned"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-status",
+                                    "planned-tag"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "file-tree-entry"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-indent"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-guide"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-guide"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-chevron-spacer"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-js",
+                                "file-tree-file-icon"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-label"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-name",
+                                    "planned"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-status",
+                                    "planned-tag"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "file-tree-entry"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-indent"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-guide"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-chevron"
+                          ],
+                          "dataAttrs": {
+                            "data-target": "tree-1-middleware"
+                          }
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "dir",
+                            "file-tree-file-icon"
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-label"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-name"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "file-tree-children"
+                      ],
+                      "children": [
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "file-tree-entry"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-indent"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-guide"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-guide"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-chevron-spacer"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-js",
+                                "file-tree-file-icon"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-label"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-name",
+                                    "planned"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-status",
+                                    "planned-tag"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "file-tree-entry"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-indent"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-guide"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-guide"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-chevron-spacer"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-js",
+                                "file-tree-file-icon"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-label"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-name",
+                                    "planned"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-status",
+                                    "planned-tag"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "file-tree-entry"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-indent"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-guide"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-chevron"
+                          ],
+                          "dataAttrs": {
+                            "data-target": "tree-1-services"
+                          }
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "dir",
+                            "file-tree-file-icon"
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-label"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-name"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "file-tree-children"
+                      ],
+                      "children": [
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "file-tree-entry"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-indent"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-guide"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-guide"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-chevron-spacer"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-js",
+                                "file-tree-file-icon"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-label"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-name",
+                                    "planned"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-status",
+                                    "planned-tag"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "file-tree-entry"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-indent"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-guide"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-guide"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-chevron-spacer"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-js",
+                                "file-tree-file-icon"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-label"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-name",
+                                    "planned"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-status",
+                                    "planned-tag"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "file-tree-entry"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-indent"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-guide"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-guide"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-chevron-spacer"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-js",
+                                "file-tree-file-icon"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-label"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-name",
+                                    "planned"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-status",
+                                    "planned-tag"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "file-tree-entry"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-indent"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-guide"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-chevron"
+                          ],
+                          "dataAttrs": {
+                            "data-target": "tree-1-models"
+                          }
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "dir",
+                            "file-tree-file-icon"
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-label"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-name"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "file-tree-children"
+                      ],
+                      "children": [
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "file-tree-entry"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-indent"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-guide"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-guide"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-chevron-spacer"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-js",
+                                "file-tree-file-icon"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-label"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-name",
+                                    "planned"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-status",
+                                    "planned-tag"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "file-tree-entry"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-indent"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-guide"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-guide"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-chevron-spacer"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-js",
+                                "file-tree-file-icon"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-label"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-name",
+                                    "planned"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "file-tree-status",
+                                    "planned-tag"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "file-tree-entry"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "file-tree-indent"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "file-tree-chevron"
+                      ],
+                      "dataAttrs": {
+                        "data-target": "tree-0-tests"
+                      }
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "dir",
+                        "file-tree-file-icon"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "file-tree-label"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-name"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "file-tree-children"
+                  ],
+                  "children": [
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "file-tree-entry"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-indent"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-guide"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-chevron-spacer"
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-js",
+                            "file-tree-file-icon"
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-label"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-name",
+                                "planned"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-status",
+                                "planned-tag"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "file-tree-entry"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-indent"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-guide"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-chevron-spacer"
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-js",
+                            "file-tree-file-icon"
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-label"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-name",
+                                "planned"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-status",
+                                "planned-tag"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "file-tree-entry"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-indent"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-guide"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-chevron-spacer"
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-js",
+                            "file-tree-file-icon"
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-label"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-name",
+                                "planned"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "file-tree-status",
+                                "planned-tag"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "file-tree-entry"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "file-tree-indent"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "file-tree-chevron-spacer"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "file-json",
+                        "file-tree-file-icon"
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "file-tree-label"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-name",
+                            "planned"
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "file-tree-status",
+                            "planned-tag"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

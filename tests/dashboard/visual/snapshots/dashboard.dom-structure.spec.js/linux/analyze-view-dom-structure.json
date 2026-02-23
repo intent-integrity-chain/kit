@@ -1,0 +1,1467 @@
+{
+  "tag": "div",
+  "children": [
+    {
+      "tag": "div",
+      "classes": [
+        "analyze-view"
+      ],
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "analyze-section"
+          ],
+          "children": [
+            {
+              "tag": "div",
+              "classes": [
+                "analyze-section-header"
+              ]
+            },
+            {
+              "tag": "div",
+              "classes": [
+                "gauge-container"
+              ],
+              "children": [
+                {
+                  "tag": "svg",
+                  "classes": [
+                    "gauge-svg"
+                  ],
+                  "ariaAttrs": {
+                    "aria-valuenow": "84",
+                    "aria-valuemin": "0",
+                    "aria-valuemax": "100",
+                    "aria-label": "Health score: 84 out of 100"
+                  },
+                  "role": "meter",
+                  "children": [
+                    {
+                      "tag": "path",
+                      "classes": [
+                        "gauge-arc",
+                        "gauge-zone-red"
+                      ]
+                    },
+                    {
+                      "tag": "path",
+                      "classes": [
+                        "gauge-arc",
+                        "gauge-zone-yellow"
+                      ]
+                    },
+                    {
+                      "tag": "path",
+                      "classes": [
+                        "gauge-arc",
+                        "gauge-zone-green"
+                      ]
+                    },
+                    {
+                      "tag": "line",
+                      "classes": [
+                        "gauge-needle"
+                      ]
+                    },
+                    {
+                      "tag": "text",
+                      "classes": [
+                        "gauge-score"
+                      ]
+                    },
+                    {
+                      "tag": "text",
+                      "classes": [
+                        "gauge-label"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "gauge-breakdown"
+                  ],
+                  "children": [
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "gauge-factor",
+                        "gauge-factor-green"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "gauge-factor-label"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "gauge-factor-context"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "gauge-factor-value"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "gauge-factor",
+                        "gauge-factor-green"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "gauge-factor-label"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "gauge-factor-context"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "gauge-factor-value"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "gauge-factor",
+                        "gauge-factor-green"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "gauge-factor-label"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "gauge-factor-context"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "gauge-factor-value"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "gauge-factor",
+                        "gauge-factor-green"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "gauge-factor-label"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "gauge-factor-context"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "gauge-factor-value"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "tag": "div",
+          "classes": [
+            "analyze-section"
+          ],
+          "children": [
+            {
+              "tag": "div",
+              "classes": [
+                "cross-link-tip"
+              ]
+            },
+            {
+              "tag": "div",
+              "classes": [
+                "analyze-section-header"
+              ]
+            },
+            {
+              "tag": "div",
+              "children": [
+                {
+                  "tag": "div",
+                  "classes": [
+                    "coverage-summary"
+                  ],
+                  "children": [
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "cov-stat"
+                      ],
+                      "children": [
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "cov-stat-header"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "cov-stat-label"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "cov-stat-value"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "cov-bar"
+                          ],
+                          "children": [
+                            {
+                              "tag": "div",
+                              "classes": [
+                                "cov-bar-fill",
+                                "cov-bar-red"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "cov-stat"
+                      ],
+                      "children": [
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "cov-stat-header"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "cov-stat-label"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "cov-stat-value"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "cov-bar"
+                          ],
+                          "children": [
+                            {
+                              "tag": "div",
+                              "classes": [
+                                "cov-bar-fill",
+                                "cov-bar-red"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "cov-stat"
+                      ],
+                      "children": [
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "cov-stat-header"
+                          ],
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "cov-stat-label"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "cov-stat-value"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "cov-bar"
+                          ],
+                          "children": [
+                            {
+                              "tag": "div",
+                              "classes": [
+                                "cov-bar-fill",
+                                "cov-bar-red"
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "coverage-gaps-label"
+                  ]
+                },
+                {
+                  "tag": "table",
+                  "classes": [
+                    "heatmap-table"
+                  ],
+                  "role": "grid",
+                  "children": [
+                    {
+                      "tag": "thead",
+                      "children": [
+                        {
+                          "tag": "tr",
+                          "children": [
+                            {
+                              "tag": "th"
+                            },
+                            {
+                              "tag": "th"
+                            },
+                            {
+                              "tag": "th"
+                            },
+                            {
+                              "tag": "th"
+                            },
+                            {
+                              "tag": "th"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "tbody",
+                      "children": [
+                        {
+                          "tag": "tr",
+                          "classes": [
+                            "heatmap-row"
+                          ],
+                          "children": [
+                            {
+                              "tag": "th",
+                              "children": [
+                                {
+                                  "tag": "code"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "classes": [
+                                "heatmap-desc"
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-covered",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "FR-004",
+                                    "data-col": "tasks"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "FR-004 tasks: Covered"
+                                  },
+                                  "role": "button"
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "heatmap-refs-inline"
+                                  ]
+                                },
+                                {
+                                  "tag": "div",
+                                  "classes": [
+                                    "heatmap-refs"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "FR-004",
+                                    "data-col": "tasks"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-missing",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "FR-004",
+                                    "data-col": "tests"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "FR-004 tests: Missing"
+                                  },
+                                  "role": "button"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-covered",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "FR-004",
+                                    "data-col": "plan"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "FR-004 plan: Covered"
+                                  },
+                                  "role": "button"
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "heatmap-refs-inline"
+                                  ]
+                                },
+                                {
+                                  "tag": "div",
+                                  "classes": [
+                                    "heatmap-refs"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "FR-004",
+                                    "data-col": "plan"
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "tr",
+                          "classes": [
+                            "heatmap-row"
+                          ],
+                          "children": [
+                            {
+                              "tag": "th",
+                              "children": [
+                                {
+                                  "tag": "code"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "classes": [
+                                "heatmap-desc"
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-covered",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "FR-005",
+                                    "data-col": "tasks"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "FR-005 tasks: Covered"
+                                  },
+                                  "role": "button"
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "heatmap-refs-inline"
+                                  ]
+                                },
+                                {
+                                  "tag": "div",
+                                  "classes": [
+                                    "heatmap-refs"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "FR-005",
+                                    "data-col": "tasks"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-missing",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "FR-005",
+                                    "data-col": "tests"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "FR-005 tests: Missing"
+                                  },
+                                  "role": "button"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-missing",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "FR-005",
+                                    "data-col": "plan"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "FR-005 plan: Missing"
+                                  },
+                                  "role": "button"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "tr",
+                          "classes": [
+                            "heatmap-row"
+                          ],
+                          "children": [
+                            {
+                              "tag": "th",
+                              "children": [
+                                {
+                                  "tag": "code"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "classes": [
+                                "heatmap-desc"
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-missing",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "FR-007",
+                                    "data-col": "tasks"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "FR-007 tasks: Missing"
+                                  },
+                                  "role": "button"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-missing",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "FR-007",
+                                    "data-col": "tests"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "FR-007 tests: Missing"
+                                  },
+                                  "role": "button"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-missing",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "FR-007",
+                                    "data-col": "plan"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "FR-007 plan: Missing"
+                                  },
+                                  "role": "button"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "tr",
+                          "classes": [
+                            "heatmap-row"
+                          ],
+                          "children": [
+                            {
+                              "tag": "th",
+                              "children": [
+                                {
+                                  "tag": "code"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "classes": [
+                                "heatmap-desc"
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-missing",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "SC-001",
+                                    "data-col": "tasks"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "SC-001 tasks: Missing"
+                                  },
+                                  "role": "button"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-missing",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "SC-001",
+                                    "data-col": "tests"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "SC-001 tests: Missing"
+                                  },
+                                  "role": "button"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-na",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "SC-001",
+                                    "data-col": "plan"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "SC-001 plan: N/A"
+                                  },
+                                  "role": "button"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "tr",
+                          "classes": [
+                            "heatmap-row"
+                          ],
+                          "children": [
+                            {
+                              "tag": "th",
+                              "children": [
+                                {
+                                  "tag": "code"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "classes": [
+                                "heatmap-desc"
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-missing",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "SC-002",
+                                    "data-col": "tasks"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "SC-002 tasks: Missing"
+                                  },
+                                  "role": "button"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-missing",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "SC-002",
+                                    "data-col": "tests"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "SC-002 tests: Missing"
+                                  },
+                                  "role": "button"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-na",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "SC-002",
+                                    "data-col": "plan"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "SC-002 plan: N/A"
+                                  },
+                                  "role": "button"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "tr",
+                          "classes": [
+                            "heatmap-row"
+                          ],
+                          "children": [
+                            {
+                              "tag": "th",
+                              "children": [
+                                {
+                                  "tag": "code"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "classes": [
+                                "heatmap-desc"
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-missing",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "SC-003",
+                                    "data-col": "tasks"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "SC-003 tasks: Missing"
+                                  },
+                                  "role": "button"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-missing",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "SC-003",
+                                    "data-col": "tests"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "SC-003 tests: Missing"
+                                  },
+                                  "role": "button"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-na",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "SC-003",
+                                    "data-col": "plan"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "SC-003 plan: N/A"
+                                  },
+                                  "role": "button"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "tr",
+                          "classes": [
+                            "heatmap-row"
+                          ],
+                          "children": [
+                            {
+                              "tag": "th",
+                              "children": [
+                                {
+                                  "tag": "code"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "classes": [
+                                "heatmap-desc"
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-missing",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "SC-004",
+                                    "data-col": "tasks"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "SC-004 tasks: Missing"
+                                  },
+                                  "role": "button"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-missing",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "SC-004",
+                                    "data-col": "tests"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "SC-004 tests: Missing"
+                                  },
+                                  "role": "button"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-na",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "SC-004",
+                                    "data-col": "plan"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "SC-004 plan: N/A"
+                                  },
+                                  "role": "button"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "tr",
+                          "classes": [
+                            "heatmap-row"
+                          ],
+                          "children": [
+                            {
+                              "tag": "th",
+                              "children": [
+                                {
+                                  "tag": "code"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "classes": [
+                                "heatmap-desc"
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-missing",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "SC-005",
+                                    "data-col": "tasks"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "SC-005 tasks: Missing"
+                                  },
+                                  "role": "button"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-missing",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "SC-005",
+                                    "data-col": "tests"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "SC-005 tests: Missing"
+                                  },
+                                  "role": "button"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "td",
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "coverage-na",
+                                    "heatmap-cell"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-req": "SC-005",
+                                    "data-col": "plan"
+                                  },
+                                  "ariaAttrs": {
+                                    "aria-label": "SC-005 plan: N/A"
+                                  },
+                                  "role": "button"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "tag": "div",
+          "classes": [
+            "analyze-section",
+            "slide-in"
+          ],
+          "children": [
+            {
+              "tag": "div",
+              "classes": [
+                "analyze-section-header"
+              ]
+            },
+            {
+              "tag": "div",
+              "classes": [
+                "severity-wrapper"
+              ],
+              "children": [
+                {
+                  "tag": "div",
+                  "classes": [
+                    "severity-controls"
+                  ],
+                  "children": [
+                    {
+                      "tag": "select",
+                      "classes": [
+                        "severity-filter"
+                      ],
+                      "children": [
+                        {
+                          "tag": "option"
+                        },
+                        {
+                          "tag": "option"
+                        },
+                        {
+                          "tag": "option"
+                        },
+                        {
+                          "tag": "option"
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "select",
+                      "classes": [
+                        "severity-filter"
+                      ],
+                      "children": [
+                        {
+                          "tag": "option"
+                        },
+                        {
+                          "tag": "option"
+                        },
+                        {
+                          "tag": "option"
+                        },
+                        {
+                          "tag": "option"
+                        },
+                        {
+                          "tag": "option"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "severity-table-scroll"
+                  ],
+                  "children": [
+                    {
+                      "tag": "table",
+                      "classes": [
+                        "severity-table"
+                      ],
+                      "children": [
+                        {
+                          "tag": "thead",
+                          "children": [
+                            {
+                              "tag": "tr",
+                              "children": [
+                                {
+                                  "tag": "th",
+                                  "dataAttrs": {
+                                    "data-sort": "id"
+                                  }
+                                },
+                                {
+                                  "tag": "th",
+                                  "dataAttrs": {
+                                    "data-sort": "category"
+                                  }
+                                },
+                                {
+                                  "tag": "th",
+                                  "dataAttrs": {
+                                    "data-sort": "severity"
+                                  }
+                                },
+                                {
+                                  "tag": "th",
+                                  "dataAttrs": {
+                                    "data-sort": "location"
+                                  }
+                                },
+                                {
+                                  "tag": "th",
+                                  "dataAttrs": {
+                                    "data-sort": "summary"
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "tbody",
+                          "children": [
+                            {
+                              "tag": "tr",
+                              "dataAttrs": {
+                                "data-severity": "high",
+                                "data-category": "Inconsistency"
+                              },
+                              "children": [
+                                {
+                                  "tag": "td"
+                                },
+                                {
+                                  "tag": "td"
+                                },
+                                {
+                                  "tag": "td",
+                                  "children": [
+                                    {
+                                      "tag": "span",
+                                      "classes": [
+                                        "severity-badge",
+                                        "severity-high"
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "tag": "td",
+                                  "children": [
+                                    {
+                                      "tag": "code"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "tag": "td"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "tr",
+                              "classes": [
+                                "severity-recommendation"
+                              ],
+                              "dataAttrs": {
+                                "data-expand-for": "A2"
+                              },
+                              "children": [
+                                {
+                                  "tag": "td"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "tr",
+                              "dataAttrs": {
+                                "data-severity": "medium",
+                                "data-category": "Test Gap"
+                              },
+                              "children": [
+                                {
+                                  "tag": "td"
+                                },
+                                {
+                                  "tag": "td"
+                                },
+                                {
+                                  "tag": "td",
+                                  "children": [
+                                    {
+                                      "tag": "span",
+                                      "classes": [
+                                        "severity-badge",
+                                        "severity-medium"
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "tag": "td",
+                                  "children": [
+                                    {
+                                      "tag": "code"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "tag": "td"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "tr",
+                              "classes": [
+                                "severity-recommendation"
+                              ],
+                              "dataAttrs": {
+                                "data-expand-for": "A3"
+                              },
+                              "children": [
+                                {
+                                  "tag": "td"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "tr",
+                              "dataAttrs": {
+                                "data-severity": "low",
+                                "data-category": "Coverage Gap"
+                              },
+                              "children": [
+                                {
+                                  "tag": "td"
+                                },
+                                {
+                                  "tag": "td"
+                                },
+                                {
+                                  "tag": "td",
+                                  "children": [
+                                    {
+                                      "tag": "span",
+                                      "classes": [
+                                        "severity-badge",
+                                        "severity-low"
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "tag": "td",
+                                  "children": [
+                                    {
+                                      "tag": "code"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "tag": "td"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "tr",
+                              "classes": [
+                                "severity-recommendation"
+                              ],
+                              "dataAttrs": {
+                                "data-expand-for": "A4"
+                              },
+                              "children": [
+                                {
+                                  "tag": "td"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "tr",
+                              "dataAttrs": {
+                                "data-severity": "critical",
+                                "data-category": "Coverage Gap"
+                              },
+                              "children": [
+                                {
+                                  "tag": "td"
+                                },
+                                {
+                                  "tag": "td"
+                                },
+                                {
+                                  "tag": "td",
+                                  "children": [
+                                    {
+                                      "tag": "span",
+                                      "classes": [
+                                        "severity-badge",
+                                        "severity-critical"
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "tag": "td",
+                                  "children": [
+                                    {
+                                      "tag": "code"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "tag": "td"
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "tr",
+                              "classes": [
+                                "severity-recommendation"
+                              ],
+                              "dataAttrs": {
+                                "data-expand-for": "A1"
+                              },
+                              "children": [
+                                {
+                                  "tag": "td"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

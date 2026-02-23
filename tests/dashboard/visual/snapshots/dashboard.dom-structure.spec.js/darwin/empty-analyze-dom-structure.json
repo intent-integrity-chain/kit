@@ -1,0 +1,36 @@
+{
+  "tag": "div",
+  "children": [
+    {
+      "tag": "div",
+      "classes": [
+        "analyze-empty"
+      ],
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "analyze-empty-icon"
+          ]
+        },
+        {
+          "tag": "div",
+          "classes": [
+            "analyze-empty-title"
+          ]
+        },
+        {
+          "tag": "div",
+          "classes": [
+            "analyze-empty-text"
+          ],
+          "children": [
+            {
+              "tag": "code"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

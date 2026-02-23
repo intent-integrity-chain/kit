@@ -1,0 +1,646 @@
+{
+  "tag": "div",
+  "children": [
+    {
+      "tag": "div",
+      "classes": [
+        "board-container"
+      ],
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "cross-link-tip"
+          ]
+        },
+        {
+          "tag": "div",
+          "classes": [
+            "board"
+          ],
+          "ariaAttrs": {
+            "aria-label": "Dashboard board"
+          },
+          "role": "region",
+          "children": [
+            {
+              "tag": "div",
+              "classes": [
+                "column",
+                "todo"
+              ],
+              "ariaAttrs": {
+                "aria-label": "Todo column with 2 stories"
+              },
+              "role": "region",
+              "children": [
+                {
+                  "tag": "div",
+                  "classes": [
+                    "column-header"
+                  ],
+                  "children": [
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "column-title"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "column-dot"
+                          ],
+                          "ariaAttrs": {
+                            "aria-hidden": "true"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "column-count"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "column-body"
+                  ],
+                  "children": [
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "card"
+                      ],
+                      "dataAttrs": {
+                        "data-card-id": "US1"
+                      },
+                      "ariaAttrs": {
+                        "aria-label": "Process Payment - P1 - 0/3 tasks complete"
+                      },
+                      "role": "article",
+                      "children": [
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "card-id",
+                            "cross-link"
+                          ],
+                          "dataAttrs": {
+                            "data-cross-target": "spec",
+                            "data-cross-id": "US1"
+                          }
+                        },
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "card-header"
+                          ],
+                          "children": [
+                            {
+                              "tag": "div",
+                              "classes": [
+                                "card-title"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "p1",
+                                "priority-badge"
+                              ],
+                              "ariaAttrs": {
+                                "aria-label": "Priority P1"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "progress-container"
+                          ],
+                          "children": [
+                            {
+                              "tag": "div",
+                              "classes": [
+                                "progress-info"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "progress-label"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "progress-value"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "div",
+                              "classes": [
+                                "progress-bar"
+                              ],
+                              "ariaAttrs": {
+                                "aria-valuenow": "0",
+                                "aria-valuemin": "0",
+                                "aria-valuemax": "100"
+                              },
+                              "role": "progressbar",
+                              "children": [
+                                {
+                                  "tag": "div",
+                                  "classes": [
+                                    "progress-fill"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "button",
+                          "classes": [
+                            "task-toggle"
+                          ],
+                          "ariaAttrs": {
+                            "aria-expanded": "false",
+                            "aria-controls": "tasks-US1"
+                          },
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "task-toggle-icon"
+                              ],
+                              "ariaAttrs": {
+                                "aria-hidden": "true"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "ul",
+                          "classes": [
+                            "collapsed",
+                            "task-list"
+                          ],
+                          "ariaAttrs": {
+                            "aria-label": "Tasks for US1"
+                          },
+                          "children": [
+                            {
+                              "tag": "li",
+                              "classes": [
+                                "task-item"
+                              ],
+                              "dataAttrs": {
+                                "data-task-id": "T001"
+                              },
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "task-checkbox"
+                                  ],
+                                  "ariaAttrs": {
+                                    "aria-hidden": "true"
+                                  }
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "cross-link",
+                                    "task-id"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-cross-target": "testify",
+                                    "data-cross-id": "T001"
+                                  }
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "task-description"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "li",
+                              "classes": [
+                                "task-item"
+                              ],
+                              "dataAttrs": {
+                                "data-task-id": "T002"
+                              },
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "task-checkbox"
+                                  ],
+                                  "ariaAttrs": {
+                                    "aria-hidden": "true"
+                                  }
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "cross-link",
+                                    "task-id"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-cross-target": "testify",
+                                    "data-cross-id": "T002"
+                                  }
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "task-description"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "li",
+                              "classes": [
+                                "task-item"
+                              ],
+                              "dataAttrs": {
+                                "data-task-id": "T003"
+                              },
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "task-checkbox"
+                                  ],
+                                  "ariaAttrs": {
+                                    "aria-hidden": "true"
+                                  }
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "cross-link",
+                                    "task-id"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-cross-target": "testify",
+                                    "data-cross-id": "T003"
+                                  }
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "task-description"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "card"
+                      ],
+                      "dataAttrs": {
+                        "data-card-id": "US2"
+                      },
+                      "ariaAttrs": {
+                        "aria-label": "View Payment History - P2 - 0/2 tasks complete"
+                      },
+                      "role": "article",
+                      "children": [
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "card-id",
+                            "cross-link"
+                          ],
+                          "dataAttrs": {
+                            "data-cross-target": "spec",
+                            "data-cross-id": "US2"
+                          }
+                        },
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "card-header"
+                          ],
+                          "children": [
+                            {
+                              "tag": "div",
+                              "classes": [
+                                "card-title"
+                              ]
+                            },
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "p2",
+                                "priority-badge"
+                              ],
+                              "ariaAttrs": {
+                                "aria-label": "Priority P2"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "div",
+                          "classes": [
+                            "progress-container"
+                          ],
+                          "children": [
+                            {
+                              "tag": "div",
+                              "classes": [
+                                "progress-info"
+                              ],
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "progress-label"
+                                  ]
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "progress-value"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "div",
+                              "classes": [
+                                "progress-bar"
+                              ],
+                              "ariaAttrs": {
+                                "aria-valuenow": "0",
+                                "aria-valuemin": "0",
+                                "aria-valuemax": "100"
+                              },
+                              "role": "progressbar",
+                              "children": [
+                                {
+                                  "tag": "div",
+                                  "classes": [
+                                    "progress-fill"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "button",
+                          "classes": [
+                            "task-toggle"
+                          ],
+                          "ariaAttrs": {
+                            "aria-expanded": "false",
+                            "aria-controls": "tasks-US2"
+                          },
+                          "children": [
+                            {
+                              "tag": "span",
+                              "classes": [
+                                "task-toggle-icon"
+                              ],
+                              "ariaAttrs": {
+                                "aria-hidden": "true"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "tag": "ul",
+                          "classes": [
+                            "collapsed",
+                            "task-list"
+                          ],
+                          "ariaAttrs": {
+                            "aria-label": "Tasks for US2"
+                          },
+                          "children": [
+                            {
+                              "tag": "li",
+                              "classes": [
+                                "task-item"
+                              ],
+                              "dataAttrs": {
+                                "data-task-id": "T004"
+                              },
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "task-checkbox"
+                                  ],
+                                  "ariaAttrs": {
+                                    "aria-hidden": "true"
+                                  }
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "cross-link",
+                                    "task-id"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-cross-target": "testify",
+                                    "data-cross-id": "T004"
+                                  }
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "task-description"
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "tag": "li",
+                              "classes": [
+                                "task-item"
+                              ],
+                              "dataAttrs": {
+                                "data-task-id": "T005"
+                              },
+                              "children": [
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "task-checkbox"
+                                  ],
+                                  "ariaAttrs": {
+                                    "aria-hidden": "true"
+                                  }
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "cross-link",
+                                    "task-id"
+                                  ],
+                                  "dataAttrs": {
+                                    "data-cross-target": "testify",
+                                    "data-cross-id": "T005"
+                                  }
+                                },
+                                {
+                                  "tag": "span",
+                                  "classes": [
+                                    "task-description"
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "tag": "div",
+              "classes": [
+                "column",
+                "in-progress"
+              ],
+              "ariaAttrs": {
+                "aria-label": "In Progress column with 0 stories"
+              },
+              "role": "region",
+              "children": [
+                {
+                  "tag": "div",
+                  "classes": [
+                    "column-header"
+                  ],
+                  "children": [
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "column-title"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "column-dot"
+                          ],
+                          "ariaAttrs": {
+                            "aria-hidden": "true"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "column-count"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "column-body"
+                  ],
+                  "children": [
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "column-empty"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "tag": "div",
+              "classes": [
+                "column",
+                "done"
+              ],
+              "ariaAttrs": {
+                "aria-label": "Done column with 0 stories"
+              },
+              "role": "region",
+              "children": [
+                {
+                  "tag": "div",
+                  "classes": [
+                    "column-header"
+                  ],
+                  "children": [
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "column-title"
+                      ],
+                      "children": [
+                        {
+                          "tag": "span",
+                          "classes": [
+                            "column-dot"
+                          ],
+                          "ariaAttrs": {
+                            "aria-hidden": "true"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "classes": [
+                        "column-count"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "classes": [
+                    "column-body"
+                  ],
+                  "children": [
+                    {
+                      "tag": "div",
+                      "classes": [
+                        "column-empty"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

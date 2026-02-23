@@ -1,0 +1,1608 @@
+{
+  "tag": "div",
+  "children": [
+    {
+      "tag": "div",
+      "classes": [
+        "testify-view"
+      ],
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "testify-seal"
+          ],
+          "ariaAttrs": {
+            "aria-live": "polite",
+            "aria-label": "Assertion integrity: Tampered"
+          },
+          "role": "status",
+          "children": [
+            {
+              "tag": "div",
+              "classes": [
+                "tampered",
+                "testify-seal-dot"
+              ]
+            },
+            {
+              "tag": "span",
+              "classes": [
+                "tampered",
+                "testify-seal-label"
+              ]
+            },
+            {
+              "tag": "span"
+            },
+            {
+              "tag": "span",
+              "classes": [
+                "testify-seal-hash"
+              ]
+            }
+          ]
+        },
+        {
+          "tag": "div",
+          "classes": [
+            "cross-link-tip"
+          ]
+        },
+        {
+          "tag": "div",
+          "classes": [
+            "testify-sankey-container"
+          ],
+          "children": [
+            {
+              "tag": "svg",
+              "classes": [
+                "testify-sankey-svg"
+              ],
+              "ariaAttrs": {
+                "aria-label": "Traceability Sankey diagram: 12 requirements, 5 test specifications, 15 tasks"
+              },
+              "role": "img",
+              "children": [
+                {
+                  "tag": "text",
+                  "classes": [
+                    "sankey-col-label"
+                  ]
+                },
+                {
+                  "tag": "text",
+                  "classes": [
+                    "sankey-col-label"
+                  ]
+                },
+                {
+                  "tag": "text",
+                  "classes": [
+                    "sankey-col-label"
+                  ]
+                },
+                {
+                  "tag": "rect",
+                  "classes": [
+                    "sankey-group-bg"
+                  ]
+                },
+                {
+                  "tag": "text",
+                  "classes": [
+                    "sankey-group-label"
+                  ]
+                },
+                {
+                  "tag": "rect",
+                  "classes": [
+                    "sankey-group-bg"
+                  ]
+                },
+                {
+                  "tag": "text",
+                  "classes": [
+                    "sankey-group-label"
+                  ]
+                },
+                {
+                  "tag": "rect",
+                  "classes": [
+                    "sankey-group-bg"
+                  ]
+                },
+                {
+                  "tag": "text",
+                  "classes": [
+                    "sankey-group-label"
+                  ]
+                },
+                {
+                  "tag": "g",
+                  "classes": [
+                    "sankey-flows"
+                  ],
+                  "children": [
+                    {
+                      "tag": "path",
+                      "classes": [
+                        "sankey-flow"
+                      ],
+                      "dataAttrs": {
+                        "data-chain-ids": "FR-001 TS-001",
+                        "data-from": "FR-001",
+                        "data-to": "TS-001"
+                      }
+                    },
+                    {
+                      "tag": "path",
+                      "classes": [
+                        "sankey-flow"
+                      ],
+                      "dataAttrs": {
+                        "data-chain-ids": "SC-001 TS-001",
+                        "data-from": "SC-001",
+                        "data-to": "TS-001"
+                      }
+                    },
+                    {
+                      "tag": "path",
+                      "classes": [
+                        "sankey-flow"
+                      ],
+                      "dataAttrs": {
+                        "data-chain-ids": "FR-002 TS-003",
+                        "data-from": "FR-002",
+                        "data-to": "TS-003"
+                      }
+                    },
+                    {
+                      "tag": "path",
+                      "classes": [
+                        "sankey-flow"
+                      ],
+                      "dataAttrs": {
+                        "data-chain-ids": "SC-002 TS-003",
+                        "data-from": "SC-002",
+                        "data-to": "TS-003"
+                      }
+                    },
+                    {
+                      "tag": "path",
+                      "classes": [
+                        "sankey-flow"
+                      ],
+                      "dataAttrs": {
+                        "data-chain-ids": "FR-003 TS-004",
+                        "data-from": "FR-003",
+                        "data-to": "TS-004"
+                      }
+                    },
+                    {
+                      "tag": "path",
+                      "classes": [
+                        "sankey-flow"
+                      ],
+                      "dataAttrs": {
+                        "data-chain-ids": "SC-003 TS-004",
+                        "data-from": "SC-003",
+                        "data-to": "TS-004"
+                      }
+                    },
+                    {
+                      "tag": "path",
+                      "classes": [
+                        "sankey-flow"
+                      ],
+                      "dataAttrs": {
+                        "data-chain-ids": "FR-001 TS-002",
+                        "data-from": "FR-001",
+                        "data-to": "TS-002"
+                      }
+                    },
+                    {
+                      "tag": "path",
+                      "classes": [
+                        "sankey-flow"
+                      ],
+                      "dataAttrs": {
+                        "data-chain-ids": "FR-006 TS-005",
+                        "data-from": "FR-006",
+                        "data-to": "TS-005"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "tag": "g",
+                  "classes": [
+                    "sankey-col-left"
+                  ],
+                  "children": [
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "FR-001",
+                        "data-chain": "FR-001 TS-001 TS-002",
+                        "data-cross-target": "spec",
+                        "data-cross-id": "FR-001"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-FR-001"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "FR-002",
+                        "data-chain": "FR-002 TS-003",
+                        "data-cross-target": "spec",
+                        "data-cross-id": "FR-002"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-FR-002"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "FR-003",
+                        "data-chain": "FR-003 TS-004",
+                        "data-cross-target": "spec",
+                        "data-cross-id": "FR-003"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-FR-003"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "gap-node",
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "FR-004",
+                        "data-chain": "FR-004",
+                        "data-cross-target": "checklist",
+                        "data-cross-id": "FR-004"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-FR-004"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "gap-node",
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "FR-005",
+                        "data-chain": "FR-005",
+                        "data-cross-target": "checklist",
+                        "data-cross-id": "FR-005"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-FR-005"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "FR-006",
+                        "data-chain": "FR-006 TS-005",
+                        "data-cross-target": "spec",
+                        "data-cross-id": "FR-006"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-FR-006"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "gap-node",
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "FR-007",
+                        "data-chain": "FR-007",
+                        "data-cross-target": "checklist",
+                        "data-cross-id": "FR-007"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-FR-007"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "SC-001",
+                        "data-chain": "SC-001 TS-001",
+                        "data-cross-target": "spec",
+                        "data-cross-id": "SC-001"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-SC-001"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "SC-002",
+                        "data-chain": "SC-002 TS-003",
+                        "data-cross-target": "spec",
+                        "data-cross-id": "SC-002"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-SC-002"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "SC-003",
+                        "data-chain": "SC-003 TS-004",
+                        "data-cross-target": "spec",
+                        "data-cross-id": "SC-003"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-SC-003"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "gap-node",
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "SC-004",
+                        "data-chain": "SC-004",
+                        "data-cross-target": "checklist",
+                        "data-cross-id": "SC-004"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-SC-004"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "gap-node",
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "SC-005",
+                        "data-chain": "SC-005",
+                        "data-cross-target": "checklist",
+                        "data-cross-id": "SC-005"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-SC-005"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "g",
+                  "classes": [
+                    "sankey-col-mid"
+                  ],
+                  "children": [
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "gap-node",
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "TS-001",
+                        "data-chain": "TS-001 FR-001 SC-001",
+                        "data-cross-target": "checklist",
+                        "data-cross-id": "TS-001"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-TS-001"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "gap-node",
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "TS-003",
+                        "data-chain": "TS-003 FR-002 SC-002",
+                        "data-cross-target": "checklist",
+                        "data-cross-id": "TS-003"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-TS-003"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "gap-node",
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "TS-004",
+                        "data-chain": "TS-004 FR-003 SC-003",
+                        "data-cross-target": "checklist",
+                        "data-cross-id": "TS-004"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-TS-004"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "gap-node",
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "TS-002",
+                        "data-chain": "TS-002 FR-001",
+                        "data-cross-target": "checklist",
+                        "data-cross-id": "TS-002"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-TS-002"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "gap-node",
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "TS-005",
+                        "data-chain": "TS-005 FR-006",
+                        "data-cross-target": "checklist",
+                        "data-cross-id": "TS-005"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-TS-005"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "g",
+                  "classes": [
+                    "sankey-col-right"
+                  ],
+                  "children": [
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "sankey-node",
+                        "task-checked"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "T001",
+                        "data-chain": "T001",
+                        "data-cross-target": "implement",
+                        "data-cross-id": "T001"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-T001"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "sankey-node",
+                        "task-checked"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "T002",
+                        "data-chain": "T002",
+                        "data-cross-target": "implement",
+                        "data-cross-id": "T002"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-T002"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "sankey-node",
+                        "task-checked"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "T003",
+                        "data-chain": "T003",
+                        "data-cross-target": "implement",
+                        "data-cross-id": "T003"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-T003"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "sankey-node",
+                        "task-checked"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "T004",
+                        "data-chain": "T004",
+                        "data-cross-target": "implement",
+                        "data-cross-id": "T004"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-T004"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "sankey-node",
+                        "task-checked"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "T005",
+                        "data-chain": "T005",
+                        "data-cross-target": "implement",
+                        "data-cross-id": "T005"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-T005"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "T006",
+                        "data-chain": "T006",
+                        "data-cross-target": "implement",
+                        "data-cross-id": "T006"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-T006"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "T007",
+                        "data-chain": "T007",
+                        "data-cross-target": "implement",
+                        "data-cross-id": "T007"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-T007"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "T008",
+                        "data-chain": "T008",
+                        "data-cross-target": "implement",
+                        "data-cross-id": "T008"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-T008"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "T009",
+                        "data-chain": "T009",
+                        "data-cross-target": "implement",
+                        "data-cross-id": "T009"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-T009"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "T010",
+                        "data-chain": "T010",
+                        "data-cross-target": "implement",
+                        "data-cross-id": "T010"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-T010"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "T011",
+                        "data-chain": "T011",
+                        "data-cross-target": "implement",
+                        "data-cross-id": "T011"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-T011"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "T012",
+                        "data-chain": "T012",
+                        "data-cross-target": "implement",
+                        "data-cross-id": "T012"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-T012"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "T013",
+                        "data-chain": "T013",
+                        "data-cross-target": "implement",
+                        "data-cross-id": "T013"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-T013"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "T014",
+                        "data-chain": "T014",
+                        "data-cross-target": "implement",
+                        "data-cross-id": "T014"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-T014"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "g",
+                      "classes": [
+                        "sankey-node"
+                      ],
+                      "dataAttrs": {
+                        "data-node-id": "T015",
+                        "data-chain": "T015",
+                        "data-cross-target": "implement",
+                        "data-cross-id": "T015"
+                      },
+                      "ariaAttrs": {
+                        "aria-describedby": "desc-T015"
+                      },
+                      "role": "button",
+                      "children": [
+                        {
+                          "tag": "title"
+                        },
+                        {
+                          "tag": "desc"
+                        },
+                        {
+                          "tag": "rect",
+                          "classes": [
+                            "sankey-node-rect"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-label"
+                          ]
+                        },
+                        {
+                          "tag": "text",
+                          "classes": [
+                            "sankey-node-desc"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
