@@ -133,6 +133,55 @@ teardown() {
     assert_contains "$output" "not found"
 }
 
+@test "validate_constitution: warns when fewer than 3 principles (heading style)" {
+    cat > "$TEST_DIR/CONSTITUTION.md" << 'EOF'
+# Constitution
+## Core Principles
+### I. First Principle
+Content here.
+### II. Second Principle
+Content here.
+EOF
+    run validate_constitution "$TEST_DIR"
+    [[ "$status" -eq 0 ]]
+    assert_contains "$output" "only 2 principle"
+}
+
+@test "validate_constitution: warns when fewer than 3 principles (bullet style)" {
+    cat > "$TEST_DIR/CONSTITUTION.md" << 'EOF'
+# Constitution
+## Core Principles
+- **Quality**: Code must be tested
+- **Speed**: Ship fast
+EOF
+    run validate_constitution "$TEST_DIR"
+    [[ "$status" -eq 0 ]]
+    assert_contains "$output" "only 2 principle"
+}
+
+@test "validate_constitution: no warning with 3+ principles" {
+    cat > "$TEST_DIR/CONSTITUTION.md" << 'EOF'
+# Constitution
+## Core Principles
+### I. First
+Content.
+### II. Second
+Content.
+### III. Third
+Content.
+EOF
+    run validate_constitution "$TEST_DIR"
+    [[ "$status" -eq 0 ]]
+    assert_not_contains "$output" "principle"
+}
+
+@test "validate_constitution: no warning with 3+ bullet principles" {
+    # The default fixture has 3 bullet-style principles
+    run validate_constitution "$TEST_DIR"
+    [[ "$status" -eq 0 ]]
+    assert_not_contains "$output" "only"
+}
+
 # =============================================================================
 # validate_spec tests
 # =============================================================================
