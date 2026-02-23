@@ -87,17 +87,17 @@ common.sh"
 common.ps1"
     fi
 
-    # Add ensure-dashboard when check-prerequisites is present (transitive dep —
-    # check-prerequisites.sh calls bash "$SCRIPT_DIR/ensure-dashboard.sh" at runtime)
+    # Add generate-dashboard-safe when check-prerequisites is present (transitive dep —
+    # check-prerequisites.sh calls bash "$SCRIPT_DIR/generate-dashboard-safe.sh" at runtime)
     if [[ -n "$bash_scripts" ]] && echo "$bash_scripts" | grep -q "^check-prerequisites\.sh$" && \
-       ! echo "$bash_scripts" | grep -q "^ensure-dashboard\.sh$"; then
+       ! echo "$bash_scripts" | grep -q "^generate-dashboard-safe\.sh$"; then
         bash_scripts="$bash_scripts
-ensure-dashboard.sh"
+generate-dashboard-safe.sh"
     fi
     if [[ -n "$ps_scripts" ]] && echo "$ps_scripts" | grep -q "^check-prerequisites\.ps1$" && \
-       ! echo "$ps_scripts" | grep -q "^ensure-dashboard\.ps1$"; then
+       ! echo "$ps_scripts" | grep -q "^generate-dashboard-safe\.ps1$"; then
         ps_scripts="$ps_scripts
-ensure-dashboard.ps1"
+generate-dashboard-safe.ps1"
     fi
 
     # Copy bash scripts
@@ -145,6 +145,16 @@ ensure-dashboard.ps1"
             mkdir -p "$skill_dir/templates"
             cp "iikit-core/templates/agent-file-template.md" "$skill_dir/templates/agent-file-template.md"
             echo "  Copied templates/agent-file-template.md → ${skill_dir}templates/ (script dep)"
+        fi
+    fi
+
+    # Copy dashboard directory when generate-dashboard-safe is present (transitive dep —
+    # generate-dashboard-safe.sh looks for ../dashboard/generate-dashboard.js at runtime)
+    if echo "$bash_scripts" | grep -q "^generate-dashboard-safe\.sh$"; then
+        if [[ -d "iikit-core/scripts/dashboard" ]]; then
+            mkdir -p "$skill_dir/scripts/dashboard"
+            cp -R iikit-core/scripts/dashboard/* "$skill_dir/scripts/dashboard/"
+            echo "  Copied scripts/dashboard/ → ${skill_dir}scripts/dashboard/ (transitive dep)"
         fi
     fi
 
