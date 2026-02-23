@@ -29,6 +29,29 @@ jobs:
       - name: Run source validation tests
         run: tests/run-source-tests.sh
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Jest dashboard tests
+        working-directory: tests/dashboard
+        run: npx jest --config jest.config.js --no-cache
+
+      - name: Install Playwright browsers
+        working-directory: tests/dashboard
+        run: |
+          npm init -y > /dev/null 2>&1
+          npm install --save-dev @playwright/test > /dev/null 2>&1
+          npx playwright install chromium --with-deps
+
+      - name: Run Playwright basic dashboard tests
+        working-directory: tests/dashboard
+        run: npx playwright test --config=playwright.config.js
+
+      - name: Run Playwright visual dashboard tests
+        working-directory: tests/dashboard
+        run: npx playwright test --config=playwright-visual.config.js
+
       - name: Install tessl CLI
         run: npm install -g @tessl/cli
 
