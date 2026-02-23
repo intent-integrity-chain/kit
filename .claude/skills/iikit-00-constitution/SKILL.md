@@ -62,7 +62,7 @@ Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/sc
 
 5. **Sync Impact Report** (HTML comment at top): version change, modified principles, added/removed sections, follow-up TODOs.
 
-6. **Validate**: no remaining bracket tokens, version matches report, dates in ISO format, principles are declarative and testable.
+6. **Validate**: no remaining bracket tokens, version matches report, dates in ISO format, principles are declarative and testable. Constitution MUST have at least 3 principles — if fewer, add more based on the project context.
 
 7. **Phase separation validation**: scan for technology-specific content per [phase-separation-rules.md](../iikit-core/references/phase-separation-rules.md). Auto-fix violations, re-validate until clean.
 

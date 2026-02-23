@@ -328,6 +328,13 @@ validate_constitution() {
         echo "WARNING: Constitution may be incomplete - missing principles section" >&2
     fi
 
+    # Check minimum principle count (### N. Pattern)
+    local principle_count
+    principle_count=$(grep -cE "^### [IVX]+\.|^### [0-9]+\." "$constitution" 2>/dev/null) || principle_count=0
+    if [[ "$principle_count" -lt 3 ]]; then
+        echo "WARNING: Constitution has only $principle_count principle(s) — minimum 3 recommended" >&2
+    fi
+
     return 0
 }
 
