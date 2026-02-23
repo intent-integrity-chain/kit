@@ -314,29 +314,40 @@ Describe "verify-steps.ps1 - Dry-run with real framework" {
         Remove-TestDirectory -TestDir $script:TestDir
     }
 
-    It "returns PASS or BLOCKED when pytest-bdd is installed and steps are defined" -Skip {
-        # This test requires a real pytest-bdd installation with step definitions.
-        # In a CI environment with pytest-bdd installed, remove the -Skip flag.
+    It "returns PASS or BLOCKED when pytest-bdd is installed and steps are defined" {
+        # Install pytest-bdd in an isolated venv
         $featuresDir = Join-Path $script:TestDir "features"
         New-FeatureFiles -Dir $featuresDir
         $planFile = Join-Path $script:TestDir "plan.md"
         New-PlanWithStack -PlanFile $planFile -Language "Python 3.11" -Framework "pytest-bdd"
 
-        $result = & $script:VerifyStepsScript --json $featuresDir $planFile 2>&1 | Out-String
+        $venvDir = Join-Path $script:TestDir ".venv"
+        python3 -m venv $venvDir 2>&1 | Out-Null
+        $origPath = $env:PATH
+        $env:PATH = (Join-Path $venvDir "bin") + [System.IO.Path]::PathSeparator + $env:PATH
+        pip install pytest-bdd 2>&1 | Out-Null
+
+        $result = & $script:VerifyStepsScript --json $featuresDir $planFile *>&1 | Out-String
         $parsed = $result.Trim() | ConvertFrom-Json
         $parsed.status | Should -BeIn @("PASS", "BLOCKED")
         $parsed.framework | Should -Be "pytest-bdd"
+
+        $env:PATH = $origPath
     }
 
-    It "returns BLOCKED when steps are undefined in cucumber-js" -Skip {
-        # This test requires a real @cucumber/cucumber installation.
-        # In a CI environment with cucumber-js installed, remove the -Skip flag.
+    It "returns BLOCKED when steps are undefined in cucumber-js" {
+        # Install cucumber-js locally in the test dir
         $featuresDir = Join-Path $script:TestDir "features"
         New-FeatureFiles -Dir $featuresDir
         $planFile = Join-Path $script:TestDir "plan.md"
         New-PlanWithStack -PlanFile $planFile -Language "TypeScript 5.x" -Framework "@cucumber/cucumber"
 
-        $result = & $script:VerifyStepsScript --json $featuresDir $planFile 2>&1 | Out-String
+        Push-Location $script:TestDir
+        npm init -y 2>&1 | Out-Null
+        npm install --save-dev @cucumber/cucumber 2>&1 | Out-Null
+        Pop-Location
+
+        $result = & $script:VerifyStepsScript --json $featuresDir $planFile *>&1 | Out-String
         $parsed = $result.Trim() | ConvertFrom-Json
         $parsed.status | Should -Be "BLOCKED"
         $parsed.undefined_steps | Should -BeGreaterThan 0

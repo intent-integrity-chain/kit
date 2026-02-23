@@ -516,28 +516,39 @@ Describe "setup-bdd.ps1 - Package installation" {
         Remove-TestDirectory -TestDir $script:TestDir
     }
 
-    It "attempts pip install for pytest-bdd when pip is available" -Skip {
-        # This test installs a real package. Only run in CI with isolated environments.
+    It "attempts pip install for pytest-bdd when pip is available" {
+        # Install into isolated temp dir via pip --target
         $planFile = Join-Path $script:TestDir "plan.md"
         New-PlanFile -Path $planFile -Content @"
 ## Technical Context
 **Testing**: pytest-bdd
 "@
+        # Create a venv to isolate the install
+        $venvDir = Join-Path $script:TestDir ".venv"
+        python3 -m venv $venvDir 2>&1 | Out-Null
+        $env:PATH = (Join-Path $venvDir "bin") + [System.IO.Path]::PathSeparator + $env:PATH
 
-        $result = & $script:SetupBddScript --json (Join-Path $script:TestDir "tests/features") $planFile 2>&1 | Out-String
+        $result = & $script:SetupBddScript --json (Join-Path $script:TestDir "tests/features") $planFile *>&1 | Out-String
         $parsed = $result.Trim() | ConvertFrom-Json
         $parsed.packages_installed | Should -Contain "pytest-bdd"
+
+        # Cleanup venv
+        $env:PATH = ($env:PATH -split [System.IO.Path]::PathSeparator | Where-Object { $_ -ne (Join-Path $venvDir "bin") }) -join [System.IO.Path]::PathSeparator
     }
 
-    It "attempts npm install for @cucumber/cucumber when npm is available" -Skip {
-        # This test installs a real package. Only run in CI with isolated environments.
+    It "attempts npm install for @cucumber/cucumber when npm is available" {
+        # npm install --save-dev is local to the test dir
         $planFile = Join-Path $script:TestDir "plan.md"
         New-PlanFile -Path $planFile -Content @"
 ## Technical Context
 **Testing**: @cucumber/cucumber
 "@
+        # Init package.json so npm install works locally
+        Push-Location $script:TestDir
+        npm init -y 2>&1 | Out-Null
+        Pop-Location
 
-        $result = & $script:SetupBddScript --json (Join-Path $script:TestDir "tests/features") $planFile 2>&1 | Out-String
+        $result = & $script:SetupBddScript --json (Join-Path $script:TestDir "tests/features") $planFile *>&1 | Out-String
         $parsed = $result.Trim() | ConvertFrom-Json
         $parsed.packages_installed | Should -Contain "@cucumber/cucumber"
     }
