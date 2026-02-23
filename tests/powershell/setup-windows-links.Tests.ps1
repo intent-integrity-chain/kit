@@ -75,7 +75,7 @@ Describe "setup-windows-links" -Skip:$script:SkipNonWindows {
     Context "Skip behavior" {
         It "skips existing links without -Force" {
             & $script:SetupScript -ProjectRoot $script:TestDir
-            $output = & $script:SetupScript -ProjectRoot $script:TestDir 2>&1 | Out-String
+            $output = & $script:SetupScript -ProjectRoot $script:TestDir *>&1 | Out-String
             $output | Should -Match "SKIP"
         }
     }
@@ -83,19 +83,19 @@ Describe "setup-windows-links" -Skip:$script:SkipNonWindows {
     Context "Force flag" {
         It "-Force overwrites existing links" {
             & $script:SetupScript -ProjectRoot $script:TestDir
-            $output = & $script:SetupScript -Force -ProjectRoot $script:TestDir 2>&1 | Out-String
+            $output = & $script:SetupScript -Force -ProjectRoot $script:TestDir *>&1 | Out-String
             $output | Should -Match "Removing existing link"
         }
     }
 
     Context "Output" {
         It "shows completion message" {
-            $output = & $script:SetupScript -ProjectRoot $script:TestDir 2>&1 | Out-String
+            $output = & $script:SetupScript -ProjectRoot $script:TestDir *>&1 | Out-String
             $output | Should -Match "Setup complete|completed"
         }
 
         It "shows project root" {
-            $output = & $script:SetupScript -ProjectRoot $script:TestDir 2>&1 | Out-String
+            $output = & $script:SetupScript -ProjectRoot $script:TestDir *>&1 | Out-String
             $output | Should -Match "Project root"
         }
     }
