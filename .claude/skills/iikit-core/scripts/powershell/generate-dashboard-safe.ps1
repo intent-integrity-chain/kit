@@ -12,17 +12,29 @@ param(
 )
 
 $ScriptDir = Split-Path $MyInvocation.MyCommand.Path -Parent
-$DashboardDir = Join-Path (Split-Path $ScriptDir -Parent) "dashboard"
-$Generator = Join-Path $DashboardDir "generate-dashboard.js"
 $OutputFile = Join-Path $ProjectDir ".specify" "dashboard.html"
+
+# Find the dashboard generator (dev layout or published self-contained layout)
+$Generator = $null
+$candidateDirs = @(
+    (Join-Path (Split-Path $ScriptDir -Parent) "dashboard"),
+    (Join-Path $ScriptDir ".." ".." ".." "iikit-core" "scripts" "dashboard")
+)
+foreach ($dir in $candidateDirs) {
+    $candidate = Join-Path $dir "generate-dashboard.js"
+    if (Test-Path $candidate) {
+        $Generator = $candidate
+        break
+    }
+}
 
 # Check if node is available
 if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
     exit 0
 }
 
-# Check if generator exists
-if (-not (Test-Path $Generator)) {
+# Check if generator was found
+if (-not $Generator) {
     exit 0
 }
 

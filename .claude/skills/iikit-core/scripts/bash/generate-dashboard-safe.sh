@@ -8,9 +8,21 @@
 
 PROJECT_DIR="${1:-$(pwd)}"
 SCRIPT_DIR="$(CDPATH="" cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DASHBOARD_DIR="$SCRIPT_DIR/../dashboard"
-GENERATOR="$DASHBOARD_DIR/generate-dashboard.js"
 OUTPUT_FILE="$PROJECT_DIR/.specify/dashboard.html"
+
+# Find the dashboard generator — may be relative to this script (dev layout)
+# or in a sibling skill (published layout where each skill is self-contained)
+GENERATOR=""
+CANDIDATE_DIRS=(
+    "$SCRIPT_DIR/../dashboard"
+    "$SCRIPT_DIR/../../../iikit-core/scripts/dashboard"
+)
+for dir in "${CANDIDATE_DIRS[@]}"; do
+    if [[ -f "$dir/generate-dashboard.js" ]]; then
+        GENERATOR="$dir/generate-dashboard.js"
+        break
+    fi
+done
 
 # Skip in test environments
 if [[ -n "${BATS_TEST_FILENAME:-}" ]] || [[ -n "${BATS_TMPDIR:-}" ]]; then
@@ -22,8 +34,8 @@ if ! command -v node >/dev/null 2>&1; then
     exit 0
 fi
 
-# Check if generator exists
-if [[ ! -f "$GENERATOR" ]]; then
+# Check if generator was found
+if [[ -z "$GENERATOR" ]]; then
     exit 0
 fi
 
