@@ -255,11 +255,12 @@ foreach ($stagedPath in $stagedTestSpecs) {
             $context = $contextJson | ConvertFrom-Json
 
             if ($context.testify -and $context.testify.assertion_hash) {
-                $storedFile = $context.testify.test_specs_file
+                $storedFile = ($context.testify.test_specs_file -replace '\\', '/')
                 $storedHash = $context.testify.assertion_hash
+                $normalizedStagedPath = ($stagedPath -replace '\\', '/')
 
                 # Match by path: stored file must end with the staged path
-                if ($storedFile -eq $stagedPath -or $storedFile.EndsWith("/$stagedPath")) {
+                if ($storedFile -eq $normalizedStagedPath -or $storedFile.EndsWith("/$normalizedStagedPath")) {
                     if ($storedHash -eq $currentHash) {
                         $contextStatus = "valid"
                     } else {

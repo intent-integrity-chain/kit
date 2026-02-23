@@ -4,7 +4,7 @@
 BeforeAll {
     Import-Module $PSScriptRoot/TestHelper.psm1 -Force
     $script:SetupScript = Join-Path $Global:ScriptsDir "setup-windows-links.ps1"
-    $script:IsWindows = $PSVersionTable.PSEdition -eq 'Desktop' -or $IsWindows
+    $script:RunningOnWindows = $PSVersionTable.PSEdition -eq 'Desktop' -or $IsWindows
 }
 
 BeforeDiscovery {

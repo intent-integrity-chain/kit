@@ -19,10 +19,11 @@ Describe "Get-RepoRoot" {
     It "returns git root in git repo" {
         # TestDir already has git initialized by New-TestDirectory
         $result = Get-RepoRoot
-        # Normalize paths to handle macOS /var -> /private/var symlink
-        # Strip /private prefix if present for comparison
-        $normalizedResult = $result -replace '^/private', ''
-        $normalizedExpected = $script:TestDir -replace '^/private', ''
+        # Normalize paths to handle:
+        # - macOS /var -> /private/var symlink
+        # - Windows path separators (git returns / but PowerShell uses \)
+        $normalizedResult = ($result -replace '\\', '/') -replace '^/private', ''
+        $normalizedExpected = ($script:TestDir -replace '\\', '/') -replace '^/private', ''
         $normalizedResult | Should -Be $normalizedExpected
     }
 
@@ -140,7 +141,9 @@ Describe "Test-Constitution" {
 
     It "fails when constitution missing" {
         Remove-Item "CONSTITUTION.md"
-        $result = Test-Constitution -RepoRoot $script:TestDir -ErrorAction SilentlyContinue
+        # Use try/catch because Write-Error may throw a terminating error
+        # on some platforms (e.g., Windows with Pester's error handling)
+        $result = try { Test-Constitution -RepoRoot $script:TestDir -ErrorAction SilentlyContinue } catch { $false }
         $result | Should -Be $false
     }
 }
@@ -163,14 +166,18 @@ Describe "Test-Spec" {
     }
 
     It "fails when spec missing" {
-        $result = Test-Spec -SpecFile "nonexistent/spec.md" -ErrorAction SilentlyContinue
+        # Use try/catch because Write-Error may throw a terminating error
+        # on some platforms (e.g., Windows with Pester's error handling)
+        $result = try { Test-Spec -SpecFile "nonexistent/spec.md" -ErrorAction SilentlyContinue } catch { $false }
         $result | Should -Be $false
     }
 
     It "fails when missing required sections" {
         $featureDir = New-MockFeature -TestDir $script:TestDir
         "# Empty Spec" | Out-File (Join-Path $featureDir "spec.md")
-        $result = Test-Spec -SpecFile (Join-Path $featureDir "spec.md") -ErrorAction SilentlyContinue
+        # Use try/catch because Write-Error may throw a terminating error
+        # on some platforms (e.g., Windows with Pester's error handling)
+        $result = try { Test-Spec -SpecFile (Join-Path $featureDir "spec.md") -ErrorAction SilentlyContinue } catch { $false }
         $result | Should -Be $false
     }
 }
@@ -193,7 +200,9 @@ Describe "Test-Tasks" {
     }
 
     It "fails when tasks missing" {
-        $result = Test-Tasks -TasksFile "nonexistent/tasks.md" -ErrorAction SilentlyContinue
+        # Use try/catch because Write-Error may throw a terminating error
+        # on some platforms (e.g., Windows with Pester's error handling)
+        $result = try { Test-Tasks -TasksFile "nonexistent/tasks.md" -ErrorAction SilentlyContinue } catch { $false }
         $result | Should -Be $false
     }
 }

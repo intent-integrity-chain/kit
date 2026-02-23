@@ -28,15 +28,21 @@ BeforeAll {
         Copy-Item (Join-Path $script:BashScriptsDir "common.sh") $bashTarget
         Copy-Item (Join-Path $script:BashScriptsDir "testify-tdd.sh") $bashTarget
         Copy-Item $script:BashPostHook $bashTarget
-        chmod +x (Join-Path $bashTarget "common.sh")
-        chmod +x (Join-Path $bashTarget "testify-tdd.sh")
-        chmod +x (Join-Path $bashTarget "post-commit-hook.sh")
 
-        # Install bash post-commit hook
+        # Install git hooks
         $hooksDir = Join-Path $testDir ".git/hooks"
         New-Item -ItemType Directory -Path $hooksDir -Force | Out-Null
-        Copy-Item $script:BashPostHook (Join-Path $hooksDir "post-commit")
-        chmod +x (Join-Path $hooksDir "post-commit")
+
+        if ($IsWindows) {
+            # On Windows, bash hooks don't work reliably; skip chmod and bash hook
+            # Tests will invoke the PowerShell hook directly after commit
+        } else {
+            chmod +x (Join-Path $bashTarget "common.sh")
+            chmod +x (Join-Path $bashTarget "testify-tdd.sh")
+            chmod +x (Join-Path $bashTarget "post-commit-hook.sh")
+            Copy-Item $script:BashPostHook (Join-Path $hooksDir "post-commit")
+            chmod +x (Join-Path $hooksDir "post-commit")
+        }
 
         New-Item -ItemType Directory -Path (Join-Path $testDir ".specify") -Force | Out-Null
         New-Item -ItemType Directory -Path (Join-Path $testDir "specs") -Force | Out-Null
@@ -90,6 +96,11 @@ Describe "Post-Commit Hook - Basic Behavior" {
         git add (Join-Path $specsDir "test-specs.md") 2>&1 | Out-Null
         git commit -m "add test specs" 2>&1 | Out-Null
 
+        if ($IsWindows) {
+            # On Windows, bash hooks don't run; invoke PowerShell hook directly
+            & $script:PostHookScript 2>&1 | Out-Null
+        }
+
         $note = (git notes --ref=refs/notes/testify show HEAD 2>$null) -join "`n"
         $LASTEXITCODE | Should -Be 0
         $note | Should -Match "testify-hash:"
@@ -124,8 +135,11 @@ Describe "Post-Commit Hook - Scripts Not Found" {
 
         $hooksDir = Join-Path $testDir ".git/hooks"
         New-Item -ItemType Directory -Path $hooksDir -Force | Out-Null
-        Copy-Item $script:BashPostHook (Join-Path $hooksDir "post-commit")
-        chmod +x (Join-Path $hooksDir "post-commit")
+
+        if (-not $IsWindows) {
+            Copy-Item $script:BashPostHook (Join-Path $hooksDir "post-commit")
+            chmod +x (Join-Path $hooksDir "post-commit")
+        }
 
         "init" | Out-File "init.txt"
         git add -A 2>&1 | Out-Null
@@ -136,7 +150,13 @@ Describe "Post-Commit Hook - Scripts Not Found" {
         "**Given**: test" | Out-File (Join-Path $specsDir "test-specs.md")
         git add (Join-Path $specsDir "test-specs.md") 2>&1 | Out-Null
 
-        { git commit -m "add specs" 2>&1 | Out-Null } | Should -Not -Throw
+        if ($IsWindows) {
+            # On Windows, invoke the PowerShell hook directly (no bash hooks)
+            # It should exit 0 when scripts are not found in the repo
+            { git commit -m "add specs" 2>&1 | Out-Null; & $script:PostHookScript 2>&1 | Out-Null } | Should -Not -Throw
+        } else {
+            { git commit -m "add specs" 2>&1 | Out-Null } | Should -Not -Throw
+        }
 
         Pop-Location
         Remove-Item -Path $testDir -Recurse -Force -ErrorAction SilentlyContinue

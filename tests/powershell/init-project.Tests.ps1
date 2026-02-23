@@ -64,6 +64,10 @@ Describe "init-project" {
         BeforeEach {
             New-Item -ItemType Directory -Path ".specify" -Force | Out-Null
             "# Constitution" | Out-File "CONSTITUTION.md"
+            # Pre-initialize git so we can configure user (Windows CI may lack global config)
+            git init . 2>&1 | Out-Null
+            git config user.email "test@test.com"
+            git config user.name "Test"
         }
 
         It "commits constitution with -CommitConstitution" {
