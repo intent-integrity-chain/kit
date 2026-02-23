@@ -1886,9 +1886,29 @@ function writeAtomic(outputPath, content) {
 var _cachedTemplate = null;
 function loadTemplate() {
   if (_cachedTemplate) return _cachedTemplate;
-  const templatePath = path.join(__dirname, "public", "index.html");
-  _cachedTemplate = fs.readFileSync(templatePath, "utf-8");
-  return _cachedTemplate;
+  // Try template.js first (embedded HTML for published tiles where .html files are stripped)
+  const templateJsCandidates = [
+    path.join(__dirname, "template.js"),
+    path.join(__dirname, "..", "dashboard", "template.js")
+  ];
+  for (const p of templateJsCandidates) {
+    if (fs.existsSync(p)) {
+      _cachedTemplate = require(p);
+      return _cachedTemplate;
+    }
+  }
+  // Fall back to public/index.html (dev layout)
+  const htmlCandidates = [
+    path.join(__dirname, "public", "index.html"),
+    path.join(__dirname, "src", "public", "index.html")
+  ];
+  for (const p of htmlCandidates) {
+    if (fs.existsSync(p)) {
+      _cachedTemplate = fs.readFileSync(p, "utf-8");
+      return _cachedTemplate;
+    }
+  }
+  throw new Error("Dashboard template not found");
 }
 async function generate(projectPath) {
   const resolvedPath = path.resolve(projectPath);

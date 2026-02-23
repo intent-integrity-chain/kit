@@ -164,10 +164,17 @@ function writeAtomic(outputPath, content) {
   fs.renameSync(tmpPath, outputPath);
 }
 
-// Template HTML — loaded from file (modular) or inlined by esbuild (bundled)
+// Template HTML — loaded from template.js (published) or public/index.html (dev)
 let _cachedTemplate = null;
 function loadTemplate() {
   if (_cachedTemplate) return _cachedTemplate;
+  // Try template.js first (published tiles)
+  const templateJs = path.join(__dirname, '..', 'template.js');
+  if (fs.existsSync(templateJs)) {
+    _cachedTemplate = require(templateJs);
+    return _cachedTemplate;
+  }
+  // Fall back to public/index.html (dev layout)
   const templatePath = path.join(__dirname, 'public', 'index.html');
   _cachedTemplate = fs.readFileSync(templatePath, 'utf-8');
   return _cachedTemplate;
