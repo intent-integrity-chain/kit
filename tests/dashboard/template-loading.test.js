@@ -48,10 +48,14 @@ function createTestProject() {
 }
 
 function runGenerator(generatorPath, projectPath) {
-  return spawnSync(process.execPath, [generatorPath, projectPath], {
+  const result = spawnSync(process.execPath, [generatorPath, projectPath], {
     encoding: 'utf-8',
     timeout: 15000
   });
+  if (result.status !== 0) {
+    console.error(`Generator failed (exit ${result.status}):`, result.stderr?.substring(0, 200));
+  }
+  return result;
 }
 
 /**
