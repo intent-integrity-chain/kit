@@ -31,16 +31,9 @@ You **MUST** consider the user input before proceeding (if not empty).
 1. Check if constitution exists: `cat CONSTITUTION.md 2>/dev/null || echo "NO_CONSTITUTION"`
 2. If missing, copy from [constitution-template.md](../iikit-core/templates/constitution-template.md)
 
-## Premise Check
-
-Before starting the constitution, handle `PREMISE.md` (app-wide context: what, who, why, domain, scope):
-
-- **If `PREMISE.md` exists** (drafted from PRD by init): present it to the user for review. Ask if anything needs changing. Update if needed.
-- **If `PREMISE.md` is missing**: copy from [premise-template.md](../iikit-core/templates/premise-template.md), then ask the user to describe the project — what it is, who it's for, the problem it solves, the domain, and high-level scope. Fill in the template from their answers. Present for confirmation, then write.
-
-The premise is content-specific (what we're building); the constitution is content-agnostic (how we build). Both live at the project root.
-
 ## Execution Flow
+
+> **Note**: `PREMISE.md` is created during `/iikit-core init` (Step 5). If it doesn't exist yet, suggest the user run init first. Do NOT create PREMISE.md here — constitution is content-agnostic.
 
 1. **Load existing constitution** — identify placeholder tokens `[ALL_CAPS_IDENTIFIER]`. Adapt to user's needs (more or fewer principles than template).
 
@@ -70,7 +63,7 @@ Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/sc
 
 9. **Git init** (if needed): `git init` to ensure project isolation
 
-10. **Commit**: `git add CONSTITUTION.md PREMISE.md && git commit -m "Initialize intent-integrity-kit project with constitution and premise"`
+10. **Commit**: `git add CONSTITUTION.md && git commit -m "Add project constitution"`
 
 11. **Report**: version, bump rationale, git status, suggested next steps
 
