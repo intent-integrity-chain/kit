@@ -83,3 +83,28 @@ describe('Bundle correctness (TS-004, FR-006a)', () => {
     }
   });
 });
+
+// --- template.js bundle regression tests ---
+// Regression: tessl publish strips .html files from the whitelist, so the bundled
+// generator must ship with template.js containing the full HTML as a JS string export.
+
+describe('template.js bundle integrity', () => {
+  const DASHBOARD_DIR = path.join(__dirname, '../../.claude/skills/iikit-core/scripts/dashboard');
+  const TEMPLATE_JS_PATH = path.join(DASHBOARD_DIR, 'template.js');
+
+  test('template.js exists alongside bundled generator', () => {
+    // Regression: without template.js, the generator crashes with ENOENT when
+    // public/index.html is stripped by tessl publish
+    expect(fs.existsSync(TEMPLATE_JS_PATH)).toBe(true);
+  });
+
+  test('template.js exports a string', () => {
+    const templateExport = require(TEMPLATE_JS_PATH);
+    expect(typeof templateExport).toBe('string');
+  });
+
+  test('template.js export starts with DOCTYPE', () => {
+    const templateExport = require(TEMPLATE_JS_PATH);
+    expect(templateExport.trimStart()).toMatch(/^<!DOCTYPE html>/i);
+  });
+});

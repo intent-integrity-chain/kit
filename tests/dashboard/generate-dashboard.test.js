@@ -329,6 +329,113 @@ describe('HTML output', () => {
   });
 });
 
+// --- Template loading regression tests ---
+// These tests cover bugs found during real-world testing:
+// Bug 1: public/index.html stripped by tessl publish — .html files not in whitelist
+// Bug 2: template.js fallback — loadTemplate() needed to try template.js before public/index.html
+// Bug 4: Silent failures — errors were swallowed (exit 0), making bugs invisible
+
+describe('Template loading', () => {
+  const DASHBOARD_DIR = path.join(__dirname, '..', '..', '.claude', 'skills', 'iikit-core', 'scripts', 'dashboard');
+  const TEMPLATE_JS_PATH = path.join(DASHBOARD_DIR, 'template.js');
+  const PUBLIC_HTML_PATH = path.join(DASHBOARD_DIR, 'public', 'index.html');
+  const SRC_PUBLIC_HTML_PATH = path.join(DASHBOARD_DIR, 'src', 'public', 'index.html');
+  // All HTML template paths that loadTemplate may check as fallbacks
+  const ALL_HTML_PATHS = [PUBLIC_HTML_PATH, SRC_PUBLIC_HTML_PATH];
+  const ALL_TEMPLATE_PATHS = [TEMPLATE_JS_PATH, ...ALL_HTML_PATHS];
+
+  /**
+   * Temporarily rename files, run callback, then restore. Safe even if callback throws.
+   */
+  function withRenamedFiles(paths, fn) {
+    const renamed = [];
+    try {
+      for (const p of paths) {
+        if (fs.existsSync(p)) {
+          fs.renameSync(p, p + '.bak');
+          renamed.push(p);
+        }
+      }
+      return fn();
+    } finally {
+      for (const p of renamed) {
+        fs.renameSync(p + '.bak', p);
+      }
+    }
+  }
+
+  test('loads template from template.js when available', () => {
+    // template.js should exist in the dashboard directory
+    expect(fs.existsSync(TEMPLATE_JS_PATH)).toBe(true);
+    const templateContent = require(TEMPLATE_JS_PATH);
+    expect(typeof templateContent).toBe('string');
+    expect(templateContent.length).toBeGreaterThan(0);
+  });
+
+  test('template.js contains valid HTML with DOCTYPE', () => {
+    const templateContent = require(TEMPLATE_JS_PATH);
+    expect(templateContent).toMatch(/^<!DOCTYPE html>/i);
+    expect(templateContent).toContain('</html>');
+    expect(templateContent).toContain('</head>');
+    expect(templateContent).toContain('</body>');
+  });
+
+  test('template.js matches public/index.html content', () => {
+    // Both template sources must have identical HTML so either can be used
+    expect(fs.existsSync(PUBLIC_HTML_PATH)).toBe(true);
+    const templateJsContent = require(TEMPLATE_JS_PATH);
+    const publicHtmlContent = fs.readFileSync(PUBLIC_HTML_PATH, 'utf-8');
+    expect(templateJsContent).toBe(publicHtmlContent);
+  });
+
+  test('generator works when public/index.html is missing but template.js exists', () => {
+    // Regression: tessl publish strips .html files; generator must work with only template.js
+    const tmpDir = createTestProject(os.tmpdir());
+    try {
+      withRenamedFiles(ALL_HTML_PATHS, () => {
+        const result = runGenerator([tmpDir]);
+        expect(result.status).toBe(0);
+        const outputPath = path.join(tmpDir, '.specify', 'dashboard.html');
+        expect(fs.existsSync(outputPath)).toBe(true);
+        const html = fs.readFileSync(outputPath, 'utf-8');
+        expect(html).toMatch(/^<!DOCTYPE html>/i);
+      });
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  test('generator works when template.js is missing but public/index.html exists', () => {
+    const tmpDir = createTestProject(os.tmpdir());
+    try {
+      withRenamedFiles([TEMPLATE_JS_PATH], () => {
+        const result = runGenerator([tmpDir]);
+        expect(result.status).toBe(0);
+        const outputPath = path.join(tmpDir, '.specify', 'dashboard.html');
+        expect(fs.existsSync(outputPath)).toBe(true);
+        const html = fs.readFileSync(outputPath, 'utf-8');
+        expect(html).toMatch(/^<!DOCTYPE html>/i);
+      });
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  test('generator throws clear error when both template sources are missing', () => {
+    // Regression: silent failures made bugs invisible — generator must report the problem
+    const tmpDir = createTestProject(os.tmpdir());
+    try {
+      withRenamedFiles(ALL_TEMPLATE_PATHS, () => {
+        const result = runGenerator([tmpDir]);
+        expect(result.status).not.toBe(0);
+        expect(result.stderr).toMatch(/not found|ENOENT|template/i);
+      });
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+});
+
 // T010: Watch mode tests (TS-005, TS-007)
 describe('Watch mode', () => {
   test('--watch flag starts watcher and re-generates on file change', (done) => {
