@@ -28,12 +28,16 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Prerequisites Check
 
-1. Check if constitution exists: `cat CONSTITUTION.md 2>/dev/null || echo "NO_CONSTITUTION"`
-2. If missing, copy from [constitution-template.md](../iikit-core/templates/constitution-template.md)
+1. **Check PREMISE.md exists**: `test -f PREMISE.md`. If missing: ERROR — "PREMISE.md not found. Run `/iikit-core init` first to create it." Do NOT proceed without PREMISE.md.
+2. **Validate PREMISE.md**:
+   ```bash
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/validate-premise.sh --json
+   ```
+   If FAIL (missing sections or placeholders): ERROR — show details, suggest re-running init.
+3. Check if constitution exists: `cat CONSTITUTION.md 2>/dev/null || echo "NO_CONSTITUTION"`
+4. If missing, copy from [constitution-template.md](../iikit-core/templates/constitution-template.md)
 
 ## Execution Flow
-
-> **Note**: `PREMISE.md` is created during `/iikit-core init` (Step 5). If it doesn't exist yet, suggest the user run init first. Do NOT create PREMISE.md here — constitution is content-agnostic.
 
 1. **Load existing constitution** — identify placeholder tokens `[ALL_CAPS_IDENTIFIER]`. Adapt to user's needs (more or fewer principles than template).
 
