@@ -1,7 +1,8 @@
 # Test helper module for Pester tests
 
 $script:TestsDir = Split-Path -Parent $PSScriptRoot
-$script:ScriptsDir = Join-Path (Split-Path -Parent $TestsDir) "scripts/powershell"
+$script:RepoRoot = Split-Path -Parent $TestsDir
+$script:ScriptsDir = Join-Path $RepoRoot "tiles/intent-integrity-kit/skills/iikit-core/scripts/powershell"
 $script:FixturesDir = Join-Path $TestsDir "fixtures"
 
 # Export paths
