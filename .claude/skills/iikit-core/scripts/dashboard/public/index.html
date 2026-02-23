@@ -5742,6 +5742,11 @@
             if (fd.bugs && currentPipeline) renderPipeline(currentPipeline);
             switchTab(activeTab);
           }
+        } else {
+          showEmptyState('No features yet — run /iikit-01-specify to create one');
+          // Still render constitution and premise even without features
+          if (!activeTab) activeTab = 'Constitution';
+          switchTab(activeTab);
         }
       } else {
         // Fetch mode (server-based)
