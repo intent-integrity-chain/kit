@@ -73,10 +73,24 @@ jobs:
           TESSL_API_TOKEN: ${{ secrets.TESSL_TOKEN }}
         run: tests/run-skill-reviews.sh --threshold 90
 
+  test-windows:
+    name: Windows Pester Tests
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Pester
+        shell: pwsh
+        run: Install-Module -Name Pester -Force -Scope CurrentUser -MinimumVersion 5.0
+
+      - name: Run Windows Pester tests
+        shell: pwsh
+        run: Invoke-Pester tests/powershell/ -Output Detailed -CI
+
   publish:
     name: Publish & Verify
     runs-on: ubuntu-latest
-    needs: test
+    needs: [test, test-windows]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
       id-token: write

@@ -1,0 +1,245 @@
+name: E2E Nightly
+
+on:
+  schedule:
+    - cron: '0 4 * * *'  # 4 AM UTC daily
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  e2e:
+    name: E2E Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install tools
+        run: |
+          npm install -g @tessl/cli
+          sudo apt-get update
+          sudo apt-get install -y bats jq
+
+      - name: E2E - Fresh install and init
+        run: |
+          # Test 1: Fresh tessl install in a new project
+          TESTDIR=$(mktemp -d)
+          cd "$TESTDIR"
+          git init && git config user.email "test@test.com" && git config user.name "Test"
+          tessl init
+          tessl install tessl-labs/intent-integrity-kit
+
+          # Verify tile installed correctly
+          test -f .tessl/tiles/tessl-labs/intent-integrity-kit/tile.json
+          test -f .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh
+          test -f .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/dashboard/generate-dashboard.js
+          test -f .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/dashboard/template.js
+
+          # Verify scripts are executable and work
+          bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/git-setup.sh --json | jq .git_available
+
+          echo "PASS: Fresh install"
+          rm -rf "$TESTDIR"
+
+      - name: E2E - Hash integrity chain
+        run: |
+          # Test 2: .feature file hash integrity
+          TESTDIR=$(mktemp -d)
+          cd "$TESTDIR"
+          git init && git config user.email "test@test.com" && git config user.name "Test"
+          tessl init && tessl install tessl-labs/intent-integrity-kit
+
+          SCRIPTS=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
+
+          # Create feature files
+          mkdir -p specs/001-test/tests/features
+          cat > specs/001-test/tests/features/login.feature << 'FEAT'
+          Feature: Login
+            Scenario: Valid login
+              Given a user
+              When they login
+              Then they are authenticated
+          FEAT
+
+          # Store hash
+          HASH=$(bash "$SCRIPTS/testify-tdd.sh" store-hash "specs/001-test/tests/features")
+          test ${#HASH} -eq 64  # SHA-256 is 64 hex chars
+
+          # Verify hash
+          RESULT=$(bash "$SCRIPTS/testify-tdd.sh" verify-hash "specs/001-test/tests/features")
+          test "$RESULT" = "valid"
+
+          # Tamper and verify fails
+          echo "  Then something wrong" >> specs/001-test/tests/features/login.feature
+          RESULT=$(bash "$SCRIPTS/testify-tdd.sh" verify-hash "specs/001-test/tests/features")
+          test "$RESULT" = "invalid"
+
+          echo "PASS: Hash integrity chain"
+          rm -rf "$TESTDIR"
+
+      - name: E2E - Dashboard generation
+        run: |
+          # Test 3: Dashboard generates and contains valid HTML
+          TESTDIR=$(mktemp -d)
+          cd "$TESTDIR"
+          git init && git config user.email "test@test.com" && git config user.name "Test"
+          tessl init && tessl install tessl-labs/intent-integrity-kit
+
+          SCRIPTS=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
+          DASHBOARD_DIR=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/dashboard"
+
+          cat > CONSTITUTION.md << 'EOF'
+          # Constitution
+          ## Core Principles
+          ### I. Quality
+          Code quality matters.
+          ### II. Testing
+          Tests first.
+          ### III. Simplicity
+          Keep it simple.
+          **Version**: 1.0.0 | **Ratified**: 2026-01-01 | **Last Amended**: 2026-01-01
+          EOF
+
+          mkdir -p specs/001-test .specify
+          cat > specs/001-test/spec.md << 'EOF'
+          # Feature: Test
+          ## User Scenarios & Testing
+          ### User Story 1 - Login (Priority: P1)
+          **Given** a user, **When** login, **Then** authenticated
+          ## Requirements
+          - **FR-001**: Must login
+          ## Success Criteria
+          - **SC-001**: Login works
+          EOF
+
+          # Generate dashboard
+          node "$DASHBOARD_DIR/generate-dashboard.js" "$TESTDIR"
+
+          # Verify output
+          test -f .specify/dashboard.html
+          grep -q "<!DOCTYPE html>" .specify/dashboard.html
+          grep -q "DASHBOARD_DATA" .specify/dashboard.html
+
+          echo "PASS: Dashboard generation"
+          rm -rf "$TESTDIR"
+
+      - name: E2E - New verification scripts
+        run: |
+          # Test 4: verify-steps.sh, verify-step-quality.sh, setup-bdd.sh
+          TESTDIR=$(mktemp -d)
+          cd "$TESTDIR"
+          git init && git config user.email "test@test.com" && git config user.name "Test"
+          tessl init && tessl install tessl-labs/intent-integrity-kit
+
+          SCRIPTS=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
+
+          mkdir -p specs/001-test/tests/features
+          cat > specs/001-test/tests/features/test.feature << 'FEAT'
+          Feature: Test
+            Scenario: Basic
+              Given a precondition
+              When an action
+              Then a result
+          FEAT
+
+          cat > specs/001-test/plan.md << 'EOF'
+          ## Technical Context
+          **Language/Version**: Python 3.11
+          **Primary Dependencies**: Flask, pytest-bdd
+          EOF
+
+          # verify-steps should detect pytest-bdd and return DEGRADED (not installed) or PASS
+          RESULT=$(bash "$SCRIPTS/verify-steps.sh" --json "specs/001-test/tests/features" "specs/001-test/plan.md")
+          echo "$RESULT" | jq .status  # Should be DEGRADED or PASS
+          echo "$RESULT" | jq .framework  # Should be pytest-bdd
+
+          # setup-bdd should detect framework and scaffold
+          RESULT=$(bash "$SCRIPTS/setup-bdd.sh" --json "specs/001-test/tests/features" "specs/001-test/plan.md")
+          echo "$RESULT" | jq .status  # Should be SCAFFOLDED
+          test -d specs/001-test/tests/step_definitions
+
+          # verify-step-quality with empty step defs
+          RESULT=$(bash "$SCRIPTS/verify-step-quality.sh" --json "specs/001-test/tests/step_definitions" "python")
+          echo "$RESULT" | jq .status  # Should be PASS (no steps = nothing to fail)
+
+          echo "PASS: New verification scripts"
+          rm -rf "$TESTDIR"
+
+      - name: E2E - Pre-commit hook
+        run: |
+          # Test 5: Pre-commit hook blocks tampered .feature files
+          TESTDIR=$(mktemp -d)
+          cd "$TESTDIR"
+          git init && git config user.email "test@test.com" && git config user.name "Test"
+          tessl init && tessl install tessl-labs/intent-integrity-kit
+
+          SCRIPTS=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
+
+          # Install hook
+          cp "$SCRIPTS/pre-commit-hook.sh" .git/hooks/pre-commit
+          chmod +x .git/hooks/pre-commit
+
+          # Create and hash feature files
+          mkdir -p specs/001-test/tests/features
+          cat > specs/001-test/tests/features/test.feature << 'FEAT'
+          Feature: Test
+            Scenario: Basic
+              Given a precondition
+              Then a result
+          FEAT
+
+          bash "$SCRIPTS/testify-tdd.sh" store-hash "specs/001-test/tests/features"
+
+          # Commit everything (should pass)
+          git add -A && git commit -m "initial" 2>&1
+
+          # Tamper with feature file
+          echo "  Then tampered" >> specs/001-test/tests/features/test.feature
+          git add specs/001-test/tests/features/test.feature
+
+          # Commit should be BLOCKED
+          if git commit -m "tampered" 2>&1; then
+            echo "FAIL: Hook should have blocked"
+            exit 1
+          else
+            echo "PASS: Pre-commit hook blocked tampered .feature files"
+          fi
+
+          rm -rf "$TESTDIR"
+
+      - name: E2E - Validate premise
+        run: |
+          # Test 6: validate-premise.sh works from installed tile
+          TESTDIR=$(mktemp -d)
+          cd "$TESTDIR"
+          tessl init && tessl install tessl-labs/intent-integrity-kit
+
+          SCRIPTS=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
+
+          # Missing premise should fail
+          RESULT=$(bash "$SCRIPTS/validate-premise.sh" --json "$TESTDIR" 2>&1) || true
+          echo "$RESULT" | jq .status  # FAIL
+
+          # Create valid premise
+          cat > PREMISE.md << 'EOF'
+          # Test App
+          ## What
+          A test application.
+          ## Who
+          Developers.
+          ## Why
+          Testing IIKit.
+          ## Domain
+          Development tools.
+          ## Scope
+          CLI only.
+          EOF
+
+          RESULT=$(bash "$SCRIPTS/validate-premise.sh" --json "$TESTDIR")
+          STATUS=$(echo "$RESULT" | jq -r .status)
+          test "$STATUS" = "PASS"
+
+          echo "PASS: Validate premise"
+          rm -rf "$TESTDIR"

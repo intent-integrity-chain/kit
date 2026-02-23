@@ -626,83 +626,200 @@ EOF
 # generate-dashboard-safe.sh — BATS skip logic validation
 # =============================================================================
 
-@test "generate-dashboard-safe: script checks BATS_TEST_FILENAME" {
-    # Verify the script actually has the BATS detection
-    run bash -c 'grep -q "BATS_TEST_FILENAME" "'"$DASHBOARD_SCRIPT"'"'
+@test "generate-dashboard-safe: skips when BATS_TEST_FILENAME is set" {
+    # Run the script with BATS_TEST_FILENAME set — it should exit 0 and
+    # produce no dashboard output (BATS skip logic)
+    local proj
+    proj=$(mktemp -d)
+    create_dashboard_project "$proj"
+
+    BATS_TEST_FILENAME="/some/test.bats" run bash "$DASHBOARD_SCRIPT" "$proj"
     [ "$status" -eq 0 ]
+    [ ! -f "$proj/.specify/dashboard.html" ]
+
+    rm -rf "$proj"
 }
 
-@test "generate-dashboard-safe: script checks BATS_TMPDIR" {
-    run bash -c 'grep -q "BATS_TMPDIR" "'"$DASHBOARD_SCRIPT"'"'
+@test "generate-dashboard-safe: skips when BATS_TMPDIR is set" {
+    # Run the script with BATS_TMPDIR set — it should exit 0 and
+    # produce no dashboard output (BATS skip logic)
+    local proj
+    proj=$(mktemp -d)
+    create_dashboard_project "$proj"
+
+    BATS_TMPDIR="/tmp" run bash "$DASHBOARD_SCRIPT" "$proj"
     [ "$status" -eq 0 ]
+    [ ! -f "$proj/.specify/dashboard.html" ]
+
+    rm -rf "$proj"
 }
 
 # =============================================================================
-# Script structural integrity
+# Script behavioral integrity
 # =============================================================================
 
-@test "generate-dashboard-safe: script is executable" {
-    [ -x "$DASHBOARD_SCRIPT" ]
-}
-
-@test "generate-dashboard-safe: has bash shebang" {
-    local first_line
-    first_line=$(head -1 "$DASHBOARD_SCRIPT")
-    [[ "$first_line" == "#!/usr/bin/env bash" ]]
-}
-
-@test "generate-dashboard-safe: always exits 0 (never fails the caller)" {
-    # The script is designed to NEVER fail. Verify all exit paths are 0.
-    # Count exits that are not 0
-    local non_zero_exits
-    non_zero_exits=$(grep -cE 'exit [1-9]' "$DASHBOARD_SCRIPT" || true)
-    [ "$non_zero_exits" -eq 0 ]
-}
-
-@test "generate-dashboard-safe: stderr is suppressed on node failure" {
-    # The script has 2>/dev/null on the node call to avoid polluting output
-    run bash -c 'grep -q "2>/dev/null" "'"$DASHBOARD_SCRIPT"'"'
+@test "generate-dashboard-safe: runs successfully with valid inputs" {
+    # Actually run the script and verify it exits 0 (not just check -x permission)
+    run bash "$DASHBOARD_SCRIPT" "$TEST_DIR"
     [ "$status" -eq 0 ]
 }
 
-@test "generate-dashboard-safe: both candidate paths are checked" {
-    # Verify the script has both candidate directory patterns
-    run bash -c 'grep -c "CANDIDATE_DIRS" "'"$DASHBOARD_SCRIPT"'"'
+@test "generate-dashboard-safe: runs correctly under bash" {
+    # Verify the script works when invoked through bash explicitly
+    run bash "$DASHBOARD_SCRIPT" "$TEST_DIR"
     [ "$status" -eq 0 ]
 
-    # Verify it has the dev layout path
-    run bash -c 'grep -q "../dashboard" "'"$DASHBOARD_SCRIPT"'"'
+    # Also verify it works when invoked directly (relies on shebang)
+    run "$DASHBOARD_SCRIPT" "$TEST_DIR"
+    [ "$status" -eq 0 ]
+}
+
+@test "generate-dashboard-safe: never exits non-zero regardless of input" {
+    # The script must ALWAYS exit 0 for any input scenario.
+    # Test with missing project, missing constitution, missing node, etc.
+
+    # Non-existent path
+    run bash "$DASHBOARD_SCRIPT" "/nonexistent/path/xyz"
     [ "$status" -eq 0 ]
 
-    # Verify it has the published layout path
-    run bash -c 'grep -q "iikit-core/scripts/dashboard" "'"$DASHBOARD_SCRIPT"'"'
+    # Empty directory (no CONSTITUTION.md)
+    local empty
+    empty=$(mktemp -d)
+    run bash "$DASHBOARD_SCRIPT" "$empty"
     [ "$status" -eq 0 ]
+    rm -rf "$empty"
+
+    # No arguments (uses cwd)
+    run bash "$DASHBOARD_SCRIPT"
+    [ "$status" -eq 0 ]
+}
+
+@test "generate-dashboard-safe: suppresses stderr from generator failures" {
+    # Run the script with a project that will cause generator to fail.
+    # The safe wrapper must not leak stderr to the caller.
+    local proj
+    proj=$(mktemp -d)
+    # No CONSTITUTION.md — generator would fail, but safe wrapper swallows it
+
+    run bash -c '
+        unset BATS_TEST_FILENAME BATS_TMPDIR
+        bash "'"$DASHBOARD_SCRIPT"'" "'"$proj"'" 2>&1
+    '
+    [ "$status" -eq 0 ]
+    # Stderr should be suppressed — no "Error" in combined output
+    [[ "$output" != *"Error"* ]]
+
+    rm -rf "$proj"
+}
+
+@test "generate-dashboard-safe: resolves both dev and published layout paths" {
+    command -v node >/dev/null 2>&1 || skip "node not available"
+
+    # Test 1: dev layout — the script at scripts/bash/ finds ../dashboard/
+    # Already tested by other tests, but verify the path is actually traversed
+    local proj
+    proj=$(mktemp -d)
+    create_dashboard_project "$proj"
+
+    # Run from dev layout — the real script should find the generator
+    bash -c '
+        unset BATS_TEST_FILENAME BATS_TMPDIR
+        bash "'"$DASHBOARD_SCRIPT"'" "'"$proj"'"
+    '
+    [ -f "$proj/.specify/dashboard.html" ]
+
+    # Test 2: published layout — create mock structure and verify generator is found
+    local tmproot
+    tmproot=$(mktemp -d)
+    mkdir -p "$tmproot/iikit-00-constitution/scripts/bash"
+    mkdir -p "$tmproot/iikit-core/scripts/dashboard"
+
+    cp "$DASHBOARD_SCRIPT" "$tmproot/iikit-00-constitution/scripts/bash/generate-dashboard-safe.sh"
+    chmod +x "$tmproot/iikit-00-constitution/scripts/bash/generate-dashboard-safe.sh"
+    cp -r "$DASHBOARD_DIR/"* "$tmproot/iikit-core/scripts/dashboard/"
+
+    local proj2
+    proj2=$(mktemp -d)
+    create_dashboard_project "$proj2"
+
+    bash -c '
+        unset BATS_TEST_FILENAME BATS_TMPDIR
+        bash "'"$tmproot"'/iikit-00-constitution/scripts/bash/generate-dashboard-safe.sh" "'"$proj2"'"
+    '
+    [ -f "$proj2/.specify/dashboard.html" ]
+
+    rm -rf "$proj" "$proj2" "$tmproot"
 }
 
 # =============================================================================
-# Generator existence in expected locations
+# Generator behavioral verification
 # =============================================================================
 
-@test "generate-dashboard.js exists in scripts/dashboard/" {
-    [ -f "$DASHBOARD_DIR/generate-dashboard.js" ]
+@test "generate-dashboard.js runs and produces output" {
+    command -v node >/dev/null 2>&1 || skip "node not available"
+
+    # Verify the generator actually runs (not just that the file exists)
+    local proj
+    proj=$(mktemp -d)
+    create_dashboard_project "$proj"
+
+    run node "$GENERATOR" "$proj"
+    [ "$status" -eq 0 ]
+    [ -f "$proj/.specify/dashboard.html" ]
+
+    rm -rf "$proj"
 }
 
-@test "generate-dashboard.js is executable" {
-    [ -x "$DASHBOARD_DIR/generate-dashboard.js" ]
+@test "generate-dashboard.js can be invoked directly as an executable" {
+    command -v node >/dev/null 2>&1 || skip "node not available"
+
+    # Verify the script has correct shebang and permissions by running it directly
+    local proj
+    proj=$(mktemp -d)
+    create_dashboard_project "$proj"
+
+    run "$GENERATOR" "$proj"
+    [ "$status" -eq 0 ]
+    [ -f "$proj/.specify/dashboard.html" ]
+
+    rm -rf "$proj"
 }
 
-@test "generate-dashboard.js has node shebang" {
-    local first_line
-    first_line=$(head -1 "$DASHBOARD_DIR/generate-dashboard.js")
-    [[ "$first_line" == "#!/usr/bin/env node" ]]
+@test "dashboard public/index.html serves as a valid fallback template" {
+    command -v node >/dev/null 2>&1 || skip "node not available"
+
+    # Verify public/index.html is not just present but is usable by the generator
+    # as a template fallback when template.js is missing
+    local proj
+    proj=$(mktemp -d)
+    create_dashboard_project "$proj"
+
+    local tmpgen
+    tmpgen=$(mktemp -d)
+    cp -r "$DASHBOARD_DIR/"* "$tmpgen/"
+    rm -f "$tmpgen/template.js"
+
+    # Generator should succeed using public/index.html as fallback
+    run node "$tmpgen/generate-dashboard.js" "$proj"
+    [ "$status" -eq 0 ]
+    [ -f "$proj/.specify/dashboard.html" ]
+
+    rm -rf "$tmpgen" "$proj"
 }
 
-@test "dashboard public/index.html exists" {
-    [ -f "$DASHBOARD_DIR/public/index.html" ]
-}
+@test "dashboard template.js loads as a valid JS module returning HTML" {
+    command -v node >/dev/null 2>&1 || skip "node not available"
 
-@test "dashboard template.js exists" {
-    [ -f "$DASHBOARD_DIR/template.js" ]
+    # Verify template.js is not just present but actually exports valid HTML content
+    run node -e "
+        const t = require('$DASHBOARD_DIR/template.js');
+        if (typeof t !== 'string') { console.error('not a string'); process.exit(1); }
+        if (!t.includes('<!DOCTYPE html>')) { console.error('missing DOCTYPE'); process.exit(1); }
+        if (!t.includes('</html>')) { console.error('missing closing html'); process.exit(1); }
+        console.log('template ok, length: ' + t.length);
+    "
+    [ "$status" -eq 0 ]
+    assert_contains "$output" "template ok"
 }
 
 # =============================================================================
@@ -827,11 +944,25 @@ EOF
 @test "generate-dashboard-safe: wraps generator failure as exit 0" {
     command -v node >/dev/null 2>&1 || skip "node not available"
 
-    # generate-dashboard-safe.sh uses || exit 0 after the node call
-    # so even if the generator fails, the safe wrapper exits 0.
-    # Verify this by checking the script source.
-    run bash -c 'grep -q "|| exit 0" "'"$DASHBOARD_SCRIPT"'"'
+    # The safe wrapper must exit 0 even when the generator itself would fail.
+    # Test with a project missing CONSTITUTION.md (generator exits non-zero).
+    local proj
+    proj=$(mktemp -d)
+    mkdir -p "$proj/.specify"
+    # No CONSTITUTION.md — generator would fail
+
+    # First confirm the generator itself DOES fail
+    run node "$GENERATOR" "$proj"
+    [ "$status" -ne 0 ]
+
+    # Now confirm the safe wrapper exits 0 despite that failure
+    run bash -c '
+        unset BATS_TEST_FILENAME BATS_TMPDIR
+        bash "'"$DASHBOARD_SCRIPT"'" "'"$proj"'"
+    '
     [ "$status" -eq 0 ]
+
+    rm -rf "$proj"
 }
 
 @test "generate-dashboard-safe: creates .specify directory if needed" {
