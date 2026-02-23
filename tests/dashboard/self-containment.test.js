@@ -214,15 +214,13 @@ describe('generate-dashboard-safe.sh error behavior', () => {
     }
   });
 
-  test('script does not suppress generator stderr in test output', () => {
-    // The generate-dashboard-safe.sh redirects stderr to /dev/null on the generator call.
-    // Verify the script structure includes 2>/dev/null (documenting this design decision).
+  test('script logs generator errors to dashboard.log instead of suppressing', () => {
+    // The generate-dashboard-safe.sh logs errors to .specify/dashboard.log
+    // instead of swallowing them with 2>/dev/null.
     const scriptPath = path.join(SKILLS_DIR, 'iikit-core', 'scripts', 'bash', 'generate-dashboard-safe.sh');
     const content = fs.readFileSync(scriptPath, 'utf-8');
-    // The generator call includes 2>/dev/null — this is the "silent failure" design,
-    // which is appropriate for generate-dashboard-safe.sh (a side-effect script) but
-    // NOT appropriate for the generator itself (which must report errors loudly).
-    expect(content).toContain('2>/dev/null');
+    expect(content).toContain('dashboard.log');
+    expect(content).not.toContain('2>/dev/null');
   });
 
   test('generate-dashboard.js (the generator) does NOT silently succeed on errors', () => {
