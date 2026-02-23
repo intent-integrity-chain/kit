@@ -32,22 +32,22 @@ Describe "setup-windows-links" -Skip:$script:SkipNonWindows {
 
     Context "Directory symlinks" {
         It "creates .codex/skills link" {
-            & $script:SetupScript
+            & $script:SetupScript -ProjectRoot $script:TestDir
             Test-Path ".codex/skills" | Should -Be $true
         }
 
         It "creates .gemini/skills link" {
-            & $script:SetupScript
+            & $script:SetupScript -ProjectRoot $script:TestDir
             Test-Path ".gemini/skills" | Should -Be $true
         }
 
         It "creates .opencode/skills link" {
-            & $script:SetupScript
+            & $script:SetupScript -ProjectRoot $script:TestDir
             Test-Path ".opencode/skills" | Should -Be $true
         }
 
         It "links point to correct content" {
-            & $script:SetupScript
+            & $script:SetupScript -ProjectRoot $script:TestDir
             Test-Path ".codex/skills/test-skill.md" | Should -Be $true
             Test-Path ".gemini/skills/test-skill.md" | Should -Be $true
             Test-Path ".opencode/skills/test-skill.md" | Should -Be $true
@@ -56,17 +56,17 @@ Describe "setup-windows-links" -Skip:$script:SkipNonWindows {
 
     Context "File symlinks" {
         It "creates CLAUDE.md link" {
-            & $script:SetupScript
+            & $script:SetupScript -ProjectRoot $script:TestDir
             Test-Path "CLAUDE.md" | Should -Be $true
         }
 
         It "creates GEMINI.md link" {
-            & $script:SetupScript
+            & $script:SetupScript -ProjectRoot $script:TestDir
             Test-Path "GEMINI.md" | Should -Be $true
         }
 
         It "file links have same content as AGENTS.md" {
-            & $script:SetupScript
+            & $script:SetupScript -ProjectRoot $script:TestDir
             (Get-Content "CLAUDE.md" -Raw) | Should -Be (Get-Content "AGENTS.md" -Raw)
             (Get-Content "GEMINI.md" -Raw) | Should -Be (Get-Content "AGENTS.md" -Raw)
         }
@@ -74,28 +74,28 @@ Describe "setup-windows-links" -Skip:$script:SkipNonWindows {
 
     Context "Skip behavior" {
         It "skips existing links without -Force" {
-            & $script:SetupScript
-            $output = & $script:SetupScript 2>&1 | Out-String
+            & $script:SetupScript -ProjectRoot $script:TestDir
+            $output = & $script:SetupScript -ProjectRoot $script:TestDir 2>&1 | Out-String
             $output | Should -Match "SKIP"
         }
     }
 
     Context "Force flag" {
         It "-Force overwrites existing links" {
-            & $script:SetupScript
-            $output = & $script:SetupScript -Force 2>&1 | Out-String
+            & $script:SetupScript -ProjectRoot $script:TestDir
+            $output = & $script:SetupScript -Force -ProjectRoot $script:TestDir 2>&1 | Out-String
             $output | Should -Match "Removing existing link"
         }
     }
 
     Context "Output" {
         It "shows completion message" {
-            $output = & $script:SetupScript 2>&1 | Out-String
+            $output = & $script:SetupScript -ProjectRoot $script:TestDir 2>&1 | Out-String
             $output | Should -Match "Setup complete|completed"
         }
 
         It "shows project root" {
-            $output = & $script:SetupScript 2>&1 | Out-String
+            $output = & $script:SetupScript -ProjectRoot $script:TestDir 2>&1 | Out-String
             $output | Should -Match "Project root"
         }
     }

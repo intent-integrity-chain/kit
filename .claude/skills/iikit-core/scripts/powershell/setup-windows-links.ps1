@@ -30,14 +30,17 @@
 #>
 
 param(
-    [switch]$Force
+    [switch]$Force,
+    [string]$ProjectRoot
 )
 
 $ErrorActionPreference = "Stop"
 
 # Get script directory and project root
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$ProjectRoot = Resolve-Path (Join-Path $ScriptDir "..\..\..") | Select-Object -ExpandProperty Path
+if (-not $ProjectRoot) {
+    $ProjectRoot = Resolve-Path (Join-Path $ScriptDir "..\..\..") | Select-Object -ExpandProperty Path
+}
 
 Write-Host ""
 Write-Host "Intent Integrity Kit Skills - Windows Link Setup" -ForegroundColor Cyan
