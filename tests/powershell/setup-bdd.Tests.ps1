@@ -3,18 +3,14 @@
 BeforeAll {
     Import-Module $PSScriptRoot/TestHelper.psm1 -Force
     $script:SetupBddScript = Join-Path $Global:ScriptsDir "setup-bdd.ps1"
-}
 
-# =============================================================================
-# Helper: create a plan.md with a specific tech stack
-# =============================================================================
-
-function New-PlanFile {
-    param(
-        [string]$Path,
-        [string]$Content
-    )
-    Set-Content -Path $Path -Value $Content -Encoding utf8
+    function script:New-PlanFile {
+        param(
+            [string]$Path,
+            [string]$Content
+        )
+        Set-Content -Path $Path -Value $Content -Encoding utf8
+    }
 }
 
 # =============================================================================
@@ -492,7 +488,7 @@ Describe "setup-bdd.ps1 - Human-readable output" {
 **Testing**: pytest-bdd
 "@
 
-        $result = & $script:SetupBddScript (Join-Path $script:TestDir "tests/features") $planFile 2>&1 | Out-String
+        $result = & $script:SetupBddScript (Join-Path $script:TestDir "tests/features") $planFile *>&1 | Out-String
         $result | Should -Match "pytest-bdd"
         $result | Should -Match "Scaffolded"
     }
@@ -501,7 +497,7 @@ Describe "setup-bdd.ps1 - Human-readable output" {
         $planFile = Join-Path $script:TestDir "plan.md"
         New-PlanFile -Path $planFile -Content "# Docs only"
 
-        $result = & $script:SetupBddScript (Join-Path $script:TestDir "tests/features") $planFile 2>&1 | Out-String
+        $result = & $script:SetupBddScript (Join-Path $script:TestDir "tests/features") $planFile *>&1 | Out-String
         $result | Should -Match "WARNING"
         $result | Should -Match "No BDD framework detected"
     }

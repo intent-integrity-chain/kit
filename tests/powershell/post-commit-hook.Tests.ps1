@@ -7,48 +7,52 @@ BeforeAll {
     $script:BashScriptsDir = Join-Path (Split-Path $Global:ScriptsDir -Parent) "bash"
     $script:BashPostHook = Join-Path $script:BashScriptsDir "post-commit-hook.sh"
     $script:BashPreHook = Join-Path $script:BashScriptsDir "pre-commit-hook.sh"
-}
 
-function New-PostHookTestDirectory {
-    $testDir = Join-Path ([System.IO.Path]::GetTempPath()) "iikit-posthook-test-$([guid]::NewGuid().ToString('N').Substring(0,8))"
-    New-Item -ItemType Directory -Path $testDir -Force | Out-Null
+    function script:New-PostHookTestDirectory {
+        $testDir = Join-Path ([System.IO.Path]::GetTempPath()) "iikit-posthook-test-$([guid]::NewGuid().ToString('N').Substring(0,8))"
+        New-Item -ItemType Directory -Path $testDir -Force | Out-Null
 
-    Push-Location $testDir
-    git init . 2>&1 | Out-Null
-    git config user.email "test@test.com"
-    git config user.name "Test"
+        Push-Location $testDir
+        git init . 2>&1 | Out-Null
+        git config user.email "test@test.com"
+        git config user.name "Test"
 
-    # Copy IIKit scripts
-    $scriptsTarget = Join-Path $testDir ".claude/skills/iikit-core/scripts/powershell"
-    New-Item -ItemType Directory -Path $scriptsTarget -Force | Out-Null
-    Copy-Item (Join-Path $Global:ScriptsDir "testify-tdd.ps1") $scriptsTarget
-    Copy-Item $script:PostHookScript $scriptsTarget
+        # Copy IIKit scripts
+        $scriptsTarget = Join-Path $testDir ".claude/skills/iikit-core/scripts/powershell"
+        New-Item -ItemType Directory -Path $scriptsTarget -Force | Out-Null
+        Copy-Item (Join-Path $Global:ScriptsDir "testify-tdd.ps1") $scriptsTarget
+        Copy-Item $script:PostHookScript $scriptsTarget
 
-    $bashTarget = Join-Path $testDir ".claude/skills/iikit-core/scripts/bash"
-    New-Item -ItemType Directory -Path $bashTarget -Force | Out-Null
-    Copy-Item (Join-Path $script:BashScriptsDir "common.sh") $bashTarget
-    Copy-Item (Join-Path $script:BashScriptsDir "testify-tdd.sh") $bashTarget
-    Copy-Item $script:BashPostHook $bashTarget
+        $bashTarget = Join-Path $testDir ".claude/skills/iikit-core/scripts/bash"
+        New-Item -ItemType Directory -Path $bashTarget -Force | Out-Null
+        Copy-Item (Join-Path $script:BashScriptsDir "common.sh") $bashTarget
+        Copy-Item (Join-Path $script:BashScriptsDir "testify-tdd.sh") $bashTarget
+        Copy-Item $script:BashPostHook $bashTarget
+        chmod +x (Join-Path $bashTarget "common.sh")
+        chmod +x (Join-Path $bashTarget "testify-tdd.sh")
+        chmod +x (Join-Path $bashTarget "post-commit-hook.sh")
 
-    # Install bash post-commit hook
-    $hooksDir = Join-Path $testDir ".git/hooks"
-    New-Item -ItemType Directory -Path $hooksDir -Force | Out-Null
-    Copy-Item $script:BashPostHook (Join-Path $hooksDir "post-commit")
+        # Install bash post-commit hook
+        $hooksDir = Join-Path $testDir ".git/hooks"
+        New-Item -ItemType Directory -Path $hooksDir -Force | Out-Null
+        Copy-Item $script:BashPostHook (Join-Path $hooksDir "post-commit")
+        chmod +x (Join-Path $hooksDir "post-commit")
 
-    New-Item -ItemType Directory -Path (Join-Path $testDir ".specify") -Force | Out-Null
-    New-Item -ItemType Directory -Path (Join-Path $testDir "specs") -Force | Out-Null
+        New-Item -ItemType Directory -Path (Join-Path $testDir ".specify") -Force | Out-Null
+        New-Item -ItemType Directory -Path (Join-Path $testDir "specs") -Force | Out-Null
 
-    git add -A 2>&1 | Out-Null
-    git commit -m "initial setup" 2>&1 | Out-Null
-    Pop-Location
+        git add -A 2>&1 | Out-Null
+        git commit -m "initial setup" 2>&1 | Out-Null
+        Pop-Location
 
-    return $testDir
-}
+        return $testDir
+    }
 
-function Remove-PostHookTestDirectory {
-    param([string]$TestDir)
-    if ($TestDir -and (Test-Path $TestDir)) {
-        Remove-Item -Path $TestDir -Recurse -Force -ErrorAction SilentlyContinue
+    function script:Remove-PostHookTestDirectory {
+        param([string]$TestDir)
+        if ($TestDir -and (Test-Path $TestDir)) {
+            Remove-Item -Path $TestDir -Recurse -Force -ErrorAction SilentlyContinue
+        }
     }
 }
 
@@ -86,7 +90,7 @@ Describe "Post-Commit Hook - Basic Behavior" {
         git add (Join-Path $specsDir "test-specs.md") 2>&1 | Out-Null
         git commit -m "add test specs" 2>&1 | Out-Null
 
-        $note = git notes --ref=refs/notes/testify show HEAD 2>$null
+        $note = (git notes --ref=refs/notes/testify show HEAD 2>$null) -join "`n"
         $LASTEXITCODE | Should -Be 0
         $note | Should -Match "testify-hash:"
         Pop-Location
@@ -121,6 +125,7 @@ Describe "Post-Commit Hook - Scripts Not Found" {
         $hooksDir = Join-Path $testDir ".git/hooks"
         New-Item -ItemType Directory -Path $hooksDir -Force | Out-Null
         Copy-Item $script:BashPostHook (Join-Path $hooksDir "post-commit")
+        chmod +x (Join-Path $hooksDir "post-commit")
 
         "init" | Out-File "init.txt"
         git add -A 2>&1 | Out-Null

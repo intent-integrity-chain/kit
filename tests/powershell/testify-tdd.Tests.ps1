@@ -104,7 +104,14 @@ Describe "Hash Computation" {
 Describe "Hash Storage and Verification" {
     BeforeEach {
         $script:TestDir = New-TestDirectory
-        $script:ContextFile = Join-Path $script:TestDir ".specify/context.json"
+        # Set up proper directory structure: specs/001-feature/tests/test-specs.md
+        # so that Get-ContextPath derives specs/001-feature/context.json
+        $script:FeatureDir = Join-Path $script:TestDir "specs/001-feature"
+        $script:TestsDir = Join-Path $script:FeatureDir "tests"
+        New-Item -ItemType Directory -Path $script:TestsDir -Force | Out-Null
+        $script:TestSpecsPath = Join-Path $script:TestsDir "test-specs.md"
+        Copy-Item (Join-Path $Global:FixturesDir "test-specs.md") $script:TestSpecsPath
+        $script:ContextFile = Join-Path $script:FeatureDir "context.json"
     }
 
     AfterEach {
@@ -112,7 +119,7 @@ Describe "Hash Storage and Verification" {
     }
 
     It "store-hash creates context file and stores hash" {
-        $result = & $script:TestifyScript store-hash (Join-Path $Global:FixturesDir "test-specs.md") $script:ContextFile
+        $result = & $script:TestifyScript store-hash $script:TestSpecsPath
 
         Test-Path $script:ContextFile | Should -Be $true
         $content = Get-Content $script:ContextFile -Raw
@@ -121,27 +128,30 @@ Describe "Hash Storage and Verification" {
     }
 
     It "verify-hash returns valid for matching hash" {
-        & $script:TestifyScript store-hash (Join-Path $Global:FixturesDir "test-specs.md") $script:ContextFile
+        & $script:TestifyScript store-hash $script:TestSpecsPath
 
-        $result = & $script:TestifyScript verify-hash (Join-Path $Global:FixturesDir "test-specs.md") $script:ContextFile
+        $result = & $script:TestifyScript verify-hash $script:TestSpecsPath
         $result | Should -Be "valid"
     }
 
     It "verify-hash returns missing for no context file" {
-        $result = & $script:TestifyScript verify-hash (Join-Path $Global:FixturesDir "test-specs.md") "/nonexistent/context.json"
+        # Use a path where no context.json exists (no store-hash was called)
+        $noCtxDir = Join-Path $script:TestDir "specs/999-nocontext/tests"
+        New-Item -ItemType Directory -Path $noCtxDir -Force | Out-Null
+        $noCtxSpecs = Join-Path $noCtxDir "test-specs.md"
+        Copy-Item (Join-Path $Global:FixturesDir "test-specs.md") $noCtxSpecs
+
+        $result = & $script:TestifyScript verify-hash $noCtxSpecs
         $result | Should -Be "missing"
     }
 
     It "verify-hash returns invalid for modified assertions" {
-        $testSpecs = Join-Path $script:TestDir "test-specs.md"
-        Copy-Item (Join-Path $Global:FixturesDir "test-specs.md") $testSpecs
-
-        & $script:TestifyScript store-hash $testSpecs $script:ContextFile
+        & $script:TestifyScript store-hash $script:TestSpecsPath
 
         # Modify an assertion
-        Add-Content -Path $testSpecs -Value "**Given**: modified assertion"
+        Add-Content -Path $script:TestSpecsPath -Value "**Given**: modified assertion"
 
-        $result = & $script:TestifyScript verify-hash $testSpecs $script:ContextFile
+        $result = & $script:TestifyScript verify-hash $script:TestSpecsPath
         $result | Should -Be "invalid"
     }
 }
@@ -149,8 +159,11 @@ Describe "Hash Storage and Verification" {
 Describe "Comprehensive Check" {
     BeforeEach {
         $script:TestDir = New-TestDirectory
-        $script:ContextFile = Join-Path $script:TestDir ".specify/context.json"
-        $script:TestSpecs = Join-Path $script:TestDir "test-specs.md"
+        # Set up proper directory structure for context.json derivation
+        $script:FeatureDir = Join-Path $script:TestDir "specs/001-feature"
+        $script:TestsSubDir = Join-Path $script:FeatureDir "tests"
+        New-Item -ItemType Directory -Path $script:TestsSubDir -Force | Out-Null
+        $script:TestSpecs = Join-Path $script:TestsSubDir "test-specs.md"
         Copy-Item (Join-Path $Global:FixturesDir "test-specs.md") $script:TestSpecs
     }
 
@@ -159,28 +172,29 @@ Describe "Comprehensive Check" {
     }
 
     It "returns PASS for valid setup" {
-        & $script:TestifyScript store-hash $script:TestSpecs $script:ContextFile
+        & $script:TestifyScript store-hash $script:TestSpecs
 
-        $result = & $script:TestifyScript comprehensive-check $script:TestSpecs $script:ContextFile (Join-Path $Global:FixturesDir "constitution.md")
+        # comprehensive-check takes: <features-dir-or-file> <constitution-file>
+        $result = & $script:TestifyScript comprehensive-check $script:TestSpecs (Join-Path $Global:FixturesDir "constitution.md")
         $json = $result | ConvertFrom-Json
         $json.overall_status | Should -Be "PASS"
     }
 
     It "returns BLOCKED for tampered assertions" {
-        & $script:TestifyScript store-hash $script:TestSpecs $script:ContextFile
+        & $script:TestifyScript store-hash $script:TestSpecs
 
         # Tamper with assertions
         Add-Content -Path $script:TestSpecs -Value "**Then**: tampered assertion"
 
-        $result = & $script:TestifyScript comprehensive-check $script:TestSpecs $script:ContextFile (Join-Path $Global:FixturesDir "constitution.md")
+        $result = & $script:TestifyScript comprehensive-check $script:TestSpecs (Join-Path $Global:FixturesDir "constitution.md")
         $json = $result | ConvertFrom-Json
         $json.overall_status | Should -Be "BLOCKED"
     }
 
     It "includes TDD determination" {
-        & $script:TestifyScript store-hash $script:TestSpecs $script:ContextFile
+        & $script:TestifyScript store-hash $script:TestSpecs
 
-        $result = & $script:TestifyScript comprehensive-check $script:TestSpecs $script:ContextFile (Join-Path $Global:FixturesDir "constitution.md")
+        $result = & $script:TestifyScript comprehensive-check $script:TestSpecs (Join-Path $Global:FixturesDir "constitution.md")
         $json = $result | ConvertFrom-Json
         $json.tdd_determination | Should -Be "mandatory"
     }

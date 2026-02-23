@@ -355,8 +355,8 @@ if ([string]::IsNullOrEmpty($dryRunCmd)) {
 $baseCmd = ($dryRunCmd -split '\s+')[0]
 $cmdAvailable = $false
 try {
-    $null = Get-Command $baseCmd -ErrorAction SilentlyContinue
-    $cmdAvailable = $true
+    $cmd = Get-Command $baseCmd -ErrorAction SilentlyContinue
+    $cmdAvailable = ($null -ne $cmd)
 } catch {
     $cmdAvailable = $false
 }

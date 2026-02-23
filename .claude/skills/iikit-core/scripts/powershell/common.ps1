@@ -312,6 +312,27 @@ function Test-DirHasFiles {
 # VALIDATION FUNCTIONS
 # =============================================================================
 
+function Test-Premise {
+    param([string]$RepoRoot)
+
+    $premise = Join-Path $RepoRoot 'PREMISE.md'
+
+    if (-not (Test-Path $premise)) {
+        Write-Warning "PREMISE.md not found. Run /iikit-core init to create one."
+    }
+
+    # Check for remaining placeholders
+    if (Test-Path $premise) {
+        $content = Get-Content -Path $premise -Raw -ErrorAction SilentlyContinue
+        $matches = [regex]::Matches($content, '\[[A-Z][A-Z_]*\]')
+        if ($matches.Count -gt 0) {
+            Write-Warning "PREMISE.md has $($matches.Count) unresolved placeholder(s)"
+        }
+    }
+
+    return $true
+}
+
 function Test-Constitution {
     param([string]$RepoRoot)
 

@@ -19,6 +19,7 @@ Describe "set-active-feature" {
     }
 
     AfterEach {
+        $env:SPECIFY_FEATURE = $null
         Pop-Location
         Remove-TestDirectory -TestDir $script:TestDir
     }

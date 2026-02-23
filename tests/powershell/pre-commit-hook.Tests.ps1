@@ -6,56 +6,56 @@ BeforeAll {
     $script:PsHookScript = Join-Path $Global:ScriptsDir "pre-commit-hook.ps1"
     $script:TestifyScript = Join-Path $Global:ScriptsDir "testify-tdd.ps1"
     $script:BashScriptsDir = Join-Path (Split-Path $Global:ScriptsDir -Parent) "bash"
-}
 
-function New-HookTestDirectory {
-    <#
-    .SYNOPSIS
-    Creates a temporary test directory with git init and iikit scripts for hook testing
-    #>
-    $testDir = Join-Path ([System.IO.Path]::GetTempPath()) "iikit-hook-test-$([guid]::NewGuid().ToString('N').Substring(0,8))"
-    New-Item -ItemType Directory -Path $testDir -Force | Out-Null
+    function script:New-HookTestDirectory {
+        <#
+        .SYNOPSIS
+        Creates a temporary test directory with git init and iikit scripts for hook testing
+        #>
+        $testDir = Join-Path ([System.IO.Path]::GetTempPath()) "iikit-hook-test-$([guid]::NewGuid().ToString('N').Substring(0,8))"
+        New-Item -ItemType Directory -Path $testDir -Force | Out-Null
 
-    # Initialize git
-    Push-Location $testDir
-    git init . 2>&1 | Out-Null
-    git config user.email "test@test.com"
-    git config user.name "Test"
+        # Initialize git
+        Push-Location $testDir
+        git init . 2>&1 | Out-Null
+        git config user.email "test@test.com"
+        git config user.name "Test"
 
-    # Copy IIKit scripts into the test directory
-    $scriptsTarget = Join-Path $testDir ".claude/skills/iikit-core/scripts/powershell"
-    New-Item -ItemType Directory -Path $scriptsTarget -Force | Out-Null
-    Copy-Item (Join-Path $Global:ScriptsDir "testify-tdd.ps1") $scriptsTarget
-    Copy-Item (Join-Path $Global:ScriptsDir "pre-commit-hook.ps1") $scriptsTarget
+        # Copy IIKit scripts into the test directory
+        $scriptsTarget = Join-Path $testDir ".claude/skills/iikit-core/scripts/powershell"
+        New-Item -ItemType Directory -Path $scriptsTarget -Force | Out-Null
+        Copy-Item (Join-Path $Global:ScriptsDir "testify-tdd.ps1") $scriptsTarget
+        Copy-Item (Join-Path $Global:ScriptsDir "pre-commit-hook.ps1") $scriptsTarget
 
-    # Also copy bash scripts (for bash-based functions)
-    $bashTarget = Join-Path $testDir ".claude/skills/iikit-core/scripts/bash"
-    New-Item -ItemType Directory -Path $bashTarget -Force | Out-Null
-    Copy-Item (Join-Path $script:BashScriptsDir "common.sh") $bashTarget
-    Copy-Item (Join-Path $script:BashScriptsDir "testify-tdd.sh") $bashTarget
-    Copy-Item $script:HookScript $bashTarget
+        # Also copy bash scripts (for bash-based functions)
+        $bashTarget = Join-Path $testDir ".claude/skills/iikit-core/scripts/bash"
+        New-Item -ItemType Directory -Path $bashTarget -Force | Out-Null
+        Copy-Item (Join-Path $script:BashScriptsDir "common.sh") $bashTarget
+        Copy-Item (Join-Path $script:BashScriptsDir "testify-tdd.sh") $bashTarget
+        Copy-Item $script:HookScript $bashTarget
 
-    # Install bash hook (git hooks always use bash)
-    $hooksDir = Join-Path $testDir ".git/hooks"
-    New-Item -ItemType Directory -Path $hooksDir -Force | Out-Null
-    Copy-Item $script:HookScript (Join-Path $hooksDir "pre-commit")
+        # Install bash hook (git hooks always use bash)
+        $hooksDir = Join-Path $testDir ".git/hooks"
+        New-Item -ItemType Directory -Path $hooksDir -Force | Out-Null
+        Copy-Item $script:HookScript (Join-Path $hooksDir "pre-commit")
 
-    # Create basic structure
-    New-Item -ItemType Directory -Path (Join-Path $testDir ".specify") -Force | Out-Null
-    New-Item -ItemType Directory -Path (Join-Path $testDir "specs") -Force | Out-Null
+        # Create basic structure
+        New-Item -ItemType Directory -Path (Join-Path $testDir ".specify") -Force | Out-Null
+        New-Item -ItemType Directory -Path (Join-Path $testDir "specs") -Force | Out-Null
 
-    # Initial commit
-    git add -A 2>&1 | Out-Null
-    git commit -m "initial setup" 2>&1 | Out-Null
-    Pop-Location
+        # Initial commit
+        git add -A 2>&1 | Out-Null
+        git commit -m "initial setup" 2>&1 | Out-Null
+        Pop-Location
 
-    return $testDir
-}
+        return $testDir
+    }
 
-function Remove-HookTestDirectory {
-    param([string]$TestDir)
-    if ($TestDir -and (Test-Path $TestDir)) {
-        Remove-Item -Path $TestDir -Recurse -Force -ErrorAction SilentlyContinue
+    function script:Remove-HookTestDirectory {
+        param([string]$TestDir)
+        if ($TestDir -and (Test-Path $TestDir)) {
+            Remove-Item -Path $TestDir -Recurse -Force -ErrorAction SilentlyContinue
+        }
     }
 }
 

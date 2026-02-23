@@ -312,6 +312,25 @@ check_dir() { [[ -d "$1" && -n $(ls -A "$1" 2>/dev/null) ]] && echo "  [Y] $2" |
 # VALIDATION FUNCTIONS
 # =============================================================================
 
+# Validate PREMISE.md exists and has no unresolved placeholders
+validate_premise() {
+    local repo_root="$1"
+    local premise="$repo_root/PREMISE.md"
+
+    if [[ ! -f "$premise" ]]; then
+        echo "WARNING: PREMISE.md not found. Run /iikit-core init to create one." >&2
+    fi
+
+    # Check for remaining placeholders
+    if grep -q '\[[A-Z][A-Z_]*\]' "$premise" 2>/dev/null; then
+        local count
+        count=$(grep -c '\[[A-Z][A-Z_]*\]' "$premise" 2>/dev/null) || count=0
+        echo "WARNING: PREMISE.md has $count unresolved placeholder(s)" >&2
+    fi
+
+    return 0
+}
+
 # Validate constitution exists
 validate_constitution() {
     local repo_root="$1"

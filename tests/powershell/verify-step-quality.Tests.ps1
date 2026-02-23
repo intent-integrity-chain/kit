@@ -3,20 +3,15 @@
 BeforeAll {
     Import-Module $PSScriptRoot/TestHelper.psm1 -Force
     $script:VerifyQualityScript = Join-Path $Global:ScriptsDir "verify-step-quality.ps1"
-}
 
-# =============================================================================
-# Helper: create Python step definition files
-# =============================================================================
+    function script:New-PythonGoodSteps {
+        param([string]$Dir)
 
-function New-PythonGoodSteps {
-    param([string]$Dir)
+        if (-not (Test-Path $Dir)) {
+            New-Item -ItemType Directory -Path $Dir -Force | Out-Null
+        }
 
-    if (-not (Test-Path $Dir)) {
-        New-Item -ItemType Directory -Path $Dir -Force | Out-Null
-    }
-
-    $content = @'
+        $content = @'
 from pytest_bdd import given, when, then
 
 @given("a registered user")
@@ -35,17 +30,17 @@ def step_logged_in(context):
 def step_see_dashboard(context):
     assert "dashboard" in context.result.redirect
 '@
-    Set-Content -Path (Join-Path $Dir "test_steps.py") -Value $content -Encoding utf8
-}
-
-function New-PythonBadSteps {
-    param([string]$Dir)
-
-    if (-not (Test-Path $Dir)) {
-        New-Item -ItemType Directory -Path $Dir -Force | Out-Null
+        Set-Content -Path (Join-Path $Dir "test_steps.py") -Value $content -Encoding utf8
     }
 
-    $content = @'
+    function script:New-PythonBadSteps {
+        param([string]$Dir)
+
+        if (-not (Test-Path $Dir)) {
+            New-Item -ItemType Directory -Path $Dir -Force | Out-Null
+        }
+
+        $content = @'
 from pytest_bdd import given, when, then
 
 @given("a user exists")
@@ -68,21 +63,17 @@ def step_everything():
 def step_data_saved(context):
     print("data saved")
 '@
-    Set-Content -Path (Join-Path $Dir "test_bad_steps.py") -Value $content -Encoding utf8
-}
-
-# =============================================================================
-# Helper: create JavaScript step definition files
-# =============================================================================
-
-function New-JavaScriptGoodSteps {
-    param([string]$Dir)
-
-    if (-not (Test-Path $Dir)) {
-        New-Item -ItemType Directory -Path $Dir -Force | Out-Null
+        Set-Content -Path (Join-Path $Dir "test_bad_steps.py") -Value $content -Encoding utf8
     }
 
-    $content = @'
+    function script:New-JavaScriptGoodSteps {
+        param([string]$Dir)
+
+        if (-not (Test-Path $Dir)) {
+            New-Item -ItemType Directory -Path $Dir -Force | Out-Null
+        }
+
+        $content = @'
 const { Given, When, Then } = require('@cucumber/cucumber');
 const assert = require('assert');
 
@@ -102,17 +93,17 @@ Then('they see the dashboard', function () {
     assert.ok(this.result.redirect.includes('dashboard'));
 });
 '@
-    Set-Content -Path (Join-Path $Dir "steps.js") -Value $content -Encoding utf8
-}
-
-function New-JavaScriptBadSteps {
-    param([string]$Dir)
-
-    if (-not (Test-Path $Dir)) {
-        New-Item -ItemType Directory -Path $Dir -Force | Out-Null
+        Set-Content -Path (Join-Path $Dir "steps.js") -Value $content -Encoding utf8
     }
 
-    $content = @'
+    function script:New-JavaScriptBadSteps {
+        param([string]$Dir)
+
+        if (-not (Test-Path $Dir)) {
+            New-Item -ItemType Directory -Path $Dir -Force | Out-Null
+        }
+
+        $content = @'
 const { Given, When, Then } = require('@cucumber/cucumber');
 
 Given('a user exists', function () {
@@ -130,7 +121,8 @@ Then('the data is saved', function () {
     console.log('saved');
 });
 '@
-    Set-Content -Path (Join-Path $Dir "steps.js") -Value $content -Encoding utf8
+        Set-Content -Path (Join-Path $Dir "steps.js") -Value $content -Encoding utf8
+    }
 }
 
 # =============================================================================
@@ -481,7 +473,7 @@ Describe "verify-step-quality.ps1 - Human-readable output" {
         $stepsDir = Join-Path $script:TestDir "steps"
         New-PythonGoodSteps -Dir $stepsDir
 
-        $result = & $script:VerifyQualityScript $stepsDir "python" 2>&1 | Out-String
+        $result = & $script:VerifyQualityScript $stepsDir "python" *>&1 | Out-String
         $result | Should -Match "Step Quality Analysis"
     }
 
@@ -489,7 +481,7 @@ Describe "verify-step-quality.ps1 - Human-readable output" {
         $stepsDir = Join-Path $script:TestDir "steps"
         New-PythonGoodSteps -Dir $stepsDir
 
-        $result = & $script:VerifyQualityScript $stepsDir "python" 2>&1 | Out-String
+        $result = & $script:VerifyQualityScript $stepsDir "python" *>&1 | Out-String
         $result | Should -Match "Language:\s+python"
         $result | Should -Match "Parser:\s+ast"
     }

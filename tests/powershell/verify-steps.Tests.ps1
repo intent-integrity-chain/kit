@@ -3,20 +3,15 @@
 BeforeAll {
     Import-Module $PSScriptRoot/TestHelper.psm1 -Force
     $script:VerifyStepsScript = Join-Path $Global:ScriptsDir "verify-steps.ps1"
-}
 
-# =============================================================================
-# Helper: create a plan.md with a specific tech stack
-# =============================================================================
+    function script:New-PlanWithStack {
+        param(
+            [string]$PlanFile,
+            [string]$Language,
+            [string]$Framework = ""
+        )
 
-function New-PlanWithStack {
-    param(
-        [string]$PlanFile,
-        [string]$Language,
-        [string]$Framework = ""
-    )
-
-    $content = @"
+        $content = @"
 # Implementation Plan
 
 ## Technical Context
@@ -25,21 +20,17 @@ function New-PlanWithStack {
 **Primary Dependencies**: $Framework
 **Testing**: $Framework
 "@
-    Set-Content -Path $PlanFile -Value $content -Encoding utf8
-}
-
-# =============================================================================
-# Helper: create .feature files in a directory
-# =============================================================================
-
-function New-FeatureFiles {
-    param([string]$Dir)
-
-    if (-not (Test-Path $Dir)) {
-        New-Item -ItemType Directory -Path $Dir -Force | Out-Null
+        Set-Content -Path $PlanFile -Value $content -Encoding utf8
     }
 
-    $loginFeature = @"
+    function script:New-FeatureFiles {
+        param([string]$Dir)
+
+        if (-not (Test-Path $Dir)) {
+            New-Item -ItemType Directory -Path $Dir -Force | Out-Null
+        }
+
+        $loginFeature = @"
 Feature: Login
   Scenario: Valid login
     Given a registered user
@@ -48,7 +39,7 @@ Feature: Login
     And they see the dashboard
 "@
 
-    $logoutFeature = @"
+        $logoutFeature = @"
 Feature: Logout
   Scenario: User logout
     Given a logged in user
@@ -56,8 +47,9 @@ Feature: Logout
     Then they are logged out
 "@
 
-    Set-Content -Path (Join-Path $Dir "login.feature") -Value $loginFeature -Encoding utf8
-    Set-Content -Path (Join-Path $Dir "logout.feature") -Value $logoutFeature -Encoding utf8
+        Set-Content -Path (Join-Path $Dir "login.feature") -Value $loginFeature -Encoding utf8
+        Set-Content -Path (Join-Path $Dir "logout.feature") -Value $logoutFeature -Encoding utf8
+    }
 }
 
 # =============================================================================

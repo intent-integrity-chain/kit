@@ -136,7 +136,7 @@ function Test-Execution {
         [string]$TestOutput
     )
 
-    $expected = Get-ExpectedTestCount -TestSpecsFile $TestSpecsFile
+    $expected = Get-ExpectedTestCount -InputPath $TestSpecsFile
     $results = Get-TestOutputCounts -Output $TestOutput
 
     $actualTotal = $results.total
@@ -183,7 +183,7 @@ switch ($Command) {
             Write-Error "Usage: verify-test-execution.ps1 count-expected <test-specs-file>"
             exit 1
         }
-        Get-ExpectedTestCount -TestSpecsFile $TestSpecsFile
+        Get-ExpectedTestCount -InputPath $TestSpecsFile
     }
     "parse-output" {
         if (-not $TestSpecsFile) {

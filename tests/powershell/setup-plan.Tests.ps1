@@ -26,18 +26,21 @@ Describe "setup-plan" {
         It "fails without constitution" {
             Remove-Item "CONSTITUTION.md" -ErrorAction SilentlyContinue
             Remove-Item ".specify/memory/constitution.md" -ErrorAction SilentlyContinue
-            { & $script:SetupPlanScript } | Should -Throw
+            & $script:SetupPlanScript *>&1 | Out-Null
+            $LASTEXITCODE | Should -Not -Be 0
         }
 
         It "fails without spec.md" {
-            { & $script:SetupPlanScript } | Should -Throw
+            & $script:SetupPlanScript *>&1 | Out-Null
+            $LASTEXITCODE | Should -Not -Be 0
         }
 
         It "succeeds with valid prerequisites" {
             $featureDir = New-MockFeature -TestDir $script:TestDir
             git checkout -b "001-test-feature" 2>&1 | Out-Null
 
-            { & $script:SetupPlanScript } | Should -Not -Throw
+            & $script:SetupPlanScript *>&1 | Out-Null
+            $LASTEXITCODE | Should -Be 0
         }
     }
 

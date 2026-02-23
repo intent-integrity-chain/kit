@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "@cucumber/cucumber": "^12.6.0"
+  }
+}

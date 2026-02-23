@@ -52,7 +52,12 @@ Describe "Validation mode" {
     }
 
     It "fails when feature dir missing" {
-        $result = & $script:CheckScript -Json 2>&1 | Out-String
+        $result = ""
+        try {
+            & $script:CheckScript -Json *>&1 | Out-String
+        } catch {
+            $result = $_.Exception.Message
+        }
         $result | Should -Match "Feature directory not found"
     }
 

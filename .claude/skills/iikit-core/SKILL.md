@@ -90,6 +90,12 @@ If `PREMISE.md` does not exist, create it from the user's input using [premise-t
 
 Replace ALL bracket placeholders `[PLACEHOLDER]` with actual content. This is MANDATORY — init is not complete without PREMISE.md.
 
+After writing PREMISE.md, validate:
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/validate-premise.sh --json "$PROJECT_PATH"
+```
+If validation fails (remaining placeholders or missing sections), fix and re-validate.
+
 #### Step 6 — Report
 
 Directories created, hook status, PREMISE.md status. Suggest `/iikit-00-constitution`.
