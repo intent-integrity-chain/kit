@@ -319,6 +319,7 @@ validate_premise() {
 
     if [[ ! -f "$premise" ]]; then
         echo "WARNING: PREMISE.md not found. Run /iikit-core init to create one." >&2
+        return 1
     fi
 
     # Check for remaining placeholders
@@ -326,6 +327,7 @@ validate_premise() {
         local count
         count=$(grep -c '\[[A-Z][A-Z_]*\]' "$premise" 2>/dev/null) || count=0
         echo "WARNING: PREMISE.md has $count unresolved placeholder(s)" >&2
+        return 1
     fi
 
     return 0

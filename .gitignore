@@ -59,3 +59,12 @@ tessl.json
 .codex/skills/tessl:*
 .gemini/skills/tessl:*
 .opencode/skills/tessl:*
+
+# npm artifacts (created by CI/tests, not project dependencies)
+package.json
+package-lock.json
+node_modules/
+tests/context.json
+tests/dashboard/package.json
+tests/dashboard/package-lock.json
+tests/dashboard/node_modules/

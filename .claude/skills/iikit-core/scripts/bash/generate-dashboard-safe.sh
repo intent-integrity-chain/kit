@@ -24,8 +24,9 @@ for dir in "${CANDIDATE_DIRS[@]}"; do
     fi
 done
 
-# Skip in test environments
-if [[ -n "${BATS_TEST_FILENAME:-}" ]] || [[ -n "${BATS_TMPDIR:-}" ]]; then
+# Skip when called indirectly from BATS tests (via check-prerequisites.sh)
+# Direct invocation from BATS tests can override with IIKIT_DASHBOARD_FORCE=1
+if [[ -n "${BATS_TEST_FILENAME:-}" || -n "${BATS_TMPDIR:-}" ]] && [[ -z "${IIKIT_DASHBOARD_FORCE:-}" ]]; then
     exit 0
 fi
 
@@ -44,9 +45,14 @@ if [[ ! -f "$PROJECT_DIR/CONSTITUTION.md" ]]; then
     exit 0
 fi
 
-# Generate dashboard
-node "$GENERATOR" "$PROJECT_DIR" 2>/dev/null || exit 0
-
-# Dashboard generated — the skill will suggest the user open it
+# Generate dashboard — log errors instead of swallowing them
+DASHBOARD_LOG="$PROJECT_DIR/.specify/dashboard.log"
+if node "$GENERATOR" "$PROJECT_DIR" 2>"$DASHBOARD_LOG"; then
+    # Success — remove log if empty
+    [[ ! -s "$DASHBOARD_LOG" ]] && rm -f "$DASHBOARD_LOG"
+else
+    # Failed — keep the log for debugging, but don't block the caller
+    echo "[iikit] Dashboard generation failed. See $DASHBOARD_LOG" >&2
+fi
 
 exit 0

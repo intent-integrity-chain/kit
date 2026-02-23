@@ -43,13 +43,18 @@ if (-not (Test-Path (Join-Path $ProjectDir "CONSTITUTION.md"))) {
     exit 0
 }
 
-# Generate dashboard
+# Generate dashboard — log errors instead of swallowing them
+$DashboardLog = Join-Path $ProjectDir ".specify" "dashboard.log"
 try {
-    node $Generator $ProjectDir 2>$null
+    node $Generator $ProjectDir 2>$DashboardLog
+    if ($LASTEXITCODE -ne 0) {
+        Write-Warning "[iikit] Dashboard generation failed. See $DashboardLog"
+    } elseif ((Test-Path $DashboardLog) -and (Get-Item $DashboardLog).Length -eq 0) {
+        Remove-Item $DashboardLog -ErrorAction SilentlyContinue
+    }
 } catch {
-    exit 0
+    Write-Warning "[iikit] Dashboard generation failed: $_"
 }
-if ($LASTEXITCODE -ne 0) { exit 0 }
 
 # Dashboard generated — the skill will suggest the user open it
 
