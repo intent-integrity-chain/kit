@@ -58,7 +58,6 @@ jobs:
           sudo apt-get install -y powershell
 
       - name: Run Pester tests (PowerShell parity)
-        continue-on-error: true
         run: |
           pwsh -Command "Install-Module -Name Pester -Force -Scope CurrentUser -MinimumVersion 5.0"
           pwsh -Command "Invoke-Pester tests/powershell/ -Output Detailed -CI"

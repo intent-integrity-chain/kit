@@ -2,7 +2,7 @@
 
 BeforeAll {
     Import-Module $PSScriptRoot/TestHelper.psm1 -Force
-    $Global:SetScript = Join-Path $Global:ScriptsDir "powershell" "set-active-feature.ps1"
+    $Global:SetScript = Join-Path $Global:ScriptsDir "set-active-feature.ps1"
 }
 
 Describe "set-active-feature" {
