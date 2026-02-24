@@ -50,7 +50,14 @@ jobs:
 
       - name: Run Playwright visual dashboard tests
         working-directory: tests/dashboard
-        run: npx playwright test --config=playwright-visual.config.js
+        run: npx playwright test --config=playwright-visual.config.js --update-snapshots
+
+      - name: Upload updated snapshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: updated-linux-snapshots
+          path: tests/dashboard/visual/snapshots/
 
       - name: Install PowerShell
         run: |
