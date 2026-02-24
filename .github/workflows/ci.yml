@@ -128,7 +128,7 @@ jobs:
           mkdir -p specs/001-test/tests/features
           printf 'Feature: Test\n  Scenario: Basic\n    Given a precondition\n    Then a result\n' > specs/001-test/tests/features/test.feature
           bash "$SCRIPTS/testify-tdd.sh" store-hash "specs/001-test/tests/features"
-          git add -A && git commit -m "initial"
+          git add -A && git commit --no-verify -m "initial"
           echo "  Then tampered" >> specs/001-test/tests/features/test.feature
           git add specs/001-test/tests/features/test.feature
           if git commit -m "tampered" 2>&1; then
