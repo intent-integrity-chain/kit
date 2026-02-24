@@ -2798,7 +2798,7 @@
       let currentTestify = null;
       let currentAnalyze = null;
       let currentBugs = null;
-      let activeTab = null;
+      let activeTab = localStorage.getItem('iikit-active-tab') || null;
       let externalSankeyHighlight = null;
       // DASHBOARD_DATA mode: when data is inlined by the generator
       const staticMode = typeof window.DASHBOARD_DATA === 'object' && window.DASHBOARD_DATA !== null;
@@ -2910,6 +2910,7 @@
         }
 
         activeTab = phaseId;
+        localStorage.setItem('iikit-active-tab', phaseId);
         // Re-render pipeline to update active state
         if (currentPipeline) renderPipeline(currentPipeline);
 
