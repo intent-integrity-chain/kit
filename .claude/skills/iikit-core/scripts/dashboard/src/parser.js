@@ -101,10 +101,8 @@ function parseChecklists(checklistDir) {
 
   const files = fs.readdirSync(checklistDir).filter(f => f.endsWith('.md'));
 
-  // If the only checklist is requirements.md (spec quality checklist from /iikit-01-specify),
-  // don't count it — the /iikit-04-checklist phase hasn't run yet
-  const hasDomainChecklists = files.some(f => f !== 'requirements.md');
-  if (!hasDomainChecklists) return result;
+  // Count all checklist files — requirements.md may be from /iikit-01-specify or /iikit-04-checklist
+  if (files.length === 0) return result;
 
   for (const file of files) {
     const content = fs.readFileSync(path.join(checklistDir, file), 'utf-8');
@@ -138,9 +136,7 @@ function parseChecklistsDetailed(checklistDir) {
 
   const files = fs.readdirSync(checklistDir).filter(f => f.endsWith('.md'));
 
-  // Same filter as parseChecklists: skip if requirements.md is the only file
-  const hasDomainChecklists = files.some(f => f !== 'requirements.md');
-  if (!hasDomainChecklists) return [];
+  if (files.length === 0) return [];
 
   const result = [];
 
