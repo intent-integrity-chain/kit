@@ -34,7 +34,7 @@ jobs:
           # Verify tile installed correctly
           test -f .tessl/tiles/tessl-labs/intent-integrity-kit/tile.json
           test -f .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh
-          test -f .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/dashboard/generate-dashboard.js
+          test -f .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/dashboard/src/generate-dashboard.js
           test -f .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/dashboard/template.js
 
           # Verify scripts are executable and work

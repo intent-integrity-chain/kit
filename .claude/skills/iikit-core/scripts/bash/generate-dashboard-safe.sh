@@ -19,7 +19,7 @@ CANDIDATE_DIRS=(
 )
 for dir in "${CANDIDATE_DIRS[@]}"; do
     if [[ -f "$dir/generate-dashboard.js" ]]; then
-        GENERATOR="$dir/generate-dashboard.js"
+        GENERATOR="$dir/src/generate-dashboard.js"
         break
     fi
 done

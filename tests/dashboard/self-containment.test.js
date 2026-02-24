@@ -123,7 +123,7 @@ describe('prepare-tile.sh self-containment', () => {
   });
 
   test('each skill with generate-dashboard-safe.sh gets dashboard/ directory', () => {
-    // Transitive dep: generate-dashboard-safe.sh looks for ../dashboard/generate-dashboard.js
+    // Transitive dep: generate-dashboard-safe.sh looks for ../dashboard/src/generate-dashboard.js
     const entries = fs.readdirSync(tmpDir, { withFileTypes: true });
     let foundAtLeastOne = false;
     for (const entry of entries) {
@@ -155,8 +155,8 @@ describe('prepare-tile.sh self-containment', () => {
     expect(foundAtLeastOne).toBe(true);
   });
 
-  test('dashboard/ copy includes generate-dashboard.js', () => {
-    // The bundled generator must be present for the dashboard to work
+  test('dashboard/ copy includes src/generate-dashboard.js', () => {
+    // The source generator must be present for the dashboard to work
     const entries = fs.readdirSync(tmpDir, { withFileTypes: true });
     let foundAtLeastOne = false;
     for (const entry of entries) {
@@ -164,7 +164,7 @@ describe('prepare-tile.sh self-containment', () => {
       const dashboardDir = path.join(tmpDir, entry.name, 'scripts', 'dashboard');
       if (fs.existsSync(dashboardDir)) {
         foundAtLeastOne = true;
-        const generator = path.join(dashboardDir, 'generate-dashboard.js');
+        const generator = path.join(dashboardDir, 'src', 'generate-dashboard.js');
         expect(fs.existsSync(generator)).toBe(true);
       }
     }

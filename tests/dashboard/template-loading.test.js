@@ -25,7 +25,7 @@ const { spawnSync } = require('child_process');
 
 const DASHBOARD_DIR = path.join(__dirname, '..', '..', '.claude', 'skills', 'iikit-core', 'scripts', 'dashboard');
 const SRC_GENERATOR = path.join(DASHBOARD_DIR, 'src', 'generate-dashboard.js');
-const BUNDLED_GENERATOR = path.join(DASHBOARD_DIR, 'generate-dashboard.js');
+// Bundled version removed — only src version exists
 const TEMPLATE_JS_PATH = path.join(DASHBOARD_DIR, 'template.js');
 const PUBLIC_HTML_PATH = path.join(DASHBOARD_DIR, 'public', 'index.html');
 const SRC_PUBLIC_HTML_PATH = path.join(DASHBOARD_DIR, 'src', 'public', 'index.html');
@@ -183,46 +183,5 @@ describe('loadTemplate resolution (src/generate-dashboard.js)', () => {
   });
 });
 
-describe('loadTemplate resolution (bundled generate-dashboard.js)', () => {
-  beforeAll(() => {
-    // Build bundle if it doesn't exist
-    if (!fs.existsSync(BUNDLED_GENERATOR)) {
-      const buildScript = path.join(DASHBOARD_DIR, 'build', 'bundle-generator.js');
-      const result = spawnSync(process.execPath, [buildScript], {
-        encoding: 'utf-8', timeout: 30000, cwd: path.join(__dirname, '..')
-      });
-      if (result.status !== 0) {
-        throw new Error(`Build failed: ${result.stderr}`);
-      }
-    }
-  });
-
-  test('bundled generator works with only template.js (all .html templates missing)', () => {
-    // This is the primary published-tile scenario: .html files are stripped
-    const htmlPaths = [PUBLIC_HTML_PATH, SRC_PUBLIC_HTML_PATH];
-    const tmpDir = createTestProject();
-    try {
-      withRenamedFiles(htmlPaths, () => {
-        const result = runGenerator(BUNDLED_GENERATOR, tmpDir);
-        expect(result.status).toBe(0);
-        const html = fs.readFileSync(path.join(tmpDir, '.specify', 'dashboard.html'), 'utf-8');
-        expect(html).toMatch(/^<!DOCTYPE html>/i);
-      });
-    } finally {
-      fs.rmSync(tmpDir, { recursive: true, force: true });
-    }
-  });
-
-  test('bundled generator fails clearly when no template source exists', () => {
-    const tmpDir = createTestProject();
-    try {
-      withRenamedFiles(ALL_TEMPLATE_PATHS, () => {
-        const result = runGenerator(BUNDLED_GENERATOR, tmpDir);
-        expect(result.status).not.toBe(0);
-        expect(result.stderr).toMatch(/not found|ENOENT|template/i);
-      });
-    } finally {
-      fs.rmSync(tmpDir, { recursive: true, force: true });
-    }
-  });
-});
+// Bundled generator removed — only src/generate-dashboard.js exists now.
+// No bundle parity tests needed.

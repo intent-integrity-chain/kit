@@ -21,7 +21,7 @@ $candidateDirs = @(
     (Join-Path $ScriptDir ".." ".." ".." "iikit-core" "scripts" "dashboard")
 )
 foreach ($dir in $candidateDirs) {
-    $candidate = Join-Path $dir "generate-dashboard.js"
+    $candidate = Join-Path $dir "src" "generate-dashboard.js"
     if (Test-Path $candidate) {
         $Generator = $candidate
         break

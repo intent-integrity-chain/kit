@@ -56,7 +56,7 @@ As a user I want to log in.
 `);
 
   // Generate the dashboard
-  const generatorPath = path.resolve(__dirname, '../../.claude/skills/iikit-core/scripts/dashboard/generate-dashboard.js');
+  const generatorPath = path.resolve(__dirname, '../../.claude/skills/iikit-core/scripts/dashboard/src/generate-dashboard.js');
   execSync(`node "${generatorPath}" "${projectDir}"`, { timeout: 15000 });
 
   dashboardPath = path.join(projectDir, '.specify', 'dashboard.html');

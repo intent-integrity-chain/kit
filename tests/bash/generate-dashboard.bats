@@ -9,7 +9,7 @@ load 'test_helper'
 
 DASHBOARD_SCRIPT="$SCRIPTS_DIR/generate-dashboard-safe.sh"
 DASHBOARD_DIR="$(dirname "$SCRIPTS_DIR")/dashboard"
-GENERATOR="$DASHBOARD_DIR/generate-dashboard.js"
+GENERATOR="$DASHBOARD_DIR/src/generate-dashboard.js"
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -268,7 +268,7 @@ EOF
 
 @test "generate-dashboard-safe: finds generator via ../dashboard/ path (dev layout)" {
     # The DASHBOARD_SCRIPT is at .../scripts/bash/generate-dashboard-safe.sh
-    # The generator is at .../scripts/dashboard/generate-dashboard.js
+    # The generator is at .../scripts/dashboard/src/generate-dashboard.js
     # This is the ../dashboard/ relative path from bash/
 
     # Verify the dev layout path works by checking the script's candidate path
@@ -282,7 +282,7 @@ EOF
 
     # Simulate self-contained skill structure:
     # <root>/iikit-00-constitution/scripts/bash/generate-dashboard-safe.sh
-    # <root>/iikit-core/scripts/dashboard/generate-dashboard.js
+    # <root>/iikit-core/scripts/dashboard/src/generate-dashboard.js
     #
     # From bash/ the path is ../../../iikit-core/scripts/dashboard/
 
@@ -304,8 +304,8 @@ EOF
     # The script does: SCRIPT_DIR/../../../iikit-core/scripts/dashboard
     # SCRIPT_DIR = iikit-00-constitution/scripts/bash
     # ../../../ = root
-    # So: root/iikit-core/scripts/dashboard/generate-dashboard.js
-    local resolved_path="$tmproot/iikit-00-constitution/scripts/bash/../../../iikit-core/scripts/dashboard/generate-dashboard.js"
+    # So: root/iikit-core/scripts/dashboard/src/generate-dashboard.js
+    local resolved_path="$tmproot/iikit-00-constitution/scripts/bash/../../../iikit-core/scripts/dashboard/src/generate-dashboard.js"
     [ -f "$resolved_path" ]
 
     # Create a project and test that the script finds the generator
