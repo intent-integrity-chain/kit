@@ -16,6 +16,7 @@ description: "Task list template for feature implementation"
 - **[P]**: Can run in parallel (different files, no dependencies)
 - **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3)
 - Include exact file paths in descriptions
+- **Traceability**: When referencing test spec IDs, use explicit comma-separated lists (e.g., `[TS-005, TS-006, TS-007]`), never prose ranges like "TS-005 through TS-007"
 
 ## Path Conventions
 

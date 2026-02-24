@@ -71,9 +71,12 @@ Create `.feature` files in `FEATURE_DIR/tests/features/`:
 Every scenario MUST include traceability tags:
 - `@TS-XXX` — test spec ID (sequential, unique across all .feature files)
 - `@FR-XXX` — functional requirement from spec.md
+- `@SC-XXX` — success criteria from spec.md
 - `@US-XXX` — user story reference
 - `@P1` / `@P2` / `@P3` — priority level
 - `@acceptance` / `@contract` / `@validation` — test type
+
+**SC-XXX coverage rule**: For each SC-XXX in spec.md, ensure at least one scenario is tagged with the corresponding `@SC-XXX`. If an FR scenario already covers the success criterion, add the `@SC-XXX` tag to that scenario rather than creating a duplicate.
 
 Feature-level tags for shared metadata:
 - `@US-XXX` on the Feature line for the parent user story

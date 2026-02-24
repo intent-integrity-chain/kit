@@ -64,7 +64,7 @@ Create `FEATURE_DIR/checklists/[domain].md`.
 Correct: "Are visual hierarchy requirements defined with measurable criteria?" [Clarity, Spec SFR-1]
 Wrong: "Verify the button clicks correctly" (this tests implementation)
 
-**Categories**: Requirement Completeness, Clarity, Consistency, Acceptance Criteria Quality, Scenario Coverage, Edge Case Coverage, Non-Functional Requirements, Dependencies & Assumptions.
+**Categories**: Requirement Completeness, Clarity, Consistency, Acceptance Criteria Quality, Scenario Coverage, SC-XXX Test Coverage, Edge Case Coverage, Non-Functional Requirements, Dependencies & Assumptions.
 
 **Traceability**: >=80% of items must reference spec sections or use markers: `[Gap]`, `[Ambiguity]`, `[Conflict]`, `[Assumption]`.
 

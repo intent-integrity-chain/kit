@@ -86,6 +86,11 @@ Extract tech stack from plan.md, user stories from spec.md, entities from data-m
 - `T001 [US1] Create model` (no checkbox)
 - `- [ ] [US1] Create User model` (no task ID)
 
+**Traceability**: When referencing multiple test spec IDs, enumerate them explicitly as a comma-separated list. Do NOT use English prose ranges like "TS-005 through TS-010" — these break automated traceability checks.
+
+**Correct**: `[TS-005, TS-006, TS-007, TS-008, TS-009, TS-010]`
+**Wrong**: `TS-005 through TS-010`
+
 ### 5. Phase Structure
 
 - **Phase 1**: Setup (project initialization)

@@ -74,15 +74,18 @@ From tasks.md: task IDs, descriptions, phases, [P] markers, file paths.
 
 **G. Inconsistency**: terminology drift; entities in plan but not spec; conflicting requirements
 
+**G2. Prose Range Detection**: Scan tasks.md for patterns like "TS-XXX through TS-XXX" or "TS-XXX to TS-XXX". Flag as MEDIUM finding: "Prose range detected — intermediate IDs not traceable. Use explicit comma-separated list."
+
 **H. Feature File Traceability** (when `FEATURE_DIR/tests/features/` exists):
 Parse all `.feature` files in `tests/features/` and extract Gherkin tags:
 - `@FR-XXX` — functional requirement references
+- `@SC-XXX` — success criteria references
 - `@US-XXX` — user story references
 - `@TS-XXX` — test specification IDs
 
-**H1. Untested requirements**: For each FR-XXX in spec.md, check if at least one `.feature` file has a corresponding `@FR-XXX` tag. Flag any FR-XXX without a matching tag as "untested requirement" (severity: HIGH).
+**H1. Untested requirements**: For each FR-XXX and SC-XXX in spec.md, check if at least one `.feature` file has a corresponding `@FR-XXX` or `@SC-XXX` tag. Flag any FR-XXX or SC-XXX without a matching tag as "untested requirement" (severity: HIGH).
 
-**H2. Orphaned tags**: For each `@FR-XXX` tag found in `.feature` files, verify the referenced ID exists in spec.md. Flag tags referencing non-existent IDs as "orphaned traceability tag" (severity: MEDIUM).
+**H2. Orphaned tags**: For each `@FR-XXX` or `@SC-XXX` tag found in `.feature` files, verify the referenced ID exists in spec.md. Flag tags referencing non-existent IDs as "orphaned traceability tag" (severity: MEDIUM).
 
 **H3. Step definition coverage** (optional): If `tests/step_definitions/` exists alongside `tests/features/`, run `verify-steps.sh` to check for undefined steps:
 ```bash
