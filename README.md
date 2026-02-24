@@ -253,8 +253,8 @@ your-project/
 IIKit builds on [GitHub Spec-Kit](https://github.com/github/spec-kit), which pioneered specification-driven development for AI coding assistants. The phased workflow, artifact structure, and checklist gating concepts originate from Spec-Kit.
 
 IIKit extends Spec-Kit with:
-- **Assertion integrity** - Cryptographic verification to prevent circular validation
-- **Intent Integrity Chain** - Theoretical framework connecting intent to implementation
+- **Assertion integrity** - Cryptographic verification (hash-locked `.feature` files, pre-commit enforcement) to prevent circular validation where AI modifies tests to match buggy code
+- **Skills as executable phases** - Each workflow phase is a self-contained skill with prerequisites, templates, and validation — not just documentation
 - **Tessl integration** - Distribution via tile registry plus runtime library knowledge during implementation
 
 ## Learn More
