@@ -32,7 +32,7 @@ detect_framework_for_steps() {
         if find "$parent_dir" -maxdepth 3 -name "*.py" -type f 2>/dev/null | head -1 | grep -q .; then
             framework="pytest-bdd"
         elif find "$parent_dir" -maxdepth 3 -name "*.ts" -o -name "*.js" -type f 2>/dev/null | head -1 | grep -q .; then
-            framework="cucumber-js"
+            framework="@cucumber/cucumber"
         elif find "$parent_dir" -maxdepth 3 -name "*.go" -type f 2>/dev/null | head -1 | grep -q .; then
             framework="godog"
         elif find "$parent_dir" -maxdepth 3 -name "*.rs" -type f 2>/dev/null | head -1 | grep -q .; then
@@ -59,7 +59,7 @@ get_dry_run_command() {
         behave)
             echo "behave --dry-run --strict"
             ;;
-        cucumber-js)
+        @cucumber/cucumber)
             echo "npx cucumber-js --dry-run --strict"
             ;;
         godog)
@@ -163,7 +163,7 @@ parse_results() {
                 details="[${details%,}]"
             fi
             ;;
-        cucumber-js)
+        @cucumber/cucumber)
             # cucumber-js --dry-run --strict marks undefined steps
             undefined_steps=$(echo "$output" | grep -c "Undefined" 2>/dev/null) || undefined_steps=0
             pending_steps=$(echo "$output" | grep -c "Pending" 2>/dev/null) || pending_steps=0

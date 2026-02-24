@@ -97,7 +97,7 @@ FEATURE
     source "$VERIFY_STEPS_SCRIPT"
 
     result=$(detect_framework_for_steps "$plan_file" "$features_dir")
-    [[ "$result" == "cucumber-js" ]]
+    [[ "$result" == "@cucumber/cucumber" ]]
 }
 
 @test "detect_framework: detects godog from plan.md" {
@@ -215,7 +215,7 @@ EOF
     source "$VERIFY_STEPS_SCRIPT"
 
     result=$(detect_framework_for_steps "$plan_file" "$features_dir")
-    [[ "$result" == "cucumber-js" ]]
+    [[ "$result" == "@cucumber/cucumber" ]]
 }
 
 @test "detect_framework: falls back to file extension heuristics" {
@@ -408,7 +408,7 @@ EOF
 @test "get_dry_run_command: returns correct command for cucumber-js" {
     source "$VERIFY_STEPS_SCRIPT"
 
-    result=$(get_dry_run_command "cucumber-js" "$TEST_DIR/features")
+    result=$(get_dry_run_command "@cucumber/cucumber" "$TEST_DIR/features")
     assert_contains "$result" "npx cucumber-js --dry-run --strict"
 }
 
@@ -510,9 +510,9 @@ EOF
     local mock_output="1 scenario (1 Undefined)
 3 steps (1 Undefined, 2 passed)"
 
-    result=$(parse_results "cucumber-js" "$mock_output" "$features_dir")
+    result=$(parse_results "@cucumber/cucumber" "$mock_output" "$features_dir")
     assert_contains "$result" '"status":"BLOCKED"'
-    assert_contains "$result" '"framework":"cucumber-js"'
+    assert_contains "$result" '"framework":"@cucumber/cucumber"'
 }
 
 @test "parse_results: includes total_steps from feature files" {
