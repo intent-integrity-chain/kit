@@ -18,7 +18,7 @@ CANDIDATE_DIRS=(
     "$SCRIPT_DIR/../../../iikit-core/scripts/dashboard"
 )
 for dir in "${CANDIDATE_DIRS[@]}"; do
-    if [[ -f "$dir/generate-dashboard.js" ]]; then
+    if [[ -f "$dir/src/generate-dashboard.js" ]]; then
         GENERATOR="$dir/src/generate-dashboard.js"
         break
     fi

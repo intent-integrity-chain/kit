@@ -274,7 +274,7 @@ EOF
     # Verify the dev layout path works by checking the script's candidate path
     local expected_dir
     expected_dir="$(dirname "$SCRIPTS_DIR")/dashboard"
-    [ -f "$expected_dir/generate-dashboard.js" ]
+    [ -f "$expected_dir/src/generate-dashboard.js" ]
 }
 
 @test "generate-dashboard-safe: finds generator via published layout path" {
@@ -393,7 +393,7 @@ EOF
     [ -f "$tmpgen/template.js" ]
 
     # Run the generator from the modified copy
-    run node "$tmpgen/generate-dashboard.js" "$proj"
+    run node "$tmpgen/src/generate-dashboard.js" "$proj"
     [ "$status" -eq 0 ]
     [ -f "$proj/.specify/dashboard.html" ]
 
@@ -417,7 +417,7 @@ EOF
     [ -f "$tmpgen/public/index.html" ]
 
     # Run the generator from the modified copy
-    run node "$tmpgen/generate-dashboard.js" "$proj"
+    run node "$tmpgen/src/generate-dashboard.js" "$proj"
     [ "$status" -eq 0 ]
     [ -f "$proj/.specify/dashboard.html" ]
 
@@ -442,7 +442,7 @@ EOF
     rm -f "$tmpgen/src/public/index.html" 2>/dev/null
 
     # Run the generator — should fail
-    run node "$tmpgen/generate-dashboard.js" "$proj"
+    run node "$tmpgen/src/generate-dashboard.js" "$proj"
     [ "$status" -ne 0 ]
 
     # Should have error message about template
@@ -529,7 +529,7 @@ EOF
     rm -rf "$proj"
 }
 
-@test "dashboard has meta refresh for auto-reload" {
+@test "dashboard does NOT have auto-reload (removed — breaks interaction)" {
     command -v node >/dev/null 2>&1 || skip "node not available"
 
     local proj
@@ -541,8 +541,9 @@ EOF
     local html
     html=$(cat "$proj/.specify/dashboard.html")
 
-    # The buildHtml function injects a meta refresh tag
-    assert_contains "$html" 'meta http-equiv="refresh"'
+    # Auto-reload was removed because it breaks user interaction
+    assert_not_contains "$html" 'meta http-equiv="refresh"'
+    assert_not_contains "$html" 'setInterval'
 
     rm -rf "$proj"
 }
@@ -800,7 +801,7 @@ EOF
     rm -f "$tmpgen/template.js"
 
     # Generator should succeed using public/index.html as fallback
-    run node "$tmpgen/generate-dashboard.js" "$proj"
+    run node "$tmpgen/src/generate-dashboard.js" "$proj"
     [ "$status" -eq 0 ]
     [ -f "$proj/.specify/dashboard.html" ]
 

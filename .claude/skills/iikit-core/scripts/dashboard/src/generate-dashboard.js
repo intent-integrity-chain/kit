@@ -176,8 +176,11 @@ function loadTemplate() {
   }
   // Fall back to public/index.html (dev layout)
   const templatePath = path.join(__dirname, 'public', 'index.html');
-  _cachedTemplate = fs.readFileSync(templatePath, 'utf-8');
-  return _cachedTemplate;
+  if (fs.existsSync(templatePath)) {
+    _cachedTemplate = fs.readFileSync(templatePath, 'utf-8');
+    return _cachedTemplate;
+  }
+  throw new Error('Dashboard template not found. Checked: ' + templateJs + ', ' + templatePath);
 }
 
 /**

@@ -37,7 +37,7 @@ teardown() {
 PROJECT_DIR="${1:-$(pwd)}"
 SCRIPT_DIR="$(CDPATH="" cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DASHBOARD_DIR="$SCRIPT_DIR/../dashboard"
-GENERATOR="$DASHBOARD_DIR/generate-dashboard.js"
+GENERATOR="$DASHBOARD_DIR/src/generate-dashboard.js"
 if [[ ! -f "$GENERATOR" ]]; then exit 0; fi
 EOF
     chmod +x "$FAKE_SCRIPT"
@@ -89,14 +89,14 @@ EOF
 # Generator script exists in expected location
 # =============================================================================
 
-@test "generate-dashboard.js exists in scripts/dashboard/" {
+@test "generate-dashboard.js exists in scripts/dashboard/src/" {
     GENERATOR_DIR="$(dirname "$SCRIPTS_DIR")/dashboard"
-    [ -f "$GENERATOR_DIR/generate-dashboard.js" ]
+    [ -f "$GENERATOR_DIR/src/generate-dashboard.js" ]
 }
 
-@test "generate-dashboard.js is executable" {
+@test "src/generate-dashboard.js is executable" {
     GENERATOR_DIR="$(dirname "$SCRIPTS_DIR")/dashboard"
-    [ -x "$GENERATOR_DIR/generate-dashboard.js" ]
+    [ -x "$GENERATOR_DIR/src/generate-dashboard.js" ]
 }
 
 @test "dashboard public/index.html exists" {
@@ -104,7 +104,7 @@ EOF
     [ -f "$GENERATOR_DIR/public/index.html" ]
 }
 
-@test "generate-dashboard.js has node shebang" {
+@test "src/generate-dashboard.js has node shebang" {
     GENERATOR_DIR="$(dirname "$SCRIPTS_DIR")/dashboard"
-    head -1 "$GENERATOR_DIR/generate-dashboard.js" | grep -q "#!/usr/bin/env node"
+    head -1 "$GENERATOR_DIR/src/generate-dashboard.js" | grep -q "#!/usr/bin/env node"
 }
