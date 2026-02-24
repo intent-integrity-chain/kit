@@ -171,6 +171,10 @@ Cross-story parallelism: independent stories can run as parallel workstreams aft
 - Subject: `feat(<feature-id>): <task-id> <task description>` (use `fix(…)` for `T-B` tasks)
 - Trailers: `iikit-feature: <feature-id>` and `iikit-task: <task-id>`
 - Skip if no files changed; for parallel batches commit each task individually after batch completes
+- After each commit, regenerate the dashboard so the board reflects the latest task state:
+  ```bash
+  bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
+  ```
 
 ### 6. Output Validation
 
