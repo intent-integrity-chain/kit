@@ -4,14 +4,18 @@
 
 An AI coding assistant toolkit that preserves your intent from idea to implementation, with cryptographic verification at each step. Compatible with Claude Code, OpenAI Codex, Google Gemini, and OpenCode.
 
-## What's New in v2.0.0
+## What's New in v2.2.0
+
+- **Pre-commit BDD runner enforcement**: When `.feature` files exist, code commits are mechanically gated — agents can no longer bypass the BDD verification chain by writing plain tests. Three gates: step definitions exist, runner dependency in project dep files, `verify-steps.sh` dry-run passes. Covers all 8 supported frameworks.
+
+### v2.0.0 (breaking)
 
 - **BDD verification chain**: Testify generates standard Gherkin `.feature` files (replaces `test-specs.md`). The implement skill enforces a full red-green-verify cycle: hash integrity → step coverage → RED → GREEN → step quality.
 - **3 new verification scripts**: `verify-steps.sh` (dry-run coverage for 8 BDD frameworks), `verify-step-quality.sh` (AST-based analysis detecting empty/tautological assertions), `setup-bdd.sh` (auto-scaffolding).
 - **Static dashboard**: Real-time kanban board as a static HTML file (replaces the old server process). No ports, no pidfiles, no `npx`.
 - **Cross-artifact traceability**: Analyze skill verifies `@FR-XXX` tags in `.feature` files trace to `spec.md` requirements.
 
-[Previous releases →](https://github.com/intent-integrity-chain/kit/blob/main/CHANGELOG.md)
+[Full changelog →](https://github.com/intent-integrity-chain/kit/blob/main/CHANGELOG.md)
 
 ## What is Intent Integrity?
 
