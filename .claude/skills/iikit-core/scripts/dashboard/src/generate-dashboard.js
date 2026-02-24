@@ -211,15 +211,13 @@ async function generate(projectPath) {
  */
 async function main() {
   const args = process.argv.slice(2);
-  const watchFlag = args.includes('--watch');
-  const positionalArgs = args.filter(a => a !== '--watch');
 
-  if (positionalArgs.length === 0) {
-    process.stderr.write('Error: Project path is required. Usage: generate-dashboard.js <projectPath> [--watch]\n');
+  if (args.length === 0) {
+    process.stderr.write('Error: Project path is required. Usage: generate-dashboard.js <projectPath>\n');
     process.exit(1);
   }
 
-  const projectPath = path.resolve(positionalArgs[0]);
+  const projectPath = path.resolve(args[0]);
 
   // Validate project directory exists (exit 1)
   if (!fs.existsSync(projectPath) || !fs.statSync(projectPath).isDirectory()) {
@@ -247,66 +245,12 @@ async function main() {
     process.exit(4);
   }
 
-  // Run initial generation
+  // Run generation
   try {
     await generate(projectPath);
   } catch (err) {
     process.stderr.write(`Error: ${err.message}\n`);
     process.exit(5);
-  }
-
-  // Watch mode (FR-008)
-  if (watchFlag) {
-    let chokidar;
-    try {
-      chokidar = require('chokidar');
-    } catch {
-      process.stderr.write('Error: chokidar is required for --watch mode. Install it: npm install chokidar\n');
-      process.exit(1);
-    }
-
-    // Watch directories (not globs — globs don't fire events reliably on macOS)
-    const watchPaths = [
-      path.join(projectPath, 'specs'),
-      path.join(projectPath, 'CONSTITUTION.md'),
-      path.join(projectPath, 'PREMISE.md')
-    ].filter(p => fs.existsSync(p));
-
-    const watcher = chokidar.watch(watchPaths, {
-      ignoreInitial: true,
-      ignored: [
-        '**/node_modules/**',
-        '**/.git/**',
-        '**/dist/**',
-        path.join(projectPath, '.specify', 'dashboard.html'),
-        /.*cache.*/,
-        /.*\.tmp$/
-      ],
-      awaitWriteFinish: { stabilityThreshold: 200, pollInterval: 50 }
-    });
-
-    let debounceTimer = null;
-    watcher.on('all', () => {
-      if (debounceTimer) clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(async () => {
-        try {
-          await generate(projectPath);
-        } catch (err) {
-          process.stderr.write(`Error during re-generation: ${err.message}\n`);
-        }
-      }, 300);
-    });
-
-    process.stdout.write(`Watching for changes in ${projectPath}...\n`);
-
-    process.on('SIGINT', () => {
-      watcher.close();
-      process.exit(0);
-    });
-    process.on('SIGTERM', () => {
-      watcher.close();
-      process.exit(0);
-    });
   }
 }
 

@@ -293,12 +293,9 @@ describe('HTML output', () => {
     expect(htmlContent).toMatch(/window\.DASHBOARD_DATA\s*=\s*\{/);
   });
 
-  test('contains meta http-equiv refresh', () => {
-    expect(htmlContent).toMatch(/<meta\s+http-equiv="refresh"\s+content="2"\s*\/?>/);
-  });
-
-  test('contains JavaScript fallback setInterval reload', () => {
-    expect(htmlContent).toMatch(/setInterval\(\s*\(\)\s*=>\s*location\.reload\(\)\s*,\s*2000\s*\)/);
+  test('does NOT contain auto-reload (removed — breaks user interaction)', () => {
+    expect(htmlContent).not.toMatch(/<meta\s+http-equiv="refresh"/);
+    expect(htmlContent).not.toMatch(/setInterval.*location\.reload/);
   });
 
   test('output is valid HTML with closing tags', () => {
@@ -436,96 +433,3 @@ describe('Template loading', () => {
   });
 });
 
-// T010: Watch mode tests (TS-005, TS-007)
-describe('Watch mode', () => {
-  test('--watch flag starts watcher and re-generates on file change', (done) => {
-    const tmpDir = createTestProject(os.tmpdir());
-    const { spawn } = require('child_process');
-    const child = spawn(process.execPath, [GENERATOR_PATH, tmpDir, '--watch'], {
-      stdio: ['pipe', 'pipe', 'pipe']
-    });
-
-    let stdout = '';
-    let generated = false;
-
-    child.stdout.on('data', (chunk) => {
-      stdout += chunk.toString();
-      // Wait for initial generation to complete
-      if (!generated && stdout.includes('dashboard.html')) {
-        generated = true;
-        // Touch a file to trigger re-generation
-        setTimeout(() => {
-          const specPath = path.join(tmpDir, 'specs', '001-test-feature', 'spec.md');
-          if (fs.existsSync(path.dirname(specPath))) {
-            fs.writeFileSync(specPath, '# Updated Spec\n');
-          }
-        }, 1000);
-      }
-      // Check for re-generation message
-      if (generated && (stdout.match(/dashboard\.html/g) || []).length >= 2) {
-        child.kill('SIGTERM');
-      }
-    });
-
-    child.on('close', () => {
-      try {
-        const outputPath = path.join(tmpDir, '.specify', 'dashboard.html');
-        expect(fs.existsSync(outputPath)).toBe(true);
-        expect(generated).toBe(true);
-        fs.rmSync(tmpDir, { recursive: true, force: true });
-        done();
-      } catch (err) {
-        fs.rmSync(tmpDir, { recursive: true, force: true });
-        done(err);
-      }
-    });
-
-    // Timeout safety
-    setTimeout(() => {
-      child.kill('SIGTERM');
-    }, 10000);
-  }, 15000);
-
-  test('only specs/**/*.md, CONSTITUTION.md, PREMISE.md trigger re-generation', (done) => {
-    const tmpDir = createTestProject(os.tmpdir());
-    const { spawn } = require('child_process');
-    const child = spawn(process.execPath, [GENERATOR_PATH, tmpDir, '--watch'], {
-      stdio: ['pipe', 'pipe', 'pipe']
-    });
-
-    let stdout = '';
-    let initialDone = false;
-
-    child.stdout.on('data', (chunk) => {
-      stdout += chunk.toString();
-      if (!initialDone && stdout.includes('dashboard.html')) {
-        initialDone = true;
-        // Write a file that should NOT trigger regeneration (e.g., a .txt file in root)
-        if (fs.existsSync(tmpDir)) {
-          fs.writeFileSync(path.join(tmpDir, 'random.txt'), 'ignored');
-        }
-        // Wait for debounce period + buffer
-        setTimeout(() => {
-          const newCount = (stdout.match(/dashboard\.html/g) || []).length;
-          // Should NOT have increased
-          child.kill('SIGTERM');
-        }, 1000);
-      }
-    });
-
-    child.on('close', () => {
-      try {
-        // Only 1 generation (initial) should have occurred
-        const genCount = (stdout.match(/dashboard\.html/g) || []).length;
-        expect(genCount).toBe(1);
-        fs.rmSync(tmpDir, { recursive: true, force: true });
-        done();
-      } catch (err) {
-        fs.rmSync(tmpDir, { recursive: true, force: true });
-        done(err);
-      }
-    });
-
-    setTimeout(() => { child.kill('SIGTERM'); }, 10000);
-  }, 15000);
-});

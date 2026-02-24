@@ -1030,7 +1030,7 @@ describe('parseChecklistsDetailed', () => {
   // TS-021: Percentage calculation rounds correctly
   test('percentage calculation rounds correctly', () => {
     fs.writeFileSync(path.join(tmpDir, 'review.md'), '- [x] CHK-001 Done\n- [ ] CHK-002 Not done\n- [ ] CHK-003 Not done\n');
-    // Need a second file so requirements.md-only filter doesn't kick in
+    // Test with a non-requirements checklist file
     const result = parseChecklistsDetailed(tmpDir);
     const reviewFile = result.find(f => f.filename === 'review.md');
     expect(reviewFile).toBeDefined();
@@ -1097,11 +1097,13 @@ describe('parseChecklistsDetailed', () => {
     expect(result[0].checked).toBe(0);
   });
 
-  // Test 8: requirements.md-only filter returns empty array
-  test('requirements.md-only filter returns empty array', () => {
+  // Test 8: requirements.md is counted as a real checklist
+  test('requirements.md is parsed as a checklist', () => {
     fs.writeFileSync(path.join(tmpDir, 'requirements.md'), '- [x] CHK-001 Done\n- [ ] CHK-002 Not done\n');
     const result = parseChecklistsDetailed(tmpDir);
-    expect(result).toEqual([]);
+    expect(result.length).toBe(1);
+    expect(result[0].filename).toBe('requirements.md');
+    expect(result[0].items.length).toBe(2);
   });
 
   // Test 9: Missing directory returns empty array
