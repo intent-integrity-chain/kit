@@ -3699,7 +3699,7 @@
               crossAttr = ` data-cross-target="spec" data-cross-id="${escapeHtml(n.id)}"`;
             } else if (n.col === 'mid') {
               // Test specs link to spec view (trace back to the requirement they verify)
-              const traceReq = n.traceability ? n.traceability.split(',')[0]?.trim() : n.id;
+              const traceReq = Array.isArray(n.traceability) && n.traceability.length > 0 ? n.traceability[0] : n.id;
               crossAttr = ` data-cross-target="spec" data-cross-id="${escapeHtml(traceReq)}"`;
             } else if (n.col === 'right') {
               crossAttr = ` data-cross-target="implement" data-cross-id="${escapeHtml(n.id)}"`;
