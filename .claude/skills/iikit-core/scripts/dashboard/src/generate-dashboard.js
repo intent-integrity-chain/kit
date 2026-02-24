@@ -265,14 +265,14 @@ async function main() {
       process.exit(1);
     }
 
-    const watchGlobs = [
-      path.join(projectPath, 'specs', '**', '*.md'),
-      path.join(projectPath, 'specs', '**', '*.feature'),
+    // Watch directories (not globs — globs don't fire events reliably on macOS)
+    const watchPaths = [
+      path.join(projectPath, 'specs'),
       path.join(projectPath, 'CONSTITUTION.md'),
       path.join(projectPath, 'PREMISE.md')
-    ];
+    ].filter(p => fs.existsSync(p));
 
-    const watcher = chokidar.watch(watchGlobs, {
+    const watcher = chokidar.watch(watchPaths, {
       ignoreInitial: true,
       ignored: [
         '**/node_modules/**',

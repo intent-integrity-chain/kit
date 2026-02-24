@@ -1975,12 +1975,13 @@ async function main() {
       process.stderr.write("Error: chokidar is required for --watch mode. Install it: npm install chokidar\n");
       process.exit(1);
     }
-    const watchGlobs = [
-      path.join(projectPath, "specs", "**", "*.md"),
+    // Watch directories (not globs — globs don't fire events reliably on macOS)
+    const watchPaths = [
+      path.join(projectPath, "specs"),
       path.join(projectPath, "CONSTITUTION.md"),
       path.join(projectPath, "PREMISE.md")
-    ];
-    const watcher = chokidar.watch(watchGlobs, {
+    ].filter(function(p) { return fs.existsSync(p); });
+    const watcher = chokidar.watch(watchPaths, {
       ignoreInitial: true,
       ignored: [
         "**/node_modules/**",
