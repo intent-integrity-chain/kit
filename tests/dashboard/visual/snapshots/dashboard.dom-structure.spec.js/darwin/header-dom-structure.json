@@ -105,6 +105,20 @@
             "theme-toggle"
           ],
           "ariaAttrs": {
+            "aria-label": "Refresh dashboard"
+          },
+          "children": [
+            {
+              "tag": "span"
+            }
+          ]
+        },
+        {
+          "tag": "button",
+          "classes": [
+            "theme-toggle"
+          ],
+          "ariaAttrs": {
             "aria-label": "Theme: System (click for Light)"
           },
           "children": [
