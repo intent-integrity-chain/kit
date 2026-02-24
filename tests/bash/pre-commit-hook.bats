@@ -511,6 +511,61 @@ EOF
 }
 
 # =============================================================================
+# TDD mandatory warning tests
+# =============================================================================
+
+@test "hook: warns when TDD mandatory and no .feature files exist" {
+    # Create constitution with mandatory TDD
+    cat > "$TEST_DIR/CONSTITUTION.md" << 'EOF'
+# Constitution
+TDD MUST be used for all features.
+EOF
+    # Create a feature dir with NO .feature files
+    mkdir -p "$TEST_DIR/specs/001-feature"
+    echo "# Spec" > "$TEST_DIR/specs/001-feature/spec.md"
+
+    git -C "$TEST_DIR" add -A >/dev/null 2>&1
+    git -C "$TEST_DIR" commit --no-verify -m "setup" >/dev/null 2>&1
+
+    # Stage a code file
+    echo "def app(): pass" > "$TEST_DIR/app.py"
+    git -C "$TEST_DIR" add app.py
+
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    # Should pass (warning only, not blocking) but emit TDD warning
+    [ "$status" -eq 0 ]
+    assert_contains "$output" "TDD is mandatory"
+    assert_contains "$output" "/iikit-05-testify"
+}
+
+@test "hook: no TDD warning when .feature files exist" {
+    # Create constitution with mandatory TDD
+    cat > "$TEST_DIR/CONSTITUTION.md" << 'EOF'
+# Constitution
+TDD MUST be used for all features.
+EOF
+    # Create feature with .feature files + full BDD setup
+    mkdir -p "$TEST_DIR/specs/001-feature/tests/features"
+    mkdir -p "$TEST_DIR/specs/001-feature/tests/step_definitions"
+    echo "Feature: Test" > "$TEST_DIR/specs/001-feature/tests/features/test.feature"
+    echo "step" > "$TEST_DIR/specs/001-feature/tests/step_definitions/steps.py"
+    echo "**Language/Version**: Python with pytest-bdd" > "$TEST_DIR/specs/001-feature/plan.md"
+    echo "pytest-bdd" > "$TEST_DIR/requirements.txt"
+
+    git -C "$TEST_DIR" add -A >/dev/null 2>&1
+    git -C "$TEST_DIR" commit --no-verify -m "setup" >/dev/null 2>&1
+
+    echo "def app(): pass" > "$TEST_DIR/app.py"
+    git -C "$TEST_DIR" add app.py
+
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    [ "$status" -eq 0 ]
+    assert_not_contains "$output" "TDD is mandatory"
+}
+
+# =============================================================================
 # Scripts not found tests
 # =============================================================================
 

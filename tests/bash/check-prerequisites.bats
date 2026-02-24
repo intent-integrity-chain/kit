@@ -629,6 +629,75 @@ teardown() {
     echo "$result" | jq '.validated.tasks' >/dev/null
 }
 
+# =============================================================================
+# Testify enforcement when TDD mandatory
+# =============================================================================
+
+@test "check-prerequisites: --phase 06 fails when TDD mandatory and no testify artifacts" {
+    create_mock_feature "001-test-feature"
+
+    # Constitution fixture already has "TDD Required: Test-first development MUST be used"
+    # No .feature files or test-specs.md exist
+
+    run "$CHECK_SCRIPT" --phase 06 --json
+    [[ "$status" -eq 1 ]]
+    assert_contains "$output" "TDD is mandatory"
+    assert_contains "$output" "/iikit-05-testify"
+}
+
+@test "check-prerequisites: --phase 06 passes when TDD mandatory and .feature files exist" {
+    create_mock_feature "001-test-feature"
+
+    # Create .feature files
+    mkdir -p "$TEST_DIR/specs/001-test-feature/tests/features"
+    echo "Feature: Test" > "$TEST_DIR/specs/001-test-feature/tests/features/test.feature"
+
+    run "$CHECK_SCRIPT" --phase 06 --json
+    [[ "$status" -eq 0 ]]
+}
+
+@test "check-prerequisites: --phase 06 passes when TDD mandatory and test-specs.md exists" {
+    create_mock_feature "001-test-feature"
+
+    # Create legacy test-specs.md
+    mkdir -p "$TEST_DIR/specs/001-test-feature/tests"
+    echo "**Given**: test" > "$TEST_DIR/specs/001-test-feature/tests/test-specs.md"
+
+    run "$CHECK_SCRIPT" --phase 06 --json
+    [[ "$status" -eq 0 ]]
+}
+
+@test "check-prerequisites: --phase 06 passes when TDD not mandatory and no testify artifacts" {
+    create_mock_feature "001-test-feature"
+
+    # Replace constitution with one that doesn't require TDD
+    cat > "$TEST_DIR/CONSTITUTION.md" << 'EOF'
+# Constitution
+## Core Principles
+- **Quality First**: Code SHOULD be tested
+- **Documentation**: All public APIs SHOULD have documentation
+- **Simplicity**: Keep it simple
+EOF
+
+    run "$CHECK_SCRIPT" --phase 06 --json
+    [[ "$status" -eq 0 ]]
+}
+
+@test "check-prerequisites: --phase 08 fails when TDD mandatory and no testify artifacts" {
+    create_complete_mock_feature "001-test-feature"
+
+    # Remove test artifacts
+    rm -rf "$TEST_DIR/specs/001-test-feature/tests"
+
+    run "$CHECK_SCRIPT" --phase 08 --json
+    [[ "$status" -eq 1 ]]
+    assert_contains "$output" "TDD is mandatory"
+}
+
+# =============================================================================
+# Status next_step for incomplete checklists
+# =============================================================================
+
 @test "check-prerequisites: --phase status next_step is /iikit-04-checklist for incomplete checklists" {
     create_mock_feature "001-test-feature"
     mkdir -p "$TEST_DIR/specs/001-test-feature/checklists"

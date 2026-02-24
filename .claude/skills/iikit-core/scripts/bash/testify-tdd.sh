@@ -31,17 +31,17 @@ assess_tdd_requirements() {
     local evidence=""
     local reasoning="No TDD indicators found in constitution"
 
-    # Check for strong TDD indicators with MUST/REQUIRED
-    if echo "$content" | grep -qi "MUST.*\(TDD\|test-first\|red-green-refactor\|write tests before\)"; then
+    # Check for strong TDD/BDD indicators with MUST/REQUIRED
+    if echo "$content" | grep -qi "MUST.*\(TDD\|BDD\|test-first\|red-green-refactor\|write tests before\|behavior-driven\|behaviour-driven\)"; then
         determination="mandatory"
         confidence="high"
-        evidence=$(echo "$content" | grep -i "MUST.*\(TDD\|test-first\|red-green-refactor\|write tests before\)" | head -1)
-        reasoning="Strong TDD indicator found with MUST modifier"
-    elif echo "$content" | grep -qi "\(TDD\|test-first\|red-green-refactor\|write tests before\).*MUST"; then
+        evidence=$(echo "$content" | grep -i "MUST.*\(TDD\|BDD\|test-first\|red-green-refactor\|write tests before\|behavior-driven\|behaviour-driven\)" | head -1)
+        reasoning="Strong TDD/BDD indicator found with MUST modifier"
+    elif echo "$content" | grep -qi "\(TDD\|BDD\|test-first\|red-green-refactor\|write tests before\|behavior-driven\|behaviour-driven\).*MUST"; then
         determination="mandatory"
         confidence="high"
-        evidence=$(echo "$content" | grep -i "\(TDD\|test-first\|red-green-refactor\|write tests before\).*MUST" | head -1)
-        reasoning="Strong TDD indicator found with MUST modifier"
+        evidence=$(echo "$content" | grep -i "\(TDD\|BDD\|test-first\|red-green-refactor\|write tests before\|behavior-driven\|behaviour-driven\).*MUST" | head -1)
+        reasoning="Strong TDD/BDD indicator found with MUST modifier"
     # Check for moderate indicators
     elif echo "$content" | grep -qi "MUST.*\(test-driven\|tests.*before.*code\|tests.*before.*implementation\)"; then
         determination="mandatory"

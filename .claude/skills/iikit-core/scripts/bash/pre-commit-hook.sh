@@ -69,6 +69,31 @@ if [[ -f "$CONSTITUTION_FILE" ]]; then
 fi
 
 # ============================================================================
+# TDD MANDATORY WARNING — when TDD required but testify never run
+# ============================================================================
+
+if [[ "$TDD_DETERMINATION" == "mandatory" ]] && [[ -n "$STAGED_CODE_FILES" ]]; then
+    # Check if ANY feature directory has .feature files
+    ANY_FEATURES=false
+    for feat_dir in "$REPO_ROOT"/specs/[0-9][0-9][0-9]-*/; do
+        [[ ! -d "$feat_dir" ]] && continue
+        if [[ -d "$feat_dir/tests/features" ]]; then
+            FCOUNT=$(find "$feat_dir/tests/features" -maxdepth 1 -name "*.feature" -type f 2>/dev/null | wc -l | tr -d ' ')
+            [[ "$FCOUNT" -gt 0 ]] && ANY_FEATURES=true && break
+        fi
+        # Also check legacy test-specs.md
+        [[ -f "$feat_dir/tests/test-specs.md" ]] && ANY_FEATURES=true && break
+    done
+
+    if ! $ANY_FEATURES; then
+        echo "" >&2
+        echo "[iikit] WARNING: TDD is mandatory (per CONSTITUTION.md) but no .feature files or test-specs.md found." >&2
+        echo "[iikit]   Run /iikit-05-testify before implementing features." >&2
+        echo "" >&2
+    fi
+fi
+
+# ============================================================================
 # BDD RUNNER ENFORCEMENT — when .feature files exist, require proper BDD setup
 # ============================================================================
 # Triggered when code files are staged and specs/NNN/tests/features/*.feature
