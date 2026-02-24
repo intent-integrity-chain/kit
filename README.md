@@ -254,7 +254,7 @@ IIKit builds on [GitHub Spec-Kit](https://github.com/github/spec-kit), which pio
 
 IIKit extends Spec-Kit with:
 - **Assertion integrity** - Cryptographic verification (hash-locked `.feature` files, pre-commit enforcement) to prevent circular validation where AI modifies tests to match buggy code
-- **Skills as executable phases** - Each workflow phase is a self-contained skill with prerequisites, templates, and validation — not just documentation
+- **Skills as executable phases** - Each workflow phase is a self-contained skill with prerequisite checks, templates, and gating — the agent enforces the process, not a human reading a guide
 - **Tessl integration** - Distribution via tile registry plus runtime library knowledge during implementation
 
 ## Learn More
