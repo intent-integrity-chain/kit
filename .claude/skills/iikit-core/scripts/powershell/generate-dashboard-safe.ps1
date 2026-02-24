@@ -56,6 +56,30 @@ try {
     Write-Warning "[iikit] Dashboard generation failed: $_"
 }
 
+# Start background watcher if not already running (requires chokidar)
+$WatcherPidFile = Join-Path $ProjectDir ".specify" ".dashboard-watcher.pid"
+$watcherRunning = $false
+if (Test-Path $WatcherPidFile) {
+    $existingPid = Get-Content $WatcherPidFile -ErrorAction SilentlyContinue
+    if ($existingPid) {
+        try {
+            $proc = Get-Process -Id $existingPid -ErrorAction SilentlyContinue
+            if ($proc) { $watcherRunning = $true }
+        } catch {}
+    }
+    if (-not $watcherRunning) { Remove-Item $WatcherPidFile -ErrorAction SilentlyContinue }
+}
+
+if (-not $watcherRunning -and $Generator) {
+    try {
+        $watchProc = Start-Process -FilePath "node" -ArgumentList "$Generator", "$ProjectDir", "--watch" -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $ProjectDir ".specify" "dashboard-watcher.log") -RedirectStandardError (Join-Path $ProjectDir ".specify" "dashboard-watcher-err.log")
+        Start-Sleep -Milliseconds 500
+        if (-not $watchProc.HasExited) {
+            Set-Content -Path $WatcherPidFile -Value $watchProc.Id
+        }
+    } catch {}
+}
+
 # Dashboard generated — the skill will suggest the user open it
 
 exit 0

@@ -55,4 +55,26 @@ else
     echo "[iikit] Dashboard generation failed. See $DASHBOARD_LOG" >&2
 fi
 
+# Start background watcher if not already running (requires chokidar)
+WATCHER_PID_FILE="$PROJECT_DIR/.specify/.dashboard-watcher.pid"
+if [[ -f "$WATCHER_PID_FILE" ]]; then
+    EXISTING_PID=$(cat "$WATCHER_PID_FILE" 2>/dev/null)
+    if [[ -n "$EXISTING_PID" ]] && kill -0 "$EXISTING_PID" 2>/dev/null; then
+        # Watcher already running
+        exit 0
+    fi
+    # Stale pid file
+    rm -f "$WATCHER_PID_FILE"
+fi
+
+# Launch watcher in background (silently fails if chokidar not installed)
+node "$GENERATOR" "$PROJECT_DIR" --watch >> "$DASHBOARD_LOG" 2>&1 &
+WATCHER_PID=$!
+
+# Check if it started (give it a moment to fail if chokidar missing)
+sleep 0.5
+if kill -0 "$WATCHER_PID" 2>/dev/null; then
+    echo "$WATCHER_PID" > "$WATCHER_PID_FILE"
+fi
+
 exit 0

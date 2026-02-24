@@ -68,3 +68,5 @@ tests/context.json
 tests/dashboard/package.json
 tests/dashboard/package-lock.json
 tests/dashboard/node_modules/
+.specify/.dashboard-watcher.pid
+.specify/dashboard-watcher*.log
