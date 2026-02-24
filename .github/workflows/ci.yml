@@ -196,9 +196,16 @@ jobs:
         run: |
           # Replace symlinks with real copies so the archive contains real files
           cd tiles/intent-integrity-kit
-          # Resolve directory symlinks first (e.g., skills -> ../../.claude/skills)
-          find . -maxdepth 3 -type l | while read link; do
-            target=$(readlink -f "$link")
+          # Git may check out symlinks as text files (not OS symlinks) on Linux.
+          # Use git ls-files to find all symlink blobs (mode 120000) reliably.
+          git ls-files -s . | grep '^120000' | awk '{print $4}' | while read link; do
+            target=$(readlink -f "$link" 2>/dev/null)
+            # If readlink fails (text file, not OS symlink), read the target path from the file
+            if [ -z "$target" ] || [ ! -e "$target" ]; then
+              target=$(cat "$link")
+              # Resolve relative to the symlink's directory
+              target=$(cd "$(dirname "$link")" && readlink -f "$target")
+            fi
             if [ -d "$target" ]; then
               rm "$link"
               cp -R "$target" "$link"
