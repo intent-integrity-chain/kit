@@ -94,6 +94,18 @@ Output: checklist path, item counts (total/checked/deferred), gap resolution sum
 
 Suggest the user run `/clear` before proceeding — the interactive gap resolution consumed significant context. State is preserved in checklist files and `.specify/context.json`.
 
+Check the constitution's TDD policy (run `bash .tessl/.../testify-tdd.sh get-tdd-determination CONSTITUTION.md`):
+
+If TDD **mandatory**:
+```
+Checklist complete! (100%)
+Next steps:
+- /iikit-05-testify - (REQUIRED by constitution) Generate test specifications
+- /iikit-06-tasks - Generate task breakdown from plan
+- Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
+```
+
+If TDD **optional** or no TDD policy:
 ```
 Checklist complete! (100%)
 Next steps:
