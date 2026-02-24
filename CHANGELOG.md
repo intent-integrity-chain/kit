@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.3.0
+
+- **Always-on Tessl rules**: Three `alwaysApply: true` rules loaded into agent context on every request — `assertion-integrity` (never tamper with `.feature` files or test assertions), `phase-discipline` (never code without spec/plan/tasks, never skip phases), and `constitution` (never violate `CONSTITUTION.md` principles). Adds a new defense-in-depth layer alongside skills, scripts, and git hooks.
+
 ## v2.2.0
 
 - **Pre-commit BDD runner enforcement**: When `.feature` files exist, code commits are now mechanically gated on three checks: step definitions present, BDD runner dependency in project dep files, and `verify-steps.sh` dry-run passes. Covers all 8 supported frameworks (pytest-bdd, behave, @cucumber/cucumber, godog, cucumber-jvm-maven, cucumber-jvm-gradle, cucumber-rs, reqnroll). Agents can no longer bypass the BDD verification chain by writing plain tests.
