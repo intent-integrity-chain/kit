@@ -138,16 +138,22 @@ async function assembleDashboardData(projectPath) {
 function buildHtml(templateHtml, dashboardData) {
   let html = templateHtml;
 
-  // Inject DASHBOARD_DATA and meta-refresh into <head> (FR-004, FR-005, FR-007)
+  // Inject DASHBOARD_DATA into <head> (FR-004, FR-005)
   // DASHBOARD_DATA must be in <head> so it's available before the IIFE in <body> runs
   // Escape </script> to prevent script-tag injection from data file content (SC-008)
   const safeJson = JSON.stringify(dashboardData).replace(/<\/script>/gi, '<\\/script>');
-  const headInject = `  <meta http-equiv="refresh" content="2">\n` +
-    `  <script>window.DASHBOARD_DATA = ${safeJson};</script>\n`;
+  const headInject = `  <script>window.DASHBOARD_DATA = ${safeJson};</script>\n`;
   html = html.replace('</head>', headInject + '</head>');
 
-  // Inject JS fallback reload before </body> (FR-007)
-  html = html.replace('</body>', `<script>setInterval(() => location.reload(), 2000);</script>\n</body>`);
+  // Inject conditional auto-reload: only on Implement tab (FR-007)
+  // Other tabs have animations/gauges that break with unconditional 2s reload
+  const reloadScript = `<script>
+setInterval(() => {
+  const tab = localStorage.getItem('iikit-active-tab');
+  if (!tab || tab === 'implement') location.reload();
+}, 5000);
+</script>\n`;
+  html = html.replace('</body>', reloadScript + '</body>');
 
   return html;
 }
