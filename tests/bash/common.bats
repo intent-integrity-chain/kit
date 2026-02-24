@@ -407,6 +407,108 @@ EOF
     [[ "$result" == "[]" ]]
 }
 
+# =============================================================================
+# check_bdd_dependency tests
+# =============================================================================
+
+@test "check_bdd_dependency: finds pytest-bdd in requirements.txt" {
+    echo "pytest-bdd>=7.0" > "$TEST_DIR/requirements.txt"
+    run check_bdd_dependency "pytest-bdd" "$TEST_DIR"
+    [[ "$status" -eq 0 ]]
+    assert_contains "$output" "requirements.txt"
+}
+
+@test "check_bdd_dependency: finds behave in pyproject.toml" {
+    mkdir -p "$TEST_DIR"
+    cat > "$TEST_DIR/pyproject.toml" << 'EOF'
+[project.optional-dependencies]
+test = ["behave>=1.2"]
+EOF
+    run check_bdd_dependency "behave" "$TEST_DIR"
+    [[ "$status" -eq 0 ]]
+    assert_contains "$output" "pyproject.toml"
+}
+
+@test "check_bdd_dependency: fails when pytest-bdd not in any dep file" {
+    echo "pytest>=7.0" > "$TEST_DIR/requirements.txt"
+    run check_bdd_dependency "pytest-bdd" "$TEST_DIR"
+    [[ "$status" -eq 1 ]]
+}
+
+@test "check_bdd_dependency: finds @cucumber/cucumber in package.json" {
+    cat > "$TEST_DIR/package.json" << 'EOF'
+{"devDependencies":{"@cucumber/cucumber":"^10.0"}}
+EOF
+    run check_bdd_dependency "@cucumber/cucumber" "$TEST_DIR"
+    [[ "$status" -eq 0 ]]
+    assert_contains "$output" "package.json"
+}
+
+@test "check_bdd_dependency: fails when @cucumber/cucumber not in package.json" {
+    cat > "$TEST_DIR/package.json" << 'EOF'
+{"devDependencies":{"jest":"^29.0"}}
+EOF
+    run check_bdd_dependency "@cucumber/cucumber" "$TEST_DIR"
+    [[ "$status" -eq 1 ]]
+}
+
+@test "check_bdd_dependency: finds godog in go.mod" {
+    cat > "$TEST_DIR/go.mod" << 'EOF'
+module example.com/app
+require github.com/cucumber/godog v0.14.0
+EOF
+    run check_bdd_dependency "godog" "$TEST_DIR"
+    [[ "$status" -eq 0 ]]
+    assert_contains "$output" "go.mod"
+}
+
+@test "check_bdd_dependency: finds cucumber in pom.xml" {
+    cat > "$TEST_DIR/pom.xml" << 'EOF'
+<dependency><groupId>io.cucumber</groupId></dependency>
+EOF
+    run check_bdd_dependency "cucumber-jvm-maven" "$TEST_DIR"
+    [[ "$status" -eq 0 ]]
+    assert_contains "$output" "pom.xml"
+}
+
+@test "check_bdd_dependency: finds cucumber in build.gradle" {
+    cat > "$TEST_DIR/build.gradle" << 'EOF'
+testImplementation 'io.cucumber:cucumber-java:7.0'
+EOF
+    run check_bdd_dependency "cucumber-jvm-gradle" "$TEST_DIR"
+    [[ "$status" -eq 0 ]]
+    assert_contains "$output" "build.gradle"
+}
+
+@test "check_bdd_dependency: finds cucumber in Cargo.toml" {
+    cat > "$TEST_DIR/Cargo.toml" << 'EOF'
+[dev-dependencies]
+cucumber = "0.20"
+EOF
+    run check_bdd_dependency "cucumber-rs" "$TEST_DIR"
+    [[ "$status" -eq 0 ]]
+    assert_contains "$output" "Cargo.toml"
+}
+
+@test "check_bdd_dependency: finds reqnroll in .csproj" {
+    mkdir -p "$TEST_DIR/src"
+    cat > "$TEST_DIR/src/MyApp.csproj" << 'EOF'
+<PackageReference Include="Reqnroll" Version="2.0" />
+EOF
+    run check_bdd_dependency "reqnroll" "$TEST_DIR"
+    [[ "$status" -eq 0 ]]
+    assert_contains "$output" ".csproj"
+}
+
+@test "check_bdd_dependency: returns 1 for unknown framework" {
+    run check_bdd_dependency "unknown-framework" "$TEST_DIR"
+    [[ "$status" -eq 1 ]]
+}
+
+# =============================================================================
+# list_features_json tests (continued)
+# =============================================================================
+
 @test "list_features_json: returns features with stages" {
     mkdir -p "$TEST_DIR/specs/001-feature-a"
     echo "# Spec" > "$TEST_DIR/specs/001-feature-a/spec.md"

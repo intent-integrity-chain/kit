@@ -353,6 +353,167 @@ EOF
 # Scripts not found tests
 # =============================================================================
 
+# =============================================================================
+# BDD runner enforcement tests
+# =============================================================================
+
+@test "hook: blocks code commit when .feature files exist but no step_definitions" {
+    # Create feature with .feature files
+    mkdir -p "$TEST_DIR/specs/001-feature/tests/features"
+    cat > "$TEST_DIR/specs/001-feature/tests/features/login.feature" << 'EOF'
+Feature: Login
+  Scenario: Valid login
+    Given a registered user
+    When they enter valid credentials
+    Then they see the dashboard
+EOF
+
+    # Create a plan.md so framework detection works
+    mkdir -p "$TEST_DIR/specs/001-feature"
+    echo "**Language/Version**: Python 3.12 with pytest-bdd" > "$TEST_DIR/specs/001-feature/plan.md"
+
+    # Commit the feature files so they exist in the repo
+    git -C "$TEST_DIR" add -A >/dev/null 2>&1
+    git -C "$TEST_DIR" commit -m "add feature files" >/dev/null 2>&1
+
+    # Now stage a code file — should trigger BDD enforcement
+    echo "def login(): pass" > "$TEST_DIR/app.py"
+    git -C "$TEST_DIR" add app.py
+
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    [ "$status" -eq 1 ]
+    assert_contains "$output" "BDD RUNNER ENFORCEMENT FAILED"
+    assert_contains "$output" "missing step definitions"
+}
+
+@test "hook: blocks code commit when step_definitions exist but dependency missing" {
+    # Create feature with .feature files AND step definitions
+    mkdir -p "$TEST_DIR/specs/001-feature/tests/features"
+    mkdir -p "$TEST_DIR/specs/001-feature/tests/step_definitions"
+    cat > "$TEST_DIR/specs/001-feature/tests/features/login.feature" << 'EOF'
+Feature: Login
+  Scenario: Valid login
+    Given a registered user
+    When they enter valid credentials
+    Then they see the dashboard
+EOF
+    echo "from pytest_bdd import given" > "$TEST_DIR/specs/001-feature/tests/step_definitions/test_login.py"
+
+    # Plan.md detects pytest-bdd
+    echo "**Language/Version**: Python 3.12 with pytest-bdd" > "$TEST_DIR/specs/001-feature/plan.md"
+
+    # NO requirements.txt with pytest-bdd
+
+    # Commit everything so .feature files exist in repo (bypass hook for setup)
+    git -C "$TEST_DIR" add -A >/dev/null 2>&1
+    git -C "$TEST_DIR" commit --no-verify -m "add feature setup" >/dev/null 2>&1
+
+    # Stage a code file
+    echo "def login(): pass" > "$TEST_DIR/app.py"
+    git -C "$TEST_DIR" add app.py
+
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    [ "$status" -eq 1 ]
+    assert_contains "$output" "BDD RUNNER ENFORCEMENT FAILED"
+    assert_contains "$output" "pytest-bdd"
+    assert_contains "$output" "not found"
+}
+
+@test "hook: passes code commit when BDD setup is complete" {
+    # Create full BDD setup: features + step_definitions + dependency
+    mkdir -p "$TEST_DIR/specs/001-feature/tests/features"
+    mkdir -p "$TEST_DIR/specs/001-feature/tests/step_definitions"
+    cat > "$TEST_DIR/specs/001-feature/tests/features/login.feature" << 'EOF'
+Feature: Login
+  Scenario: Valid login
+    Given a registered user
+    When they enter valid credentials
+    Then they see the dashboard
+EOF
+    echo "from pytest_bdd import given" > "$TEST_DIR/specs/001-feature/tests/step_definitions/test_login.py"
+    echo "**Language/Version**: Python 3.12 with pytest-bdd" > "$TEST_DIR/specs/001-feature/plan.md"
+    echo "pytest-bdd>=7.0" > "$TEST_DIR/requirements.txt"
+
+    # Commit everything
+    git -C "$TEST_DIR" add -A >/dev/null 2>&1
+    git -C "$TEST_DIR" commit -m "full bdd setup" >/dev/null 2>&1
+
+    # Stage a code file
+    echo "def login(): pass" > "$TEST_DIR/app.py"
+    git -C "$TEST_DIR" add app.py
+
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    # Should pass (gate 3 may degrade if pytest not installed, but won't block)
+    [ "$status" -eq 0 ]
+}
+
+@test "hook: no BDD enforcement when no .feature files exist" {
+    # No .feature files at all — code commit should pass through fast
+    echo "def hello(): pass" > "$TEST_DIR/app.py"
+    git -C "$TEST_DIR" add app.py
+
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    [ "$status" -eq 0 ]
+}
+
+@test "hook: no BDD enforcement when only .feature files staged (testify phase)" {
+    # Staging .feature files only — BDD enforcement should NOT trigger
+    mkdir -p "$TEST_DIR/specs/001-feature/tests/features"
+    cat > "$TEST_DIR/specs/001-feature/tests/features/login.feature" << 'EOF'
+Feature: Login
+  Scenario: Valid login
+    Given a registered user
+    When they enter valid credentials
+    Then they see the dashboard
+EOF
+
+    git -C "$TEST_DIR" add specs/001-feature/tests/features/login.feature
+
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    # .feature files staged but no code files => BDD enforcement skipped
+    # Assertion integrity check runs but no stored hash => passes (missing = ok)
+    [ "$status" -eq 0 ]
+}
+
+@test "hook: BDD enforcement skips features without .feature files" {
+    # Feature 001 has .feature files, feature 002 does not
+    mkdir -p "$TEST_DIR/specs/001-feature/tests/features"
+    mkdir -p "$TEST_DIR/specs/001-feature/tests/step_definitions"
+    cat > "$TEST_DIR/specs/001-feature/tests/features/login.feature" << 'EOF'
+Feature: Login
+  Scenario: Valid login
+    Given a registered user
+    When they enter valid credentials
+    Then they see the dashboard
+EOF
+    echo "from pytest_bdd import given" > "$TEST_DIR/specs/001-feature/tests/step_definitions/test_login.py"
+    echo "**Language/Version**: Python 3.12 with pytest-bdd" > "$TEST_DIR/specs/001-feature/plan.md"
+    echo "pytest-bdd>=7.0" > "$TEST_DIR/requirements.txt"
+
+    # Feature 002 has no .feature files — should be unaffected
+    mkdir -p "$TEST_DIR/specs/002-other-feature"
+    echo "# Spec" > "$TEST_DIR/specs/002-other-feature/spec.md"
+
+    git -C "$TEST_DIR" add -A >/dev/null 2>&1
+    git -C "$TEST_DIR" commit -m "setup" >/dev/null 2>&1
+
+    echo "def app(): pass" > "$TEST_DIR/app.py"
+    git -C "$TEST_DIR" add app.py
+
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    [ "$status" -eq 0 ]
+}
+
+# =============================================================================
+# Scripts not found tests
+# =============================================================================
+
 @test "hook: exit 0 with warning when scripts directory not found" {
     # Remove all IIKit script directories
     rm -rf "$TEST_DIR/.claude"

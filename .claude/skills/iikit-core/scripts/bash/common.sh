@@ -553,3 +553,100 @@ detect_framework() {
 
     echo ""
 }
+
+# =============================================================================
+# BDD DEPENDENCY CHECK (used by pre-commit-hook.sh)
+# Returns 0 (found) or 1 (not found)
+# Outputs the dep file path on stdout when found
+# =============================================================================
+
+check_bdd_dependency() {
+    local framework="$1"
+    local repo_root="$2"
+
+    case "$framework" in
+        pytest-bdd|behave)
+            # Check Python dependency files for framework name
+            local py_dep_files=(
+                "$repo_root/requirements.txt"
+                "$repo_root/requirements-dev.txt"
+                "$repo_root/requirements-test.txt"
+                "$repo_root/pyproject.toml"
+                "$repo_root/setup.py"
+                "$repo_root/setup.cfg"
+                "$repo_root/Pipfile"
+            )
+            # Also check requirements*.txt via glob
+            for f in "$repo_root"/requirements*.txt; do
+                [[ -f "$f" ]] && py_dep_files+=("$f")
+            done
+            for dep_file in "${py_dep_files[@]}"; do
+                if [[ -f "$dep_file" ]] && grep -qi "$framework" "$dep_file" 2>/dev/null; then
+                    echo "$dep_file"
+                    return 0
+                fi
+            done
+            return 1
+            ;;
+        @cucumber/cucumber)
+            local pkg_json="$repo_root/package.json"
+            if [[ -f "$pkg_json" ]] && grep -q "@cucumber/cucumber" "$pkg_json" 2>/dev/null; then
+                echo "$pkg_json"
+                return 0
+            fi
+            return 1
+            ;;
+        godog)
+            local go_mod="$repo_root/go.mod"
+            if [[ -f "$go_mod" ]] && grep -qi "godog" "$go_mod" 2>/dev/null; then
+                echo "$go_mod"
+                return 0
+            fi
+            return 1
+            ;;
+        cucumber-jvm-maven)
+            local pom="$repo_root/pom.xml"
+            if [[ -f "$pom" ]] && grep -qi "cucumber" "$pom" 2>/dev/null; then
+                echo "$pom"
+                return 0
+            fi
+            return 1
+            ;;
+        cucumber-jvm-gradle)
+            for gf in "$repo_root/build.gradle" "$repo_root/build.gradle.kts"; do
+                if [[ -f "$gf" ]] && grep -qi "cucumber" "$gf" 2>/dev/null; then
+                    echo "$gf"
+                    return 0
+                fi
+            done
+            return 1
+            ;;
+        cucumber-rs)
+            local cargo="$repo_root/Cargo.toml"
+            if [[ -f "$cargo" ]] && grep -qi "cucumber" "$cargo" 2>/dev/null; then
+                echo "$cargo"
+                return 0
+            fi
+            return 1
+            ;;
+        reqnroll)
+            # Search for *.csproj files up to 2 levels deep
+            local found
+            found=$(find "$repo_root" -maxdepth 2 -name "*.csproj" -type f 2>/dev/null | while read -r csproj; do
+                if grep -qi "reqnroll" "$csproj" 2>/dev/null; then
+                    echo "$csproj"
+                    break
+                fi
+            done)
+            if [[ -n "$found" ]]; then
+                echo "$found"
+                return 0
+            fi
+            return 1
+            ;;
+        *)
+            # Unknown framework — can't check
+            return 1
+            ;;
+    esac
+}

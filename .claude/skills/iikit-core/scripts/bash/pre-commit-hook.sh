@@ -39,13 +39,14 @@ if [[ -z "$SCRIPTS_DIR" ]]; then
 fi
 
 # ============================================================================
-# FAST PATH — exit immediately if no .feature files or test-specs.md staged
+# FAST PATH — exit immediately if nothing relevant is staged
 # ============================================================================
 
 STAGED_FEATURE_FILES=$(git diff --cached --name-only 2>/dev/null | grep -E 'tests/features/.*\.feature$') || true
 STAGED_TEST_SPECS=$(git diff --cached --name-only 2>/dev/null | grep 'test-specs\.md$') || true
+STAGED_CODE_FILES=$(git diff --cached --name-only 2>/dev/null | grep -E '\.(py|js|ts|jsx|tsx|go|java|rs|cs|rb|kt)$') || true
 
-if [[ -z "$STAGED_FEATURE_FILES" ]] && [[ -z "$STAGED_TEST_SPECS" ]]; then
+if [[ -z "$STAGED_FEATURE_FILES" ]] && [[ -z "$STAGED_TEST_SPECS" ]] && [[ -z "$STAGED_CODE_FILES" ]]; then
     exit 0
 fi
 
@@ -65,6 +66,90 @@ CONSTITUTION_FILE="$REPO_ROOT/CONSTITUTION.md"
 TDD_DETERMINATION="unknown"
 if [[ -f "$CONSTITUTION_FILE" ]]; then
     TDD_DETERMINATION=$(get_tdd_determination "$CONSTITUTION_FILE")
+fi
+
+# ============================================================================
+# BDD RUNNER ENFORCEMENT — when .feature files exist, require proper BDD setup
+# ============================================================================
+# Triggered when code files are staged and specs/NNN/tests/features/*.feature
+# files exist in the repo. Committing .feature files alone (testify phase) is
+# unaffected — only code/test commits trigger this gate.
+
+if [[ -n "$STAGED_CODE_FILES" ]]; then
+    BDD_BLOCKED=false
+    BDD_BLOCK_MESSAGES=()
+
+    # Discover all feature directories containing .feature files
+    for feat_dir in "$REPO_ROOT"/specs/[0-9][0-9][0-9]-*/; do
+        [[ ! -d "$feat_dir" ]] && continue
+        FEATURES_DIR="$feat_dir/tests/features"
+        [[ ! -d "$FEATURES_DIR" ]] && continue
+
+        # Check that at least one .feature file exists
+        FEATURE_COUNT=$(find "$FEATURES_DIR" -maxdepth 1 -name "*.feature" -type f 2>/dev/null | wc -l | tr -d ' ')
+        [[ "$FEATURE_COUNT" -eq 0 ]] && continue
+
+        FEAT_NAME=$(basename "$feat_dir")
+        PLAN_FILE="$feat_dir/plan.md"
+
+        # ── Gate 1: Step definitions directory must exist with at least one file ──
+        STEP_DEFS_DIR="$feat_dir/tests/step_definitions"
+        if [[ ! -d "$STEP_DEFS_DIR" ]] || [[ -z "$(ls -A "$STEP_DEFS_DIR" 2>/dev/null)" ]]; then
+            BDD_BLOCKED=true
+            BDD_BLOCK_MESSAGES+=("BLOCKED: specs/$FEAT_NAME — missing step definitions")
+            BDD_BLOCK_MESSAGES+=("  Expected: specs/$FEAT_NAME/tests/step_definitions/ with at least one file")
+            BDD_BLOCK_MESSAGES+=("  .feature files exist but no step definitions wire them to code.")
+            BDD_BLOCK_MESSAGES+=("  Run /iikit-08-implement to generate step definitions.")
+            continue
+        fi
+
+        # ── Gate 2: BDD runner dependency present in project dep files ──
+        FRAMEWORK_RESULT=$(detect_framework "$PLAN_FILE" 2>/dev/null)
+        FRAMEWORK=$(echo "$FRAMEWORK_RESULT" | cut -d'|' -f1)
+
+        if [[ -n "$FRAMEWORK" ]]; then
+            if ! DEP_FILE=$(check_bdd_dependency "$FRAMEWORK" "$REPO_ROOT"); then
+                BDD_BLOCKED=true
+                BDD_BLOCK_MESSAGES+=("BLOCKED: specs/$FEAT_NAME — BDD runner dependency '$FRAMEWORK' not found")
+                BDD_BLOCK_MESSAGES+=("  Add '$FRAMEWORK' to your project dependencies.")
+                continue
+            fi
+        fi
+        # If framework undetectable, skip gate 2 (can't enforce what we can't identify)
+
+        # ── Gate 3: verify-steps.sh dry-run passes ──
+        VERIFY_STEPS="$SCRIPTS_DIR/verify-steps.sh"
+        if [[ -x "$VERIFY_STEPS" ]] || [[ -f "$VERIFY_STEPS" ]]; then
+            VERIFY_OUTPUT=$(bash "$VERIFY_STEPS" --json "$FEATURES_DIR" "$PLAN_FILE" 2>/dev/null) || true
+            VERIFY_STATUS=$(echo "$VERIFY_OUTPUT" | grep -o '"status":"[^"]*"' | cut -d'"' -f4 2>/dev/null) || true
+
+            if [[ "$VERIFY_STATUS" == "BLOCKED" ]]; then
+                BDD_BLOCKED=true
+                BDD_BLOCK_MESSAGES+=("BLOCKED: specs/$FEAT_NAME — BDD step verification failed (undefined/pending steps)")
+                BDD_BLOCK_MESSAGES+=("  Run verify-steps.sh to see which steps need definitions.")
+            fi
+            # DEGRADED = tool not on PATH; gate 2 already caught the dep file, so just warn
+            if [[ "$VERIFY_STATUS" == "DEGRADED" ]]; then
+                echo "[iikit] Warning: specs/$FEAT_NAME — BDD dry-run degraded (runner tool not on PATH)" >&2
+            fi
+        fi
+    done
+
+    if [[ "$BDD_BLOCKED" == true ]]; then
+        echo "" >&2
+        echo "+-------------------------------------------------------------+" >&2
+        echo "|  IIKIT PRE-COMMIT: BDD RUNNER ENFORCEMENT FAILED           |" >&2
+        echo "+-------------------------------------------------------------+" >&2
+        echo "" >&2
+        for msg in "${BDD_BLOCK_MESSAGES[@]}"; do
+            echo "[iikit] $msg" >&2
+        done
+        echo "" >&2
+        echo "[iikit] .feature files exist — code commits require proper BDD wiring." >&2
+        echo "[iikit] To bypass (NOT recommended): git commit --no-verify" >&2
+        echo "" >&2
+        exit 1
+    fi
 fi
 
 # ============================================================================
