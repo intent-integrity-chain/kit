@@ -115,7 +115,9 @@ jobs:
           EOF
 
           # Generate dashboard
-          node "$DASHBOARD_DIR/generate-dashboard.js" "$TESTDIR"
+          GEN="$DASHBOARD_DIR/src/generate-dashboard.js"
+          test -f "$GEN" || GEN="$DASHBOARD_DIR/generate-dashboard.js"
+          node "$GEN" "$TESTDIR"
 
           # Verify output
           test -f .specify/dashboard.html

@@ -108,7 +108,9 @@ jobs:
           mkdir -p specs/001-test .specify
           printf '# Spec\n## User Scenarios & Testing\n### User Story 1 - Test (Priority: P1)\n**Given** X, **When** Y, **Then** Z\n## Requirements\n- **FR-001**: Test\n## Success Criteria\n- **SC-001**: Works\n' > specs/001-test/spec.md
           printf '## Technical Context\n**Language/Version**: Python 3.11\n**Primary Dependencies**: pytest-bdd\n' > specs/001-test/plan.md
-          node "$DASHBOARD/generate-dashboard.js" "$TESTDIR"
+          GEN="$DASHBOARD/src/generate-dashboard.js"
+          test -f "$GEN" || GEN="$DASHBOARD/generate-dashboard.js"
+          node "$GEN" "$TESTDIR"
           test -f .specify/dashboard.html
           grep -q "DASHBOARD_DATA" .specify/dashboard.html
           bash "$SCRIPTS/verify-steps.sh" --json "specs/001-test/tests/features" "specs/001-test/plan.md" 2>/dev/null || true
