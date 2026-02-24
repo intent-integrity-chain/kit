@@ -65,6 +65,75 @@ jobs:
       - name: Install tessl CLI
         run: npm install -g @tessl/cli
 
+      - name: E2E - Fresh install and hash integrity
+        run: |
+          TESTDIR=$(mktemp -d)
+          cd "$TESTDIR"
+          git init && git config user.email "test@test.com" && git config user.name "Test"
+          tessl init
+          tessl install tessl-labs/intent-integrity-kit
+          SCRIPTS=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
+          test -f "$SCRIPTS/testify-tdd.sh"
+          test -f "$SCRIPTS/../dashboard/template.js"
+          mkdir -p specs/001-test/tests/features .specify
+          printf 'Feature: Test\n  Scenario: Basic\n    Given a precondition\n    Then a result\n' > specs/001-test/tests/features/test.feature
+          HASH=$(bash "$SCRIPTS/testify-tdd.sh" store-hash "specs/001-test/tests/features")
+          test ${#HASH} -eq 64
+          RESULT=$(bash "$SCRIPTS/testify-tdd.sh" verify-hash "specs/001-test/tests/features")
+          test "$RESULT" = "valid"
+          echo "  Then tampered" >> specs/001-test/tests/features/test.feature
+          RESULT=$(bash "$SCRIPTS/testify-tdd.sh" verify-hash "specs/001-test/tests/features")
+          test "$RESULT" = "invalid"
+          rm -rf "$TESTDIR"
+
+      - name: E2E - Dashboard and verification scripts
+        run: |
+          TESTDIR=$(mktemp -d)
+          cd "$TESTDIR"
+          git init && git config user.email "test@test.com" && git config user.name "Test"
+          tessl init && tessl install tessl-labs/intent-integrity-kit
+          SCRIPTS=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
+          DASHBOARD=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/dashboard"
+          cat > CONSTITUTION.md << 'CONST'
+          # Constitution
+          ## Core Principles
+          ### I. Quality
+          Quality matters.
+          ### II. Testing
+          Tests first.
+          ### III. Simplicity
+          Keep it simple.
+          **Version**: 1.0.0 | **Ratified**: 2026-01-01 | **Last Amended**: 2026-01-01
+          CONST
+          mkdir -p specs/001-test .specify
+          printf '# Spec\n## User Scenarios & Testing\n### User Story 1 - Test (Priority: P1)\n**Given** X, **When** Y, **Then** Z\n## Requirements\n- **FR-001**: Test\n## Success Criteria\n- **SC-001**: Works\n' > specs/001-test/spec.md
+          printf '## Technical Context\n**Language/Version**: Python 3.11\n**Primary Dependencies**: pytest-bdd\n' > specs/001-test/plan.md
+          node "$DASHBOARD/generate-dashboard.js" "$TESTDIR"
+          test -f .specify/dashboard.html
+          grep -q "DASHBOARD_DATA" .specify/dashboard.html
+          bash "$SCRIPTS/verify-steps.sh" --json "specs/001-test/tests/features" "specs/001-test/plan.md" 2>/dev/null || true
+          bash "$SCRIPTS/setup-bdd.sh" --json "specs/001-test/tests/features" "specs/001-test/plan.md" | grep -q "SCAFFOLDED\|NO_FRAMEWORK"
+          rm -rf "$TESTDIR"
+
+      - name: E2E - Pre-commit hook blocks tampering
+        run: |
+          TESTDIR=$(mktemp -d)
+          cd "$TESTDIR"
+          git init && git config user.email "test@test.com" && git config user.name "Test"
+          tessl init && tessl install tessl-labs/intent-integrity-kit
+          SCRIPTS=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
+          cp "$SCRIPTS/pre-commit-hook.sh" .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+          mkdir -p specs/001-test/tests/features
+          printf 'Feature: Test\n  Scenario: Basic\n    Given a precondition\n    Then a result\n' > specs/001-test/tests/features/test.feature
+          bash "$SCRIPTS/testify-tdd.sh" store-hash "specs/001-test/tests/features"
+          git add -A && git commit -m "initial"
+          echo "  Then tampered" >> specs/001-test/tests/features/test.feature
+          git add specs/001-test/tests/features/test.feature
+          if git commit -m "tampered" 2>&1; then
+            echo "FAIL: Hook should have blocked" && exit 1
+          fi
+          rm -rf "$TESTDIR"
+
       - name: Lint tile manifest
         run: tessl tile lint tiles/intent-integrity-kit
 
