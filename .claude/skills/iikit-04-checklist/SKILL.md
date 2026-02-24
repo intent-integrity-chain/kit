@@ -92,6 +92,18 @@ Output: checklist path, item counts (total/checked/deferred), gap resolution sum
 
 ## Next Steps
 
+## Dashboard Refresh
+
+Regenerate the dashboard so the pipeline reflects checklist completion:
+
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
+```
+
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
+
+## Next Steps
+
 Suggest the user run `/clear` before proceeding — the interactive gap resolution consumed significant context. State is preserved in checklist files and `.specify/context.json`.
 
 Check the constitution's TDD policy (run `bash .tessl/.../testify-tdd.sh get-tdd-determination CONSTITUTION.md`):

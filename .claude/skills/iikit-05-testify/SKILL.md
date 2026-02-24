@@ -142,6 +142,16 @@ Output: TDD determination, scenario counts by source (acceptance/contract/valida
 | No acceptance scenarios | ERROR: Run /iikit-02-clarify |
 | .feature syntax error | FIX: Auto-correct and report |
 
+## Dashboard Refresh
+
+Regenerate the dashboard so the pipeline reflects the new testify artifacts:
+
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
+```
+
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
+
 ## Next Steps
 
 You MUST read [model-recommendations.md](../iikit-core/references/model-recommendations.md), check the expiration date (refresh via web search if expired), detect the agent via env vars, and include a model switch tip in the output below if the next phase needs a different model tier.

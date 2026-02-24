@@ -123,6 +123,16 @@ Output: path to tasks.md, total count, count per story, parallel opportunities, 
 
 If tasks.md exists: preserve `[x]` completion status, map old IDs to new by similarity, warn about changes to completed tasks. Ask confirmation before overwriting. Use format from [formatting-guide.md](../iikit-core/references/formatting-guide.md) (Semantic Diff section).
 
+## Dashboard Refresh
+
+Regenerate the dashboard so the pipeline reflects the new tasks:
+
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
+```
+
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
+
 ## Next Steps
 
 You MUST read [model-recommendations.md](../iikit-core/references/model-recommendations.md), check the expiration date (refresh via web search if expired), detect the agent via env vars, and include a model switch tip in the output below if the next phase needs a different model tier.

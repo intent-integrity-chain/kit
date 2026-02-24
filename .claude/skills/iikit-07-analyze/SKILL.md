@@ -158,6 +158,16 @@ Ask: "Suggest concrete remediation edits for the top N issues?" Do NOT apply aut
 - Prioritize constitution violations, use specific examples over exhaustive rules
 - Report zero issues gracefully with coverage statistics
 
+## Dashboard Refresh
+
+Regenerate the dashboard so the pipeline reflects the analysis results:
+
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
+```
+
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
+
 ## Next Steps
 
 You MUST read [model-recommendations.md](../iikit-core/references/model-recommendations.md), check the expiration date (refresh via web search if expired), detect the agent via env vars, and include a model switch tip in the output below if the next phase needs a different model tier.
