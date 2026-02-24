@@ -44,7 +44,7 @@ fi
 
 STAGED_FEATURE_FILES=$(git diff --cached --name-only 2>/dev/null | grep -E 'tests/features/.*\.feature$') || true
 STAGED_TEST_SPECS=$(git diff --cached --name-only 2>/dev/null | grep 'test-specs\.md$') || true
-STAGED_CODE_FILES=$(git diff --cached --name-only 2>/dev/null | grep -E '\.(py|js|ts|jsx|tsx|go|java|rs|cs|rb|kt)$') || true
+STAGED_CODE_FILES=$(git diff --cached --name-only 2>/dev/null | grep -E '\.(py|js|ts|jsx|tsx|go|java|rs|cs|rb|kt)$' | grep -vE '^(\.tessl/|\.claude/|\.codex/|\.gemini/|\.opencode/|node_modules/)') || true
 
 if [[ -z "$STAGED_FEATURE_FILES" ]] && [[ -z "$STAGED_TEST_SPECS" ]] && [[ -z "$STAGED_CODE_FILES" ]]; then
     exit 0
