@@ -72,7 +72,7 @@ FEATURE
     # Source the script to get the function
     source "$VERIFY_STEPS_SCRIPT"
 
-    result=$(detect_framework "$plan_file" "$features_dir")
+    result=$(detect_framework_for_steps "$plan_file" "$features_dir")
     [[ "$result" == "pytest-bdd" ]]
 }
 
@@ -84,7 +84,7 @@ FEATURE
 
     source "$VERIFY_STEPS_SCRIPT"
 
-    result=$(detect_framework "$plan_file" "$features_dir")
+    result=$(detect_framework_for_steps "$plan_file" "$features_dir")
     [[ "$result" == "behave" ]]
 }
 
@@ -96,7 +96,7 @@ FEATURE
 
     source "$VERIFY_STEPS_SCRIPT"
 
-    result=$(detect_framework "$plan_file" "$features_dir")
+    result=$(detect_framework_for_steps "$plan_file" "$features_dir")
     [[ "$result" == "cucumber-js" ]]
 }
 
@@ -108,7 +108,7 @@ FEATURE
 
     source "$VERIFY_STEPS_SCRIPT"
 
-    result=$(detect_framework "$plan_file" "$features_dir")
+    result=$(detect_framework_for_steps "$plan_file" "$features_dir")
     [[ "$result" == "godog" ]]
 }
 
@@ -129,7 +129,7 @@ EOF
 
     source "$VERIFY_STEPS_SCRIPT"
 
-    result=$(detect_framework "$plan_file" "$features_dir")
+    result=$(detect_framework_for_steps "$plan_file" "$features_dir")
     [[ "$result" == "cucumber-jvm-maven" ]]
 }
 
@@ -150,7 +150,7 @@ EOF
 
     source "$VERIFY_STEPS_SCRIPT"
 
-    result=$(detect_framework "$plan_file" "$features_dir")
+    result=$(detect_framework_for_steps "$plan_file" "$features_dir")
     [[ "$result" == "cucumber-jvm-gradle" ]]
 }
 
@@ -162,7 +162,7 @@ EOF
 
     source "$VERIFY_STEPS_SCRIPT"
 
-    result=$(detect_framework "$plan_file" "$features_dir")
+    result=$(detect_framework_for_steps "$plan_file" "$features_dir")
     [[ "$result" == "cucumber-rs" ]]
 }
 
@@ -174,7 +174,7 @@ EOF
 
     source "$VERIFY_STEPS_SCRIPT"
 
-    result=$(detect_framework "$plan_file" "$features_dir")
+    result=$(detect_framework_for_steps "$plan_file" "$features_dir")
     [[ "$result" == "reqnroll" ]]
 }
 
@@ -194,7 +194,7 @@ EOF
 
     source "$VERIFY_STEPS_SCRIPT"
 
-    result=$(detect_framework "$plan_file" "$features_dir")
+    result=$(detect_framework_for_steps "$plan_file" "$features_dir")
     [[ "$result" == "pytest-bdd" ]]
 }
 
@@ -214,7 +214,7 @@ EOF
 
     source "$VERIFY_STEPS_SCRIPT"
 
-    result=$(detect_framework "$plan_file" "$features_dir")
+    result=$(detect_framework_for_steps "$plan_file" "$features_dir")
     [[ "$result" == "cucumber-js" ]]
 }
 
@@ -233,7 +233,7 @@ EOF
 
     source "$VERIFY_STEPS_SCRIPT"
 
-    result=$(detect_framework "$plan_file" "$features_dir")
+    result=$(detect_framework_for_steps "$plan_file" "$features_dir")
     [[ "$result" == "pytest-bdd" ]]
 }
 
@@ -245,7 +245,7 @@ EOF
 
     source "$VERIFY_STEPS_SCRIPT"
 
-    result=$(detect_framework "$plan_file" "$features_dir")
+    result=$(detect_framework_for_steps "$plan_file" "$features_dir")
     [[ -z "$result" ]]
 }
 
