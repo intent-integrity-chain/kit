@@ -3693,12 +3693,14 @@
             const desc = n.text || n.title || n.description || '';
             const truncDesc = desc.length > 22 ? desc.substring(0, 22) + '...' : desc;
 
-            // Cross-link: requirements → spec, tasks → implement, gap nodes → checklist
+            // Cross-link: requirements → spec, tests → spec (trace to requirement), tasks → implement
             let crossAttr = '';
-            if (n.isGap) {
-              crossAttr = ` data-cross-target="checklist" data-cross-id="${escapeHtml(n.id)}"`;
-            } else if (n.col === 'left') {
+            if (n.col === 'left') {
               crossAttr = ` data-cross-target="spec" data-cross-id="${escapeHtml(n.id)}"`;
+            } else if (n.col === 'mid') {
+              // Test specs link to spec view (trace back to the requirement they verify)
+              const traceReq = n.traceability ? n.traceability.split(',')[0]?.trim() : n.id;
+              crossAttr = ` data-cross-target="spec" data-cross-id="${escapeHtml(traceReq)}"`;
             } else if (n.col === 'right') {
               crossAttr = ` data-cross-target="implement" data-cross-id="${escapeHtml(n.id)}"`;
             }
