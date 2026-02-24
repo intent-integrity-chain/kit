@@ -475,3 +475,81 @@ calculate_spec_quality() {
 
     echo "$score"
 }
+
+# =============================================================================
+# BDD FRAMEWORK DETECTION (shared by verify-steps.sh and setup-bdd.sh)
+# Returns: "framework_name|language" or empty string if none detected
+# Callers that need only the framework: $(detect_framework "$plan" | cut -d'|' -f1)
+# =============================================================================
+
+detect_framework() {
+    local plan_file="$1"
+
+    if [[ ! -f "$plan_file" ]]; then
+        echo ""
+        return
+    fi
+
+    local content
+    content=$(cat "$plan_file")
+
+    # Python + pytest-bdd
+    if echo "$content" | grep -qi "pytest-bdd"; then
+        echo "pytest-bdd|python"; return
+    fi
+    # Python + behave
+    if echo "$content" | grep -qi "behave"; then
+        echo "behave|python"; return
+    fi
+    # JavaScript/TypeScript + Cucumber
+    if echo "$content" | grep -qi "@cucumber/cucumber\|cucumber-js\|cucumber\.js"; then
+        echo "@cucumber/cucumber|javascript"; return
+    fi
+    # Go + godog
+    if echo "$content" | grep -qi "godog"; then
+        echo "godog|go"; return
+    fi
+    # Java + Maven + Cucumber-JVM
+    if echo "$content" | grep -qi "cucumber" && echo "$content" | grep -qi "maven\|pom\.xml"; then
+        echo "cucumber-jvm-maven|java"; return
+    fi
+    # Java + Gradle + Cucumber-JVM
+    if echo "$content" | grep -qi "cucumber" && echo "$content" | grep -qi "gradle"; then
+        echo "cucumber-jvm-gradle|java"; return
+    fi
+    # Rust + cucumber-rs
+    if echo "$content" | grep -qi "cucumber-rs\|cucumber.*rust\|rust.*cucumber"; then
+        echo "cucumber-rs|rust"; return
+    fi
+    # C# + Reqnroll
+    if echo "$content" | grep -qi "reqnroll"; then
+        echo "reqnroll|csharp"; return
+    fi
+
+    # Fallback: detect language and infer default BDD framework
+    if echo "$content" | grep -qi "python\|pytest"; then
+        echo "pytest-bdd|python"; return
+    fi
+    if echo "$content" | grep -qi "javascript\|typescript\|node\.js\|jest\|vitest"; then
+        echo "@cucumber/cucumber|javascript"; return
+    fi
+    if echo "$content" | grep -qi "golang\|go test\|go 1\."; then
+        echo "godog|go"; return
+    fi
+    if echo "$content" | grep -qiE "java[^s].*(jdk|jre|spring|maven|gradle)"; then
+        if echo "$content" | grep -qi "gradle"; then
+            echo "cucumber-jvm-gradle|java"
+        else
+            echo "cucumber-jvm-maven|java"
+        fi
+        return
+    fi
+    if echo "$content" | grep -qi "rust\|cargo"; then
+        echo "cucumber-rs|rust"; return
+    fi
+    if echo "$content" | grep -qi "c#\|csharp\|\.net\|dotnet"; then
+        echo "reqnroll|csharp"; return
+    fi
+
+    echo ""
+}

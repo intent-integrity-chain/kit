@@ -11,63 +11,21 @@ source "$SCRIPT_DIR/common.sh"
 # FRAMEWORK DETECTION
 # =============================================================================
 
-# Detect BDD framework from plan.md Technical Context section
-# Returns: framework name (e.g., "pytest-bdd", "behave", "cucumber-js", etc.)
-# Falls back to file extension heuristics if plan.md is ambiguous
-detect_framework() {
+# Detect BDD framework — uses shared detect_framework from common.sh
+# Returns: framework name only (strips language from "framework|language" pair)
+# Falls back to file extension heuristics if plan.md detection fails
+detect_framework_for_steps() {
     local plan_file="$1"
     local features_dir="$2"
-    local framework=""
 
-    # Parse plan.md Technical Context for language/framework keywords
-    if [[ -f "$plan_file" ]]; then
-        local plan_content
-        plan_content=$(cat "$plan_file")
-
-        # Python + pytest-bdd
-        if echo "$plan_content" | grep -qi "pytest-bdd\|pytest.bdd"; then
-            framework="pytest-bdd"
-        # Python + behave
-        elif echo "$plan_content" | grep -qi "behave"; then
-            framework="behave"
-        # JavaScript/TypeScript + Cucumber
-        elif echo "$plan_content" | grep -qi "@cucumber/cucumber\|cucumber-js\|cucumberjs"; then
-            framework="cucumber-js"
-        # Go + godog
-        elif echo "$plan_content" | grep -qi "godog"; then
-            framework="godog"
-        # Java + Maven + Cucumber
-        elif echo "$plan_content" | grep -qi "cucumber" && echo "$plan_content" | grep -qi "maven\|mvn"; then
-            framework="cucumber-jvm-maven"
-        # Java + Gradle + Cucumber
-        elif echo "$plan_content" | grep -qi "cucumber" && echo "$plan_content" | grep -qi "gradle"; then
-            framework="cucumber-jvm-gradle"
-        # Rust + cucumber-rs
-        elif echo "$plan_content" | grep -qi "cucumber-rs\|cucumber.*rust"; then
-            framework="cucumber-rs"
-        # C# + Reqnroll
-        elif echo "$plan_content" | grep -qi "reqnroll"; then
-            framework="reqnroll"
-        # Fallback: detect language from plan.md and infer default BDD framework
-        elif echo "$plan_content" | grep -qi "python\|pytest"; then
-            framework="pytest-bdd"
-        elif echo "$plan_content" | grep -qi "typescript\|javascript\|node\|npm\|npx"; then
-            framework="cucumber-js"
-        elif echo "$plan_content" | grep -qi "\bgo\b\|golang"; then
-            framework="godog"
-        elif echo "$plan_content" | grep -qi "\brust\b\|cargo"; then
-            framework="cucumber-rs"
-        elif echo "$plan_content" | grep -qi "c#\|csharp\|dotnet\|\.net"; then
-            framework="reqnroll"
-        elif echo "$plan_content" | grep -qi "java\b"; then
-            # Default to Maven for Java if build tool not specified
-            framework="cucumber-jvm-maven"
-        fi
-    fi
+    # Use shared detection from common.sh (returns "framework|language")
+    local result
+    result=$(detect_framework "$plan_file")
+    local framework
+    framework=$(echo "$result" | cut -d'|' -f1)
 
     # Fall back to file extension heuristics if plan.md didn't resolve
     if [[ -z "$framework" ]] && [[ -d "$features_dir" ]]; then
-        # Look for step definition files by extension in common locations
         local parent_dir
         parent_dir=$(dirname "$features_dir")
 
@@ -342,7 +300,7 @@ if [[ "$feature_count" -eq 0 ]]; then
 fi
 
 # Detect framework
-framework=$(detect_framework "$PLAN_FILE" "$FEATURES_DIR")
+framework=$(detect_framework_for_steps "$PLAN_FILE" "$FEATURES_DIR")
 
 if [[ -z "$framework" ]]; then
     output_degraded "$JSON_MODE"
