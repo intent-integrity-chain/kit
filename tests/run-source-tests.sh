@@ -100,14 +100,14 @@ test_skill_completeness() {
     local expected=(
         "iikit-00-constitution"
         "iikit-01-specify"
-        "iikit-02-clarify"
-        "iikit-03-plan"
-        "iikit-04-checklist"
-        "iikit-05-testify"
-        "iikit-06-tasks"
-        "iikit-07-analyze"
-        "iikit-08-implement"
-        "iikit-09-taskstoissues"
+        "iikit-clarify"
+        "iikit-02-plan"
+        "iikit-03-checklist"
+        "iikit-04-testify"
+        "iikit-05-tasks"
+        "iikit-06-analyze"
+        "iikit-07-implement"
+        "iikit-08-taskstoissues"
         "iikit-core"
     )
 
@@ -244,9 +244,9 @@ test_templates_exist() {
 
 test_parallel_execution() {
     log_section "Parallel Execution Feature"
-    local impl="$SKILLS_DIR/iikit-08-implement/SKILL.md"
-    local ref="$SKILLS_DIR/iikit-08-implement/references/parallel-execution.md"
-    local tasks="$SKILLS_DIR/iikit-06-tasks/SKILL.md"
+    local impl="$SKILLS_DIR/iikit-07-implement/SKILL.md"
+    local ref="$SKILLS_DIR/iikit-07-implement/references/parallel-execution.md"
+    local tasks="$SKILLS_DIR/iikit-05-tasks/SKILL.md"
 
     # parallel-execution.md reference doc exists
     ((TESTS_RUN++))
@@ -491,8 +491,8 @@ test_premise_support() {
 
 test_task_commits() {
     log_section "Task Commits (§5.6)"
-    local impl="$SKILLS_DIR/iikit-08-implement/SKILL.md"
-    local ref="$SKILLS_DIR/iikit-08-implement/references/parallel-execution.md"
+    local impl="$SKILLS_DIR/iikit-07-implement/SKILL.md"
+    local ref="$SKILLS_DIR/iikit-07-implement/references/parallel-execution.md"
 
     # Section 5.6 exists in implement skill
     ((TESTS_RUN++))
@@ -542,7 +542,7 @@ test_github_fallback() {
 
     # implement skill: uses Fixes #N for closing
     ((TESTS_RUN++))
-    if grep -q 'Fixes #' "$SKILLS_DIR/iikit-08-implement/SKILL.md"; then
+    if grep -q 'Fixes #' "$SKILLS_DIR/iikit-07-implement/SKILL.md"; then
         log_pass "implement: closes issues via Fixes #N in commit"
     else
         log_fail "implement: missing Fixes #N commit pattern"
@@ -550,7 +550,7 @@ test_github_fallback() {
 
     # implement skill: curl fallback for comments
     ((TESTS_RUN++))
-    if grep -q 'curl.*GitHub API\|curl.*github' "$SKILLS_DIR/iikit-08-implement/SKILL.md"; then
+    if grep -q 'curl.*GitHub API\|curl.*github' "$SKILLS_DIR/iikit-07-implement/SKILL.md"; then
         log_pass "implement: curl fallback for GitHub comments"
     else
         log_fail "implement: no curl fallback for GitHub comments"
@@ -566,7 +566,7 @@ test_github_fallback() {
 
     # taskstoissues: curl fallback
     ((TESTS_RUN++))
-    if grep -q 'curl.*GitHub API\|curl.*github' "$SKILLS_DIR/iikit-09-taskstoissues/SKILL.md"; then
+    if grep -q 'curl.*GitHub API\|curl.*github' "$SKILLS_DIR/iikit-08-taskstoissues/SKILL.md"; then
         log_pass "taskstoissues: curl fallback for issue creation"
     else
         log_fail "taskstoissues: no curl fallback for issue creation"
@@ -589,7 +589,7 @@ test_github_fallback() {
 
 test_clarify_no_limit() {
     log_section "Clarify: No Artificial Question Limit"
-    local clarify="$SKILLS_DIR/iikit-02-clarify/SKILL.md"
+    local clarify="$SKILLS_DIR/iikit-clarify/SKILL.md"
 
     # No "max 5" or "5 questions" in clarify skill
     ((TESTS_RUN++))

@@ -1,5 +1,13 @@
 # Changelog
 
+## v2.5.0
+
+- **Generic clarify utility**: `/iikit-clarify` extracted from the numbered sequence into a standalone utility. Can run after any phase on any artifact (spec, plan, checklist, testify, tasks, or constitution). Auto-detects the most recent artifact in reverse phase order; user can override with an argument (e.g., `/iikit-clarify plan`). Per-artifact ambiguity taxonomies: spec (functional scope, domain, UX, non-functional, edge cases, terminology), plan (framework choice, architecture, trade-offs, scalability, dependency risks), checklist (threshold appropriateness, missing checks, false positives), testify (scenario precision, missing paths, Given/When/Then completeness), tasks (dependency correctness, ordering, scope, parallelization), constitution (principle clarity, threshold specificity, conflict resolution, enforcement gaps).
+- **Full skill renumbering**: All downstream skills renumbered after extracting clarify. New sequence: `iikit-02-plan`, `iikit-03-checklist`, `iikit-04-testify`, `iikit-05-tasks`, `iikit-06-analyze`, `iikit-07-implement`, `iikit-08-taskstoissues`. Utilities: `iikit-core`, `iikit-clarify`, `iikit-bugfix`.
+- **Dashboard clarification badges**: Pipeline nodes display `?N` amber badges when clarification sessions exist for that artifact's `## Clarifications` section. Clarify removed from pipeline as a phase node. New `countClarificationSessions()` parser function counts `### Session YYYY-MM-DD` headings per artifact.
+- **Relaxed clarify prerequisites**: `check-prerequisites.sh --phase clarify` no longer requires a feature directory or spec — can clarify a constitution alone. Phase config: soft constitution, no spec/plan/tasks requirements.
+- **Checklist excludes requirements.md**: `parseChecklists()` and `parseChecklistsDetailed()` now filter out `requirements.md` (spec quality checklist from `/iikit-01-specify`) to prevent falsely marking the checklist phase as complete before `/iikit-03-checklist` is actually run.
+
 ## v2.4.0
 
 - **BDD in bugfix workflow**: When the constitution mandates TDD/BDD, `/iikit-bugfix` creates `bugfix_BUG-NNN.feature` files with Gherkin scenarios and re-hashes the features directory. `/iikit-08-implement` bugfix mode applies the full BDD verification chain when `.feature` files are present.

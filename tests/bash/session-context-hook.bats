@@ -52,7 +52,7 @@ teardown() {
     [[ "$status" -eq 0 ]]
     assert_contains "$output" "001-test-feature"
     assert_contains "$output" "specified"
-    assert_contains "$output" "/iikit-03-plan"
+    assert_contains "$output" "/iikit-02-plan"
 }
 
 @test "session-hook: shows planned stage with next steps" {
@@ -65,7 +65,7 @@ teardown() {
     run "$HOOK_SCRIPT"
     [[ "$status" -eq 0 ]]
     assert_contains "$output" "planned"
-    assert_contains "$output" "/iikit-06-tasks"
+    assert_contains "$output" "/iikit-05-tasks"
 }
 
 @test "session-hook: shows tasks-ready stage with next steps" {
@@ -77,7 +77,7 @@ teardown() {
     run "$HOOK_SCRIPT"
     [[ "$status" -eq 0 ]]
     assert_contains "$output" "tasks-ready"
-    assert_contains "$output" "/iikit-08-implement"
+    assert_contains "$output" "/iikit-07-implement"
 }
 
 @test "session-hook: shows implementing stage with resume" {
@@ -101,7 +101,7 @@ teardown() {
     run "$HOOK_SCRIPT"
     [[ "$status" -eq 0 ]]
     assert_contains "$output" "complete"
-    assert_contains "$output" "/iikit-09-taskstoissues"
+    assert_contains "$output" "/iikit-08-taskstoissues"
 }
 
 # =============================================================================

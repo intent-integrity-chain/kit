@@ -179,14 +179,14 @@ if ($stagedFeatureFiles) {
             "invalid" {
                 $blocked = $true
                 $blockMessages += "BLOCKED: $featDir/tests/features/ - .feature assertion integrity check failed"
-                $blockMessages += "  .feature file assertions have been modified since /iikit-05-testify generated them."
-                $blockMessages += "  Re-run /iikit-05-testify to regenerate .feature files."
+                $blockMessages += "  .feature file assertions have been modified since /iikit-04-testify generated them."
+                $blockMessages += "  Re-run /iikit-04-testify to regenerate .feature files."
             }
             "missing" {
                 if ($tddDetermination -eq "mandatory") {
                     Write-Warning "[iikit] $featDir/tests/features/ - no stored assertion hash found (TDD is mandatory)"
                     Write-Warning "[iikit]   If this is the initial testify commit, this is expected."
-                    Write-Warning "[iikit]   Otherwise, run /iikit-05-testify to generate integrity hashes."
+                    Write-Warning "[iikit]   Otherwise, run /iikit-04-testify to generate integrity hashes."
                 }
             }
         }
@@ -340,14 +340,14 @@ foreach ($stagedPath in $stagedTestSpecs) {
         "invalid" {
             $blocked = $true
             $blockMessages += "BLOCKED: $stagedPath - assertion integrity check failed"
-            $blockMessages += "  Assertions have been modified since /iikit-05-testify generated them."
-            $blockMessages += "  Re-run /iikit-05-testify to regenerate test specifications."
+            $blockMessages += "  Assertions have been modified since /iikit-04-testify generated them."
+            $blockMessages += "  Re-run /iikit-04-testify to regenerate test specifications."
         }
         "missing" {
             if ($tddDetermination -eq "mandatory") {
                 Write-Warning "[iikit] $stagedPath - no stored assertion hash found (TDD is mandatory)"
                 Write-Warning "[iikit]   If this is the initial testify commit, this is expected."
-                Write-Warning "[iikit]   Otherwise, run /iikit-05-testify to generate integrity hashes."
+                Write-Warning "[iikit]   Otherwise, run /iikit-04-testify to generate integrity hashes."
             }
             # Allow in both cases
         }
@@ -368,7 +368,7 @@ if ($blocked) {
         Write-Host "[iikit] $msg" -ForegroundColor Red
     }
     Write-Host ""
-    Write-Host "[iikit] To fix: Re-run /iikit-05-testify to regenerate test specs with valid hashes." -ForegroundColor Yellow
+    Write-Host "[iikit] To fix: Re-run /iikit-04-testify to regenerate test specs with valid hashes." -ForegroundColor Yellow
     Write-Host "[iikit] To bypass (NOT recommended): git commit --no-verify" -ForegroundColor Yellow
     Write-Host ""
     exit 1

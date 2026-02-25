@@ -166,14 +166,14 @@ test.describe('Feature Switching', () => {
     await waitForDashboard(page);
 
     const initialNodes = await page.locator('.pipeline-node').count();
-    expect(initialNodes).toBe(9);
+    expect(initialNodes).toBe(8);
 
     // Switch to second feature
     await selectFeatureByIndex(page, 1);
     await page.waitForTimeout(500);
 
     const newNodes = await page.locator('.pipeline-node').count();
-    expect(newNodes).toBe(9);
+    expect(newNodes).toBe(8);
   });
 
   test('feature selector shows all features', async ({ page }) => {
@@ -509,6 +509,39 @@ test.describe('Cross-Panel Navigation', () => {
 
     // Should navigate to spec view
     await expect(page.locator('.pipeline-node.active', { hasText: 'Spec' })).toBeVisible();
+  });
+
+  test('clarify view shows clarification entries from spec', async ({ page }) => {
+    await waitForDashboard(page);
+    await selectFeatureByIndex(page, 1); // 001-auth (has clarifications)
+
+    // Navigate to clarify view programmatically
+    await page.evaluate(() => window._switchTab('clarify'));
+    await page.waitForSelector('.clarify-view, .clarify-empty', { timeout: 5000 });
+
+    // The fixture spec.md has a ## Clarifications section with Session 2026-02-10
+    // and 2 Q&A entries. Verify the clarify view renders them.
+    const entries = page.locator('.clarify-entry');
+    const entryCount = await entries.count();
+    expect(entryCount, 'Expected clarification entries from fixture spec.md').toBeGreaterThan(0);
+
+    // Verify Q&A content rendered
+    const questions = page.locator('.clarify-question');
+    expect(await questions.count()).toBeGreaterThan(0);
+    const answers = page.locator('.clarify-answer');
+    expect(await answers.count()).toBeGreaterThan(0);
+  });
+
+  test('programmatic switchTab to clarify renders clarify-specific view', async ({ page }) => {
+    await waitForDashboard(page);
+    await selectFeatureByIndex(page, 1);
+    await page.waitForTimeout(500);
+
+    // Navigate to clarify via JS (no pipeline node exists)
+    await page.evaluate(() => window._switchTab('clarify'));
+
+    // Verify clarify-specific content rendered (not leftover from previous view)
+    await expect(page.locator('.clarify-view, .clarify-empty')).toBeVisible({ timeout: 5000 });
   });
 });
 

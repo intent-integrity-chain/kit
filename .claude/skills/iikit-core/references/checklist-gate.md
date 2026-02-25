@@ -9,10 +9,10 @@ Used by: testify, tasks, analyze, implement
    - If any unchecked items remain:
      ```
      WARNING: Checklists incomplete (X/Y items checked, Z%).
-     Recommend running /iikit-04-checklist to resolve.
+     Recommend running /iikit-03-checklist to resolve.
      Continue anyway? [y/N]
      ```
-   - If user declines: stop and suggest `/iikit-04-checklist`
+   - If user declines: stop and suggest `/iikit-03-checklist`
 2. If no checklists directory exists: proceed silently (checklists are optional)
 
 ## Gate Strength

@@ -536,7 +536,7 @@ EOF
     # Should pass (warning only, not blocking) but emit TDD warning
     [ "$status" -eq 0 ]
     assert_contains "$output" "TDD is mandatory"
-    assert_contains "$output" "/iikit-05-testify"
+    assert_contains "$output" "/iikit-04-testify"
 }
 
 @test "hook: no TDD warning when .feature files exist" {

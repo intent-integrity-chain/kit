@@ -52,9 +52,9 @@ IIKit_Template_v0_0_90/
 │   ├── agents/                    # Agent files (9 total)
 │   │   ├── iikit-00-constitution.agent.md
 │   │   ├── iikit-01-specify.agent.md
-│   │   ├── iikit-02-clarify.agent.md
-│   │   ├── iikit-03-plan.agent.md
-│   │   ├── iikit-04-checklist.agent.md
+│   │   ├── iikit-clarify.agent.md
+│   │   ├── iikit-02-plan.agent.md
+│   │   ├── iikit-03-checklist.agent.md
 │   │   ├── iikit-05-tasks.agent.md
 │   │   ├── iikit-06-analyze.agent.md
 │   │   ├── iikit-07-implement.agent.md
@@ -92,9 +92,9 @@ Implements Constitution → Specify → Clarify → Plan → Tasks → Analyze �
 |-------|------|---------|------------|
 | iikit-00-constitution | 5.2KB | Create project governance principles | `CONSTITUTION.md` |
 | iikit-01-specify | 12.8KB | Feature specs from natural language | `spec.md`, branches, validation checklist |
-| iikit-02-clarify | 11.3KB | Structured questioning (max 5: 3 initial + 2 follow-up) | Clarification answers in spec |
-| iikit-03-plan | 3.1KB | Technical architecture decisions | `plan.md`, `research.md`, `data-model.md`, `contracts/` |
-| iikit-04-checklist | 16.8KB | "Unit Tests for English"—validates REQUIREMENTS quality, not implementation | `checklists/*.md` |
+| iikit-clarify | 11.3KB | Structured questioning (max 5: 3 initial + 2 follow-up) | Clarification answers in spec |
+| iikit-02-plan | 3.1KB | Technical architecture decisions | `plan.md`, `research.md`, `data-model.md`, `contracts/` |
+| iikit-03-checklist | 16.8KB | "Unit Tests for English"—validates REQUIREMENTS quality, not implementation | `checklists/*.md` |
 | iikit-05-tasks | 6.3KB | Executable work unit breakdown | `tasks.md` with phases |
 | iikit-06-analyze | 7.2KB | Cross-artifact consistency validation | Validation report |
 | iikit-07-implement | 7.5KB | TDD workflow + ignore file generation | Code + tests + .gitignore/.dockerignore |
@@ -110,10 +110,10 @@ Implements Constitution → Specify → Clarify → Plan → Tasks → Analyze �
 description: Create or update the feature specification...
 handoffs: 
   - label: Build Technical Plan
-    agent: iikit-03-plan
+    agent: iikit-02-plan
     prompt: Create a plan for the spec. I am building with...
   - label: Clarify Spec Requirements
-    agent: iikit-02-clarify
+    agent: iikit-clarify
     prompt: Clarify specification requirements
     send: true
 ---
@@ -400,7 +400,7 @@ cat .specify/context.json | jq -r '.artifacts.spec // empty'
 **Recommendation:** Check context.json first for speed; fall back to script if context.json missing or stale.
 
 ```yaml
-# .claude/skills/iikit-03-plan/SKILL.md
+# .claude/skills/iikit-02-plan/SKILL.md
 ---
 name: iikit-plan
 description: Create technical architecture from specification
@@ -448,7 +448,7 @@ Never skip phases. Each /iikit-* command validates its prerequisites.
 Read CONSTITUTION.md for this project's governing principles.
 
 <!-- IIKIT-TECH-START -->
-<!-- Tech stack will be inserted here by /iikit-03-plan -->
+<!-- Tech stack will be inserted here by /iikit-02-plan -->
 <!-- IIKIT-TECH-END -->
 ```
 
@@ -584,10 +584,10 @@ This project uses:
 - Preserves manual additions outside markers
 - Adds new technologies from current plan without duplicating
 
-**Called by:** `/iikit-03-plan` after Phase 1 (Design & Contracts)
+**Called by:** `/iikit-02-plan` after Phase 1 (Design & Contracts)
 
 ```bash
-# From iikit-03-plan.agent.md
+# From iikit-02-plan.agent.md
 .specify/scripts/bash/update-agent-context.sh copilot
 ```
 
@@ -662,7 +662,7 @@ Every skill must handle these error conditions gracefully:
 | context.json corrupted | JSON parse fails | Backup corrupted file, recreate from filesystem scan |
 | Feature directory missing | `specs/NNN-*` not found | STOP with "Run /iikit-01-specify first" |
 | User declines checklist bypass | Response is "no" or empty | STOP gracefully: "Implementation paused. Complete checklists and re-run /iikit-07-implement" |
-| Spec has `[NEEDS CLARIFICATION]` | Grep finds markers | Warn user, suggest `/iikit-02-clarify` before proceeding |
+| Spec has `[NEEDS CLARIFICATION]` | Grep finds markers | Warn user, suggest `/iikit-clarify` before proceeding |
 
 **Recovery script:** Skills can call `check-prerequisites.sh --repair` to attempt automatic recovery:
 - Rebuilds context.json from filesystem
@@ -679,9 +679,9 @@ Every skill must handle these error conditions gracefully:
 |-------------------|------------------------|
 | `.github/agents/iikit-00-constitution.agent.md` | `.claude/skills/iikit-00-constitution/SKILL.md` |
 | `.github/agents/iikit-01-specify.agent.md` | `.claude/skills/iikit-01-specify/SKILL.md` |
-| `.github/agents/iikit-02-clarify.agent.md` | `.claude/skills/iikit-02-clarify/SKILL.md` |
-| `.github/agents/iikit-03-plan.agent.md` | `.claude/skills/iikit-03-plan/SKILL.md` |
-| `.github/agents/iikit-04-checklist.agent.md` | `.claude/skills/iikit-04-checklist/SKILL.md` |
+| `.github/agents/iikit-clarify.agent.md` | `.claude/skills/iikit-clarify/SKILL.md` |
+| `.github/agents/iikit-02-plan.agent.md` | `.claude/skills/iikit-02-plan/SKILL.md` |
+| `.github/agents/iikit-03-checklist.agent.md` | `.claude/skills/iikit-03-checklist/SKILL.md` |
 | `.github/agents/iikit-05-tasks.agent.md` | `.claude/skills/iikit-05-tasks/SKILL.md` |
 | `.github/agents/iikit-06-analyze.agent.md` | `.claude/skills/iikit-06-analyze/SKILL.md` |
 | `.github/agents/iikit-07-implement.agent.md` | `.claude/skills/iikit-07-implement/SKILL.md` |
@@ -723,7 +723,7 @@ Every skill must handle these error conditions gracefully:
 
 **Acceptance criteria:**
 - [ ] `/iikit-01-specify` creates feature branch, spec.md, and context.json
-- [ ] `/iikit-02-clarify` respects 5-question limit across sessions
+- [ ] `/iikit-clarify` respects 5-question limit across sessions
 - [ ] Both skills load and validate constitution
 
 ### Phase 3: Planning & Tasks (Week 4)
@@ -737,8 +737,8 @@ Every skill must handle these error conditions gracefully:
 3. **iikit-tasks** (6.3KB) — User story phases, task ID format (`T001 [P] [US1]`), parallel markers
 
 **Acceptance criteria:**
-- [ ] `/iikit-03-plan` updates CLAUDE.md/AGENTS.md/GEMINI.md via update-agent-context.sh
-- [ ] `/iikit-04-checklist` creates domain-specific checklists, updates context.json
+- [ ] `/iikit-02-plan` updates CLAUDE.md/AGENTS.md/GEMINI.md via update-agent-context.sh
+- [ ] `/iikit-03-checklist` creates domain-specific checklists, updates context.json
 - [ ] `/iikit-05-tasks` generates correctly formatted task IDs
 
 ### Phase 4: Analysis & Implementation (Week 5)
@@ -779,8 +779,8 @@ Every skill must handle these error conditions gracefully:
 ## Next Steps
 
 After completing the specification, you can:
-- Run `/iikit-02-clarify` if any `[NEEDS CLARIFICATION]` markers exist
-- Run `/iikit-03-plan` to create the technical implementation plan
+- Run `/iikit-clarify` if any `[NEEDS CLARIFICATION]` markers exist
+- Run `/iikit-02-plan` to create the technical implementation plan
 
 These skills will validate that this spec exists before proceeding.
 ```
@@ -1008,7 +1008,7 @@ You can reply with the option letter (e.g., "A"), accept the recommendation by s
 **Question limits:**
 - Initial questions: Up to 3 (skip if already clear from $ARGUMENTS)
 - Follow-up questions: Up to 2 more (only if ≥2 scenario classes remain unclear)
-- Total cap: 5 questions per `/iikit-02-clarify` session
+- Total cap: 5 questions per `/iikit-clarify` session
 
 ### Implement Checklist Gating
 

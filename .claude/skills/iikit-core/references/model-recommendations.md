@@ -19,21 +19,21 @@ Phases are grouped by reasoning demand:
 
 **Light (fast/cheap model preferred):**
 - `/iikit-core` (init, status, help)
-- `/iikit-04-checklist` (scoring against spec)
-- `/iikit-09-taskstoissues` (mechanical issue creation)
+- `/iikit-03-checklist` (scoring against spec)
+- `/iikit-08-taskstoissues` (mechanical issue creation)
 
 **Medium (balanced model):**
 - `/iikit-01-specify` (structured extraction from description)
-- `/iikit-02-clarify` (targeted questions)
-- `/iikit-05-testify` (test spec generation)
-- `/iikit-06-tasks` (task breakdown)
+- `/iikit-clarify` (targeted questions, runs at any phase)
+- `/iikit-04-testify` (test spec generation)
+- `/iikit-05-tasks` (task breakdown)
 - `/iikit-bugfix` (bug analysis + task generation)
 
 **Heavy (strongest model preferred):**
 - `/iikit-00-constitution` (governance design, premise authoring)
-- `/iikit-03-plan` (architecture, tech selection, data model)
-- `/iikit-07-analyze` (cross-artifact consistency)
-- `/iikit-08-implement` (code generation, parallel orchestration)
+- `/iikit-02-plan` (architecture, tech selection, data model)
+- `/iikit-06-analyze` (cross-artifact consistency)
+- `/iikit-07-implement` (code generation, parallel orchestration)
 
 ## Agent-Specific Recommendations
 
@@ -70,8 +70,10 @@ Show generic suggestion: "Consider using a stronger/faster model for this phase.
 When suggesting the next step, append a model hint:
 
 ```
-Next: /iikit-03-plan
+Next: /iikit-02-plan
 Tip: This phase benefits from deep reasoning. Switch to [model]: [command]
 ```
+
+Note: `/iikit-clarify` is a utility that can be run at any point after any phase. It is not a numbered step in the sequence.
 
 Only suggest if the current model tier doesn't match the recommended tier for the next phase. If already on the right tier or higher, skip the suggestion.

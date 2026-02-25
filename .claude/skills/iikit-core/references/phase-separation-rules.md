@@ -4,7 +4,7 @@ Content belongs in specific artifacts. Violations indicate content placed in the
 
 ## Constitution (MUST NOT contain)
 
-Technology-specific content — these belong in `/iikit-03-plan`:
+Technology-specific content — these belong in `/iikit-02-plan`:
 - Programming languages, frameworks, databases, infrastructure
 - Specific libraries, packages, or version numbers
 - File extensions tied to languages, API specifications
@@ -15,7 +15,7 @@ Technology-specific content — these belong in `/iikit-03-plan`:
 
 ## Specification (MUST NOT contain)
 
-Implementation details — these belong in `/iikit-03-plan`:
+Implementation details — these belong in `/iikit-02-plan`:
 - Framework/library references, API implementation details
 - Database schemas, architecture patterns, code organization
 - File structures or deployment specifics

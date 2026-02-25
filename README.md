@@ -4,12 +4,11 @@
 
 An AI coding assistant toolkit that preserves your intent from idea to implementation, with cryptographic verification at each step. Compatible with Claude Code, OpenAI Codex, Google Gemini, and OpenCode.
 
-## What's New in v2.4.0
+## What's New in v2.5.0
 
-- **BDD in bugfix workflow**: Bug fixes create `.feature` files and go through the full BDD verification chain when the constitution mandates TDD/BDD.
-- **Five always-on rules**: assertion integrity, phase discipline, constitution, dashboard refresh, phase separation — loaded into agent context on every request.
-- **Cached TDD determination**: Computed once on constitution ratification, stored in `.specify/context.json`, read everywhere. No more 4 different implementations re-parsing the constitution.
-- **Pre-commit BDD runner enforcement** (v2.2.0): When `.feature` files exist, code commits are mechanically gated — three gates: step definitions exist, runner dependency in project dep files, `verify-steps.sh` dry-run passes. Covers all 8 supported frameworks.
+- **Generic clarify utility**: `/iikit-clarify` is now a standalone utility that can run after any phase on any artifact — spec, plan, checklist, testify, tasks, or constitution. Auto-detects the most recent artifact; override with an argument (e.g., `/iikit-clarify plan`). Per-artifact ambiguity taxonomies guide targeted questions.
+- **Full skill renumbering**: Clarify extracted from the numbered sequence. New numbering: 02-plan, 03-checklist, 04-testify, 05-tasks, 06-analyze, 07-implement, 08-taskstoissues.
+- **Dashboard clarification badges**: Pipeline nodes show `?N` amber badges when clarification sessions exist for that artifact. Clarify is no longer a pipeline phase — it's a utility visible through per-artifact badges.
 
 ### v2.0.0 (breaking)
 
@@ -66,16 +65,16 @@ claude          # or: codex, gemini, opencode
 /iikit-01-specify Build a CLI task manager with add, list, complete commands
 
 # 5. Plan the implementation
-/iikit-03-plan
+/iikit-02-plan
 
 # 6. Generate tests from requirements
-/iikit-05-testify
+/iikit-04-testify
 
 # 7. Break into tasks
-/iikit-06-tasks
+/iikit-05-tasks
 
 # 8. Implement (with integrity verification)
-/iikit-08-implement
+/iikit-07-implement
 ```
 
 ## The Workflow
@@ -84,18 +83,19 @@ Each phase builds on the previous. Never skip phases.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│  /iikit-core              →  Initialize project, status, help              │
+│  /iikit-core               →  Initialize project, status, help             │
+│  /iikit-clarify            →  Resolve ambiguities (any artifact, any time) │
+│  /iikit-bugfix             →  Report and fix bugs                          │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  0. /iikit-00-constitution  →  Project governance (tech-agnostic)          │
-│  1. /iikit-01-specify       →  Feature specification (WHAT, not HOW)       │
-│  2. /iikit-02-clarify       →  Resolve ambiguities until spec is clear     │
-│  3. /iikit-03-plan          →  Technical plan (HOW - frameworks, etc.)     │
-│  4. /iikit-04-checklist     →  Quality checklists (unit tests for English) │
-│  5. /iikit-05-testify       →  Gherkin .feature files from requirements     │
-│  6. /iikit-06-tasks         →  Task breakdown                              │
-│  7. /iikit-07-analyze       →  Cross-artifact consistency check            │
-│  8. /iikit-08-implement     →  Execute with integrity verification         │
-│  9. /iikit-09-taskstoissues →  Export to GitHub Issues                     │
+│  0. /iikit-00-constitution →  Project governance (tech-agnostic)           │
+│  1. /iikit-01-specify      →  Feature specification (WHAT, not HOW)        │
+│  2. /iikit-02-plan         →  Technical plan (HOW - frameworks, etc.)      │
+│  3. /iikit-03-checklist    →  Quality checklists (unit tests for English)  │
+│  4. /iikit-04-testify      →  Gherkin .feature files from requirements     │
+│  5. /iikit-05-tasks        →  Task breakdown                               │
+│  6. /iikit-06-analyze      →  Cross-artifact consistency check             │
+│  7. /iikit-07-implement    →  Execute with integrity verification          │
+│  8. /iikit-08-taskstoissues→  Export to GitHub Issues                      │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -105,9 +105,9 @@ The core of IIKit is preventing circular verification — where AI modifies test
 
 ### How It Works
 
-1. **`/iikit-05-testify`** generates Gherkin `.feature` files from your spec's Given/When/Then scenarios
+1. **`/iikit-04-testify`** generates Gherkin `.feature` files from your spec's Given/When/Then scenarios
 2. A SHA256 hash of all step lines (across all `.feature` files) is stored in `context.json` and as a git note
-3. **`/iikit-08-implement`** enforces the full BDD chain before marking any task complete:
+3. **`/iikit-07-implement`** enforces the full BDD chain before marking any task complete:
    - **Hash check**: `.feature` files not tampered since testify
    - **Step coverage**: `verify-steps.sh` — all Gherkin steps have matching step definitions (dry-run)
    - **RED phase**: Tests must fail before production code is written
@@ -130,7 +130,7 @@ The core of IIKit is preventing circular verification — where AI modifies test
 ### If Requirements Change
 
 1. Update `spec.md` with new requirements
-2. Re-run `/iikit-05-testify` to regenerate `.feature` files
+2. Re-run `/iikit-04-testify` to regenerate `.feature` files
 3. New hash is stored, implementation proceeds
 
 This ensures test changes are **intentional** and traceable to requirement changes.
@@ -149,13 +149,13 @@ The workflow is linear *the first time through*. After that, you'll often go bac
 
 | What changed | Re-run |
 |--------------|--------|
-| Added/removed requirements | `/iikit-03-plan` then `/iikit-06-tasks` |
-| Changed acceptance criteria (Given/When/Then) | `/iikit-05-testify` (re-generates .feature files, re-locks hash) |
+| Added/removed requirements | `/iikit-02-plan` then `/iikit-05-tasks` |
+| Changed acceptance criteria (Given/When/Then) | `/iikit-04-testify` (re-generates .feature files, re-locks hash) |
 | Clarified wording only | Nothing — downstream artifacts still valid |
 
 ### Changing the technical plan (plan.md, research.md)
 
-**Option A — Re-run:** `/iikit-03-plan` detects the existing plan.md, shows a semantic diff of tech stack and architecture changes, and flags breaking changes with downstream impact.
+**Option A — Re-run:** `/iikit-02-plan` detects the existing plan.md, shows a semantic diff of tech stack and architecture changes, and flags breaking changes with downstream impact.
 
 **Option B — Edit directly:** Edit `plan.md` or `research.md` for targeted changes (swap a library, update a version, add a design decision).
 
@@ -163,24 +163,24 @@ The workflow is linear *the first time through*. After that, you'll often go bac
 
 | What changed | Re-run |
 |--------------|--------|
-| Swapped a framework/library | `/iikit-06-tasks` (tasks may differ) |
-| Changed data model | `/iikit-05-testify` then `/iikit-06-tasks` |
-| Added a design constraint | `/iikit-04-checklist` (new quality checks) |
+| Swapped a framework/library | `/iikit-05-tasks` (tasks may differ) |
+| Changed data model | `/iikit-04-testify` then `/iikit-05-tasks` |
+| Added a design constraint | `/iikit-03-checklist` (new quality checks) |
 | Minor version bump | Nothing |
 
 ### Changing tasks (tasks.md)
 
-Re-run `/iikit-06-tasks`. It preserves `[x]` completion status on existing tasks, maps old task IDs to new ones by similarity, and warns about changes to already-completed tasks.
+Re-run `/iikit-05-tasks`. It preserves `[x]` completion status on existing tasks, maps old task IDs to new ones by similarity, and warns about changes to already-completed tasks.
 
 ### Quick reference: "I want to change X, what do I run?"
 
 ```
-Changed requirements?        → edit spec.md → /iikit-03-plan → /iikit-06-tasks
-Changed acceptance criteria?  → edit spec.md → /iikit-05-testify
-Changed tech stack?           → /iikit-03-plan (or edit plan.md) → /iikit-06-tasks
-Changed a library?            → edit research.md → /iikit-06-tasks
-Need more quality checks?     → /iikit-04-checklist
-Everything looks wrong?       → /iikit-07-analyze (finds inconsistencies)
+Changed requirements?        → edit spec.md → /iikit-02-plan → /iikit-05-tasks
+Changed acceptance criteria?  → edit spec.md → /iikit-04-testify
+Changed tech stack?           → /iikit-02-plan (or edit plan.md) → /iikit-05-tasks
+Changed a library?            → edit research.md → /iikit-05-tasks
+Need more quality checks?     → /iikit-03-checklist
+Everything looks wrong?       → /iikit-06-analyze (finds inconsistencies)
 ```
 
 **Rule of thumb:** Edit the artifact directly for small changes. Re-run the skill for significant changes — it shows you the diff and warns about downstream impact. Then cascade forward through the phases that depend on what you changed.
@@ -217,8 +217,8 @@ IIKit is distributed as a [Tessl](https://tessl.io) tile - a versioned package o
 
 | Phase | What happens |
 |-------|--------------|
-| `/iikit-03-plan` | Discovers and installs tiles for your tech stack |
-| `/iikit-08-implement` | Queries `mcp__tessl__query_library_docs` before writing library code |
+| `/iikit-02-plan` | Discovers and installs tiles for your tech stack |
+| `/iikit-07-implement` | Queries `mcp__tessl__query_library_docs` before writing library code |
 
 ## Project Structure
 

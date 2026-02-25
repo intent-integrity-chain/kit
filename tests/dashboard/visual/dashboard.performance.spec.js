@@ -151,7 +151,7 @@ test.describe('Performance Baselines', () => {
     expect(elapsed).toBeLessThan(TAB_SWITCH_MAX_MS * 2);
   });
 
-  test('tab switch: to Clarify view', async ({ page }) => {
+  test('programmatic switch to Clarify view within budget', async ({ page }) => {
     await page.goto(url());
     await page.waitForSelector('.pipeline-node', { timeout: 10000 });
     await page.waitForSelector('#contentArea:not(:empty)', { timeout: 10000 });
@@ -159,14 +159,26 @@ test.describe('Performance Baselines', () => {
     await page.waitForTimeout(500);
 
     const start = Date.now();
-    const node = page.locator('.pipeline-node', { hasText: 'Clarify' });
-    await node.click();
-    // Clarify view may render into the content area
-    await page.waitForTimeout(200);
-    await page.waitForSelector('#contentArea:not(:empty)', { timeout: 10000 });
+    await page.evaluate(() => window._switchTab('clarify'));
+    // Wait for clarify-specific content (not just any non-empty content)
+    await page.waitForSelector('.clarify-view, .clarify-empty', { timeout: 10000 });
     const elapsed = Date.now() - start;
 
     expect(elapsed).toBeLessThan(TAB_SWITCH_MAX_MS);
+  });
+
+  test('pipeline badge rendering does not slow feature switch', async ({ page }) => {
+    await page.goto(url());
+    await page.waitForSelector('.pipeline-node', { timeout: 10000 });
+
+    const start = Date.now();
+    // Select feature with clarifications to trigger badge rendering
+    await page.selectOption('#featureSelect', { index: 1 });
+    await page.waitForSelector('.pipeline-clarify-badge', { timeout: 10000 });
+    const elapsed = Date.now() - start;
+
+    // Feature switch + badge render should be within 2x tab switch budget
+    expect(elapsed).toBeLessThan(TAB_SWITCH_MAX_MS * 2);
   });
 
   test('tab switch: back to Implement view', async ({ page }) => {
@@ -216,7 +228,6 @@ test.describe('Performance Baselines', () => {
     const tabs = [
       { name: 'Constitution', selector: '.constitution-view, .placeholder-view' },
       { name: 'Spec', selector: '.storymap-view, .placeholder-view' },
-      { name: 'Clarify', selector: '#contentArea:not(:empty)' },
       { name: 'Checklist', selector: '.checklist-view, .checklist-empty' },
       { name: 'Testify', selector: '.testify-view, .testify-empty' },
       { name: 'Analyze', selector: '.analyze-view, .analyze-empty' },

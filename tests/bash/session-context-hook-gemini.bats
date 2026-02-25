@@ -58,7 +58,7 @@ teardown() {
 
     result=$("$HOOK_SCRIPT")
     context=$(echo "$result" | jq -r '.hookSpecificOutput.additionalContext')
-    [[ "$context" == *"/iikit-06-tasks"* ]]
+    [[ "$context" == *"/iikit-05-tasks"* ]]
 }
 
 @test "gemini-hook: no plain text on stdout" {

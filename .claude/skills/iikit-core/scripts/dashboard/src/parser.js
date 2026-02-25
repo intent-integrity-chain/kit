@@ -99,9 +99,12 @@ function parseChecklists(checklistDir) {
 
   if (!fs.existsSync(checklistDir)) return result;
 
-  const files = fs.readdirSync(checklistDir).filter(f => f.endsWith('.md'));
+  const allFiles = fs.readdirSync(checklistDir).filter(f => f.endsWith('.md'));
 
-  // Count all checklist files — requirements.md may be from /iikit-01-specify or /iikit-04-checklist
+  // Exclude requirements.md — it's a spec quality checklist created by /iikit-01-specify,
+  // not a domain checklist from /iikit-03-checklist. Including it falsely marks checklist phase complete.
+  const files = allFiles.filter(f => f !== 'requirements.md');
+
   if (files.length === 0) return result;
 
   for (const file of files) {
@@ -125,8 +128,7 @@ function parseChecklists(checklistDir) {
  * Parse all checklist files in a directory and return detailed per-file data
  * with individual items, categories, CHK IDs, and tags.
  *
- * Applies same requirements.md-only filter as parseChecklists:
- * if requirements.md is the only file, returns empty array.
+ * Excludes requirements.md (spec quality checklist from /iikit-01-specify).
  *
  * @param {string} checklistDir - Path to checklists/ directory
  * @returns {Array<{name: string, filename: string, total: number, checked: number, items: Array}>}
@@ -134,7 +136,7 @@ function parseChecklists(checklistDir) {
 function parseChecklistsDetailed(checklistDir) {
   if (!fs.existsSync(checklistDir)) return [];
 
-  const files = fs.readdirSync(checklistDir).filter(f => f.endsWith('.md'));
+  const files = fs.readdirSync(checklistDir).filter(f => f.endsWith('.md') && f !== 'requirements.md');
 
   if (files.length === 0) return [];
 
@@ -236,6 +238,19 @@ function parseConstitutionTDD(constitutionPath) {
 function hasClarifications(specContent) {
   if (!specContent || typeof specContent !== 'string') return false;
   return /^## Clarifications/m.test(specContent);
+}
+
+/**
+ * Count clarification sessions in content (any artifact).
+ * Sessions are marked by ### Session YYYY-MM-DD headings under ## Clarifications.
+ *
+ * @param {string} content - Raw markdown content
+ * @returns {number} Number of clarification sessions found
+ */
+function countClarificationSessions(content) {
+  if (!content || typeof content !== 'string') return 0;
+  const matches = content.match(/^### Session \d{4}-\d{2}-\d{2}/gm);
+  return matches ? matches.length : 0;
 }
 
 /**
@@ -1278,4 +1293,4 @@ function extractField(section, fieldName) {
   return value;
 }
 
-module.exports = { parseSpecStories, parseTasks, parseChecklists, parseChecklistsDetailed, parseConstitutionTDD, hasClarifications, parseConstitutionPrinciples, parsePremise, parseRequirements, parseSuccessCriteria, parseClarifications, parseStoryRequirementRefs, parseTechContext, parseFileStructure, parseAsciiDiagram, parseTesslJson, parseResearchDecisions, parseTestSpecs, parseTaskTestRefs, parseAnalysisFindings, parseAnalysisCoverage, parseAnalysisMetrics, parseConstitutionAlignment, parsePhaseSeparation, parseBugs };
+module.exports = { parseSpecStories, parseTasks, parseChecklists, parseChecklistsDetailed, parseConstitutionTDD, hasClarifications, countClarificationSessions, parseConstitutionPrinciples, parsePremise, parseRequirements, parseSuccessCriteria, parseClarifications, parseStoryRequirementRefs, parseTechContext, parseFileStructure, parseAsciiDiagram, parseTesslJson, parseResearchDecisions, parseTestSpecs, parseTaskTestRefs, parseAnalysisFindings, parseAnalysisCoverage, parseAnalysisMetrics, parseConstitutionAlignment, parsePhaseSeparation, parseBugs };

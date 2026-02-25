@@ -391,7 +391,7 @@ validate_spec() {
     if grep -q "\[NEEDS CLARIFICATION" "$spec_file" 2>/dev/null; then
         local count=$(grep -c "\[NEEDS CLARIFICATION" "$spec_file" 2>/dev/null || echo "0")
         echo "WARNING: spec.md has $count unresolved [NEEDS CLARIFICATION] markers" >&2
-        echo "Consider running /iikit-02-clarify to resolve them." >&2
+        echo "Consider running /iikit-clarify to resolve them." >&2
     fi
 
     [[ $errors -gt 0 ]] && return 1
@@ -405,7 +405,7 @@ validate_plan() {
 
     if [[ ! -f "$plan_file" ]]; then
         echo "ERROR: plan.md not found at $plan_file" >&2
-        echo "Run /iikit-03-plan first to create the implementation plan." >&2
+        echo "Run /iikit-02-plan first to create the implementation plan." >&2
         return 1
     fi
 
@@ -429,7 +429,7 @@ validate_tasks() {
 
     if [[ ! -f "$tasks_file" ]]; then
         echo "ERROR: tasks.md not found at $tasks_file" >&2
-        echo "Run /iikit-06-tasks first to create the task list." >&2
+        echo "Run /iikit-05-tasks first to create the task list." >&2
         return 1
     fi
 

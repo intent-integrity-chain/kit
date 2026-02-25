@@ -382,7 +382,7 @@ function Test-Spec {
     if ($content -match '\[NEEDS CLARIFICATION') {
         $count = ([regex]::Matches($content, '\[NEEDS CLARIFICATION')).Count
         Write-Warning "spec.md has $count unresolved [NEEDS CLARIFICATION] markers"
-        Write-Host "Consider running /iikit-02-clarify to resolve them."
+        Write-Host "Consider running /iikit-clarify to resolve them."
     }
 
     return ($errors -eq 0)
@@ -393,7 +393,7 @@ function Test-Plan {
 
     if (-not (Test-Path $PlanFile)) {
         Write-Error "plan.md not found at $PlanFile"
-        Write-Host "Run /iikit-03-plan first to create the implementation plan."
+        Write-Host "Run /iikit-02-plan first to create the implementation plan."
         return $false
     }
 
@@ -416,7 +416,7 @@ function Test-Tasks {
 
     if (-not (Test-Path $TasksFile)) {
         Write-Error "tasks.md not found at $TasksFile"
-        Write-Host "Run /iikit-06-tasks first to create the task list."
+        Write-Host "Run /iikit-05-tasks first to create the task list."
         return $false
     }
 

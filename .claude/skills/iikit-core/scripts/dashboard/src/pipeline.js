@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { parseTasks, parseChecklists, parseConstitutionTDD, hasClarifications } = require('./parser');
+const { parseTasks, parseChecklists, parseConstitutionTDD, hasClarifications, countClarificationSessions } = require('./parser');
 const { getFeatureFiles } = require('./testify');
 
 /**
@@ -33,6 +33,9 @@ function computePipelineState(projectPath, featureId) {
   // Read spec content for clarifications check
   const specContent = specExists ? fs.readFileSync(specPath, 'utf-8') : '';
 
+  // Read plan content for clarifications check
+  const planContent = planExists ? fs.readFileSync(planPath, 'utf-8') : '';
+
   // Parse tasks for implement progress
   const tasksContent = tasksExists ? fs.readFileSync(tasksPath, 'utf-8') : '';
   const tasks = parseTasks(tasksContent);
@@ -41,6 +44,9 @@ function computePipelineState(projectPath, featureId) {
 
   // Parse checklists
   const checklistStatus = parseChecklists(checklistDir);
+
+  // Read constitution content for clarifications check
+  const constitutionContent = constitutionExists ? fs.readFileSync(constitutionPath, 'utf-8') : '';
 
   // TDD requirement check — read from .specify/context.json first, fallback to parsing
   const contextPath = path.join(projectPath, '.specify', 'context.json');
@@ -58,34 +64,38 @@ function computePipelineState(projectPath, featureId) {
     tddRequired = constitutionExists ? parseConstitutionTDD(constitutionPath) : false;
   }
 
+  // Count clarification sessions per artifact
+  const clarifications = {
+    constitution: countClarificationSessions(constitutionContent),
+    spec: countClarificationSessions(specContent),
+    plan: countClarificationSessions(planContent),
+    tasks: countClarificationSessions(tasksContent)
+  };
+
   const phases = [
     {
       id: 'constitution',
       name: premiseExists ? 'Premise &\nConstitution' : 'Constitution',
       status: constitutionExists ? 'complete' : 'not_started',
       progress: null,
-      optional: false
+      optional: false,
+      clarifications: clarifications.constitution
     },
     {
       id: 'spec',
       name: 'Spec',
       status: specExists ? 'complete' : 'not_started',
       progress: null,
-      optional: false
-    },
-    {
-      id: 'clarify',
-      name: 'Clarify',
-      status: hasClarifications(specContent) ? 'complete' : (planExists && !hasClarifications(specContent) ? 'skipped' : 'not_started'),
-      progress: null,
-      optional: true
+      optional: false,
+      clarifications: clarifications.spec
     },
     {
       id: 'plan',
       name: 'Plan',
       status: planExists ? 'complete' : 'not_started',
       progress: null,
-      optional: false
+      optional: false,
+      clarifications: clarifications.plan
     },
     {
       id: 'checklist',
@@ -98,7 +108,8 @@ function computePipelineState(projectPath, featureId) {
       progress: checklistStatus.total > 0
         ? `${Math.round((checklistStatus.checked / checklistStatus.total) * 100)}%`
         : null,
-      optional: false
+      optional: false,
+      clarifications: 0
     },
     {
       id: 'testify',
@@ -107,21 +118,24 @@ function computePipelineState(projectPath, featureId) {
         ? 'complete'
         : (!tddRequired && planExists ? 'skipped' : 'not_started'),
       progress: null,
-      optional: !tddRequired
+      optional: !tddRequired,
+      clarifications: 0
     },
     {
       id: 'tasks',
       name: 'Tasks',
       status: tasksExists ? 'complete' : 'not_started',
       progress: null,
-      optional: false
+      optional: false,
+      clarifications: clarifications.tasks
     },
     {
       id: 'analyze',
       name: 'Analyze',
       status: analysisExists ? 'complete' : 'not_started',
       progress: null,
-      optional: false
+      optional: false,
+      clarifications: 0
     },
     {
       id: 'implement',
@@ -134,7 +148,8 @@ function computePipelineState(projectPath, featureId) {
       progress: totalCount > 0 && checkedCount > 0
         ? `${Math.round((checkedCount / totalCount) * 100)}%`
         : null,
-      optional: false
+      optional: false,
+      clarifications: 0
     }
   ];
 

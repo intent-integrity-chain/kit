@@ -5,8 +5,10 @@ This document clarifies what belongs in each phase of the intent-integrity-kit w
 ## Phase Overview
 
 ```
-Constitution → Specify → Plan → Tasks → Implement
-(governance)   (what)    (how)  (work)  (execute)
+Constitution → Specify → Plan → Checklist → Testify → Tasks → Analyze → Implement
+(governance)   (what)    (how)  (quality)   (tests)   (work)  (verify)  (execute)
+
+Utilities (run anytime): clarify, bugfix, core
 ```
 
 ---
@@ -96,7 +98,7 @@ All features must have comprehensive test coverage before being considered compl
 
 ---
 
-## 3. Plan (`/iikit-03-plan`)
+## 3. Plan (`/iikit-02-plan`)
 
 **Purpose**: Define HOW to implement (technology choices, architecture).
 

@@ -74,25 +74,25 @@ describe('computePipelineState', () => {
     expect(result.phases.find(p => p.id === 'implement').status).toBe('not_started');
   });
 
-  // TS-018: Clarify detection — complete when clarifications section exists
-  test('Clarify is complete when spec.md has Clarifications section', () => {
+  // TS-018: Clarification count — spec clarifications tracked on spec phase
+  test('Spec phase has clarification count when spec.md has Clarifications section', () => {
     createFeature(projectPath, '001-test', {
       'spec.md': '# Spec\n## Clarifications\n### Session 2026-01-01\n- Q: test -> A: yes\n'
     });
 
     const result = computePipelineState(projectPath, '001-test');
-    expect(result.phases.find(p => p.id === 'clarify').status).toBe('complete');
+    expect(result.phases.find(p => p.id === 'spec').clarifications).toBe(1);
   });
 
-  // TS-019: Clarify detection — skipped when plan exists without clarifications
-  test('Clarify is skipped when plan.md exists but spec.md has no clarifications', () => {
+  // TS-019: No clarify phase in pipeline (clarify is now a utility)
+  test('No clarify phase exists in pipeline (clarify is a utility)', () => {
     createFeature(projectPath, '001-test', {
       'spec.md': '# Spec\n## Requirements\n',
       'plan.md': '# Plan\n## Technical Context\n'
     });
 
     const result = computePipelineState(projectPath, '001-test');
-    expect(result.phases.find(p => p.id === 'clarify').status).toBe('skipped');
+    expect(result.phases.find(p => p.id === 'clarify')).toBeUndefined();
   });
 
   // TS-020: Checklist detection — in progress with percentage
@@ -106,8 +106,9 @@ describe('computePipelineState', () => {
     const result = computePipelineState(projectPath, '001-test');
     const checklist = result.phases.find(p => p.id === 'checklist');
 
+    // Only domain.md counts (requirements.md is excluded as spec quality checklist)
     expect(checklist.status).toBe('in_progress');
-    expect(checklist.progress).toBe('50%');
+    expect(checklist.progress).toBe('33%');
   });
 
   // TS-021: Checklist detection — complete when all 100%
@@ -119,6 +120,7 @@ describe('computePipelineState', () => {
     });
 
     const result = computePipelineState(projectPath, '001-test');
+    // Only domain.md counts (requirements.md excluded)
     expect(result.phases.find(p => p.id === 'checklist').status).toBe('complete');
   });
 
@@ -190,7 +192,7 @@ describe('computePipelineState', () => {
   test('correct status for partially complete feature (spec+plan+tasks at 40%)', () => {
     fs.writeFileSync(path.join(projectPath, 'CONSTITUTION.md'), '# Constitution\nTDD MUST be used.\n');
     createFeature(projectPath, '001-test', {
-      'spec.md': '# Spec\n## Clarifications\n### Session\n- Q: x -> A: y\n',
+      'spec.md': '# Spec\n## Clarifications\n### Session 2026-01-15\n- Q: x -> A: y\n',
       'plan.md': '# Plan\n## Tech\n',
       'tasks.md': '# Tasks\n- [x] T001 A\n- [x] T002 B\n- [ ] T003 C\n- [ ] T004 D\n- [ ] T005 E\n'
     });
@@ -199,7 +201,7 @@ describe('computePipelineState', () => {
 
     expect(result.phases.find(p => p.id === 'constitution').status).toBe('complete');
     expect(result.phases.find(p => p.id === 'spec').status).toBe('complete');
-    expect(result.phases.find(p => p.id === 'clarify').status).toBe('complete');
+    expect(result.phases.find(p => p.id === 'spec').clarifications).toBe(1);
     expect(result.phases.find(p => p.id === 'plan').status).toBe('complete');
     expect(result.phases.find(p => p.id === 'tasks').status).toBe('complete');
     expect(result.phases.find(p => p.id === 'implement').status).toBe('in_progress');
@@ -210,7 +212,7 @@ describe('computePipelineState', () => {
   test('all nodes complete for finished feature', () => {
     fs.writeFileSync(path.join(projectPath, 'CONSTITUTION.md'), '# Constitution\nTDD MUST be used.\n');
     createFeature(projectPath, '001-test', {
-      'spec.md': '# Spec\n## Clarifications\n### Session\n- Q: x -> A: y\n',
+      'spec.md': '# Spec\n## Clarifications\n### Session 2026-01-15\n- Q: x -> A: y\n',
       'plan.md': '# Plan',
       'checklists/req.md': '- [x] CHK001 Done\n',
       'tests/features/acceptance.feature': '@TS-001 @acceptance @P1\nScenario: Test\n  Given x\n  Then y\n',
@@ -225,15 +227,15 @@ describe('computePipelineState', () => {
     }
   });
 
-  // Returns exactly 9 phases
-  test('always returns exactly 9 phases', () => {
+  // Returns exactly 8 phases (clarify removed — now a utility)
+  test('always returns exactly 8 phases', () => {
     createFeature(projectPath, '001-test', { 'spec.md': '# Spec' });
 
     const result = computePipelineState(projectPath, '001-test');
-    expect(result.phases).toHaveLength(9);
+    expect(result.phases).toHaveLength(8);
   });
 
-  // Phase IDs are correct and ordered
+  // Phase IDs are correct and ordered (no clarify — it's a utility)
   test('phase IDs are in correct order', () => {
     createFeature(projectPath, '001-test', { 'spec.md': '# Spec' });
 
@@ -241,8 +243,18 @@ describe('computePipelineState', () => {
     const ids = result.phases.map(p => p.id);
 
     expect(ids).toEqual([
-      'constitution', 'spec', 'clarify', 'plan',
+      'constitution', 'spec', 'plan',
       'checklist', 'testify', 'tasks', 'analyze', 'implement'
     ]);
+  });
+
+  // Each phase has a clarifications count field
+  test('each phase has a clarifications count field', () => {
+    createFeature(projectPath, '001-test', { 'spec.md': '# Spec' });
+
+    const result = computePipelineState(projectPath, '001-test');
+    for (const phase of result.phases) {
+      expect(typeof phase.clarifications).toBe('number');
+    }
   });
 });

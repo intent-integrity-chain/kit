@@ -11,21 +11,21 @@
 # PHASES:
 #   00       Constitution (no validation)
 #   01       Specify (soft constitution)
-#   02       Clarify (soft constitution, requires spec)
+#   clarify  Clarify (soft constitution, at least one artifact)
 #   bugfix   Bug fix (soft constitution)
-#   03       Plan (hard constitution, requires spec, copies template)
-#   04       Checklist (basic constitution, requires spec + plan)
-#   05       Testify (basic constitution, requires spec + plan, soft checklist)
-#   06       Tasks (basic constitution, requires spec + plan, soft checklist)
-#   07       Analyze (hard constitution, requires spec + plan + tasks, soft checklist)
-#   08       Implement (hard constitution, requires spec + plan + tasks, hard checklist)
-#   09       Tasks to Issues (implicit constitution, requires spec + plan + tasks)
+#   02       Plan (hard constitution, requires spec, copies template)
+#   03       Checklist (basic constitution, requires spec + plan)
+#   04       Testify (basic constitution, requires spec + plan, soft checklist)
+#   05       Tasks (basic constitution, requires spec + plan, soft checklist)
+#   06       Analyze (hard constitution, requires spec + plan + tasks, soft checklist)
+#   07       Implement (hard constitution, requires spec + plan + tasks, hard checklist)
+#   08       Tasks to Issues (implicit constitution, requires spec + plan + tasks)
 #   core     Paths only (no validation)
 #   status   Deterministic status report (non-fatal validation, computes ready_for/next_step)
 #
 # LEGACY FLAGS (deprecated, map to phases):
 #   --paths-only              -> --phase core
-#   --require-tasks           -> --phase 08
+#   --require-tasks           -> --phase 07
 #   --include-tasks           (used with --require-tasks)
 #
 # OPTIONS:
@@ -83,15 +83,15 @@ Phase-aware prerequisite checking for IIKit workflow.
 PHASES:
   00       Constitution (no validation)
   01       Specify (soft constitution)
-  02       Clarify (soft constitution, requires spec)
+  clarify  Clarify (soft constitution, at least one artifact)
   bugfix   Bug fix (soft constitution)
-  03       Plan (hard constitution, requires spec, copies template)
-  04       Checklist (basic constitution, requires spec + plan)
-  05       Testify (basic constitution, requires spec + plan, soft checklist)
-  06       Tasks (basic constitution, requires spec + plan, soft checklist)
-  07       Analyze (hard constitution, requires spec + plan + tasks, soft checklist)
-  08       Implement (hard constitution, requires spec + plan + tasks, hard checklist)
-  09       Tasks to Issues (implicit constitution, requires spec + plan + tasks)
+  02       Plan (hard constitution, requires spec, copies template)
+  03       Checklist (basic constitution, requires spec + plan)
+  04       Testify (basic constitution, requires spec + plan, soft checklist)
+  05       Tasks (basic constitution, requires spec + plan, soft checklist)
+  06       Analyze (hard constitution, requires spec + plan + tasks, soft checklist)
+  07       Implement (hard constitution, requires spec + plan + tasks, hard checklist)
+  08       Tasks to Issues (implicit constitution, requires spec + plan + tasks)
   core     Paths only (no validation)
   status   Deterministic status report (non-fatal, computes ready_for/next_step)
 
@@ -102,15 +102,15 @@ OPTIONS:
 
 LEGACY FLAGS (deprecated):
   --paths-only        Use --phase core instead
-  --require-tasks     Use --phase 08 instead
-  --include-tasks     Use --phase 08 instead
+  --require-tasks     Use --phase 07 instead
+  --include-tasks     Use --phase 07 instead
 
 EXAMPLES:
   # Check prerequisites for plan phase
-  ./check-prerequisites.sh --phase 03 --json
+  ./check-prerequisites.sh --phase 02 --json
 
   # Check prerequisites for implementation phase
-  ./check-prerequisites.sh --phase 08 --json
+  ./check-prerequisites.sh --phase 07 --json
 
   # Get feature paths only (no validation)
   ./check-prerequisites.sh --phase core --json
@@ -131,11 +131,11 @@ if [[ -z "$PHASE" ]]; then
         echo "DEPRECATED: --paths-only is deprecated, use --phase core" >&2
         PHASE="core"
     elif $LEGACY_REQUIRE_TASKS; then
-        echo "DEPRECATED: --require-tasks/--include-tasks are deprecated, use --phase 08" >&2
-        PHASE="08"
+        echo "DEPRECATED: --require-tasks/--include-tasks are deprecated, use --phase 07" >&2
+        PHASE="07"
     else
-        # Default to phase 04 (backward compat with bare invocations)
-        PHASE="04"
+        # Default to phase 03 (backward compat with bare invocations)
+        PHASE="03"
     fi
 fi
 
@@ -165,19 +165,19 @@ configure_phase() {
     case "$phase" in
         00)      P_CONST=none;     P_SPEC=no;       P_PLAN=no;       P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=none; P_EXTRAS="" ;;
         01)      P_CONST=soft;     P_SPEC=no;       P_PLAN=no;       P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=none; P_EXTRAS="" ;;
-        02)      P_CONST=soft;     P_SPEC=required; P_PLAN=no;       P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=none; P_EXTRAS="" ;;
+        clarify) P_CONST=soft;     P_SPEC=no;       P_PLAN=no;       P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=none; P_EXTRAS="" ;;
         bugfix)  P_CONST=soft;     P_SPEC=no;       P_PLAN=no;       P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=none; P_EXTRAS="" ;;
-        03)      P_CONST=hard;     P_SPEC=required; P_PLAN=no;       P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=none; P_EXTRAS="spec_quality,copy_plan_template" ;;
-        04)      P_CONST=basic;    P_SPEC=required; P_PLAN=required; P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=none; P_EXTRAS="" ;;
+        02)      P_CONST=hard;     P_SPEC=required; P_PLAN=no;       P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=none; P_EXTRAS="spec_quality,copy_plan_template" ;;
+        03)      P_CONST=basic;    P_SPEC=required; P_PLAN=required; P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=none; P_EXTRAS="" ;;
+        04)      P_CONST=basic;    P_SPEC=required; P_PLAN=required; P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=soft; P_EXTRAS="" ;;
         05)      P_CONST=basic;    P_SPEC=required; P_PLAN=required; P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=soft; P_EXTRAS="" ;;
-        06)      P_CONST=basic;    P_SPEC=required; P_PLAN=required; P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=soft; P_EXTRAS="" ;;
-        07)      P_CONST=hard;     P_SPEC=required; P_PLAN=required; P_TASKS=required; P_INCLUDE_TASKS=yes; P_CHECKLIST=soft; P_EXTRAS="" ;;
-        08)      P_CONST=hard;     P_SPEC=required; P_PLAN=required; P_TASKS=required; P_INCLUDE_TASKS=yes; P_CHECKLIST=hard; P_EXTRAS="" ;;
-        09)      P_CONST=implicit; P_SPEC=required; P_PLAN=required; P_TASKS=required; P_INCLUDE_TASKS=yes; P_CHECKLIST=none; P_EXTRAS="" ;;
+        06)      P_CONST=hard;     P_SPEC=required; P_PLAN=required; P_TASKS=required; P_INCLUDE_TASKS=yes; P_CHECKLIST=soft; P_EXTRAS="" ;;
+        07)      P_CONST=hard;     P_SPEC=required; P_PLAN=required; P_TASKS=required; P_INCLUDE_TASKS=yes; P_CHECKLIST=hard; P_EXTRAS="" ;;
+        08)      P_CONST=implicit; P_SPEC=required; P_PLAN=required; P_TASKS=required; P_INCLUDE_TASKS=yes; P_CHECKLIST=none; P_EXTRAS="" ;;
         core)    P_CONST=none;     P_SPEC=no;       P_PLAN=no;       P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=none; P_EXTRAS="paths_only" ;;
         status)  P_CONST=none;     P_SPEC=no;       P_PLAN=no;       P_TASKS=no;       P_INCLUDE_TASKS=no;  P_CHECKLIST=none; P_EXTRAS="status_mode" ;;
         *)
-            echo "ERROR: Unknown phase '$phase'. Valid: 00 01 02 03 04 05 06 07 08 09 bugfix core status" >&2
+            echo "ERROR: Unknown phase '$phase'. Valid: 00 01 02 03 04 05 06 07 08 bugfix clarify core status" >&2
             exit 1
             ;;
     esac
@@ -359,37 +359,33 @@ if [[ "$P_EXTRAS" == *"status_mode"* ]]; then
     # Phase 01: specify (soft constitution) — always passable
     $V_CONSTITUTION || true  # 01 only needs soft constitution
     READY_FOR="01"
-    # Phase 02: clarify (requires valid spec)
-    if $V_SPEC; then
+    # Phase 02: plan (requires valid spec + hard constitution)
+    if $V_CONSTITUTION && $V_SPEC; then
         READY_FOR="02"
     fi
-    # Phase 03: plan (requires valid spec + hard constitution)
-    if $V_CONSTITUTION && $V_SPEC; then
+    # Phase 03: checklist (requires valid spec + plan)
+    if $V_CONSTITUTION && $V_SPEC && $V_PLAN; then
         READY_FOR="03"
     fi
-    # Phase 04: checklist (requires valid spec + plan)
+    # Phase 04: testify (requires valid spec + plan, soft checklist)
     if $V_CONSTITUTION && $V_SPEC && $V_PLAN; then
         READY_FOR="04"
     fi
-    # Phase 05: testify (requires valid spec + plan, soft checklist)
+    # Phase 05: tasks (requires valid spec + plan, soft checklist)
     if $V_CONSTITUTION && $V_SPEC && $V_PLAN; then
         READY_FOR="05"
     fi
-    # Phase 06: tasks (requires valid spec + plan, soft checklist)
-    if $V_CONSTITUTION && $V_SPEC && $V_PLAN; then
+    # Phase 06: analyze (requires valid spec + plan + tasks)
+    if $V_CONSTITUTION && $V_SPEC && $V_PLAN && $V_TASKS; then
         READY_FOR="06"
     fi
-    # Phase 07: analyze (requires valid spec + plan + tasks)
+    # Phase 07: implement (requires valid spec + plan + tasks, hard checklist)
     if $V_CONSTITUTION && $V_SPEC && $V_PLAN && $V_TASKS; then
         READY_FOR="07"
     fi
-    # Phase 08: implement (requires valid spec + plan + tasks, hard checklist)
+    # Phase 08: tasks to issues (requires valid spec + plan + tasks)
     if $V_CONSTITUTION && $V_SPEC && $V_PLAN && $V_TASKS; then
         READY_FOR="08"
-    fi
-    # Phase 09: tasks to issues (requires valid spec + plan + tasks)
-    if $V_CONSTITUTION && $V_SPEC && $V_PLAN && $V_TASKS; then
-        READY_FOR="09"
     fi
 
     # --- Next step + clear_before (deterministic) ---
@@ -405,19 +401,19 @@ if [[ "$P_EXTRAS" == *"status_mode"* ]]; then
         NEXT_STEP="/iikit-01-specify <description>"
         CLEAR_BEFORE=false
     elif ! $V_PLAN; then
-        NEXT_STEP="/iikit-03-plan"
+        NEXT_STEP="/iikit-02-plan"
         CLEAR_BEFORE=true
     elif $A_CHECKLISTS && [[ "$CHECKLIST_TOTAL" -gt 0 ]] && ! $CHECKLIST_COMPLETE; then
-        NEXT_STEP="/iikit-04-checklist"
+        NEXT_STEP="/iikit-03-checklist"
         CLEAR_BEFORE=false
     elif ! $V_TASKS; then
-        NEXT_STEP="/iikit-06-tasks"
+        NEXT_STEP="/iikit-05-tasks"
         CLEAR_BEFORE=true
     elif [[ "$FEATURE_STAGE" == "complete" ]]; then
         NEXT_STEP=""
         CLEAR_BEFORE=false
     else
-        NEXT_STEP="/iikit-08-implement"
+        NEXT_STEP="/iikit-07-implement"
         CLEAR_BEFORE=true
     fi
 
@@ -517,8 +513,8 @@ V_SPEC=false
 V_PLAN=false
 V_TASKS=false
 
-# Feature directory check (needed for any validation phase)
-if [[ ! -d "$FEATURE_DIR" ]]; then
+# Feature directory check (needed for any validation phase except clarify)
+if [[ "$PHASE" != "clarify" ]] && [[ ! -d "$FEATURE_DIR" ]]; then
     echo "ERROR: Feature directory not found: $FEATURE_DIR" >&2
     echo "Run /iikit-01-specify first to create the feature structure." >&2
     exit 1
@@ -552,13 +548,13 @@ if [[ "$P_SPEC" == "required" ]]; then
     V_SPEC=true
 fi
 
-# Phase 03 extras: spec quality
+# Phase 02 extras: spec quality
 SPEC_QUALITY=""
 if [[ "$P_EXTRAS" == *"spec_quality"* ]]; then
     SPEC_QUALITY=$(calculate_spec_quality "$FEATURE_SPEC")
     echo "Spec quality score: $SPEC_QUALITY/10" >&2
     if [[ $SPEC_QUALITY -lt 6 ]]; then
-        WARNINGS+=("Spec quality is low ($SPEC_QUALITY/10). Consider running /iikit-02-clarify.")
+        WARNINGS+=("Spec quality is low ($SPEC_QUALITY/10). Consider running /iikit-clarify.")
     fi
 fi
 
@@ -568,7 +564,7 @@ if [[ "$P_PLAN" == "required" ]]; then
     V_PLAN=true
 fi
 
-# Phase 03 extras: copy plan template
+# Phase 02 extras: copy plan template
 PLAN_TEMPLATE_COPIED=""
 if [[ "$P_EXTRAS" == *"copy_plan_template"* ]]; then
     mkdir -p "$FEATURE_DIR"
@@ -614,13 +610,13 @@ if [[ "$P_CHECKLIST" != "none" ]]; then
         if [[ "$P_CHECKLIST" == "hard" ]]; then
             WARNINGS+=("Checklists incomplete ($CHECKLIST_CHECKED/$CHECKLIST_TOTAL items, ${checklist_pct}%). Must be 100% for implementation.")
         else
-            WARNINGS+=("Checklists incomplete ($CHECKLIST_CHECKED/$CHECKLIST_TOTAL items, ${checklist_pct}%). Recommend /iikit-04-checklist.")
+            WARNINGS+=("Checklists incomplete ($CHECKLIST_CHECKED/$CHECKLIST_TOTAL items, ${checklist_pct}%). Recommend /iikit-03-checklist.")
         fi
     fi
 fi
 
-# Testify gate — when TDD is mandatory, phases 06+ require .feature files
-if [[ "$PHASE" == "06" || "$PHASE" == "07" || "$PHASE" == "08" || "$PHASE" == "09" ]]; then
+# Testify gate — when TDD is mandatory, phases 05+ require .feature files
+if [[ "$PHASE" == "05" || "$PHASE" == "06" || "$PHASE" == "07" || "$PHASE" == "08" ]]; then
     TDD_DET=$(get_cached_tdd_determination "$REPO_ROOT")
     if [[ "$TDD_DET" == "mandatory" ]]; then
         HAS_FEATURES=false
@@ -630,9 +626,9 @@ if [[ "$PHASE" == "06" || "$PHASE" == "07" || "$PHASE" == "08" || "$PHASE" == "0
         fi
 
         if ! $HAS_FEATURES; then
-            echo "ERROR: TDD is mandatory (per CONSTITUTION.md) but /iikit-05-testify has not been run." >&2
+            echo "ERROR: TDD is mandatory (per CONSTITUTION.md) but /iikit-04-testify has not been run." >&2
             echo "  No .feature files found in $FEATURE_DIR/tests/features/" >&2
-            echo "  Run /iikit-05-testify before /iikit-$(printf '%02d' "$PHASE")-*" >&2
+            echo "  Run /iikit-04-testify before /iikit-$(printf '%02d' "$PHASE")-*" >&2
             exit 1
         fi
     fi
@@ -689,7 +685,7 @@ if $JSON_MODE; then
     json_output=$(printf '{"phase":"%s","constitution_mode":"%s","FEATURE_DIR":"%s","FEATURE_SPEC":"%s","IMPL_PLAN":"%s","TASKS":"%s","BRANCH":"%s","HAS_GIT":%s,"REPO_ROOT":"%s","AVAILABLE_DOCS":%s,"validated":%s,"warnings":%s' \
         "$PHASE" "$P_CONST" "$FEATURE_DIR" "$FEATURE_SPEC" "$IMPL_PLAN" "$TASKS" "$CURRENT_BRANCH" "$HAS_GIT" "$REPO_ROOT" "$json_docs" "$json_validated" "$json_warnings")
 
-    # Phase 03 extras
+    # Phase 02 extras
     if [[ -n "$SPEC_QUALITY" ]]; then
         json_output+=$(printf ',"spec_quality":%s' "$SPEC_QUALITY")
     fi

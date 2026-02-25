@@ -1,4 +1,4 @@
-const { parseSpecStories, parseTasks, parseChecklists, parseChecklistsDetailed, parseConstitutionTDD, hasClarifications, parseConstitutionPrinciples, parseRequirements, parseSuccessCriteria, parseClarifications, parseStoryRequirementRefs, parseTechContext, parseFileStructure, parseAsciiDiagram, parseTesslJson, parseResearchDecisions, parseTestSpecs, parseTaskTestRefs, parseAnalysisFindings, parseAnalysisCoverage, parseAnalysisMetrics, parseConstitutionAlignment, parsePhaseSeparation, parseBugs } = require('../../.claude/skills/iikit-core/scripts/dashboard/src/parser');
+const { parseSpecStories, parseTasks, parseChecklists, parseChecklistsDetailed, parseConstitutionTDD, hasClarifications, countClarificationSessions, parseConstitutionPrinciples, parseRequirements, parseSuccessCriteria, parseClarifications, parseStoryRequirementRefs, parseTechContext, parseFileStructure, parseAsciiDiagram, parseTesslJson, parseResearchDecisions, parseTestSpecs, parseTaskTestRefs, parseAnalysisFindings, parseAnalysisCoverage, parseAnalysisMetrics, parseConstitutionAlignment, parsePhaseSeparation, parseBugs } = require('../../.claude/skills/iikit-core/scripts/dashboard/src/parser');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
@@ -193,6 +193,21 @@ describe('parseChecklists', () => {
     const result = parseChecklists(tmpDir);
     expect(result.total).toBe(0);
   });
+
+  test('excludes requirements.md (spec quality checklist from specify phase)', () => {
+    fs.writeFileSync(path.join(tmpDir, 'requirements.md'), '- [x] CHK001 Done\n- [x] CHK002 Done\n');
+    const result = parseChecklists(tmpDir);
+    expect(result).toEqual({ total: 0, checked: 0, percentage: 0 });
+  });
+
+  test('excludes requirements.md but counts domain checklists', () => {
+    fs.writeFileSync(path.join(tmpDir, 'requirements.md'), '- [x] CHK001 Done\n');
+    fs.writeFileSync(path.join(tmpDir, 'domain.md'), '- [x] CHK002 Done\n- [ ] CHK003 Not done\n');
+    const result = parseChecklists(tmpDir);
+    expect(result.total).toBe(2);
+    expect(result.checked).toBe(1);
+    expect(result.percentage).toBe(50);
+  });
 });
 
 // T007: Tests for parseConstitutionTDD
@@ -246,6 +261,60 @@ describe('hasClarifications', () => {
 
   test('returns false for null', () => {
     expect(hasClarifications(null)).toBe(false);
+  });
+});
+
+// Tests for countClarificationSessions
+describe('countClarificationSessions', () => {
+  test('returns 0 for empty string', () => {
+    expect(countClarificationSessions('')).toBe(0);
+  });
+
+  test('returns 0 for null', () => {
+    expect(countClarificationSessions(null)).toBe(0);
+  });
+
+  test('returns 0 when no Clarifications section exists', () => {
+    expect(countClarificationSessions('# Spec\n## Requirements\n- FR-001\n')).toBe(0);
+  });
+
+  test('returns 1 for a single session', () => {
+    const content = '# Spec\n## Clarifications\n### Session 2026-01-15\n- Q: x -> A: y [FR-001]\n';
+    expect(countClarificationSessions(content)).toBe(1);
+  });
+
+  test('returns 2 for two sessions', () => {
+    const content = [
+      '# Spec',
+      '## Clarifications',
+      '### Session 2026-01-15',
+      '- Q: x -> A: y [FR-001]',
+      '### Session 2026-02-10',
+      '- Q: z -> A: w [FR-002]',
+    ].join('\n');
+    expect(countClarificationSessions(content)).toBe(2);
+  });
+
+  test('returns 0 for Session heading without date', () => {
+    const content = '# Spec\n## Clarifications\n### Session\n- Q: x -> A: y\n';
+    expect(countClarificationSessions(content)).toBe(0);
+  });
+
+  test('returns 0 for malformed date', () => {
+    const content = '# Spec\n## Clarifications\n### Session 2026-1-5\n- Q: x -> A: y\n';
+    expect(countClarificationSessions(content)).toBe(0);
+  });
+
+  test('counts sessions across different artifact types', () => {
+    const planContent = [
+      '# Plan',
+      '## Technical Context',
+      'Node.js 20',
+      '## Clarifications',
+      '### Session 2026-03-01',
+      '- Q: Why Redis? -> A: Built-in TTL [KDD-1]',
+    ].join('\n');
+    expect(countClarificationSessions(planContent)).toBe(1);
   });
 });
 
@@ -1005,19 +1074,19 @@ describe('parseChecklistsDetailed', () => {
 
   // TS-020: Returns per-file item arrays with correct counts
   test('returns per-file item arrays with correct counts', () => {
-    fs.writeFileSync(path.join(tmpDir, 'requirements.md'), '- [x] CHK-001 Req one\n- [x] CHK-002 Req two\n- [x] CHK-003 Req three\n- [ ] CHK-004 Req four\n- [ ] CHK-005 Req five\n');
+    fs.writeFileSync(path.join(tmpDir, 'domain.md'), '- [x] CHK-001 Req one\n- [x] CHK-002 Req two\n- [x] CHK-003 Req three\n- [ ] CHK-004 Req four\n- [ ] CHK-005 Req five\n');
     fs.writeFileSync(path.join(tmpDir, 'ux.md'), '- [x] CHK-010 UX item one\n');
     const result = parseChecklistsDetailed(tmpDir);
     expect(result).toHaveLength(2);
 
-    const reqFile = result.find(f => f.filename === 'requirements.md');
+    const domainFile = result.find(f => f.filename === 'domain.md');
     const uxFile = result.find(f => f.filename === 'ux.md');
 
-    expect(reqFile).toBeDefined();
-    expect(reqFile.name).toBe('Requirements');
-    expect(reqFile.total).toBe(5);
-    expect(reqFile.checked).toBe(3);
-    expect(reqFile.items).toHaveLength(5);
+    expect(domainFile).toBeDefined();
+    expect(domainFile.name).toBe('Domain');
+    expect(domainFile.total).toBe(5);
+    expect(domainFile.checked).toBe(3);
+    expect(domainFile.items).toHaveLength(5);
 
     expect(uxFile).toBeDefined();
     expect(uxFile.name).toBe('Ux');
@@ -1078,12 +1147,12 @@ describe('parseChecklistsDetailed', () => {
 
   // TS-032: Checklist name derived from filename
   test('checklist name derived from filename', () => {
-    fs.writeFileSync(path.join(tmpDir, 'requirements.md'), '- [ ] Item\n');
+    fs.writeFileSync(path.join(tmpDir, 'domain.md'), '- [ ] Item\n');
     fs.writeFileSync(path.join(tmpDir, 'api-design.md'), '- [ ] Item\n');
     fs.writeFileSync(path.join(tmpDir, 'ux.md'), '- [ ] Item\n');
     const result = parseChecklistsDetailed(tmpDir);
     const names = result.map(f => f.name).sort();
-    expect(names).toContain('Requirements');
+    expect(names).toContain('Domain');
     expect(names).toContain('Api Design');
     expect(names).toContain('Ux');
   });
@@ -1097,12 +1166,20 @@ describe('parseChecklistsDetailed', () => {
     expect(result[0].checked).toBe(0);
   });
 
-  // Test 8: requirements.md is counted as a real checklist
-  test('requirements.md is parsed as a checklist', () => {
+  // Test 8: requirements.md is excluded (spec quality checklist from /iikit-01-specify)
+  test('requirements.md is excluded from checklist parsing', () => {
     fs.writeFileSync(path.join(tmpDir, 'requirements.md'), '- [x] CHK-001 Done\n- [ ] CHK-002 Not done\n');
     const result = parseChecklistsDetailed(tmpDir);
+    expect(result.length).toBe(0);
+  });
+
+  // Test 8b: requirements.md excluded but domain checklists still parsed
+  test('requirements.md excluded but domain checklists still parsed', () => {
+    fs.writeFileSync(path.join(tmpDir, 'requirements.md'), '- [x] CHK-001 Done\n');
+    fs.writeFileSync(path.join(tmpDir, 'domain.md'), '- [x] CHK-002 Done\n- [ ] CHK-003 Not done\n');
+    const result = parseChecklistsDetailed(tmpDir);
     expect(result.length).toBe(1);
-    expect(result[0].filename).toBe('requirements.md');
+    expect(result[0].filename).toBe('domain.md');
     expect(result[0].items.length).toBe(2);
   });
 

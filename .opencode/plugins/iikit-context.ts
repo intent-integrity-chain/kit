@@ -30,12 +30,12 @@ function getFeatureStage(specsDir: string, feature: string): string {
 }
 
 function getNextStep(stage: string): string {
-  if (stage === "specified") return "Next: /iikit-02-clarify or /iikit-03-plan"
-  if (stage === "planned") return "Next: /iikit-04-checklist or /iikit-06-tasks"
-  if (stage === "tasks-ready") return "Next: /iikit-07-analyze or /iikit-08-implement"
-  if (stage.startsWith("implementing")) return "Next: /iikit-08-implement (resume)"
+  if (stage === "specified") return "Next: /iikit-clarify or /iikit-02-plan"
+  if (stage === "planned") return "Next: /iikit-03-checklist or /iikit-05-tasks"
+  if (stage === "tasks-ready") return "Next: /iikit-06-analyze or /iikit-07-implement"
+  if (stage.startsWith("implementing")) return "Next: /iikit-07-implement (resume)"
   if (stage === "complete")
-    return "All tasks complete. /iikit-09-taskstoissues to export."
+    return "All tasks complete. /iikit-08-taskstoissues to export."
   return "Run /iikit-core status to see current state."
 }
 
