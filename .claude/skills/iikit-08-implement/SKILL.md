@@ -49,8 +49,9 @@ Scan tasks.md for unchecked tasks (`[ ]`). If **every** unchecked task has a `T-
 
 **Bugfix mode** (`BUGFIX_ONLY=true`):
 1. **Artifact completeness**: tasks.md (has T-B tasks), bugs.md (has matching BUG-NNN entries). plan.md, checklists, and spec.md are NOT required.
-2. **Cross-artifact consistency**: skip (bugfix tasks trace to bugs.md, not spec FR-XXX)
-3. Report readiness: READY or BLOCKED
+2. **BDD chain**: If `tests/features/` exists with `.feature` files, the BDD verification chain (sections 2.1–2.4) still applies — bugfix tests use the same BDD framework as feature tests.
+3. **Cross-artifact consistency**: skip (bugfix tasks trace to bugs.md, not spec FR-XXX)
+4. Report readiness: READY or BLOCKED
 
 ## Checklist Gating
 
@@ -71,7 +72,7 @@ Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path) — updates 
 
 **Standard mode**: Required: `tasks.md`, `plan.md`. Optional: `data-model.md`, `contracts/`, `research.md`, `quickstart.md`, `tests/features/` (BDD .feature files)
 
-**Bugfix mode**: Required: `tasks.md`, `bugs.md`. Optional: `plan.md`, `tests/features/` (present if TDD)
+**Bugfix mode**: Required: `tasks.md`, `bugs.md`. Optional: `plan.md`, `tests/features/` (if present, BDD chain applies — bugfix tests must use the same BDD framework)
 
 ### 2. TDD Support Check
 
