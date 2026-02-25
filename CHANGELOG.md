@@ -1,5 +1,14 @@
 # Changelog
 
+## v2.4.0
+
+- **BDD in bugfix workflow**: When the constitution mandates TDD/BDD, `/iikit-bugfix` creates `bugfix_BUG-NNN.feature` files with Gherkin scenarios and re-hashes the features directory. `/iikit-08-implement` bugfix mode applies the full BDD verification chain when `.feature` files are present.
+- **Testify enforcement across phases**: `check-prerequisites.sh` gates phases 06-09 on `.feature` file existence when TDD/BDD is mandatory. All four defense lines (skill, rule, script, hook) now enforce testify.
+- **Cached TDD determination**: Constitution skill writes `tdd_determination` to `.specify/context.json` on ratification. All consumers read from cache instead of re-parsing the constitution.
+- **BDD/behavior-driven detection**: Constitution scanner recognizes BDD, behavior-driven, and behaviour-driven as synonyms for TDD.
+- **Dashboard refresh rule**: Always-on rule ensures dashboard regeneration after any file change in `specs/` or project root. Skills also regenerate explicitly (testify, tasks, checklist, analyze).
+- **Phase separation rule**: Always-on rule enforcing no tech in constitution, no implementation in spec, no governance in plan.
+
 ## v2.3.0
 
 - **Always-on Tessl rules**: Three `alwaysApply: true` rules loaded into agent context on every request — `assertion-integrity` (never tamper with `.feature` files or test assertions), `phase-discipline` (never code without spec/plan/tasks, never skip phases), and `constitution` (never violate `CONSTITUTION.md` principles). Adds a new defense-in-depth layer alongside skills, scripts, and git hooks.

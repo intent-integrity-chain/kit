@@ -4,9 +4,11 @@
 
 An AI coding assistant toolkit that preserves your intent from idea to implementation, with cryptographic verification at each step. Compatible with Claude Code, OpenAI Codex, Google Gemini, and OpenCode.
 
-## What's New in v2.3.0
+## What's New in v2.4.0
 
-- **Always-on rules**: Three Tessl rules loaded into agent context on every request — assertion integrity (never tamper with `.feature` files), phase discipline (never skip phases), and constitution enforcement (never violate `CONSTITUTION.md`). Defense-in-depth alongside skills, scripts, and git hooks.
+- **BDD in bugfix workflow**: Bug fixes create `.feature` files and go through the full BDD verification chain when the constitution mandates TDD/BDD.
+- **Five always-on rules**: assertion integrity, phase discipline, constitution, dashboard refresh, phase separation — loaded into agent context on every request.
+- **Cached TDD determination**: Computed once on constitution ratification, stored in `.specify/context.json`, read everywhere. No more 4 different implementations re-parsing the constitution.
 - **Pre-commit BDD runner enforcement** (v2.2.0): When `.feature` files exist, code commits are mechanically gated — three gates: step definitions exist, runner dependency in project dep files, `verify-steps.sh` dry-run passes. Covers all 8 supported frameworks.
 
 ### v2.0.0 (breaking)
