@@ -62,11 +62,7 @@ source "$SCRIPTS_DIR/testify-tdd.sh"
 # TDD DETERMINATION — check constitution for TDD requirements
 # ============================================================================
 
-CONSTITUTION_FILE="$REPO_ROOT/CONSTITUTION.md"
-TDD_DETERMINATION="unknown"
-if [[ -f "$CONSTITUTION_FILE" ]]; then
-    TDD_DETERMINATION=$(get_tdd_determination "$CONSTITUTION_FILE")
-fi
+TDD_DETERMINATION=$(get_cached_tdd_determination "$REPO_ROOT")
 
 # ============================================================================
 # TDD MANDATORY WARNING — when TDD required but testify never run

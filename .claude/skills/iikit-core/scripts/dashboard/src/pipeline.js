@@ -42,8 +42,21 @@ function computePipelineState(projectPath, featureId) {
   // Parse checklists
   const checklistStatus = parseChecklists(checklistDir);
 
-  // TDD requirement check
-  const tddRequired = constitutionExists ? parseConstitutionTDD(constitutionPath) : false;
+  // TDD requirement check — read from .specify/context.json first, fallback to parsing
+  const contextPath = path.join(projectPath, '.specify', 'context.json');
+  let tddRequired = false;
+  if (fs.existsSync(contextPath)) {
+    try {
+      const ctx = JSON.parse(fs.readFileSync(contextPath, 'utf-8'));
+      if (ctx.tdd_determination) {
+        tddRequired = ctx.tdd_determination === 'mandatory';
+      } else {
+        tddRequired = constitutionExists ? parseConstitutionTDD(constitutionPath) : false;
+      }
+    } catch { tddRequired = constitutionExists ? parseConstitutionTDD(constitutionPath) : false; }
+  } else {
+    tddRequired = constitutionExists ? parseConstitutionTDD(constitutionPath) : false;
+  }
 
   const phases = [
     {

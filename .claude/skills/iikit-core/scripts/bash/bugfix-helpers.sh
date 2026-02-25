@@ -110,7 +110,11 @@ cmd_validate_feature() {
 
     [[ -f "$feature_dir/tasks.md" ]] && has_tasks="true"
     [[ -f "$feature_dir/bugs.md" ]] && has_bugs="true"
-    [[ -f "$feature_dir/tests/test-specs.md" ]] && has_tests="true"
+    if [[ -d "$feature_dir/tests/features" ]]; then
+        local fcount
+        fcount=$(find "$feature_dir/tests/features" -maxdepth 1 -name "*.feature" -type f 2>/dev/null | wc -l | tr -d ' ')
+        [[ "$fcount" -gt 0 ]] && has_tests="true"
+    fi
 
     printf '{"valid":true,"has_tasks":%s,"has_bugs":%s,"has_tests":%s}\n' \
         "$has_tasks" "$has_bugs" "$has_tests"

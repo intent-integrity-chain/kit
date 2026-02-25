@@ -58,6 +58,10 @@ create_mock_feature() {
     cp "$FIXTURES_DIR/spec.md" "$feature_dir/spec.md"
     cp "$FIXTURES_DIR/plan.md" "$feature_dir/plan.md"
 
+    # Add .feature files so testify gate passes (fixture constitution mandates TDD)
+    mkdir -p "$feature_dir/tests/features"
+    echo "Feature: Test" > "$feature_dir/tests/features/test.feature"
+
     # Return relative path for assertions
     echo "specs/$feature_name"
 }
@@ -70,8 +74,8 @@ create_complete_mock_feature() {
     local feature_dir="$TEST_DIR/$relative_dir"
 
     cp "$FIXTURES_DIR/tasks.md" "$feature_dir/tasks.md"
-    mkdir -p "$feature_dir/tests"
-    cp "$FIXTURES_DIR/test-specs.md" "$feature_dir/tests/test-specs.md"
+    mkdir -p "$feature_dir/tests/features"
+    echo "Feature: Test" > "$feature_dir/tests/features/test.feature"
 
     echo "$relative_dir"
 }

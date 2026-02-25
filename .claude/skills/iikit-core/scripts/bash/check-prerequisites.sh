@@ -619,28 +619,21 @@ if [[ "$P_CHECKLIST" != "none" ]]; then
     fi
 fi
 
-# Testify gate — when TDD is mandatory, phases 06+ require .feature files or test-specs.md
+# Testify gate — when TDD is mandatory, phases 06+ require .feature files
 if [[ "$PHASE" == "06" || "$PHASE" == "07" || "$PHASE" == "08" || "$PHASE" == "09" ]]; then
-    # Source testify-tdd.sh for get_tdd_determination (it sources common.sh)
-    source "$SCRIPT_DIR/testify-tdd.sh"
-    CONSTITUTION_FILE="$REPO_ROOT/CONSTITUTION.md"
-    if [[ -f "$CONSTITUTION_FILE" ]]; then
-        TDD_DET=$(get_tdd_determination "$CONSTITUTION_FILE")
-        if [[ "$TDD_DET" == "mandatory" ]]; then
-            HAS_FEATURES=false
-            HAS_TEST_SPECS=false
-            if [[ -d "$FEATURE_DIR/tests/features" ]]; then
-                FCOUNT=$(find "$FEATURE_DIR/tests/features" -maxdepth 1 -name "*.feature" -type f 2>/dev/null | wc -l | tr -d ' ')
-                [[ "$FCOUNT" -gt 0 ]] && HAS_FEATURES=true
-            fi
-            [[ -f "$FEATURE_DIR/tests/test-specs.md" ]] && HAS_TEST_SPECS=true
+    TDD_DET=$(get_cached_tdd_determination "$REPO_ROOT")
+    if [[ "$TDD_DET" == "mandatory" ]]; then
+        HAS_FEATURES=false
+        if [[ -d "$FEATURE_DIR/tests/features" ]]; then
+            FCOUNT=$(find "$FEATURE_DIR/tests/features" -maxdepth 1 -name "*.feature" -type f 2>/dev/null | wc -l | tr -d ' ')
+            [[ "$FCOUNT" -gt 0 ]] && HAS_FEATURES=true
+        fi
 
-            if ! $HAS_FEATURES && ! $HAS_TEST_SPECS; then
-                echo "ERROR: TDD is mandatory (per CONSTITUTION.md) but /iikit-05-testify has not been run." >&2
-                echo "  No .feature files or test-specs.md found in $FEATURE_DIR/tests/" >&2
-                echo "  Run /iikit-05-testify before /iikit-$(printf '%02d' "$PHASE")-*" >&2
-                exit 1
-            fi
+        if ! $HAS_FEATURES; then
+            echo "ERROR: TDD is mandatory (per CONSTITUTION.md) but /iikit-05-testify has not been run." >&2
+            echo "  No .feature files found in $FEATURE_DIR/tests/features/" >&2
+            echo "  Run /iikit-05-testify before /iikit-$(printf '%02d' "$PHASE")-*" >&2
+            exit 1
         fi
     fi
 fi

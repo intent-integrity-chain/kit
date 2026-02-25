@@ -555,6 +555,47 @@ detect_framework() {
 }
 
 # =============================================================================
+# TDD DETERMINATION — cached in .specify/context.json, fallback to constitution
+# Written by /iikit-00-constitution, read by all consumers.
+# Returns: "mandatory", "optional", "forbidden", or "unknown"
+# =============================================================================
+
+get_cached_tdd_determination() {
+    local repo_root="${1:-$(get_repo_root)}"
+    local context_file="$repo_root/.specify/context.json"
+
+    # Try cached value first
+    if [[ -f "$context_file" ]]; then
+        local cached
+        cached=$(jq -r '.tdd_determination // ""' "$context_file" 2>/dev/null)
+        if [[ -n "$cached" && "$cached" != "null" ]]; then
+            echo "$cached"
+            return
+        fi
+    fi
+
+    # Fallback: parse constitution directly (for projects that haven't re-run constitution skill)
+    local constitution="$repo_root/CONSTITUTION.md"
+    if [[ -f "$constitution" ]]; then
+        # Inline lightweight check matching assess_tdd_requirements() in testify-tdd.sh
+        local content
+        content=$(cat "$constitution")
+        if echo "$content" | grep -qi "MUST.*\(TDD\|BDD\|test-first\|red-green-refactor\|write tests before\|behavior-driven\|behaviour-driven\)"; then
+            echo "mandatory"
+        elif echo "$content" | grep -qi "\(TDD\|BDD\|test-first\|red-green-refactor\|write tests before\|behavior-driven\|behaviour-driven\).*MUST"; then
+            echo "mandatory"
+        elif echo "$content" | grep -qi "MUST.*\(test-driven\|tests.*before.*code\|tests.*before.*implementation\)"; then
+            echo "mandatory"
+        else
+            echo "optional"
+        fi
+        return
+    fi
+
+    echo "unknown"
+}
+
+# =============================================================================
 # BDD DEPENDENCY CHECK (used by pre-commit-hook.sh)
 # Returns 0 (found) or 1 (not found)
 # Outputs the dep file path on stdout when found

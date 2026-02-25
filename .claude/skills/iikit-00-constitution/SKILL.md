@@ -65,11 +65,21 @@ Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/sc
 
 8. **Write** to `CONSTITUTION.md`
 
-9. **Git init** (if needed): `git init` to ensure project isolation
+9. **Store TDD determination** in `.specify/context.json` so all skills read from here instead of re-parsing the constitution:
+   ```bash
+   TDD_DET=$(bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh get-tdd-determination "CONSTITUTION.md")
+   ```
+   Write to `.specify/context.json` using `jq` (merge, don't overwrite):
+   ```bash
+   jq --arg det "$TDD_DET" '. + {tdd_determination: $det}' .specify/context.json > .specify/context.json.tmp && mv .specify/context.json.tmp .specify/context.json
+   ```
+   If `.specify/context.json` doesn't exist, create it: `echo '{}' | jq --arg det "$TDD_DET" '{tdd_determination: $det}' > .specify/context.json`
 
-10. **Commit**: `git add CONSTITUTION.md && git commit -m "Add project constitution"`
+10. **Git init** (if needed): `git init` to ensure project isolation
 
-11. **Report**: version, bump rationale, git status, suggested next steps
+11. **Commit**: `git add CONSTITUTION.md .specify/context.json && git commit -m "Add project constitution"`
+
+12. **Report**: version, bump rationale, TDD determination, git status, suggested next steps
 
 ## Formatting
 

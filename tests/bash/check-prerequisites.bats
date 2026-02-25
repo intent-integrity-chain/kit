@@ -636,8 +636,10 @@ teardown() {
 @test "check-prerequisites: --phase 06 fails when TDD mandatory and no testify artifacts" {
     create_mock_feature "001-test-feature"
 
+    # Remove .feature files added by create_mock_feature
+    rm -rf "$TEST_DIR/specs/001-test-feature/tests/features"
+
     # Constitution fixture already has "TDD Required: Test-first development MUST be used"
-    # No .feature files or test-specs.md exist
 
     run "$CHECK_SCRIPT" --phase 06 --json
     [[ "$status" -eq 1 ]]
@@ -646,22 +648,19 @@ teardown() {
 }
 
 @test "check-prerequisites: --phase 06 passes when TDD mandatory and .feature files exist" {
+    # create_mock_feature already adds .feature files
     create_mock_feature "001-test-feature"
-
-    # Create .feature files
-    mkdir -p "$TEST_DIR/specs/001-test-feature/tests/features"
-    echo "Feature: Test" > "$TEST_DIR/specs/001-test-feature/tests/features/test.feature"
 
     run "$CHECK_SCRIPT" --phase 06 --json
     [[ "$status" -eq 0 ]]
 }
 
-@test "check-prerequisites: --phase 06 passes when TDD mandatory and test-specs.md exists" {
+@test "check-prerequisites: --phase 06 passes when TDD mandatory and cached in context.json" {
     create_mock_feature "001-test-feature"
 
-    # Create legacy test-specs.md
-    mkdir -p "$TEST_DIR/specs/001-test-feature/tests"
-    echo "**Given**: test" > "$TEST_DIR/specs/001-test-feature/tests/test-specs.md"
+    # Write cached TDD determination to .specify/context.json
+    mkdir -p "$TEST_DIR/.specify"
+    echo '{"tdd_determination": "mandatory"}' > "$TEST_DIR/.specify/context.json"
 
     run "$CHECK_SCRIPT" --phase 06 --json
     [[ "$status" -eq 0 ]]
