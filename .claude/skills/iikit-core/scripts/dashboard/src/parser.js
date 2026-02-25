@@ -220,7 +220,8 @@ function parseConstitutionTDD(constitutionPath) {
   if (!fs.existsSync(constitutionPath)) return false;
 
   const content = fs.readFileSync(constitutionPath, 'utf-8').toLowerCase();
-  const hasTDDTerms = /\btdd\b|test-first|red-green-refactor|write tests before|tests must be written before/.test(content);
+  // Keep in sync with assess_tdd_requirements() in testify-tdd.sh
+  const hasTDDTerms = /\btdd\b|\bbdd\b|test-first|red-green-refactor|write tests before|tests must be written before|test-driven|behavior-driven|behaviour-driven/.test(content);
   const hasMandatory = /\bmust\b|\brequired\b|non-negotiable/.test(content);
 
   return hasTDDTerms && hasMandatory;
