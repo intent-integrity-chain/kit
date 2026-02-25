@@ -162,27 +162,29 @@ pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powe
 
 Parse JSON response for `determination` field.
 
-### 10. TDD Flow (If Mandatory)
+### 10. BDD/TDD Flow (If Mandatory)
 
 If TDD is mandatory (`determination` = `mandatory`):
 
-1. Check if `<feature_dir>/tests/test-specs.md` exists
-2. If missing: ERROR with "TDD is required by constitution but test-specs.md not found. Run `/iikit-05-testify` first."
-3. If exists: append a "Bug Fix Tests" section with:
-   - Continue TS-NNN numbering from the last existing entry
-   - Write Given/When/Then test specification derived from the bug report
-   - Given: the conditions that trigger the bug
-   - When: the action that causes the incorrect behavior
-   - Then: the expected correct behavior
-4. Re-hash test-specs.md (atomic — single command computes and stores):
-   ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh rehash "<feature_dir>/tests/test-specs.md"
+1. Create `<feature_dir>/tests/features/` if it doesn't exist
+2. Create `<feature_dir>/tests/features/bugfix_<BUG-NNN>.feature`:
+   ```gherkin
+   @BUG-NNN
+   Feature: Bug fix for BUG-NNN — <description>
+     Scenario: <description>
+       Given <conditions that trigger the bug>
+       When <action that causes incorrect behavior>
+       Then <expected correct behavior>
    ```
-5. **Verify hash was stored** — if result is NOT `valid`, STOP and report error:
+3. Re-hash the features directory:
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh verify-hash "<feature_dir>/tests/test-specs.md"
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh rehash "<feature_dir>/tests/features"
    ```
-6. Continue to Step 11 with TDD task variant
+4. **Verify hash was stored** — if result is NOT `valid`, STOP and report error:
+   ```bash
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh verify-hash "<feature_dir>/tests/features"
+   ```
+5. Continue to Step 11 with TDD task variant
 
 ### 11. Generate Bug Fix Tasks
 
@@ -243,7 +245,7 @@ Bug reported successfully!
 Files modified:
   - <feature_dir>/bugs.md (created/appended)
   - <feature_dir>/tasks.md (appended)
-  - <feature_dir>/tests/test-specs.md (appended, TDD only)
+  - <feature_dir>/tests/features/bugfix_BUG-NNN.feature (created, TDD only)
 
 Next step:
   - /iikit-08-implement — runs in bugfix mode (relaxed gates: no checklist or plan required, traces to bugs.md instead of spec)
@@ -259,6 +261,6 @@ Next step:
 | Feature validation failed | ERROR with specific message |
 | GitHub API unreachable | Fall back: `gh` → `curl` GitHub API → skip with WARN |
 | GitHub issue not found | ERROR with "verify issue number" |
-| TDD required, no test-specs.md | ERROR: "Run `/iikit-05-testify` first" |
+| TDD required, no test artifacts | ERROR: "Run `/iikit-05-testify` first" |
 | Existing bugs.md | Append without modifying existing entries |
 | Existing tasks.md | Append without modifying existing entries |
