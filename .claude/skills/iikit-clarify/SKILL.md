@@ -161,13 +161,7 @@ After each write and final pass:
 
 Output: questions asked/answered, target artifact and path, sections touched, traceability summary table (clarification -> referenced items), coverage summary (category -> status), suggested next command.
 
-**Next command logic**: suggest the next phase command based on the artifact clarified:
-- After spec clarification: `/iikit-02-plan`
-- After plan clarification: `/iikit-03-checklist`
-- After checklist clarification: `/iikit-04-testify` or `/iikit-05-tasks`
-- After testify clarification: `/iikit-05-tasks`
-- After tasks clarification: `/iikit-06-analyze`
-- After constitution clarification: `/iikit-01-specify <description>`
+**Next command logic**: run `check-prerequisites.sh --json status` and use its `next_step` field. This returns the actual next phase based on feature state (which artifacts exist), not what was just clarified. Clarify can run at any point — the next step depends on where the feature is, not where clarify was invoked.
 
 ## Behavior Rules
 
@@ -179,11 +173,14 @@ Output: questions asked/answered, target artifact and path, sections touched, tr
 
 ## Next Steps
 
-You MUST read [model-recommendations.md](../iikit-core/references/model-recommendations.md), check the expiration date (refresh via web search if expired), detect the agent via env vars, and include a model switch tip in the output below if the next phase needs a different model tier.
+Run `check-prerequisites.sh --json status` to get `next_step` and look up its model tier in [model-recommendations.md](../iikit-core/references/model-recommendations.md) (check the expiration date — refresh via web search if expired). Detect the agent via env vars and include a model switch tip if the next phase needs a different tier.
 
 ```
-Clarification complete! Next: /clear then <next_command>
-(Q&A consumed significant context — /clear before next phase is recommended)
+Clarification complete!
+
+Next: /clear → <next_step from check-prerequisites.sh>
 Tip: <model switch suggestion if tier mismatch, omit if already on the right model>
 - Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
 ```
+
+`/clear` is always strongly recommended — Q&A sessions consume significant context and the next phase benefits from a fresh window.
