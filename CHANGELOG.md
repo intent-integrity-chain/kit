@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.5.1
+
+- **Clarify next-step fix**: Clarify now uses feature state to determine the correct next-step suggestion instead of hardcoded phase logic.
+
 ## v2.5.0
 
 - **Generic clarify utility**: `/iikit-clarify` extracted from the numbered sequence into a standalone utility. Can run after any phase on any artifact (spec, plan, checklist, testify, tasks, or constitution). Auto-detects the most recent artifact in reverse phase order; user can override with an argument (e.g., `/iikit-clarify plan`). Per-artifact ambiguity taxonomies: spec (functional scope, domain, UX, non-functional, edge cases, terminology), plan (framework choice, architecture, trade-offs, scalability, dependency risks), checklist (threshold appropriateness, missing checks, false positives), testify (scenario precision, missing paths, Given/When/Then completeness), tasks (dependency correctness, ordering, scope, parallelization), constitution (principle clarity, threshold specificity, conflict resolution, enforcement gaps).

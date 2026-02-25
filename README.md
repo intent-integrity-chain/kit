@@ -4,7 +4,11 @@
 
 An AI coding assistant toolkit that preserves your intent from idea to implementation, with cryptographic verification at each step. Compatible with Claude Code, OpenAI Codex, Google Gemini, and OpenCode.
 
-## What's New in v2.5.0
+## What's New in v2.5.1
+
+- **Clarify next-step fix**: Clarify now uses feature state to determine the correct next-step suggestion instead of hardcoded phase logic.
+
+### v2.5.0
 
 - **Generic clarify utility**: `/iikit-clarify` is now a standalone utility that can run after any phase on any artifact — spec, plan, checklist, testify, tasks, or constitution. Auto-detects the most recent artifact; override with an argument (e.g., `/iikit-clarify plan`). Per-artifact ambiguity taxonomies guide targeted questions.
 - **Full skill renumbering**: Clarify extracted from the numbered sequence. New numbering: 02-plan, 03-checklist, 04-testify, 05-tasks, 06-analyze, 07-implement, 08-taskstoissues.
