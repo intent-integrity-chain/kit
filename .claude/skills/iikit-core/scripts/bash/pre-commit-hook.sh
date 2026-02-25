@@ -84,7 +84,7 @@ if [[ "$TDD_DETERMINATION" == "mandatory" ]] && [[ -n "$STAGED_CODE_FILES" ]]; t
     if ! $ANY_FEATURES; then
         echo "" >&2
         echo "[iikit] WARNING: TDD is mandatory (per CONSTITUTION.md) but no .feature files or test-specs.md found." >&2
-        echo "[iikit]   Run /iikit-05-testify before implementing features." >&2
+        echo "[iikit]   Run /iikit-04-testify before implementing features." >&2
         echo "" >&2
     fi
 fi
@@ -120,7 +120,7 @@ if [[ -n "$STAGED_CODE_FILES" ]]; then
             BDD_BLOCK_MESSAGES+=("BLOCKED: specs/$FEAT_NAME — missing step definitions")
             BDD_BLOCK_MESSAGES+=("  Expected: specs/$FEAT_NAME/tests/step_definitions/ with at least one file")
             BDD_BLOCK_MESSAGES+=("  .feature files exist but no step definitions wire them to code.")
-            BDD_BLOCK_MESSAGES+=("  Run /iikit-08-implement to generate step definitions.")
+            BDD_BLOCK_MESSAGES+=("  Run /iikit-07-implement to generate step definitions.")
             continue
         fi
 
@@ -288,14 +288,14 @@ if [[ -n "$STAGED_FEATURE_FILES" ]]; then
             invalid)
                 BLOCKED=true
                 BLOCK_MESSAGES+=("BLOCKED: $FEAT_DIR/tests/features/ — .feature assertion integrity check failed")
-                BLOCK_MESSAGES+=("  .feature file assertions have been modified since /iikit-05-testify generated them.")
-                BLOCK_MESSAGES+=("  Re-run /iikit-05-testify to regenerate .feature files.")
+                BLOCK_MESSAGES+=("  .feature file assertions have been modified since /iikit-04-testify generated them.")
+                BLOCK_MESSAGES+=("  Re-run /iikit-04-testify to regenerate .feature files.")
                 ;;
             missing)
                 if [[ "$TDD_DETERMINATION" == "mandatory" ]]; then
                     echo "[iikit] Warning: $FEAT_DIR/tests/features/ — no stored assertion hash found (TDD is mandatory)" >&2
                     echo "[iikit]   If this is the initial testify commit, this is expected." >&2
-                    echo "[iikit]   Otherwise, run /iikit-05-testify to generate integrity hashes." >&2
+                    echo "[iikit]   Otherwise, run /iikit-04-testify to generate integrity hashes." >&2
                 fi
                 ;;
         esac
@@ -407,14 +407,14 @@ while IFS= read -r staged_path; do
         invalid)
             BLOCKED=true
             BLOCK_MESSAGES+=("BLOCKED: $staged_path — assertion integrity check failed")
-            BLOCK_MESSAGES+=("  Assertions have been modified since /iikit-05-testify generated them.")
-            BLOCK_MESSAGES+=("  Re-run /iikit-05-testify to regenerate test specifications.")
+            BLOCK_MESSAGES+=("  Assertions have been modified since /iikit-04-testify generated them.")
+            BLOCK_MESSAGES+=("  Re-run /iikit-04-testify to regenerate test specifications.")
             ;;
         missing)
             if [[ "$TDD_DETERMINATION" == "mandatory" ]]; then
                 echo "[iikit] Warning: $staged_path — no stored assertion hash found (TDD is mandatory)" >&2
                 echo "[iikit]   If this is the initial testify commit, this is expected." >&2
-                echo "[iikit]   Otherwise, run /iikit-05-testify to generate integrity hashes." >&2
+                echo "[iikit]   Otherwise, run /iikit-04-testify to generate integrity hashes." >&2
             fi
             ;;
     esac
@@ -434,7 +434,7 @@ if [[ "$BLOCKED" == true ]]; then
         echo "[iikit] $msg" >&2
     done
     echo "" >&2
-    echo "[iikit] To fix: Re-run /iikit-05-testify to regenerate test specs with valid hashes." >&2
+    echo "[iikit] To fix: Re-run /iikit-04-testify to regenerate test specs with valid hashes." >&2
     echo "[iikit] To bypass (NOT recommended): git commit --no-verify" >&2
     echo "" >&2
     exit 1

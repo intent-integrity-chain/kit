@@ -194,10 +194,11 @@ test_skills_exist() {
     # Check iikit-core exists
     run_test "iikit-core skill" "[[ -d '$base/iikit-core' && -f '$base/iikit-core/SKILL.md' ]]"
 
-    for i in 00 01 02 03 04 05 06 07 08 09; do
+    for i in 00 01 02 03 04 05 06 07 08; do
         local skill=$(ls -d "$base"/iikit-${i}-* 2>/dev/null | head -1)
         run_test "iikit-${i}-* skill" "[[ -d '$skill' && -f '$skill/SKILL.md' ]]"
     done
+    run_test "iikit-clarify skill" "[[ -d '$base/iikit-clarify' && -f '$base/iikit-clarify/SKILL.md' ]]"
 }
 
 test_workflow_order() {
@@ -206,7 +207,7 @@ test_workflow_order() {
 
     # Plan should NOT suggest implement (requires tasks)
     ((TESTS_RUN++))
-    if grep -A20 "## Next Steps" "$base/iikit-03-plan/SKILL.md" | grep -E "^- /iikit-08-implement|^[0-9]\..*/iikit-08-implement" >/dev/null 2>&1; then
+    if grep -A20 "## Next Steps" "$base/iikit-02-plan/SKILL.md" | grep -E "^- /iikit-07-implement|^[0-9]\..*/iikit-07-implement" >/dev/null 2>&1; then
         log_fail "plan suggests implement before tasks"
     else
         log_pass "plan does not suggest implement"
@@ -214,7 +215,7 @@ test_workflow_order() {
 
     # Testify should NOT suggest analyze (requires tasks)
     ((TESTS_RUN++))
-    if grep -A15 "## Next Steps" "$base/iikit-05-testify/SKILL.md" | grep -E "^- /iikit-07-analyze|^[0-9]\..*/iikit-07-analyze" >/dev/null 2>&1; then
+    if grep -A15 "## Next Steps" "$base/iikit-04-testify/SKILL.md" | grep -E "^- /iikit-06-analyze|^[0-9]\..*/iikit-06-analyze" >/dev/null 2>&1; then
         log_fail "testify suggests analyze before tasks"
     else
         log_pass "testify does not suggest analyze"
@@ -222,7 +223,7 @@ test_workflow_order() {
 
     # Checklist should NOT suggest implement
     ((TESTS_RUN++))
-    if grep -A20 "## Next Steps" "$base/iikit-04-checklist/SKILL.md" | grep -E "^- /iikit-08-implement|^[0-9]\..*/iikit-08-implement" >/dev/null 2>&1; then
+    if grep -A20 "## Next Steps" "$base/iikit-03-checklist/SKILL.md" | grep -E "^- /iikit-07-implement|^[0-9]\..*/iikit-07-implement" >/dev/null 2>&1; then
         log_fail "checklist suggests implement before tasks"
     else
         log_pass "checklist does not suggest implement"
@@ -231,7 +232,7 @@ test_workflow_order() {
 
 test_tdd_check_has_args() {
     log_section "TDD Check Has Arguments"
-    local impl=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-08-implement/SKILL.md"
+    local impl=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-07-implement/SKILL.md"
 
     ((TESTS_RUN++))
     if grep -q 'testify-tdd.sh comprehensive-check "FEATURE_DIR' "$impl"; then
@@ -271,7 +272,7 @@ test_tdd_conditional_next_steps() {
 
     # Plan skill must show TDD as "REQUIRED by constitution" when mandatory
     ((TESTS_RUN++))
-    if grep -q "REQUIRED by constitution.*test specifications\|REQUIRED by constitution) Generate test" "$base/iikit-03-plan/SKILL.md"; then
+    if grep -q "REQUIRED by constitution.*test specifications\|REQUIRED by constitution) Generate test" "$base/iikit-02-plan/SKILL.md"; then
         log_pass "plan shows testify as REQUIRED when TDD mandatory"
     else
         log_fail "plan missing REQUIRED testify for mandatory TDD"
@@ -279,7 +280,7 @@ test_tdd_conditional_next_steps() {
 
     # Plan skill must show TDD as "Optional" when not required
     ((TESTS_RUN++))
-    if grep -q "(Optional).*test specifications for TDD\|(Optional) Generate test specifications" "$base/iikit-03-plan/SKILL.md"; then
+    if grep -q "(Optional).*test specifications for TDD\|(Optional) Generate test specifications" "$base/iikit-02-plan/SKILL.md"; then
         log_pass "plan shows testify as Optional when TDD not mandatory"
     else
         log_fail "plan missing Optional testify for non-mandatory TDD"
@@ -287,7 +288,7 @@ test_tdd_conditional_next_steps() {
 
     # Checklist skill must include testify in next steps
     ((TESTS_RUN++))
-    if grep -A20 "## Next Steps" "$base/iikit-04-checklist/SKILL.md" | grep -q "iikit-05-testify"; then
+    if grep -A20 "## Next Steps" "$base/iikit-03-checklist/SKILL.md" | grep -q "iikit-04-testify"; then
         log_pass "checklist includes testify in next steps"
     else
         log_fail "checklist missing testify in next steps"
@@ -643,7 +644,7 @@ test_template_paths_resolve() {
         log_fail "create-new-feature.sh template not found: $template_path"
     fi
 
-    # check-prerequisites.sh --phase 03 -> plan-template.md
+    # check-prerequisites.sh --phase 02 -> plan-template.md
     ((TESTS_RUN++))
     template_path="$script_dir/../../templates/plan-template.md"
     if [[ -f "$template_path" ]]; then
@@ -1192,14 +1193,14 @@ test_skill_numbering_consistency() {
     local expected_skills=(
         "iikit-00-constitution"
         "iikit-01-specify"
-        "iikit-02-clarify"
-        "iikit-03-plan"
-        "iikit-04-checklist"
-        "iikit-05-testify"
-        "iikit-06-tasks"
-        "iikit-07-analyze"
-        "iikit-08-implement"
-        "iikit-09-taskstoissues"
+        "iikit-clarify"
+        "iikit-02-plan"
+        "iikit-03-checklist"
+        "iikit-04-testify"
+        "iikit-05-tasks"
+        "iikit-06-analyze"
+        "iikit-07-implement"
+        "iikit-08-taskstoissues"
     )
 
     for skill in "${expected_skills[@]}"; do
@@ -1212,14 +1213,14 @@ test_skill_numbering_consistency() {
     done
 
     # Verify SKILL.md "Next Steps" sections reference correct skill numbers
-    # E.g., iikit-03-plan should suggest iikit-06-tasks, not iikit-05-tasks
+    # E.g., iikit-02-plan should suggest iikit-05-tasks, not iikit-05-tasks
     ((TESTS_RUN++))
     local wrong_numbering=0
 
     # Plan (03) should NOT suggest implement (08) directly
-    if grep -A20 "## Next Steps" "$base/iikit-03-plan/SKILL.md" 2>/dev/null | grep -qE "/iikit-08-implement[^-]"; then
+    if grep -A20 "## Next Steps" "$base/iikit-02-plan/SKILL.md" 2>/dev/null | grep -qE "/iikit-07-implement[^-]"; then
         # Check if it's in a conditional block (OK) or direct suggestion (BAD)
-        if grep -A20 "## Next Steps" "$base/iikit-03-plan/SKILL.md" 2>/dev/null | grep -B2 "/iikit-08-implement" | grep -qiE "if|when|after|require"; then
+        if grep -A20 "## Next Steps" "$base/iikit-02-plan/SKILL.md" 2>/dev/null | grep -B2 "/iikit-07-implement" | grep -qiE "if|when|after|require"; then
             : # Conditional reference is OK
         else
             ((wrong_numbering++))
@@ -1228,7 +1229,7 @@ test_skill_numbering_consistency() {
     fi
 
     # Tasks (06) should suggest analyze (07) and implement (08)
-    if ! grep -A15 "## Next Steps" "$base/iikit-06-tasks/SKILL.md" 2>/dev/null | grep -q "/iikit-07-analyze"; then
+    if ! grep -A15 "## Next Steps" "$base/iikit-05-tasks/SKILL.md" 2>/dev/null | grep -q "/iikit-06-analyze"; then
         ((wrong_numbering++))
         log_info "tasks doesn't suggest analyze (07)"
     fi

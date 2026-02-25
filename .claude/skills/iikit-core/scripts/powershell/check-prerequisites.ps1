@@ -4,11 +4,11 @@
 #
 # Usage: ./check-prerequisites.ps1 -Phase <PHASE> [-Json] [-ProjectRoot PATH]
 #
-# PHASES: 00, 01, 02, 03, 04, 05, 06, 07, 08, 09, bugfix, core
+# PHASES: 00, 01, 02, 03, 04, 05, 06, 07, 08, bugfix, clarify, core
 #
 # LEGACY FLAGS (deprecated, map to phases):
 #   -PathsOnly    -> -Phase core
-#   -RequireTasks -> -Phase 08
+#   -RequireTasks -> -Phase 07
 #   -IncludeTasks (used with -RequireTasks)
 
 [CmdletBinding()]
@@ -34,15 +34,15 @@ Phase-aware prerequisite checking for IIKit workflow.
 PHASES:
   00       Constitution (no validation)
   01       Specify (soft constitution)
-  02       Clarify (soft constitution, requires spec)
+  clarify  Clarify (soft constitution, at least one artifact)
   bugfix   Bug fix (soft constitution)
-  03       Plan (hard constitution, requires spec, copies template)
-  04       Checklist (basic constitution, requires spec + plan)
-  05       Testify (basic constitution, requires spec + plan, soft checklist)
-  06       Tasks (basic constitution, requires spec + plan, soft checklist)
-  07       Analyze (hard constitution, requires spec + plan + tasks, soft checklist)
-  08       Implement (hard constitution, requires spec + plan + tasks, hard checklist)
-  09       Tasks to Issues (implicit constitution, requires spec + plan + tasks)
+  02       Plan (hard constitution, requires spec, copies template)
+  03       Checklist (basic constitution, requires spec + plan)
+  04       Testify (basic constitution, requires spec + plan, soft checklist)
+  05       Tasks (basic constitution, requires spec + plan, soft checklist)
+  06       Analyze (hard constitution, requires spec + plan + tasks, soft checklist)
+  07       Implement (hard constitution, requires spec + plan + tasks, hard checklist)
+  08       Tasks to Issues (implicit constitution, requires spec + plan + tasks)
   core     Paths only (no validation)
   status   Deterministic status report (non-fatal, computes ready_for/next_step)
 
@@ -53,8 +53,8 @@ OPTIONS:
 
 LEGACY FLAGS (deprecated):
   -PathsOnly     Use -Phase core instead
-  -RequireTasks  Use -Phase 08 instead
-  -IncludeTasks  Use -Phase 08 instead
+  -RequireTasks  Use -Phase 07 instead
+  -IncludeTasks  Use -Phase 07 instead
 
 "@
     exit 0
@@ -66,10 +66,10 @@ if (-not $Phase) {
         Write-Warning "DEPRECATED: -PathsOnly is deprecated, use -Phase core"
         $Phase = 'core'
     } elseif ($RequireTasks) {
-        Write-Warning "DEPRECATED: -RequireTasks/-IncludeTasks are deprecated, use -Phase 08"
-        $Phase = '08'
+        Write-Warning "DEPRECATED: -RequireTasks/-IncludeTasks are deprecated, use -Phase 07"
+        $Phase = '07'
     } else {
-        $Phase = '04'
+        $Phase = '03'
     }
 }
 
@@ -81,23 +81,23 @@ if (-not $Phase) {
 # =============================================================================
 
 $phaseConfig = @{
-    '00'     = @{ Const='none';     Spec='no';       Plan='no';       Tasks='no';       IncTasks='no';  Checklist='none'; Extras='' }
-    '01'     = @{ Const='soft';     Spec='no';       Plan='no';       Tasks='no';       IncTasks='no';  Checklist='none'; Extras='' }
-    '02'     = @{ Const='soft';     Spec='required'; Plan='no';       Tasks='no';       IncTasks='no';  Checklist='none'; Extras='' }
-    'bugfix' = @{ Const='soft';     Spec='no';       Plan='no';       Tasks='no';       IncTasks='no';  Checklist='none'; Extras='' }
-    '03'     = @{ Const='hard';     Spec='required'; Plan='no';       Tasks='no';       IncTasks='no';  Checklist='none'; Extras='spec_quality,copy_plan_template' }
-    '04'     = @{ Const='basic';    Spec='required'; Plan='required'; Tasks='no';       IncTasks='no';  Checklist='none'; Extras='' }
-    '05'     = @{ Const='basic';    Spec='required'; Plan='required'; Tasks='no';       IncTasks='no';  Checklist='soft'; Extras='' }
-    '06'     = @{ Const='basic';    Spec='required'; Plan='required'; Tasks='no';       IncTasks='no';  Checklist='soft'; Extras='' }
-    '07'     = @{ Const='hard';     Spec='required'; Plan='required'; Tasks='required'; IncTasks='yes'; Checklist='soft'; Extras='' }
-    '08'     = @{ Const='hard';     Spec='required'; Plan='required'; Tasks='required'; IncTasks='yes'; Checklist='hard'; Extras='' }
-    '09'     = @{ Const='implicit'; Spec='required'; Plan='required'; Tasks='required'; IncTasks='yes'; Checklist='none'; Extras='' }
-    'core'   = @{ Const='none';     Spec='no';       Plan='no';       Tasks='no';       IncTasks='no';  Checklist='none'; Extras='paths_only' }
-    'status' = @{ Const='none';     Spec='no';       Plan='no';       Tasks='no';       IncTasks='no';  Checklist='none'; Extras='status_mode' }
+    '00'      = @{ Const='none';     Spec='no';       Plan='no';       Tasks='no';       IncTasks='no';  Checklist='none'; Extras='' }
+    '01'      = @{ Const='soft';     Spec='no';       Plan='no';       Tasks='no';       IncTasks='no';  Checklist='none'; Extras='' }
+    'clarify' = @{ Const='soft';     Spec='no';       Plan='no';       Tasks='no';       IncTasks='no';  Checklist='none'; Extras='' }
+    'bugfix'  = @{ Const='soft';     Spec='no';       Plan='no';       Tasks='no';       IncTasks='no';  Checklist='none'; Extras='' }
+    '02'      = @{ Const='hard';     Spec='required'; Plan='no';       Tasks='no';       IncTasks='no';  Checklist='none'; Extras='spec_quality,copy_plan_template' }
+    '03'      = @{ Const='basic';    Spec='required'; Plan='required'; Tasks='no';       IncTasks='no';  Checklist='none'; Extras='' }
+    '04'      = @{ Const='basic';    Spec='required'; Plan='required'; Tasks='no';       IncTasks='no';  Checklist='soft'; Extras='' }
+    '05'      = @{ Const='basic';    Spec='required'; Plan='required'; Tasks='no';       IncTasks='no';  Checklist='soft'; Extras='' }
+    '06'      = @{ Const='hard';     Spec='required'; Plan='required'; Tasks='required'; IncTasks='yes'; Checklist='soft'; Extras='' }
+    '07'      = @{ Const='hard';     Spec='required'; Plan='required'; Tasks='required'; IncTasks='yes'; Checklist='hard'; Extras='' }
+    '08'      = @{ Const='implicit'; Spec='required'; Plan='required'; Tasks='required'; IncTasks='yes'; Checklist='none'; Extras='' }
+    'core'    = @{ Const='none';     Spec='no';       Plan='no';       Tasks='no';       IncTasks='no';  Checklist='none'; Extras='paths_only' }
+    'status'  = @{ Const='none';     Spec='no';       Plan='no';       Tasks='no';       IncTasks='no';  Checklist='none'; Extras='status_mode' }
 }
 
 if (-not $phaseConfig.ContainsKey($Phase)) {
-    Write-Error "Unknown phase '$Phase'. Valid: 00 01 02 03 04 05 06 07 08 09 bugfix core status"
+    Write-Error "Unknown phase '$Phase'. Valid: 00 01 02 03 04 05 06 07 08 bugfix clarify core status"
     exit 1
 }
 
@@ -276,14 +276,13 @@ if ($cfg.Extras -match 'status_mode') {
     # --- Ready-for computation ---
     $readyFor = '00'
     $readyFor = '01'  # Phase 01 always passable (soft constitution)
-    if ($vSpec) { $readyFor = '02' }
-    if ($vConstitution -and $vSpec) { $readyFor = '03' }
+    if ($vConstitution -and $vSpec) { $readyFor = '02' }
+    if ($vConstitution -and $vSpec -and $vPlan) { $readyFor = '03' }
     if ($vConstitution -and $vSpec -and $vPlan) { $readyFor = '04' }
     if ($vConstitution -and $vSpec -and $vPlan) { $readyFor = '05' }
-    if ($vConstitution -and $vSpec -and $vPlan) { $readyFor = '06' }
+    if ($vConstitution -and $vSpec -and $vPlan -and $vTasks) { $readyFor = '06' }
     if ($vConstitution -and $vSpec -and $vPlan -and $vTasks) { $readyFor = '07' }
     if ($vConstitution -and $vSpec -and $vPlan -and $vTasks) { $readyFor = '08' }
-    if ($vConstitution -and $vSpec -and $vPlan -and $vTasks) { $readyFor = '09' }
 
     # --- Next step + clear_before ---
     $nextStep = $null
@@ -298,19 +297,19 @@ if ($cfg.Extras -match 'status_mode') {
         $nextStep = '/iikit-01-specify <description>'
         $clearBefore = $false
     } elseif (-not $vPlan) {
-        $nextStep = '/iikit-03-plan'
+        $nextStep = '/iikit-02-plan'
         $clearBefore = $true
     } elseif ($aChecklists -and $checklistTotal -gt 0 -and -not $checklistComplete) {
-        $nextStep = '/iikit-04-checklist'
+        $nextStep = '/iikit-03-checklist'
         $clearBefore = $false
     } elseif (-not $vTasks) {
-        $nextStep = '/iikit-06-tasks'
+        $nextStep = '/iikit-05-tasks'
         $clearBefore = $true
     } elseif ($featureStage -eq 'complete') {
         $nextStep = $null
         $clearBefore = $false
     } else {
-        $nextStep = '/iikit-08-implement'
+        $nextStep = '/iikit-07-implement'
         $clearBefore = $true
     }
 
@@ -400,8 +399,8 @@ $vSpec = $false
 $vPlan = $false
 $vTasks = $false
 
-# Feature directory check
-if (-not (Test-Path $paths.FEATURE_DIR -PathType Container)) {
+# Feature directory check (needed for any validation phase except clarify)
+if ($Phase -ne 'clarify' -and -not (Test-Path $paths.FEATURE_DIR -PathType Container)) {
     Write-Error "Feature directory not found: $($paths.FEATURE_DIR)"
     Write-Host "Run /iikit-01-specify first to create the feature structure."
     exit 1
@@ -441,13 +440,13 @@ if ($cfg.Spec -eq 'required') {
     $vSpec = $true
 }
 
-# Phase 03 extras: spec quality
+# Phase 02 extras: spec quality
 $specQuality = $null
 if ($cfg.Extras -match 'spec_quality') {
     $specQuality = Get-SpecQualityScore -SpecFile $paths.FEATURE_SPEC
     Write-Host "Spec quality score: $specQuality/10" -ForegroundColor Cyan
     if ($specQuality -lt 6) {
-        $warnings += "Spec quality is low ($specQuality/10). Consider running /iikit-02-clarify."
+        $warnings += "Spec quality is low ($specQuality/10). Consider running /iikit-clarify."
     }
 }
 
@@ -459,7 +458,7 @@ if ($cfg.Plan -eq 'required') {
     $vPlan = $true
 }
 
-# Phase 03 extras: copy plan template
+# Phase 02 extras: copy plan template
 $planTemplateCopied = $null
 if ($cfg.Extras -match 'copy_plan_template') {
     New-Item -ItemType Directory -Path $paths.FEATURE_DIR -Force | Out-Null
@@ -507,7 +506,7 @@ if ($cfg.Checklist -ne 'none') {
         if ($cfg.Checklist -eq 'hard') {
             $warnings += "Checklists incomplete ($checklistChecked/$checklistTotal items, ${pct}%). Must be 100% for implementation."
         } else {
-            $warnings += "Checklists incomplete ($checklistChecked/$checklistTotal items, ${pct}%). Recommend /iikit-04-checklist."
+            $warnings += "Checklists incomplete ($checklistChecked/$checklistTotal items, ${pct}%). Recommend /iikit-03-checklist."
         }
     }
 }
@@ -552,7 +551,7 @@ if ($Json) {
         warnings          = $warnings
     }
 
-    # Phase 03 extras
+    # Phase 02 extras
     if ($null -ne $specQuality) {
         $result['spec_quality'] = $specQuality
     }

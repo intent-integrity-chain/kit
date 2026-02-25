@@ -232,7 +232,7 @@ EOF
 @test "validate_tasks: fails when tasks missing" {
     run validate_tasks "$TEST_DIR/specs/nonexistent/tasks.md"
     [[ "$status" -eq 1 ]]
-    assert_contains "$output" "/iikit-06-tasks"
+    assert_contains "$output" "/iikit-05-tasks"
 }
 
 # =============================================================================

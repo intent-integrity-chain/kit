@@ -4,19 +4,27 @@
 
 ## Quick Reference
 
+### Utilities (run anytime)
+
+| Skill | Command | Input | Output | Prerequisites |
+|-------|---------|-------|--------|---------------|
+| Core | `/iikit-core` | Subcommand: init, status, help | Project structure, status report | None |
+| Clarify | `/iikit-clarify` | None (reads most recent artifact) | Updated artifact with clarifications | Any artifact |
+| Bugfix | `/iikit-bugfix` | Bug description | `bugs.md`, fix tasks in `tasks.md` | None |
+
+### Workflow Phases
+
 | # | Skill | Command | Input | Output | Prerequisites |
 |---|-------|---------|-------|--------|---------------|
-| - | Core | `/iikit-core` | Subcommand: init, status, help | Project structure, status report | None |
 | 0 | Constitution | `/iikit-00-constitution` | Governance principles (optional) | `CONSTITUTION.md` | None |
 | 1 | Specify | `/iikit-01-specify` | Feature description (required) | `specs/NNN-feature/spec.md` | Constitution (warn if missing) |
-| 2 | Clarify | `/iikit-02-clarify` | None (reads spec) | Updated `spec.md` with clarifications | spec.md |
-| 3 | Plan | `/iikit-03-plan` | None (reads spec) | `plan.md`, `research.md`, `data-model.md`, `contracts/` | constitution.md, spec.md |
-| 4 | Checklist | `/iikit-04-checklist` | Domain focus (optional) | `checklists/*.md` | spec.md |
-| 5 | Testify | `/iikit-05-testify` | None (reads artifacts) | `tests/test-specs.md` | constitution.md, spec.md, plan.md |
-| 6 | Tasks | `/iikit-06-tasks` | None (reads plan) | `tasks.md` | plan.md |
-| 7 | Analyze | `/iikit-07-analyze` | None (reads all) | Console report | spec.md, plan.md, tasks.md |
-| 8 | Implement | `/iikit-08-implement` | None (reads tasks) | Implementation code | tasks.md, checklists (100%) |
-| 9 | Tasks to Issues | `/iikit-09-taskstoissues` | None (reads tasks) | GitHub Issues | tasks.md, GitHub remote |
+| 2 | Plan | `/iikit-02-plan` | None (reads spec) | `plan.md`, `research.md`, `data-model.md`, `contracts/` | constitution.md, spec.md |
+| 3 | Checklist | `/iikit-03-checklist` | Domain focus (optional) | `checklists/*.md` | spec.md |
+| 4 | Testify | `/iikit-04-testify` | None (reads artifacts) | `tests/test-specs.md` | constitution.md, spec.md, plan.md |
+| 5 | Tasks | `/iikit-05-tasks` | None (reads plan) | `tasks.md` | plan.md |
+| 6 | Analyze | `/iikit-06-analyze` | None (reads all) | Console report | spec.md, plan.md, tasks.md |
+| 7 | Implement | `/iikit-07-implement` | None (reads tasks) | Implementation code | tasks.md, checklists (100%) |
+| 8 | Tasks to Issues | `/iikit-08-taskstoissues` | None (reads tasks) | GitHub Issues | tasks.md, GitHub remote |
 
 ---
 
@@ -28,44 +36,37 @@
 └────────┬─────────┘
          │
          ▼
+┌──────────────────┐    ┌──────────────────┐
+│   01-specify     │    │  clarify         │ ◄── Utility: runs after any phase
+└────────┬─────────┘    │  (anytime)       │
+         │              └──────────────────┘
+         ▼
 ┌──────────────────┐
-│   01-specify     │ ◄── REQUIRED: Feature description
+│    02-plan       │ ◄── REQUIRES: constitution.md
 └────────┬─────────┘
          │
          ├────────────────────┐
          ▼                    ▼
 ┌──────────────────┐  ┌──────────────────┐
-│   02-clarify     │  │   04-checklist   │
+│   04-testify     │  │   03-checklist   │
+│ (optional/TDD)   │  │   (optional)     │
+└────────┬─────────┘  └──────────────────┘
+         │
+         ▼
+┌──────────────────┐
+│    05-tasks      │
+└────────┬─────────┘
+         │
+         ├────────────────────┐
+         ▼                    ▼
+┌──────────────────┐  ┌──────────────────┐
+│   06-analyze     │  │ 08-taskstoissues │
 │   (optional)     │  │   (optional)     │
 └────────┬─────────┘  └──────────────────┘
          │
          ▼
 ┌──────────────────┐
-│    03-plan       │ ◄── REQUIRES: constitution.md
-└────────┬─────────┘
-         │
-         ├────────────────────┐
-         ▼                    ▼
-┌──────────────────┐  ┌──────────────────┐
-│   05-testify     │  │   04-checklist   │
-│ (optional/TDD)   │  │   (if not done)  │
-└────────┬─────────┘  └──────────────────┘
-         │
-         ▼
-┌──────────────────┐
-│    06-tasks      │
-└────────┬─────────┘
-         │
-         ├────────────────────┐
-         ▼                    ▼
-┌──────────────────┐  ┌──────────────────┐
-│   07-analyze     │  │ 09-taskstoissues │
-│   (optional)     │  │   (optional)     │
-└────────┬─────────┘  └──────────────────┘
-         │
-         ▼
-┌──────────────────┐
-│   08-implement   │ ◄── REQUIRES: checklists 100%
+│   07-implement   │ ◄── REQUIRES: checklists 100%
 └──────────────────┘
 ```
 
@@ -102,7 +103,7 @@ If no subcommand provided, shows help.
 │  Constitution:  [exists/missing]                    │
 │  Current Feature: NNN-feature-name                  │
 │  Artifacts: spec.md ✓, plan.md ✓, tasks.md ✗       │
-│  Next Step: /iikit-06-tasks                         │
+│  Next Step: /iikit-05-tasks                         │
 ╰─────────────────────────────────────────────────────╯
 ```
 
@@ -163,33 +164,35 @@ If no subcommand provided, shows help.
 
 ---
 
-### 02 - Clarify
+### Clarify (Utility)
 
-**Purpose**: Resolve specification ambiguities
+**Purpose**: Resolve ambiguities in any artifact at any phase
 
-**Command**: `/iikit-02-clarify`
+**Command**: `/iikit-clarify`
 
-**Input**: None (reads from spec.md)
+**Input**: None (auto-detects most recent artifact)
 
 **Output**:
-- Updated `spec.md` with clarifications section
-- Maximum 5 questions asked
+- Updated artifact with clarifications section
+- Maximum 5 questions asked per run
 
 **Prerequisites**:
-- `spec.md` must exist
+- Any artifact must exist (spec, plan, checklist, tasks, or constitution)
 
 **Behavior**:
+- Auto-detects the most recently modified artifact
 - Presents one question at a time
 - Provides recommended option for each question
-- Records answers in `## Clarifications` section
+- Records answers in `## Clarifications` section of the target artifact
+- Can be run after any phase — not tied to a specific workflow position
 
 ---
 
-### 03 - Plan
+### 02 - Plan
 
 **Purpose**: Create technical implementation plan
 
-**Command**: `/iikit-03-plan`
+**Command**: `/iikit-02-plan`
 
 **Input**: None (reads spec.md, constitution.md)
 
@@ -217,11 +220,11 @@ If no subcommand provided, shows help.
 
 ---
 
-### 04 - Checklist
+### 03 - Checklist
 
 **Purpose**: Generate quality checklists for requirements
 
-**Command**: `/iikit-04-checklist [domain focus]`
+**Command**: `/iikit-03-checklist [domain focus]`
 
 **Input**:
 - Optional: Domain focus (UX, API, Security, etc.)
@@ -245,11 +248,11 @@ If no subcommand provided, shows help.
 
 ---
 
-### 05 - Testify
+### 04 - Testify
 
 **Purpose**: Generate test specifications (TDD support)
 
-**Command**: `/iikit-05-testify`
+**Command**: `/iikit-04-testify`
 
 **Input**: None (reads artifacts automatically)
 
@@ -283,11 +286,11 @@ Analyzes constitution for TDD requirements:
 
 ---
 
-### 06 - Tasks
+### 05 - Tasks
 
 **Purpose**: Generate actionable task breakdown
 
-**Command**: `/iikit-06-tasks`
+**Command**: `/iikit-05-tasks`
 
 **Input**: None (reads plan.md, spec.md)
 
@@ -322,11 +325,11 @@ Components:
 
 ---
 
-### 07 - Analyze
+### 06 - Analyze
 
 **Purpose**: Validate cross-artifact consistency
 
-**Command**: `/iikit-07-analyze`
+**Command**: `/iikit-06-analyze`
 
 **Input**: None (reads all artifacts)
 
@@ -361,11 +364,11 @@ Components:
 
 ---
 
-### 08 - Implement
+### 07 - Implement
 
 **Purpose**: Execute implementation plan
 
-**Command**: `/iikit-08-implement`
+**Command**: `/iikit-07-implement`
 
 **Input**: None (reads tasks.md)
 
@@ -406,11 +409,11 @@ Components:
 
 ---
 
-### 09 - Tasks to Issues
+### 08 - Tasks to Issues
 
 **Purpose**: Export tasks to GitHub Issues
 
-**Command**: `/iikit-09-taskstoissues`
+**Command**: `/iikit-08-taskstoissues`
 
 **Input**: None (reads tasks.md)
 
@@ -450,16 +453,16 @@ Components:
 
 | Error | Skill(s) | Resolution |
 |-------|----------|------------|
-| `Constitution not found` | 03, 05, 07, 08 | Run `/iikit-00-constitution` |
-| `spec.md not found` | 02, 03, 04, 05, 06, 07 | Run `/iikit-01-specify` |
-| `plan.md not found` | 05, 06, 07, 08 | Run `/iikit-03-plan` |
-| `tasks.md not found` | 07, 08, 09 | Run `/iikit-06-tasks` |
-| `No acceptance scenarios` | 05 | Run `/iikit-02-clarify` |
-| `TDD forbidden` | 05 | Constitution prohibits TDD |
-| `Assertion integrity failed` | 08 | Restore test-specs.md or re-run `/iikit-05-testify` |
-| `Checklists incomplete` | 08 | Complete checklists or confirm proceed |
-| `Not a GitHub remote` | 09 | Only works with GitHub repositories |
-| `gh CLI not installed` | 09 | Install GitHub CLI |
+| `Constitution not found` | 02, 04, 06, 07 | Run `/iikit-00-constitution` |
+| `spec.md not found` | clarify, 02, 03, 04, 05, 06, 07 | Run `/iikit-01-specify` |
+| `plan.md not found` | 04, 05, 06, 07, 08 | Run `/iikit-02-plan` |
+| `tasks.md not found` | 06, 07, 08 | Run `/iikit-05-tasks` |
+| `No acceptance scenarios` | 04 | Run `/iikit-clarify` |
+| `TDD forbidden` | 04 | Constitution prohibits TDD |
+| `Assertion integrity failed` | 07 | Restore test-specs.md or re-run `/iikit-04-testify` |
+| `Checklists incomplete` | 07 | Complete checklists or confirm proceed |
+| `Not a GitHub remote` | 08 | Only works with GitHub repositories |
+| `gh CLI not installed` | 08 | Install GitHub CLI |
 
 ---
 
@@ -468,16 +471,16 @@ Components:
 | Artifact | Created By | Used By | Location |
 |----------|------------|---------|----------|
 | constitution.md | 00 | All skills | `root (CONSTITUTION.md)` |
-| spec.md | 01 | 02, 03, 04, 05, 06, 07 | `specs/NNN-feature/` |
-| plan.md | 03 | 05, 06, 07, 08 | `specs/NNN-feature/` |
-| research.md | 03 | 08 | `specs/NNN-feature/` |
-| data-model.md | 03 | 05, 08 | `specs/NNN-feature/` |
-| contracts/ | 03 | 08 | `specs/NNN-feature/` |
-| quickstart.md | 03 | 08 | `specs/NNN-feature/` |
-| checklists/*.md | 01, 04 | 08 | `specs/NNN-feature/checklists/` |
-| tests/test-specs.md | 05 | 06, 08 | `specs/NNN-feature/tests/` |
-| tasks.md | 06 | 07, 08, 09 | `specs/NNN-feature/` |
-| context.json | 05 | 08 | `.specify/` |
+| spec.md | 01 | clarify, 02, 03, 04, 05, 06, 07 | `specs/NNN-feature/` |
+| plan.md | 02 | clarify, 04, 05, 06, 07, 08 | `specs/NNN-feature/` |
+| research.md | 02 | 07 | `specs/NNN-feature/` |
+| data-model.md | 02 | 04, 07 | `specs/NNN-feature/` |
+| contracts/ | 02 | 07 | `specs/NNN-feature/` |
+| quickstart.md | 02 | 07 | `specs/NNN-feature/` |
+| checklists/*.md | 01, 03 | 07 | `specs/NNN-feature/checklists/` |
+| tests/test-specs.md | 04 | 05, 07 | `specs/NNN-feature/tests/` |
+| tasks.md | 05 | 06, 07, 08 | `specs/NNN-feature/` |
+| context.json | 04 | 07 | `.specify/` |
 
 ---
 
@@ -502,8 +505,8 @@ When Tessl is installed, skills integrate automatically:
 
 | Skill | Tessl Usage |
 |-------|-------------|
-| 03-plan | Search/install tiles for tech stack |
-| 06-tasks | Query framework conventions |
-| 08-implement | Query docs before implementing, invoke skill tiles |
+| 02-plan | Search/install tiles for tech stack |
+| 05-tasks | Query framework conventions |
+| 07-implement | Query docs before implementing, invoke skill tiles |
 
 If Tessl is not installed, skills continue without tile support.

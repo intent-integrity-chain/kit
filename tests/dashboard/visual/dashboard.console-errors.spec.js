@@ -103,7 +103,7 @@ test.describe('Console Error Monitoring', () => {
     await page.waitForTimeout(500);
 
     const tabs = [
-      'Constitution', 'Spec', 'Clarify', 'Plan',
+      'Constitution', 'Spec', 'Plan',
       'Checklist', 'Testify', 'Tasks', 'Analyze', 'Implement'
     ];
 
@@ -112,7 +112,11 @@ test.describe('Console Error Monitoring', () => {
       await page.waitForTimeout(500);
     }
 
-    monitor.assertClean('navigating through all tabs');
+    // Navigate to Clarify view programmatically (no pipeline node — it's a utility)
+    await page.evaluate(() => window._switchTab('clarify'));
+    await page.waitForSelector('.clarify-view, .clarify-empty', { timeout: 5000 });
+
+    monitor.assertClean('navigating through all tabs including clarify');
   });
 
   test('no errors when switching features', async ({ page }) => {
@@ -162,7 +166,7 @@ test.describe('Console Error Monitoring', () => {
     await page.waitForTimeout(500);
 
     const tabs = [
-      'Constitution', 'Spec', 'Clarify', 'Plan',
+      'Constitution', 'Spec', 'Plan',
       'Checklist', 'Testify', 'Analyze', 'Implement'
     ];
 
@@ -171,7 +175,11 @@ test.describe('Console Error Monitoring', () => {
       await page.waitForTimeout(500);
     }
 
-    monitor.assertClean('empty-state feature tabs');
+    // Navigate to Clarify view programmatically (utility — no pipeline node)
+    await page.evaluate(() => window._switchTab('clarify'));
+    await page.waitForSelector('.clarify-view, .clarify-empty', { timeout: 5000 });
+
+    monitor.assertClean('empty-state feature tabs including clarify');
   });
 
   test('no errors during theme toggle on each view', async ({ page }) => {
@@ -202,7 +210,7 @@ test.describe('Console Error Monitoring', () => {
 
     // Rapidly switch through tabs without waiting
     const tabs = [
-      'Constitution', 'Spec', 'Clarify', 'Plan',
+      'Constitution', 'Spec', 'Plan',
       'Checklist', 'Testify', 'Analyze', 'Implement'
     ];
     for (const tab of tabs) {
@@ -212,9 +220,13 @@ test.describe('Console Error Monitoring', () => {
       await page.waitForTimeout(100);
     }
 
+    // Also rapid-switch to Clarify view programmatically
+    await page.evaluate(() => window._switchTab('clarify'));
+    await page.waitForTimeout(100);
+
     // Final settle
     await page.waitForTimeout(2000);
 
-    monitor.assertClean('rapid tab switching');
+    monitor.assertClean('rapid tab switching including clarify');
   });
 });

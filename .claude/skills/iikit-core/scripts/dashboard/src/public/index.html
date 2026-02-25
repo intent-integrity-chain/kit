@@ -728,6 +728,20 @@
       background: var(--color-surface-elevated);
     }
 
+    .pipeline-clarify-badge {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      font-size: 9px;
+      font-weight: 700;
+      color: #b8860b;
+      background: rgba(245, 166, 35, 0.18);
+      border-radius: 8px;
+      padding: 1px 5px;
+      line-height: 14px;
+      pointer-events: none;
+    }
+
     .pipeline-dot {
       width: 28px;
       height: 28px;
@@ -2788,6 +2802,9 @@
   <script>
     (function() {
       'use strict';
+      // Expose switchTab on window for test automation (clarify utility has no pipeline node)
+      const _exposeForTests = () => { window._switchTab = (id) => switchTab(id); };
+      setTimeout(_exposeForTests, 0);
 
       // ====== State ======
       let currentFeature = null;
@@ -2870,6 +2887,7 @@
             <div class="pipeline-dot ${phase.status}">${PHASE_ICONS[phase.status] || ''}</div>
             <span class="pipeline-label${phase.name.includes('\n') ? ' pipeline-label-multiline' : ''}">${phase.name.includes('\n') ? phase.name.split('\n').map(l => `<span class="pipeline-label-line">${escapeHtml(l)}</span>`).join('') : escapeHtml(phase.name)}${phase.id === 'tasks' ? ' <span class="pipeline-redirect" title="Opens Implement board">&#x2197;</span>' : ''}</span>
             <span class="pipeline-progress">${phase.progress || ''}</span>
+            ${phase.clarifications > 0 ? '<span class="pipeline-clarify-badge" title="' + phase.clarifications + ' clarification session' + (phase.clarifications > 1 ? 's' : '') + '">?' + phase.clarifications + '</span>' : ''}
           `;
 
           node.addEventListener('click', () => switchTab(phase.id));
@@ -3240,7 +3258,7 @@
 
       function renderPlaceholderView(phaseId) {
         const phaseNames = {
-          constitution: 'Constitution', spec: 'Specification', clarify: 'Clarification',
+          constitution: 'Constitution', spec: 'Specification',
           plan: 'Plan', checklist: 'Checklist', testify: 'Test Specs',
           tasks: 'Tasks', analyze: 'Analysis', implement: 'Implementation'
         };
@@ -3281,7 +3299,7 @@
             <div class="checklist-empty">
               <div class="checklist-empty-icon">&#9744;</div>
               <div class="checklist-empty-title">No checklists generated for this feature</div>
-              <div class="checklist-empty-text">Run <code>/iikit-04-checklist</code> to generate domain-specific quality checklists for requirements validation.</div>
+              <div class="checklist-empty-text">Run <code>/iikit-03-checklist</code> to generate domain-specific quality checklists for requirements validation.</div>
             </div>`;
           return;
         }
@@ -3440,7 +3458,7 @@
             <div class="testify-empty">
               <div class="testify-empty-icon">&#128269;</div>
               <div class="testify-empty-title">No test specifications generated for this feature</div>
-              <div class="testify-empty-text">Run <code>/iikit-05-testify</code> to generate test specifications with traceability links to requirements and tasks.</div>
+              <div class="testify-empty-text">Run <code>/iikit-04-testify</code> to generate test specifications with traceability links to requirements and tasks.</div>
             </div>`;
           return;
         }
@@ -3725,7 +3743,7 @@
           svg += `<text x="${COL_LEFT + NODE_W / 2}" y="${PAD + 60}" text-anchor="middle" fill="var(--color-text-muted)" font-size="11">No requirements found in spec.md</text>`;
         }
         if (tasks.length === 0) {
-          svg += `<text x="${COL_RIGHT + NODE_W / 2}" y="${PAD + 60}" text-anchor="middle" fill="var(--color-text-muted)" font-size="11">No tasks generated \u2014 run /iikit-06-tasks</text>`;
+          svg += `<text x="${COL_RIGHT + NODE_W / 2}" y="${PAD + 60}" text-anchor="middle" fill="var(--color-text-muted)" font-size="11">No tasks generated \u2014 run /iikit-05-tasks</text>`;
         }
 
         svg += '</svg>';
@@ -4264,7 +4282,7 @@
             <div class="clarify-view" role="region" aria-label="Clarifications">
               <div class="clarify-empty">
                 <div class="placeholder-view-title">Specification Not Yet Created</div>
-                <div class="placeholder-view-text">The Clarify phase refines an existing specification. Run <code>/iikit-01-specify</code> first to create the feature spec, then run <code>/iikit-02-clarify</code> to resolve ambiguities.</div>
+                <div class="placeholder-view-text">The Clarify phase refines an existing specification. Run <code>/iikit-01-specify</code> first to create the feature spec, then run <code>/iikit-clarify</code> to resolve ambiguities.</div>
               </div>
             </div>`;
           return;
@@ -4297,7 +4315,7 @@
             : 'Clarify Not Yet Run';
           const text = clarifyWasRun
             ? 'The clarification phase was completed with no ambiguities found. The specification is clear as written.'
-            : 'This is an optional phase. Run <code>/iikit-02-clarify</code> to identify and resolve ambiguities in the spec.';
+            : 'This is an optional phase. Run <code>/iikit-clarify</code> to identify and resolve ambiguities in any artifact.';
 
           contentArea.innerHTML = `
             <div class="clarify-view" role="region" aria-label="Clarifications">
@@ -4622,7 +4640,7 @@
             <div class="analyze-empty">
               <div class="analyze-empty-icon">&#128270;</div>
               <div class="analyze-empty-title">No analysis data for this feature</div>
-              <div class="analyze-empty-text">Run <code>/iikit-07-analyze</code> to generate a cross-artifact consistency analysis report.</div>
+              <div class="analyze-empty-text">Run <code>/iikit-06-analyze</code> to generate a cross-artifact consistency analysis report.</div>
             </div>`;
           return;
         }
@@ -5358,7 +5376,7 @@
 
       function renderPlanViewContent(data) {
         if (!data || !data.exists) {
-          contentArea.innerHTML = `<div class="planview-empty"><div class="planview-empty-title">No plan created yet</div><div class="planview-empty-text">Run /iikit-03-plan to create a technical implementation plan for this feature.</div></div>`;
+          contentArea.innerHTML = `<div class="planview-empty"><div class="planview-empty-title">No plan created yet</div><div class="planview-empty-text">Run /iikit-02-plan to create a technical implementation plan for this feature.</div></div>`;
           return;
         }
 
@@ -5724,6 +5742,7 @@
         const dirName = D.meta.projectPath.split('/').pop();
         label.textContent = dirName;
         label.title = D.meta.projectPath;
+        document.title = dirName + ' — IIKit Dashboard';
         currentConstitution = D.constitution;
         currentPremise = D.premise;
         updateFeatureSelector(D.features);

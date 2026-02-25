@@ -32,18 +32,18 @@ echo "IIKit active feature: $FEATURE (stage: $STAGE)"
 
 case "$STAGE" in
     specified)
-        echo "Next: /iikit-02-clarify or /iikit-03-plan"
+        echo "Next: /iikit-clarify or /iikit-02-plan"
         ;;
     planned)
-        echo "Next: /iikit-04-checklist or /iikit-06-tasks"
+        echo "Next: /iikit-03-checklist or /iikit-05-tasks"
         ;;
     tasks-ready)
-        echo "Next: /iikit-07-analyze or /iikit-08-implement"
+        echo "Next: /iikit-06-analyze or /iikit-07-implement"
         ;;
     implementing-*)
-        echo "Next: /iikit-08-implement (resume)"
+        echo "Next: /iikit-07-implement (resume)"
         ;;
     complete)
-        echo "All tasks complete. /iikit-09-taskstoissues to export."
+        echo "All tasks complete. /iikit-08-taskstoissues to export."
         ;;
 esac

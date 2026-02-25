@@ -248,7 +248,7 @@ Files modified:
   - <feature_dir>/tests/features/bugfix_BUG-NNN.feature (created, TDD only)
 
 Next step:
-  - /iikit-08-implement — runs in bugfix mode (relaxed gates: no checklist or plan required, traces to bugs.md instead of spec)
+  - /iikit-07-implement — runs in bugfix mode (relaxed gates: no checklist or plan required, traces to bugs.md instead of spec)
   - Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
 ```
 
@@ -261,6 +261,6 @@ Next step:
 | Feature validation failed | ERROR with specific message |
 | GitHub API unreachable | Fall back: `gh` → `curl` GitHub API → skip with WARN |
 | GitHub issue not found | ERROR with "verify issue number" |
-| TDD required, no test artifacts | ERROR: "Run `/iikit-05-testify` first" |
+| TDD required, no test artifacts | ERROR: "Run `/iikit-04-testify` first" |
 | Existing bugs.md | Append without modifying existing entries |
 | Existing tasks.md | Append without modifying existing entries |

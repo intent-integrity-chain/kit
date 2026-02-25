@@ -11,18 +11,18 @@ Intent Integrity Kit (IIKit) preserves your intent from idea to implementation t
 This project uses specification-driven development. The phases are:
 
 **Utility:** `/iikit-core` - Initialize project (git/GitHub setup, PRD seeding), check status, select active feature, show help (run `init` before starting)
+**Utility:** `/iikit-clarify` - Resolve ambiguities in any artifact (spec, plan, checklist, testify, tasks, constitution) — runnable after any phase
 **Utility:** `/iikit-bugfix` - Report and fix bugs without full specification workflow
 
 0. `/iikit-00-constitution` - Define project governance principles
 1. `/iikit-01-specify` - Create feature specification from natural language
-2. `/iikit-02-clarify` - Resolve ambiguities until spec is clear
-3. `/iikit-03-plan` - Create technical implementation plan
-4. `/iikit-04-checklist` - Generate domain-specific quality checklists
-5. `/iikit-05-testify` - Generate test specifications (TDD support, optional unless constitutionally required)
-6. `/iikit-06-tasks` - Generate task breakdown
-7. `/iikit-07-analyze` - Validate cross-artifact consistency
-8. `/iikit-08-implement` - Execute implementation
-9. `/iikit-09-taskstoissues` - Export tasks to GitHub Issues
+2. `/iikit-02-plan` - Create technical implementation plan
+3. `/iikit-03-checklist` - Generate domain-specific quality checklists
+4. `/iikit-04-testify` - Generate test specifications (TDD support, optional unless constitutionally required)
+5. `/iikit-05-tasks` - Generate task breakdown
+6. `/iikit-06-analyze` - Validate cross-artifact consistency
+7. `/iikit-07-implement` - Execute implementation
+8. `/iikit-08-taskstoissues` - Export tasks to GitHub Issues
 
 **Never skip phases.** Each `/iikit-*` command validates its prerequisites.
 
@@ -62,7 +62,7 @@ specs/                       # Feature specifications (created per feature)
     quickstart.md            # Quick start guide
     contracts/               # API contracts
     checklists/              # Quality checklists
-    tests/                   # Test specifications (created by /iikit-05-testify)
+    tests/                   # Test specifications (created by /iikit-04-testify)
       test-specs.md          # Generated test specifications
 ```
 
@@ -92,17 +92,17 @@ chmod +x .claude/skills/iikit-core/scripts/bash/*.sh
 | Skill | Command | Description |
 |-------|---------|-------------|
 | Core | `/iikit-core` | Initialize project (git/GitHub setup, PRD seeding), check status, select feature, show help |
+| Clarify | `/iikit-clarify` | Resolve ambiguities in any artifact (utility, runnable after any phase) |
 | Bugfix | `/iikit-bugfix` | Report and fix bugs without full specification workflow |
 | Constitution | `/iikit-00-constitution` | Create project governance principles |
 | Specify | `/iikit-01-specify` | Create feature spec from description |
-| Clarify | `/iikit-02-clarify` | Resolve spec ambiguities |
-| Plan | `/iikit-03-plan` | Create technical implementation plan |
-| Checklist | `/iikit-04-checklist` | Generate quality checklists |
-| Testify | `/iikit-05-testify` | Generate test specs (TDD support) |
-| Tasks | `/iikit-06-tasks` | Generate task breakdown |
-| Analyze | `/iikit-07-analyze` | Validate cross-artifact consistency |
-| Implement | `/iikit-08-implement` | Execute implementation |
-| Tasks to Issues | `/iikit-09-taskstoissues` | Export tasks to GitHub Issues |
+| Plan | `/iikit-02-plan` | Create technical implementation plan |
+| Checklist | `/iikit-03-checklist` | Generate quality checklists |
+| Testify | `/iikit-04-testify` | Generate test specs (TDD support) |
+| Tasks | `/iikit-05-tasks` | Generate task breakdown |
+| Analyze | `/iikit-06-analyze` | Validate cross-artifact consistency |
+| Implement | `/iikit-07-implement` | Execute implementation |
+| Tasks to Issues | `/iikit-08-taskstoissues` | Export tasks to GitHub Issues |
 
 ## Key Concepts
 
@@ -140,7 +140,7 @@ Checklists are "unit tests for English" - they validate REQUIREMENTS quality, no
 
 ### TDD Support (Testify)
 
-The `/iikit-05-testify` skill generates test specifications from requirements before implementation:
+The `/iikit-04-testify` skill generates test specifications from requirements before implementation:
 
 - **When mandatory**: If the constitution contains TDD requirements (e.g., "test-first MUST be used"), testify is required before implementation
 - **When optional**: If no TDD requirements exist, testify can be skipped
@@ -158,7 +158,7 @@ Skills are stored in `.claude/skills/` with symlinks for other agents:
 Instruction files: `CLAUDE.md` and `GEMINI.md` are symlinks to this file (`AGENTS.md`).
 
 <!-- IIKIT-TECH-START -->
-<!-- Tech stack will be inserted here by /iikit-03-plan -->
+<!-- Tech stack will be inserted here by /iikit-02-plan -->
 <!-- IIKIT-TECH-END -->
 
 # Tessl Rules <!-- tessl-managed -->

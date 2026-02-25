@@ -94,40 +94,6 @@
     {
       "tag": "button",
       "classes": [
-        "optional",
-        "pipeline-node"
-      ],
-      "children": [
-        {
-          "tag": "div",
-          "classes": [
-            "not_started",
-            "pipeline-dot"
-          ]
-        },
-        {
-          "tag": "span",
-          "classes": [
-            "pipeline-label"
-          ]
-        },
-        {
-          "tag": "span",
-          "classes": [
-            "pipeline-progress"
-          ]
-        }
-      ]
-    },
-    {
-      "tag": "div",
-      "classes": [
-        "pipeline-connector"
-      ]
-    },
-    {
-      "tag": "button",
-      "classes": [
         "pipeline-node"
       ],
       "children": [

@@ -1,8 +1,8 @@
 {
   "name": "tessl-labs/intent-integrity-kit",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "summary": "Closing the intent-to-code chasm - specification-driven development with BDD verification chain",
-  "description": "Intent Integrity Kit (IIKit) preserves your intent from idea to implementation through specification-driven development with BDD verification chain. Compatible with Claude Code, Codex, Gemini, and OpenCode.\n\nWhat's new in v2.2.0: Pre-commit hook now mechanically enforces BDD runner presence — agents can no longer bypass the verification chain. Three gates: step definitions exist, runner dependency in project dep files, dry-run passes. Covers pytest-bdd, behave, Cucumber (JS/JVM/RS), godog, reqnroll.\n\nv2.0.0: BREAKING — testify generates Gherkin .feature files (replaces test-specs.md). Full BDD verification chain: hash integrity, step coverage, step quality, framework scaffolding. Static dashboard. Analyze skill .feature tag traceability. Implement skill enforces red-green-verify cycle.",
+  "description": "Intent Integrity Kit (IIKit) preserves your intent from idea to implementation through specification-driven development with BDD verification chain. Compatible with Claude Code, Codex, Gemini, and OpenCode.\n\nWhat's new in v2.5.0: Clarify is now a generic utility (/iikit-clarify) that can run after any phase on any artifact — spec, plan, checklist, testify, tasks, or constitution. All downstream skills renumbered (02-plan through 08-taskstoissues). Dashboard shows ?N clarification count badges on pipeline nodes.\n\nv2.0.0: BREAKING — testify generates Gherkin .feature files (replaces test-specs.md). Full BDD verification chain: hash integrity, step coverage, step quality, framework scaffolding. Static dashboard. Analyze skill .feature tag traceability. Implement skill enforces red-green-verify cycle.",
   "entrypoint": "README.md",
   "private": false,
   "repository": "https://github.com/intent-integrity-chain/kit",
@@ -23,29 +23,29 @@
     "iikit-01-specify": {
       "path": "skills/iikit-01-specify/SKILL.md"
     },
-    "iikit-02-clarify": {
-      "path": "skills/iikit-02-clarify/SKILL.md"
+    "iikit-clarify": {
+      "path": "skills/iikit-clarify/SKILL.md"
     },
-    "iikit-03-plan": {
-      "path": "skills/iikit-03-plan/SKILL.md"
+    "iikit-02-plan": {
+      "path": "skills/iikit-02-plan/SKILL.md"
     },
-    "iikit-04-checklist": {
-      "path": "skills/iikit-04-checklist/SKILL.md"
+    "iikit-03-checklist": {
+      "path": "skills/iikit-03-checklist/SKILL.md"
     },
-    "iikit-05-testify": {
-      "path": "skills/iikit-05-testify/SKILL.md"
+    "iikit-04-testify": {
+      "path": "skills/iikit-04-testify/SKILL.md"
     },
-    "iikit-06-tasks": {
-      "path": "skills/iikit-06-tasks/SKILL.md"
+    "iikit-05-tasks": {
+      "path": "skills/iikit-05-tasks/SKILL.md"
     },
-    "iikit-07-analyze": {
-      "path": "skills/iikit-07-analyze/SKILL.md"
+    "iikit-06-analyze": {
+      "path": "skills/iikit-06-analyze/SKILL.md"
     },
-    "iikit-08-implement": {
-      "path": "skills/iikit-08-implement/SKILL.md"
+    "iikit-07-implement": {
+      "path": "skills/iikit-07-implement/SKILL.md"
     },
-    "iikit-09-taskstoissues": {
-      "path": "skills/iikit-09-taskstoissues/SKILL.md"
+    "iikit-08-taskstoissues": {
+      "path": "skills/iikit-08-taskstoissues/SKILL.md"
     },
     "iikit-bugfix": {
       "path": "skills/iikit-bugfix/SKILL.md"

@@ -143,15 +143,10 @@ As a user, I want my session to persist so that I don't have to log in repeatedl
 
 ## Clarifications
 
-### Clarification 1
+### Session 2026-02-10
 
-**Q**: Should OAuth users also be required to set a local password?
-**A**: No. OAuth-only users should not need a local password. However, if they later want to add email/password login, they can set one via the profile page. **Affects**: FR-003
-
-### Clarification 2
-
-**Q**: What happens when a session expires while the user is actively working?
-**A**: The system should show a modal prompting re-authentication, preserving the current page state. **Affects**: FR-004, SC-004
+- Q: Should OAuth users also be required to set a local password? -> A: No. OAuth-only users should not need a local password. If they later want email/password login, they can set one via the profile page. [FR-003]
+- Q: What happens when a session expires while the user is actively working? -> A: The system should show a modal prompting re-authentication, preserving the current page state. [FR-004, SC-004]
 `);
 
   fs.writeFileSync(path.join(feature1Dir, 'tasks.md'), `# Tasks

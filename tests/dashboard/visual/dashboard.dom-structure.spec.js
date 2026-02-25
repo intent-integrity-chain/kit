@@ -137,15 +137,38 @@ test.describe('DOM Structure Snapshots', () => {
     expect(JSON.stringify(structure, null, 2)).toMatchSnapshot('storymap-view-dom-structure.json');
   });
 
-  test('Clarify view structure', async ({ page }) => {
+  test('Clarification badge renders on Spec node (which has sessions) and not on others', async ({ page }) => {
+    await waitForDashboard(page);
+    // Select 001-auth which has clarification sessions in spec.md
+    await page.selectOption('#featureSelect', { index: 1 });
+    await page.waitForTimeout(500);
+
+    // Spec node should have a badge (fixture has ### Session 2026-02-10 in spec.md)
+    const specNode = page.locator('.pipeline-node', { hasText: 'Spec' });
+    const specBadge = specNode.locator('.pipeline-clarify-badge');
+    await expect(specBadge).toBeVisible();
+    const badgeText = await specBadge.textContent();
+    expect(badgeText).toBe('?1'); // exactly 1 session in fixture
+
+    // Plan node should NOT have a badge (no clarifications in plan.md)
+    const planNode = page.locator('.pipeline-node', { hasText: 'Plan' });
+    const planBadge = planNode.locator('.pipeline-clarify-badge');
+    await expect(planBadge).toHaveCount(0);
+
+    // Implement node should NOT have a badge
+    const implNode = page.locator('.pipeline-node', { hasText: 'Implement' });
+    const implBadge = implNode.locator('.pipeline-clarify-badge');
+    await expect(implBadge).toHaveCount(0);
+  });
+
+  test('Clarification badge has correct title tooltip with session count', async ({ page }) => {
     await waitForDashboard(page);
     await page.selectOption('#featureSelect', { index: 1 });
     await page.waitForTimeout(500);
-    await switchToTab(page, 'Clarify');
-    await page.waitForTimeout(500);
-    const structure = await extractDOMStructure(page, '#contentArea');
-    expect(structure).not.toBeNull();
-    expect(JSON.stringify(structure, null, 2)).toMatchSnapshot('clarify-view-dom-structure.json');
+    const specNode = page.locator('.pipeline-node', { hasText: 'Spec' });
+    const badge = specNode.locator('.pipeline-clarify-badge');
+    const title = await badge.getAttribute('title');
+    expect(title).toBe('1 clarification session'); // singular, not plural
   });
 
   test('Plan view structure', async ({ page }) => {

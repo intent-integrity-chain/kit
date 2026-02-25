@@ -31,11 +31,11 @@ build_context() {
     local context="IIKit active feature: $feature (stage: $stage)"
 
     case "$stage" in
-        specified)     context="$context. Next: /iikit-02-clarify or /iikit-03-plan" ;;
-        planned)       context="$context. Next: /iikit-04-checklist or /iikit-06-tasks" ;;
-        tasks-ready)   context="$context. Next: /iikit-07-analyze or /iikit-08-implement" ;;
-        implementing*) context="$context. Next: /iikit-08-implement (resume)" ;;
-        complete)      context="$context. All tasks complete. /iikit-09-taskstoissues to export." ;;
+        specified)     context="$context. Next: /iikit-clarify or /iikit-02-plan" ;;
+        planned)       context="$context. Next: /iikit-03-checklist or /iikit-05-tasks" ;;
+        tasks-ready)   context="$context. Next: /iikit-06-analyze or /iikit-07-implement" ;;
+        implementing*) context="$context. Next: /iikit-07-implement (resume)" ;;
+        complete)      context="$context. All tasks complete. /iikit-08-taskstoissues to export." ;;
     esac
 
     echo "$context"

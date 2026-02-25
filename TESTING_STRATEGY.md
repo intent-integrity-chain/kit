@@ -100,22 +100,22 @@ status (pending/done).
 
 #### Workflow Steps
 
-| Step | Skills Command | Vanilla Command |
-|------|---------------|-----------------|
-| 1 | /iikit-00-constitution | /iikit.constitution |
-| 2 | /iikit-01-specify | /iikit.specify |
-| 3 | /iikit-02-clarify | /iikit.clarify |
-| 4 | /iikit-03-plan | /iikit.plan |
-| 5 | /iikit-04-checklist | /iikit.checklist |
-| 6 | /iikit-06-tasks | /iikit.tasks |
-| 7 | /iikit-07-analyze | /iikit.analyze |
-| 8 | /iikit-08-implement | /iikit.implement |
+| Step | Skills Command | Vanilla Command | Notes |
+|------|---------------|-----------------|-------|
+| 1 | /iikit-00-constitution | /iikit.constitution | |
+| 2 | /iikit-01-specify | /iikit.specify | |
+| 3 | /iikit-clarify | /iikit.clarify | Utility — run after any phase as needed |
+| 4 | /iikit-02-plan | /iikit.plan | |
+| 5 | /iikit-03-checklist | /iikit.checklist | |
+| 6 | /iikit-05-tasks | /iikit.tasks | |
+| 7 | /iikit-06-analyze | /iikit.analyze | |
+| 8 | /iikit-07-implement | /iikit.implement | |
 
 ### 3. Expected "Skills Advantage" Reports
 
 The Skills version should display these reports that Vanilla doesn't show:
 
-#### SPEC QUALITY REPORT (after /iikit-03-plan)
+#### SPEC QUALITY REPORT (after /iikit-02-plan)
 ```
 ╭─────────────────────────────────────────────╮
 │  SPEC QUALITY REPORT (Skills Advantage)     │
@@ -132,7 +132,7 @@ The Skills version should display these reports that Vanilla doesn't show:
 ╰─────────────────────────────────────────────╯
 ```
 
-#### PLAN READINESS REPORT (after /iikit-06-tasks)
+#### PLAN READINESS REPORT (after /iikit-05-tasks)
 ```
 ╭─────────────────────────────────────────────╮
 │  PLAN READINESS REPORT (Skills Advantage)   │
@@ -147,7 +147,7 @@ The Skills version should display these reports that Vanilla doesn't show:
 ╰─────────────────────────────────────────────╯
 ```
 
-#### DEPENDENCY GRAPH ANALYSIS (after /iikit-06-tasks)
+#### DEPENDENCY GRAPH ANALYSIS (after /iikit-05-tasks)
 ```
 ╭─────────────────────────────────────────────╮
 │  DEPENDENCY GRAPH ANALYSIS                  │
@@ -164,7 +164,7 @@ The Skills version should display these reports that Vanilla doesn't show:
 ╰─────────────────────────────────────────────╯
 ```
 
-#### IMPLEMENTATION READINESS (before /iikit-08-implement)
+#### IMPLEMENTATION READINESS (before /iikit-07-implement)
 ```
 ╭─────────────────────────────────────────────────────╮
 │  IMPLEMENTATION READINESS (Skills Advantage)        │
@@ -269,15 +269,17 @@ Skills version generated **51 tests** vs vanilla's **21 tests** - a **2.4x impro
 
 ### 2. Visual Reports
 Skills displays formatted box reports at key workflow stages:
-- After /iikit-03-plan: SPEC QUALITY REPORT
-- After /iikit-06-tasks: PLAN READINESS + DEPENDENCY GRAPH
-- Before /iikit-08-implement: IMPLEMENTATION READINESS + CONSTITUTION GATE
+- After /iikit-02-plan: SPEC QUALITY REPORT
+- After /iikit-05-tasks: PLAN READINESS + DEPENDENCY GRAPH
+- Before /iikit-07-implement: IMPLEMENTATION READINESS + CONSTITUTION GATE
+
+Note: /iikit-clarify is a utility that runs after any phase — it is not a numbered workflow step.
 
 ### 3. Earlier Error Detection
 Skills catches missing prerequisites at script level:
 - Missing constitution → immediate ERROR
 - Invalid spec structure → immediate ERROR with specific section names
-- Low quality score → WARNING with recommendation to run /iikit-02-clarify
+- Low quality score → WARNING with recommendation to run /iikit-clarify
 
 ### 4. Constitution Enforcement
 Skills explicitly extracts enforcement rules (MUST, MUST NOT, REQUIRED, NON-NEGOTIABLE) and displays them before implementation, ensuring developers are aware of constraints.

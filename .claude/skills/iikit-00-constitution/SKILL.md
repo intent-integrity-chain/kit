@@ -16,7 +16,7 @@ Create or update the project constitution at `CONSTITUTION.md` — the governing
 
 **MUST contain**: governance principles, non-negotiable development rules, quality standards, amendment procedures, compliance expectations.
 
-**MUST NOT contain**: technology stack, frameworks, databases, implementation details, specific tools or versions. These belong in `/iikit-03-plan`. See [phase-separation-rules.md](../iikit-core/references/phase-separation-rules.md).
+**MUST NOT contain**: technology stack, frameworks, databases, implementation details, specific tools or versions. These belong in `/iikit-02-plan`. See [phase-separation-rules.md](../iikit-core/references/phase-separation-rules.md).
 
 ## User Input
 

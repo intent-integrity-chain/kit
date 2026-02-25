@@ -49,9 +49,9 @@ cd ..
 |-----------------|--------------|
 | `/iikit-00-constitution` | `/iikit-00-constitution` |
 | `/iikit-01-specify` | `/iikit-01-specify` |
-| `/iikit-02-clarify` | `/iikit-02-clarify` |
-| `/iikit-03-plan` | `/iikit-03-plan` |
-| `/iikit-04-checklist` | `/iikit-04-checklist` |
+| `/iikit-clarify` | `/iikit-clarify` |
+| `/iikit-02-plan` | `/iikit-02-plan` |
+| `/iikit-03-checklist` | `/iikit-03-checklist` |
 | `/iikit-05-tasks` | `/iikit-05-tasks` |
 | `/iikit-06-analyze` | `/iikit-06-analyze` |
 | `/iikit-07-implement` | `/iikit-07-implement` |
@@ -96,7 +96,7 @@ optional description, and status (pending/done).
 ### Phase 3: Plan
 
 ```
-/iikit-03-plan I'm building with Python 3.11 using Click for CLI and SQLite for storage
+/iikit-02-plan I'm building with Python 3.11 using Click for CLI and SQLite for storage
 ```
 
 **Verify:**
@@ -124,7 +124,7 @@ Test workflow enforcement and abuse prevention.
 
 Without running specify first:
 ```
-/iikit-03-plan Python 3.11, Click, SQLite
+/iikit-02-plan Python 3.11, Click, SQLite
 ```
 
 **Expected:** BLOCKED - missing prerequisite

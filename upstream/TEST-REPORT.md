@@ -96,7 +96,7 @@ Testing workflow enforcement and abuse prevention. Both implementations share th
 
 | Test Case | Description | Vanilla | Skills | Expected |
 |-----------|-------------|:-------:|:------:|----------|
-| Skip to plan | Run `/iikit-03-plan` without spec | BLOCKED | BLOCKED | BLOCKED |
+| Skip to plan | Run `/iikit-02-plan` without spec | BLOCKED | BLOCKED | BLOCKED |
 | Skip to tasks | Run `/iikit-05-tasks` without plan | BLOCKED | BLOCKED | BLOCKED |
 | Wrong branch | Run skills on `main` instead of feature branch | BLOCKED | BLOCKED | BLOCKED |
 | Invalid branch number | Use `abc-feature` instead of `001-feature` | BLOCKED | BLOCKED | BLOCKED |

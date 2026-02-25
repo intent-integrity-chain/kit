@@ -115,16 +115,14 @@ test.describe('Story Map View', () => {
 });
 
 // ============================================================
-// Clarify View
+// Clarification Badges
 // ============================================================
 
-test.describe('Clarify View', () => {
-  test('clarifications displayed', async ({ page }) => {
+test.describe('Clarification Badges', () => {
+  test('pipeline bar with clarification badges visible', async ({ page }) => {
     await waitForDashboard(page);
-    await switchToTab(page, 'Clarify');
-    await page.waitForTimeout(500);
-    const content = page.locator('#contentArea');
-    await expect(content).toHaveScreenshot('clarify-view.png');
+    const pipelineBar = page.locator('.pipeline-bar');
+    await expect(pipelineBar).toHaveScreenshot('pipeline-bar-with-badges.png');
   });
 });
 

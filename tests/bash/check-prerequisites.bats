@@ -245,87 +245,105 @@ teardown() {
     [[ "$status" -eq 0 ]]
 }
 
-@test "check-prerequisites: --phase 04 validates constitution, spec, and plan" {
+@test "check-prerequisites: --phase 03 validates constitution, spec, and plan" {
     create_mock_feature "001-test-feature"
 
-    run "$CHECK_SCRIPT" --phase 04 --json
+    run "$CHECK_SCRIPT" --phase 03 --json
     [[ "$status" -eq 0 ]]
 
     # Check enriched JSON fields
     echo "$output" | jq . >/dev/null
-    assert_contains "$output" '"phase":"04"'
+    assert_contains "$output" '"phase":"03"'
     assert_contains "$output" '"constitution_mode":"basic"'
     assert_contains "$output" '"validated"'
 }
 
-@test "check-prerequisites: --phase 04 fails without plan.md" {
+@test "check-prerequisites: --phase 03 fails without plan.md" {
     mkdir -p specs/001-test-feature
     cp "$FIXTURES_DIR/spec.md" specs/001-test-feature/spec.md
 
-    run "$CHECK_SCRIPT" --phase 04 --json
+    run "$CHECK_SCRIPT" --phase 03 --json
     [[ "$status" -eq 1 ]]
     assert_contains "$output" "plan.md not found"
 }
 
-@test "check-prerequisites: --phase 02 validates spec but not plan" {
+@test "check-prerequisites: --phase clarify validates spec but not plan" {
     mkdir -p specs/001-test-feature
     cp "$FIXTURES_DIR/spec.md" specs/001-test-feature/spec.md
-    # No plan.md, but phase 02 doesn't require it
+    # No plan.md, but clarify doesn't require it
 
-    run "$CHECK_SCRIPT" --phase 02 --json
+    run "$CHECK_SCRIPT" --phase clarify --json
     [[ "$status" -eq 0 ]]
-    assert_contains "$output" '"phase":"02"'
+    assert_contains "$output" '"phase":"clarify"'
 }
 
-@test "check-prerequisites: --phase 02 fails without spec.md" {
+@test "check-prerequisites: --phase clarify succeeds without spec.md (utility phase)" {
     mkdir -p specs/001-test-feature
 
-    run "$CHECK_SCRIPT" --phase 02 --json
-    [[ "$status" -eq 1 ]]
-    assert_contains "$output" "spec.md not found"
+    run "$CHECK_SCRIPT" --phase clarify --json
+    [[ "$status" -eq 0 ]]
 }
 
-@test "check-prerequisites: --phase 02 soft constitution warns but continues" {
+@test "check-prerequisites: --phase clarify succeeds with only constitution (no feature dir)" {
+    # Clarify can target constitution alone — no feature dir needed
+    rm -rf specs/001-test-feature
+
+    run "$CHECK_SCRIPT" --phase clarify --json
+    [[ "$status" -eq 0 ]]
+    assert_contains "$output" '"phase":"clarify"'
+}
+
+@test "check-prerequisites: --phase clarify succeeds with no artifacts at all" {
+    # Even with nothing — clarify prerequisites pass (SKILL.md handles the error)
+    rm -rf specs/001-test-feature
+    rm -f CONSTITUTION.md
+
+    run "$CHECK_SCRIPT" --phase clarify --json
+    [[ "$status" -eq 0 ]]
+    assert_contains "$output" "Constitution not found"
+}
+
+@test "check-prerequisites: --phase clarify soft constitution warns but continues" {
     mkdir -p specs/001-test-feature
     cp "$FIXTURES_DIR/spec.md" specs/001-test-feature/spec.md
     rm -f CONSTITUTION.md
 
-    run "$CHECK_SCRIPT" --phase 02 --json
+    run "$CHECK_SCRIPT" --phase clarify --json
     [[ "$status" -eq 0 ]]
     assert_contains "$output" '"constitution_mode":"soft"'
     assert_contains "$output" "Constitution not found"
 }
 
-@test "check-prerequisites: --phase 08 requires tasks" {
+@test "check-prerequisites: --phase 07 requires tasks" {
     create_mock_feature "001-test-feature"
 
-    run "$CHECK_SCRIPT" --phase 08 --json
+    run "$CHECK_SCRIPT" --phase 07 --json
     [[ "$status" -eq 1 ]]
     assert_contains "$output" "tasks.md not found"
 }
 
-@test "check-prerequisites: --phase 08 succeeds with tasks" {
+@test "check-prerequisites: --phase 07 succeeds with tasks" {
     create_complete_mock_feature "001-test-feature"
 
-    run "$CHECK_SCRIPT" --phase 08 --json
+    run "$CHECK_SCRIPT" --phase 07 --json
     [[ "$status" -eq 0 ]]
-    assert_contains "$output" '"phase":"08"'
+    assert_contains "$output" '"phase":"07"'
     assert_contains "$output" '"tasks.md"'
 }
 
-@test "check-prerequisites: --phase 08 includes tasks in available docs" {
+@test "check-prerequisites: --phase 07 includes tasks in available docs" {
     create_complete_mock_feature "001-test-feature"
 
-    result=$("$CHECK_SCRIPT" --phase 08 --json)
+    result=$("$CHECK_SCRIPT" --phase 07 --json)
 
     assert_contains "$result" '"tasks.md"'
 }
 
-@test "check-prerequisites: --phase 03 copies plan template" {
+@test "check-prerequisites: --phase 02 copies plan template" {
     mkdir -p specs/001-test-feature
     cp "$FIXTURES_DIR/spec.md" specs/001-test-feature/spec.md
 
-    run "$CHECK_SCRIPT" --phase 03 --json
+    run "$CHECK_SCRIPT" --phase 02 --json
     [[ "$status" -eq 0 ]]
 
     # plan.md should have been created from template
@@ -333,29 +351,29 @@ teardown() {
     assert_contains "$output" '"plan_template_copied"'
 }
 
-@test "check-prerequisites: --phase 03 reports spec quality" {
+@test "check-prerequisites: --phase 02 reports spec quality" {
     mkdir -p specs/001-test-feature
     cp "$FIXTURES_DIR/spec.md" specs/001-test-feature/spec.md
 
-    result=$("$CHECK_SCRIPT" --phase 03 --json)
+    result=$("$CHECK_SCRIPT" --phase 02 --json)
 
     assert_contains "$result" '"spec_quality"'
 }
 
-@test "check-prerequisites: --phase 09 requires tasks with implicit constitution" {
+@test "check-prerequisites: --phase 08 requires tasks with implicit constitution" {
     create_mock_feature "001-test-feature"
 
-    run "$CHECK_SCRIPT" --phase 09 --json
+    run "$CHECK_SCRIPT" --phase 08 --json
     [[ "$status" -eq 1 ]]
     assert_contains "$output" "tasks.md not found"
 }
 
-@test "check-prerequisites: --phase 09 succeeds with complete feature" {
+@test "check-prerequisites: --phase 08 succeeds with complete feature" {
     create_complete_mock_feature "001-test-feature"
 
-    run "$CHECK_SCRIPT" --phase 09 --json
+    run "$CHECK_SCRIPT" --phase 08 --json
     [[ "$status" -eq 0 ]]
-    assert_contains "$output" '"phase":"09"'
+    assert_contains "$output" '"phase":"08"'
     assert_contains "$output" '"constitution_mode":"implicit"'
 }
 
@@ -368,7 +386,7 @@ teardown() {
 @test "check-prerequisites: enriched JSON has validated object" {
     create_mock_feature "001-test-feature"
 
-    result=$("$CHECK_SCRIPT" --phase 04 --json)
+    result=$("$CHECK_SCRIPT" --phase 03 --json)
 
     # Parse validated object
     constitution=$(echo "$result" | jq -r '.validated.constitution')
@@ -385,7 +403,7 @@ teardown() {
 @test "check-prerequisites: enriched JSON has warnings array" {
     create_mock_feature "001-test-feature"
 
-    result=$("$CHECK_SCRIPT" --phase 04 --json)
+    result=$("$CHECK_SCRIPT" --phase 03 --json)
 
     # warnings should be a JSON array
     echo "$result" | jq '.warnings' >/dev/null
@@ -393,12 +411,12 @@ teardown() {
     [[ "$warnings_type" == "array" ]]
 }
 
-@test "check-prerequisites: --phase 07 with soft checklist warns on incomplete" {
+@test "check-prerequisites: --phase 06 with soft checklist warns on incomplete" {
     create_complete_mock_feature "001-test-feature"
     mkdir -p "$TEST_DIR/specs/001-test-feature/checklists"
     printf -- '- [ ] Item 1\n- [x] Item 2\n- [ ] Item 3\n' > "$TEST_DIR/specs/001-test-feature/checklists/quality.md"
 
-    result=$("$CHECK_SCRIPT" --phase 07 --json)
+    result=$("$CHECK_SCRIPT" --phase 06 --json)
 
     assert_contains "$result" "Checklists incomplete"
     assert_contains "$result" "Recommend"
@@ -406,12 +424,12 @@ teardown() {
     assert_contains "$result" '"checklist_total":3'
 }
 
-@test "check-prerequisites: --phase 08 with hard checklist warns strongly" {
+@test "check-prerequisites: --phase 07 with hard checklist warns strongly" {
     create_complete_mock_feature "001-test-feature"
     mkdir -p "$TEST_DIR/specs/001-test-feature/checklists"
     printf -- '- [ ] Item 1\n- [x] Item 2\n' > "$TEST_DIR/specs/001-test-feature/checklists/quality.md"
 
-    result=$("$CHECK_SCRIPT" --phase 08 --json)
+    result=$("$CHECK_SCRIPT" --phase 07 --json)
 
     assert_contains "$result" "Must be 100%"
 }
@@ -437,7 +455,7 @@ teardown() {
     cp "$FIXTURES_DIR/spec.md" "$alt_dir/specs/001-test-feature/spec.md"
     cp "$FIXTURES_DIR/constitution.md" "$alt_dir/CONSTITUTION.md"
 
-    result=$("$CHECK_SCRIPT" --phase 02 --json --project-root "$alt_dir")
+    result=$("$CHECK_SCRIPT" --phase clarify --json --project-root "$alt_dir")
 
     assert_contains "$result" "$alt_dir"
     rm -rf "$alt_dir"
@@ -469,40 +487,40 @@ teardown() {
     echo "$result" | jq '.artifacts.test_specs' >/dev/null
 }
 
-@test "check-prerequisites: --phase status ready_for is 06 for spec+plan" {
+@test "check-prerequisites: --phase status ready_for is 05 for spec+plan" {
     create_mock_feature "001-test-feature"
 
     result=$("$CHECK_SCRIPT" --phase status --json)
 
     ready_for=$(echo "$result" | jq -r '.ready_for')
-    [[ "$ready_for" == "06" ]]
+    [[ "$ready_for" == "05" ]]
 }
 
-@test "check-prerequisites: --phase status ready_for is 09 for complete feature" {
+@test "check-prerequisites: --phase status ready_for is 08 for complete feature" {
     create_complete_mock_feature "001-test-feature"
 
     result=$("$CHECK_SCRIPT" --phase status --json)
 
     ready_for=$(echo "$result" | jq -r '.ready_for')
-    [[ "$ready_for" == "09" ]]
+    [[ "$ready_for" == "08" ]]
 }
 
-@test "check-prerequisites: --phase status next_step is /iikit-06-tasks when plan exists but no tasks" {
+@test "check-prerequisites: --phase status next_step is /iikit-05-tasks when plan exists but no tasks" {
     create_mock_feature "001-test-feature"
 
     result=$("$CHECK_SCRIPT" --phase status --json)
 
     next_step=$(echo "$result" | jq -r '.next_step')
-    [[ "$next_step" == "/iikit-06-tasks" ]]
+    [[ "$next_step" == "/iikit-05-tasks" ]]
 }
 
-@test "check-prerequisites: --phase status next_step is /iikit-08-implement when tasks exist" {
+@test "check-prerequisites: --phase status next_step is /iikit-07-implement when tasks exist" {
     create_complete_mock_feature "001-test-feature"
 
     result=$("$CHECK_SCRIPT" --phase status --json)
 
     next_step=$(echo "$result" | jq -r '.next_step')
-    [[ "$next_step" == "/iikit-08-implement" ]]
+    [[ "$next_step" == "/iikit-07-implement" ]]
 }
 
 @test "check-prerequisites: --phase status next_step is /iikit-00-constitution when no constitution" {
@@ -515,14 +533,14 @@ teardown() {
     [[ "$next_step" == "/iikit-00-constitution" ]]
 }
 
-@test "check-prerequisites: --phase status next_step is /iikit-03-plan with spec but no plan" {
+@test "check-prerequisites: --phase status next_step is /iikit-02-plan with spec but no plan" {
     mkdir -p specs/001-test-feature
     cp "$FIXTURES_DIR/spec.md" specs/001-test-feature/spec.md
 
     result=$("$CHECK_SCRIPT" --phase status --json)
 
     next_step=$(echo "$result" | jq -r '.next_step')
-    [[ "$next_step" == "/iikit-03-plan" ]]
+    [[ "$next_step" == "/iikit-02-plan" ]]
 }
 
 @test "check-prerequisites: --phase status clear_before is true for plan transition" {
@@ -633,7 +651,7 @@ teardown() {
 # Testify enforcement when TDD mandatory
 # =============================================================================
 
-@test "check-prerequisites: --phase 06 fails when TDD mandatory and no testify artifacts" {
+@test "check-prerequisites: --phase 05 fails when TDD mandatory and no testify artifacts" {
     create_mock_feature "001-test-feature"
 
     # Remove .feature files added by create_mock_feature
@@ -641,32 +659,32 @@ teardown() {
 
     # Constitution fixture already has "TDD Required: Test-first development MUST be used"
 
-    run "$CHECK_SCRIPT" --phase 06 --json
+    run "$CHECK_SCRIPT" --phase 05 --json
     [[ "$status" -eq 1 ]]
     assert_contains "$output" "TDD is mandatory"
-    assert_contains "$output" "/iikit-05-testify"
+    assert_contains "$output" "/iikit-04-testify"
 }
 
-@test "check-prerequisites: --phase 06 passes when TDD mandatory and .feature files exist" {
+@test "check-prerequisites: --phase 05 passes when TDD mandatory and .feature files exist" {
     # create_mock_feature already adds .feature files
     create_mock_feature "001-test-feature"
 
-    run "$CHECK_SCRIPT" --phase 06 --json
+    run "$CHECK_SCRIPT" --phase 05 --json
     [[ "$status" -eq 0 ]]
 }
 
-@test "check-prerequisites: --phase 06 passes when TDD mandatory and cached in context.json" {
+@test "check-prerequisites: --phase 05 passes when TDD mandatory and cached in context.json" {
     create_mock_feature "001-test-feature"
 
     # Write cached TDD determination to .specify/context.json
     mkdir -p "$TEST_DIR/.specify"
     echo '{"tdd_determination": "mandatory"}' > "$TEST_DIR/.specify/context.json"
 
-    run "$CHECK_SCRIPT" --phase 06 --json
+    run "$CHECK_SCRIPT" --phase 05 --json
     [[ "$status" -eq 0 ]]
 }
 
-@test "check-prerequisites: --phase 06 passes when TDD not mandatory and no testify artifacts" {
+@test "check-prerequisites: --phase 05 passes when TDD not mandatory and no testify artifacts" {
     create_mock_feature "001-test-feature"
 
     # Replace constitution with one that doesn't require TDD
@@ -678,17 +696,17 @@ teardown() {
 - **Simplicity**: Keep it simple
 EOF
 
-    run "$CHECK_SCRIPT" --phase 06 --json
+    run "$CHECK_SCRIPT" --phase 05 --json
     [[ "$status" -eq 0 ]]
 }
 
-@test "check-prerequisites: --phase 08 fails when TDD mandatory and no testify artifacts" {
+@test "check-prerequisites: --phase 05 fails when TDD mandatory and no testify artifacts (complete feature)" {
     create_complete_mock_feature "001-test-feature"
 
     # Remove test artifacts
     rm -rf "$TEST_DIR/specs/001-test-feature/tests"
 
-    run "$CHECK_SCRIPT" --phase 08 --json
+    run "$CHECK_SCRIPT" --phase 05 --json
     [[ "$status" -eq 1 ]]
     assert_contains "$output" "TDD is mandatory"
 }
@@ -697,7 +715,7 @@ EOF
 # Status next_step for incomplete checklists
 # =============================================================================
 
-@test "check-prerequisites: --phase status next_step is /iikit-04-checklist for incomplete checklists" {
+@test "check-prerequisites: --phase status next_step is /iikit-03-checklist for incomplete checklists" {
     create_mock_feature "001-test-feature"
     mkdir -p "$TEST_DIR/specs/001-test-feature/checklists"
     printf -- '- [ ] Item 1\n- [x] Item 2\n- [ ] Item 3\n' > "$TEST_DIR/specs/001-test-feature/checklists/quality.md"
@@ -705,5 +723,5 @@ EOF
     result=$("$CHECK_SCRIPT" --phase status --json)
 
     next_step=$(echo "$result" | jq -r '.next_step')
-    [[ "$next_step" == "/iikit-04-checklist" ]]
+    [[ "$next_step" == "/iikit-03-checklist" ]]
 }
