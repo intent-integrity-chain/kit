@@ -44,15 +44,47 @@ function listFeatures(projectPath) {
     const namePart = entry.name.replace(/^\d+-/, '');
     const name = namePart.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
+    // Find most recent mtime across all artifacts in this feature
+    let lastActive = 0;
+    const artifactFiles = [
+      specPath, tasksPath,
+      path.join(featureDir, 'plan.md'),
+      path.join(featureDir, 'analysis.md'),
+      path.join(featureDir, 'bugs.md'),
+    ];
+    for (const f of artifactFiles) {
+      try {
+        const mtime = fs.statSync(f).mtimeMs;
+        if (mtime > lastActive) lastActive = mtime;
+      } catch { /* file doesn't exist */ }
+    }
+    // Also check checklists/ and tests/ directories
+    for (const subdir of ['checklists', 'tests', 'tests/features']) {
+      const sd = path.join(featureDir, subdir);
+      try {
+        const files = fs.readdirSync(sd);
+        for (const f of files) {
+          try {
+            const mtime = fs.statSync(path.join(sd, f)).mtimeMs;
+            if (mtime > lastActive) lastActive = mtime;
+          } catch { /* skip */ }
+        }
+      } catch { /* dir doesn't exist */ }
+    }
+
     features.push({
       id: entry.name,
       name,
       stories: stories.length,
-      progress: `${checkedCount}/${totalCount}`
+      progress: `${checkedCount}/${totalCount}`,
+      lastActive
     });
   }
 
-  return features.reverse();
+  // Sort by last active descending — most recently touched feature first
+  features.sort((a, b) => b.lastActive - a.lastActive);
+
+  return features;
 }
 
 /**
