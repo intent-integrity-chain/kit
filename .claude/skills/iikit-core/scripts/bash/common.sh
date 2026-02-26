@@ -504,11 +504,16 @@ calculate_spec_quality() {
     # +1 for having edge cases section
     grep -q "^### Edge Cases\|^## Edge Cases" "$spec_file" 2>/dev/null && ((score+=1))
 
-    # -3 for bracket placeholders like [PLACEHOLDER], [Feature Name], [Brief description]
-    if grep -qE '\[[A-Z][A-Za-z_ ]*\]' "$spec_file" 2>/dev/null; then
+    # Penalty for bracket placeholders like [Feature Name], [initial state], [action]
+    # Scale: 1-3 placeholders = -3, 4+ = -5 (likely an unfilled template)
+    local placeholder_count
+    placeholder_count=$(grep -coE '\[[A-Za-z][A-Za-z_ ,.:]*\]' "$spec_file" 2>/dev/null) || placeholder_count=0
+    if [[ "$placeholder_count" -ge 4 ]]; then
+        score=$((score - 5))
+    elif [[ "$placeholder_count" -ge 1 ]]; then
         score=$((score - 3))
-        [[ $score -lt 0 ]] && score=0
     fi
+    [[ $score -lt 0 ]] && score=0
 
     echo "$score"
 }
