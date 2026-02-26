@@ -495,6 +495,7 @@ function parseClarifications(content) {
       continue;
     }
 
+    // Match single-line: - Q: question -> A: answer [refs]
     const qaMatch = line.match(/^- Q:\s*(.*?)\s*->\s*A:\s*(.*)/);
     if (qaMatch && currentSession) {
       let answer = qaMatch[2].trim();
@@ -513,6 +514,57 @@ function parseClarifications(content) {
         answer,
         refs
       });
+      continue;
+    }
+
+    // Match start of multi-line: - Q: question (no -> A: on this line)
+    const qStartMatch = line.match(/^- Q:\s*(.+)/);
+    if (qStartMatch && currentSession && !line.includes('-> A:')) {
+      // Accumulate continuation lines until we find -> A:
+      let fullQuestion = qStartMatch[1].trim();
+      let fullAnswer = '';
+      let foundAnswer = false;
+      // Peek ahead by re-scanning from current position
+      const currentIdx = lines.indexOf(line);
+      for (let j = currentIdx + 1; j < lines.length; j++) {
+        const nextLine = lines[j];
+        // Stop at next Q, next session heading, or next section
+        if (/^- Q:/.test(nextLine) || /^### /.test(nextLine) || /^## /.test(nextLine)) break;
+        const answerInLine = nextLine.match(/->\s*A:\s*(.*)/);
+        if (answerInLine) {
+          // Everything before -> A: is part of the question
+          const beforeAnswer = nextLine.substring(0, nextLine.indexOf('-> A:')).trim();
+          if (beforeAnswer) fullQuestion += ' ' + beforeAnswer;
+          fullAnswer = answerInLine[1].trim();
+          foundAnswer = true;
+          // Continue collecting answer continuation lines
+          for (let k = j + 1; k < lines.length; k++) {
+            const contLine = lines[k];
+            if (/^- Q:/.test(contLine) || /^### /.test(contLine) || /^## /.test(contLine) || contLine.trim() === '') break;
+            if (/^\s+/.test(contLine)) {
+              fullAnswer += ' ' + contLine.trim();
+            } else break;
+          }
+          break;
+        } else if (/^\s+/.test(nextLine)) {
+          fullQuestion += ' ' + nextLine.trim();
+        }
+      }
+
+      if (foundAnswer) {
+        let refs = [];
+        const refsMatch = fullAnswer.match(/\[((?:(?:FR|US|SC)-\w+(?:,\s*)?)+)\]\s*$/);
+        if (refsMatch) {
+          refs = refsMatch[1].split(/,\s*/).map(r => r.trim());
+          fullAnswer = fullAnswer.substring(0, fullAnswer.lastIndexOf('[')).trim();
+        }
+        clarifications.push({
+          session: currentSession,
+          question: fullQuestion,
+          answer: fullAnswer,
+          refs
+        });
+      }
     }
   }
 
