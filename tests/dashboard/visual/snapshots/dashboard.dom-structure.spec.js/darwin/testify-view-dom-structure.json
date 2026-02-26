@@ -356,7 +356,7 @@
                       "dataAttrs": {
                         "data-node-id": "FR-004",
                         "data-chain": "FR-004",
-                        "data-cross-target": "spec",
+                        "data-cross-target": "checklist",
                         "data-cross-id": "FR-004"
                       },
                       "ariaAttrs": {
@@ -399,7 +399,7 @@
                       "dataAttrs": {
                         "data-node-id": "FR-005",
                         "data-chain": "FR-005",
-                        "data-cross-target": "spec",
+                        "data-cross-target": "checklist",
                         "data-cross-id": "FR-005"
                       },
                       "ariaAttrs": {
@@ -484,7 +484,7 @@
                       "dataAttrs": {
                         "data-node-id": "FR-007",
                         "data-chain": "FR-007",
-                        "data-cross-target": "spec",
+                        "data-cross-target": "checklist",
                         "data-cross-id": "FR-007"
                       },
                       "ariaAttrs": {
@@ -653,7 +653,7 @@
                       "dataAttrs": {
                         "data-node-id": "SC-004",
                         "data-chain": "SC-004",
-                        "data-cross-target": "spec",
+                        "data-cross-target": "checklist",
                         "data-cross-id": "SC-004"
                       },
                       "ariaAttrs": {
@@ -696,7 +696,7 @@
                       "dataAttrs": {
                         "data-node-id": "SC-005",
                         "data-chain": "SC-005",
-                        "data-cross-target": "spec",
+                        "data-cross-target": "checklist",
                         "data-cross-id": "SC-005"
                       },
                       "ariaAttrs": {
@@ -747,8 +747,8 @@
                       "dataAttrs": {
                         "data-node-id": "TS-001",
                         "data-chain": "TS-001 FR-001 SC-001",
-                        "data-cross-target": "spec",
-                        "data-cross-id": "FR-001"
+                        "data-cross-target": "checklist",
+                        "data-cross-id": "TS-001"
                       },
                       "ariaAttrs": {
                         "aria-describedby": "desc-TS-001"
@@ -790,8 +790,8 @@
                       "dataAttrs": {
                         "data-node-id": "TS-003",
                         "data-chain": "TS-003 FR-002 SC-002",
-                        "data-cross-target": "spec",
-                        "data-cross-id": "FR-002"
+                        "data-cross-target": "checklist",
+                        "data-cross-id": "TS-003"
                       },
                       "ariaAttrs": {
                         "aria-describedby": "desc-TS-003"
@@ -833,8 +833,8 @@
                       "dataAttrs": {
                         "data-node-id": "TS-004",
                         "data-chain": "TS-004 FR-003 SC-003",
-                        "data-cross-target": "spec",
-                        "data-cross-id": "FR-003"
+                        "data-cross-target": "checklist",
+                        "data-cross-id": "TS-004"
                       },
                       "ariaAttrs": {
                         "aria-describedby": "desc-TS-004"
@@ -876,8 +876,8 @@
                       "dataAttrs": {
                         "data-node-id": "TS-002",
                         "data-chain": "TS-002 FR-001",
-                        "data-cross-target": "spec",
-                        "data-cross-id": "FR-001"
+                        "data-cross-target": "checklist",
+                        "data-cross-id": "TS-002"
                       },
                       "ariaAttrs": {
                         "aria-describedby": "desc-TS-002"
@@ -919,8 +919,8 @@
                       "dataAttrs": {
                         "data-node-id": "TS-005",
                         "data-chain": "TS-005 FR-006",
-                        "data-cross-target": "spec",
-                        "data-cross-id": "FR-006"
+                        "data-cross-target": "checklist",
+                        "data-cross-id": "TS-005"
                       },
                       "ariaAttrs": {
                         "aria-describedby": "desc-TS-005"

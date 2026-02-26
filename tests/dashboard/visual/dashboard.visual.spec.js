@@ -105,8 +105,7 @@ test.describe('Constitution View', () => {
 // ============================================================
 
 test.describe('Story Map View', () => {
-  // TODO: visual snapshot needs regeneration after story map rendering changes
-  test.fixme('story map with stories, requirements, edges', async ({ page }) => {
+  test('story map with stories, requirements, edges', async ({ page }) => {
     await waitForDashboard(page);
     await switchToTab(page, 'Spec');
     await page.waitForTimeout(500);

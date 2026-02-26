@@ -48,8 +48,21 @@ jobs:
         working-directory: tests/dashboard
         run: npx playwright test --config=playwright.config.js
 
-      # Visual screenshot comparison tests removed — served their purpose during
-      # dashboard migration from standalone app. Behavioral tests remain in basic config.
+      - name: Run Playwright visual dashboard tests
+        working-directory: tests/dashboard
+        run: npx playwright test --config=playwright-visual.config.js --update-snapshots
+
+      - name: Commit updated snapshots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add tests/dashboard/visual/ || true
+          git diff --cached --quiet || git commit -m "ci: update Playwright snapshots for Linux [skip ci]"
+          git push || true
+
+      - name: Verify Playwright visual tests pass
+        working-directory: tests/dashboard
+        run: npx playwright test --config=playwright-visual.config.js
 
       - name: Install PowerShell
         run: |

@@ -137,8 +137,7 @@ test.describe('DOM Structure Snapshots', () => {
     expect(JSON.stringify(structure, null, 2)).toMatchSnapshot('storymap-view-dom-structure.json');
   });
 
-  // TODO: fixture needs - Q: lines (badge now counts Q items, not sessions)
-  test.fixme('Clarification badge renders on Spec node (which has sessions) and not on others', async ({ page }) => {
+  test('Clarification badge renders on Spec node (which has sessions) and not on others', async ({ page }) => {
     await waitForDashboard(page);
     // Select 001-auth which has clarification sessions in spec.md
     await page.selectOption('#featureSelect', { index: 1 });
@@ -162,7 +161,7 @@ test.describe('DOM Structure Snapshots', () => {
     await expect(implBadge).toHaveCount(0);
   });
 
-  test.fixme('Clarification badge has correct title tooltip with session count', async ({ page }) => {
+  test('Clarification badge has correct title tooltip with session count', async ({ page }) => {
     await waitForDashboard(page);
     await page.selectOption('#featureSelect', { index: 1 });
     await page.waitForTimeout(500);

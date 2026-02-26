@@ -167,8 +167,7 @@ test.describe('Performance Baselines', () => {
     expect(elapsed).toBeLessThan(TAB_SWITCH_MAX_MS);
   });
 
-  // TODO: fixture needs clarification data for badge to render
-  test.fixme('pipeline badge rendering does not slow feature switch', async ({ page }) => {
+  test('pipeline badge rendering does not slow feature switch', async ({ page }) => {
     await page.goto(url());
     await page.waitForSelector('.pipeline-node', { timeout: 10000 });
 

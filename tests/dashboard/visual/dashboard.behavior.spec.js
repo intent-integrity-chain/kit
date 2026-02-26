@@ -266,8 +266,7 @@ test.describe('Constitution View', () => {
 // ============================================================
 
 test.describe('Checklist View', () => {
-  // TODO: fixture needs checklist data with multiple files for ring rendering
-  test.fixme('shows progress rings for each checklist file', async ({ page }) => {
+  test('shows progress rings for each checklist file', async ({ page }) => {
     await waitForDashboard(page);
     // Feature 001-auth is at index 1 (sorted newest first: 002=0, 001=1)
     await selectFeatureByIndex(page, 1);
@@ -279,7 +278,7 @@ test.describe('Checklist View', () => {
     expect(count).toBe(3); // security, ux, api checklists
   });
 
-  test.fixme('shows gate status', async ({ page }) => {
+  test('shows gate status', async ({ page }) => {
     await waitForDashboard(page);
     await selectFeatureByIndex(page, 1);
     await switchToTab(page, 'Checklist');
@@ -289,7 +288,7 @@ test.describe('Checklist View', () => {
     await expect(page.locator('.gate-label')).toBeVisible();
   });
 
-  test.fixme('clicking a ring expands checklist detail', async ({ page }) => {
+  test('clicking a ring expands checklist detail', async ({ page }) => {
     await waitForDashboard(page);
     await selectFeatureByIndex(page, 1);
     await switchToTab(page, 'Checklist');
@@ -311,8 +310,7 @@ test.describe('Checklist View', () => {
 // ============================================================
 
 test.describe('Story Map View', () => {
-  // TODO: fixture has 2 stories but test expects 4 — update fixture
-  test.fixme('renders story cards with titles', async ({ page }) => {
+  test('renders story cards with titles', async ({ page }) => {
     await waitForDashboard(page);
     await selectFeatureByIndex(page, 1); // 001-auth
     await switchToTab(page, 'Spec');
@@ -354,7 +352,7 @@ test.describe('Story Map View', () => {
 // ============================================================
 
 test.describe('Analyze View', () => {
-  test.fixme('shows health score gauge', async ({ page }) => {
+  test('shows health score gauge', async ({ page }) => {
     await waitForDashboard(page);
     await selectFeatureByIndex(page, 1); // 001-auth
     await switchToTab(page, 'Analyze');
@@ -363,7 +361,7 @@ test.describe('Analyze View', () => {
     await expect(page.locator('.gauge-score')).toBeVisible();
   });
 
-  test.fixme('shows issues with severity badges', async ({ page }) => {
+  test('shows issues with severity badges', async ({ page }) => {
     await waitForDashboard(page);
     await selectFeatureByIndex(page, 1);
     await switchToTab(page, 'Analyze');
@@ -374,7 +372,7 @@ test.describe('Analyze View', () => {
     expect(count).toBeGreaterThanOrEqual(1);
   });
 
-  test.fixme('shows coverage heatmap table', async ({ page }) => {
+  test('shows coverage heatmap table', async ({ page }) => {
     await waitForDashboard(page);
     await selectFeatureByIndex(page, 1);
     await switchToTab(page, 'Analyze');
@@ -445,7 +443,7 @@ test.describe('Plan View', () => {
 // ============================================================
 
 test.describe('Testify View', () => {
-  test.fixme('shows sankey traceability nodes', async ({ page }) => {
+  test('shows sankey traceability nodes', async ({ page }) => {
     await waitForDashboard(page);
     await selectFeatureByIndex(page, 1); // 001-auth
     await switchToTab(page, 'Testify');
@@ -455,7 +453,7 @@ test.describe('Testify View', () => {
     expect(count).toBeGreaterThanOrEqual(1);
   });
 
-  test.fixme('shows test pyramid group labels', async ({ page }) => {
+  test('shows test pyramid group labels', async ({ page }) => {
     await waitForDashboard(page);
     await selectFeatureByIndex(page, 1);
     await switchToTab(page, 'Testify');
@@ -466,7 +464,7 @@ test.describe('Testify View', () => {
     expect(count).toBeGreaterThanOrEqual(1);
   });
 
-  test.fixme('shows integrity seal', async ({ page }) => {
+  test('shows integrity seal', async ({ page }) => {
     await waitForDashboard(page);
     await selectFeatureByIndex(page, 1);
     await switchToTab(page, 'Testify');
@@ -513,7 +511,7 @@ test.describe('Cross-Panel Navigation', () => {
     await expect(page.locator('.pipeline-node.active', { hasText: 'Spec' })).toBeVisible();
   });
 
-  test.fixme('clarify view shows clarification entries from spec', async ({ page }) => {
+  test('clarify view shows clarification entries from spec', async ({ page }) => {
     await waitForDashboard(page);
     await selectFeatureByIndex(page, 1); // 001-auth (has clarifications)
 
@@ -534,7 +532,7 @@ test.describe('Cross-Panel Navigation', () => {
     expect(await answers.count()).toBeGreaterThan(0);
   });
 
-  test.fixme('programmatic switchTab to clarify renders clarify-specific view', async ({ page }) => {
+  test('programmatic switchTab to clarify renders clarify-specific view', async ({ page }) => {
     await waitForDashboard(page);
     await selectFeatureByIndex(page, 1);
     await page.waitForTimeout(500);
