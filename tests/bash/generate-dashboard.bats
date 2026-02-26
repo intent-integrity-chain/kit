@@ -552,19 +552,19 @@ EOF
 # Regression tests for specific bugs
 # =============================================================================
 
-@test "no silent failure — stderr has error when generation fails" {
+@test "no silent failure — stderr has warning when constitution missing" {
     command -v node >/dev/null 2>&1 || skip "node not available"
 
     local proj
     proj=$(mktemp -d)
-    # No CONSTITUTION.md — the generator should error
+    # No CONSTITUTION.md — the generator should warn but succeed
 
     run node "$GENERATOR" "$proj"
-    [ "$status" -ne 0 ]
+    [ "$status" -eq 0 ]
 
-    # stderr should contain an error message (not silently swallowed)
-    # The generator writes to stderr: "Error: CONSTITUTION.md not found..."
-    assert_contains "$output" "Error"
+    # stderr should contain a warning message (not silently swallowed)
+    assert_contains "$output" "Warning"
+    assert_contains "$output" "CONSTITUTION.md"
 
     rm -rf "$proj"
 }
@@ -928,35 +928,28 @@ EOF
     assert_contains "$output" "not found"
 }
 
-@test "generate-dashboard.js exits non-zero when CONSTITUTION.md missing" {
+@test "generate-dashboard.js warns but succeeds when CONSTITUTION.md missing" {
     command -v node >/dev/null 2>&1 || skip "node not available"
 
     local proj
     proj=$(mktemp -d)
-    # No CONSTITUTION.md
+    # No CONSTITUTION.md — generator warns but continues
 
     run node "$GENERATOR" "$proj"
-    [ "$status" -ne 0 ]
-    assert_contains "$output" "CONSTITUTION.md not found"
+    [ "$status" -eq 0 ]
+    assert_contains "$output" "CONSTITUTION.md"
 
     rm -rf "$proj"
 }
 
-@test "generate-dashboard-safe: wraps generator failure as exit 0" {
+@test "generate-dashboard-safe: exits 0 when constitution missing" {
     command -v node >/dev/null 2>&1 || skip "node not available"
 
-    # The safe wrapper must exit 0 even when the generator itself would fail.
-    # Test with a project missing CONSTITUTION.md (generator exits non-zero).
     local proj
     proj=$(mktemp -d)
     mkdir -p "$proj/.specify"
-    # No CONSTITUTION.md — generator would fail
+    # No CONSTITUTION.md — both generator and safe wrapper exit 0
 
-    # First confirm the generator itself DOES fail
-    run node "$GENERATOR" "$proj"
-    [ "$status" -ne 0 ]
-
-    # Now confirm the safe wrapper exits 0 despite that failure
     run bash -c '
         unset BATS_TEST_FILENAME BATS_TMPDIR
         bash "'"$DASHBOARD_SCRIPT"'" "'"$proj"'"

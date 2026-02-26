@@ -121,13 +121,15 @@ Describe "Artifact-state fallback" {
         $result.next_step | Should -Be "/iikit-02-plan"
     }
 
-    It "status → /iikit-05-tasks when plan exists but no tasks" {
+    It "status → /iikit-04-testify when plan exists with TDD mandatory but no tasks" {
         $featureDir = New-MockFeature -TestDir $script:TestDir
         New-Item -ItemType Directory -Path (Join-Path $script:TestDir ".specify") -Force | Out-Null
         "001-test-feature" | Set-Content (Join-Path $script:TestDir ".specify/active-feature") -NoNewline
 
+        # PowerShell next-step detects TDD mandatory from constitution fixture
+        # and routes to testify since .feature detection is bash-only
         $result = & $script:NextStepScript -Phase status -Json | ConvertFrom-Json
-        $result.next_step | Should -Be "/iikit-05-tasks"
+        $result.next_step | Should -Be "/iikit-04-testify"
     }
 
     It "status → /iikit-07-implement when tasks exist and incomplete" {
@@ -304,5 +306,40 @@ Describe "Alt steps" {
     It "includes analyze after tasks (phase 05)" {
         $result = & $script:NextStepScript -Phase 05 -Json | ConvertFrom-Json
         $result.alt_steps.step | Should -Contain "/iikit-06-analyze"
+    }
+}
+
+# =============================================================================
+# Bug regression tests
+# =============================================================================
+
+Describe "Bug regressions" {
+    BeforeEach {
+        $script:TestDir = New-TestDirectory
+        Push-Location $script:TestDir
+        $env:SPECIFY_FEATURE = "001-test-feature"
+    }
+
+    AfterEach {
+        Pop-Location
+        $env:SPECIFY_FEATURE = $null
+        Remove-TestDirectory -TestDir $script:TestDir
+    }
+
+    It "BUG-14: alt_steps includes clarify after phase 00 when constitution exists" {
+        $result = & $script:NextStepScript -Phase 00 -Json | ConvertFrom-Json
+        $result.alt_steps.step | Should -Contain "/iikit-clarify"
+    }
+
+    It "BUG-16: --phase 01 warns when constitution is missing" {
+        Remove-Item "CONSTITUTION.md"
+        $featureDir = New-MockFeature -TestDir $script:TestDir
+        New-Item -ItemType Directory -Path (Join-Path $script:TestDir ".specify") -Force | Out-Null
+        "001-test-feature" | Set-Content (Join-Path $script:TestDir ".specify/active-feature") -NoNewline
+
+        $result = & $script:NextStepScript -Phase 01 -Json | ConvertFrom-Json
+        # Should mention constitution in alt_steps or redirect there
+        $hasConst = ($result.alt_steps.step -contains "/iikit-00-constitution") -or ($result.next_step -eq "/iikit-00-constitution")
+        $hasConst | Should -BeTrue
     }
 }

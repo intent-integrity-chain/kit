@@ -55,14 +55,15 @@ teardown() {
     assert_contains "$output" "/iikit-02-plan"
 }
 
-@test "session-hook: shows planned stage with next steps" {
+@test "session-hook: shows testified stage with next steps" {
     create_mock_feature "001-test-feature"
     mkdir -p .specify
     echo "001-test-feature" > .specify/active-feature
 
     run "$HOOK_SCRIPT"
     [[ "$status" -eq 0 ]]
-    assert_contains "$output" "planned"
+    # create_mock_feature adds spec + plan + .feature files → testified stage
+    assert_contains "$output" "testified"
     # TDD mandatory (fixture constitution) with .feature files → /iikit-05-tasks
     assert_contains "$output" "/iikit-05-tasks"
 }
