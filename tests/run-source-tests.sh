@@ -265,8 +265,8 @@ test_parallel_execution() {
         log_fail "implement SKILL.md does not reference parallel-execution.md"
     fi
 
-    # Section 5 has subsections 5.1-5.5 (bold-formatted in SKILL.md)
-    local subsections=("5.1 Task extraction" "5.2 Execution strategy" "5.3 Phase-by-phase" "5.4 Rules" "5.5 Failure handling")
+    # Section 6 has subsections 6.1-6.5 (bold-formatted in SKILL.md)
+    local subsections=("6.1 Task extraction" "6.2 Execution strategy" "6.3 Phase-by-phase" "6.4 Rules" "6.5 Failure handling")
     for sub in "${subsections[@]}"; do
         ((TESTS_RUN++))
         if grep -q "$sub" "$impl"; then
@@ -490,16 +490,16 @@ test_premise_support() {
 # ─── Task Commits ────────────────────────────────────────────────────────────
 
 test_task_commits() {
-    log_section "Task Commits (§5.6)"
+    log_section "Task Commits (§6.6)"
     local impl="$SKILLS_DIR/iikit-07-implement/SKILL.md"
     local ref="$SKILLS_DIR/iikit-07-implement/references/parallel-execution.md"
 
-    # Section 5.6 exists in implement skill
+    # Section 6.6 exists in implement skill
     ((TESTS_RUN++))
-    if grep -q '5.6 Task Commits' "$impl"; then
-        log_pass "section 5.6 Task Commits present"
+    if grep -q '6.6 Task Commits' "$impl"; then
+        log_pass "section 6.6 Task Commits present"
     else
-        log_fail "section 5.6 Task Commits missing"
+        log_fail "section 6.6 Task Commits missing"
     fi
 
     # Commit message format specified
@@ -518,12 +518,12 @@ test_task_commits() {
         log_fail "bugfix commit prefix not documented"
     fi
 
-    # parallel-execution.md references §5.6
+    # parallel-execution.md references §6.6
     ((TESTS_RUN++))
-    if grep -q '§5.6' "$ref"; then
-        log_pass "parallel-execution.md references §5.6"
+    if grep -q '§6.6' "$ref"; then
+        log_pass "parallel-execution.md references §6.6"
     else
-        log_fail "parallel-execution.md does not reference §5.6"
+        log_fail "parallel-execution.md does not reference §6.6"
     fi
 
     # Next Steps says "Push commits" not "Commit and push"
@@ -650,6 +650,38 @@ test_script_distribution() {
         log_pass "all scripts and references exist after prepare-tile"
     else
         log_fail "$missing file(s) missing after prepare-tile"
+    fi
+
+    # BUG-2: Check that template files referenced in SKILL.md exist
+    local tmpl_missing=0
+    for skill_md in "$tmpdir"/iikit-*/SKILL.md; do
+        [[ ! -f "$skill_md" ]] && continue
+        local skill_name
+        skill_name=$(basename "$(dirname "$skill_md")")
+
+        while IFS= read -r tmpl; do
+            local tmpl_path
+            tmpl_path="$(dirname "$skill_md")/${tmpl#./}"
+            if [[ ! -f "$tmpl_path" ]]; then
+                ((tmpl_missing++))
+                log_fail "missing template after prepare-tile: $skill_name/$tmpl"
+            fi
+        done < <(grep -oE '\./templates/[a-z-]+\.md' "$skill_md" 2>/dev/null | sort -u)
+        # Also check (templates/ without ./) references
+        while IFS= read -r tmpl; do
+            local tmpl_path="$(dirname "$skill_md")/$tmpl"
+            if [[ ! -f "$tmpl_path" ]]; then
+                ((tmpl_missing++))
+                log_fail "missing template after prepare-tile: $skill_name/$tmpl"
+            fi
+        done < <(grep -oE 'templates/[a-z-]+\.md' "$skill_md" 2>/dev/null | grep -v '^\.' | sort -u)
+    done
+
+    ((TESTS_RUN++))
+    if [[ "$tmpl_missing" -eq 0 ]]; then
+        log_pass "all templates referenced in SKILL.md exist after prepare-tile"
+    else
+        log_fail "$tmpl_missing template(s) missing after prepare-tile"
     fi
 
     rm -rf "$tmpdir"
