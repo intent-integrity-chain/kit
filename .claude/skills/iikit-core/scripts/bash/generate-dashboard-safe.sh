@@ -46,6 +46,8 @@ if [[ ! -f "$PROJECT_DIR/CONSTITUTION.md" ]]; then
 fi
 
 # Generate dashboard — log errors instead of swallowing them
+# Note: src/package.json contains {"type":"commonjs"} to prevent Node from treating
+# generate-dashboard.js as ESM when the user's project has "type":"module".
 DASHBOARD_LOG="$PROJECT_DIR/.specify/dashboard.log"
 if node "$GENERATOR" "$PROJECT_DIR" 2>"$DASHBOARD_LOG"; then
     # Success — remove log if empty

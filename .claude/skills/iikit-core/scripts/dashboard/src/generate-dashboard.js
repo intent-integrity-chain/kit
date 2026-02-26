@@ -171,14 +171,8 @@ function loadTemplate() {
   // Try template.js first (published tiles)
   const templateJs = path.join(__dirname, '..', 'template.js');
   if (fs.existsSync(templateJs)) {
-    try {
-      _cachedTemplate = require(templateJs);
-      return _cachedTemplate;
-    } catch {
-      // require() may fail in ESM projects — fall back to readFileSync
-      _cachedTemplate = fs.readFileSync(templateJs, 'utf-8');
-      return _cachedTemplate;
-    }
+    _cachedTemplate = require(templateJs);
+    return _cachedTemplate;
   }
   // Fall back to public/index.html (dev layout)
   const templatePath = path.join(__dirname, 'public', 'index.html');
