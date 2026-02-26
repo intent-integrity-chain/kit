@@ -146,7 +146,6 @@ As a user, I want my session to persist so that I don't have to log in repeatedl
 ### Session 2026-02-10
 
 - Q: Should OAuth users also be required to set a local password? -> A: No. OAuth-only users should not need a local password. If they later want email/password login, they can set one via the profile page. [FR-003]
-- Q: What happens when a session expires while the user is actively working? -> A: The system should show a modal prompting re-authentication, preserving the current page state. [FR-004, SC-004]
 `);
 
   fs.writeFileSync(path.join(feature1Dir, 'tasks.md'), `# Tasks
@@ -448,6 +447,21 @@ As a user, I want to view my payment history so that I can track my spending.
 - [ ] T004 [US2] Create payment history API endpoint
 - [ ] T005 [US2] Build payment history UI
 `);
+
+  // Set explicit mtimes so feature ordering is deterministic.
+  // 001-auth (rich data) should be most recently active → index 0.
+  // 002-payments (minimal) should be older → index 1.
+  const oldTime = new Date('2026-01-01T00:00:00Z');
+  const newTime = new Date('2026-02-15T00:00:00Z');
+  // Make 002-payments old
+  for (const f of fs.readdirSync(feature2Dir)) {
+    fs.utimesSync(path.join(feature2Dir, f), oldTime, oldTime);
+  }
+  // Make 001-auth recent
+  for (const f of fs.readdirSync(feature1Dir)) {
+    const fp = path.join(feature1Dir, f);
+    if (fs.statSync(fp).isFile()) fs.utimesSync(fp, newTime, newTime);
+  }
 
   return testDir;
 }

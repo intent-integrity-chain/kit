@@ -128,7 +128,7 @@ test.describe('DOM Structure Snapshots', () => {
 
   test('Spec (story map) view structure', async ({ page }) => {
     await waitForDashboard(page);
-    await page.selectOption('#featureSelect', { index: 1 });
+    await page.selectOption('#featureSelect', { index: 0 });
     await page.waitForTimeout(500);
     await switchToTab(page, 'Spec');
     await page.waitForTimeout(500);
@@ -140,7 +140,7 @@ test.describe('DOM Structure Snapshots', () => {
   test('Clarification badge renders on Spec node (which has sessions) and not on others', async ({ page }) => {
     await waitForDashboard(page);
     // Select 001-auth which has clarification sessions in spec.md
-    await page.selectOption('#featureSelect', { index: 1 });
+    await page.selectOption('#featureSelect', { index: 0 });
     await page.waitForTimeout(500);
 
     // Spec node should have a badge (fixture has ### Session 2026-02-10 in spec.md)
@@ -163,7 +163,7 @@ test.describe('DOM Structure Snapshots', () => {
 
   test('Clarification badge has correct title tooltip with session count', async ({ page }) => {
     await waitForDashboard(page);
-    await page.selectOption('#featureSelect', { index: 1 });
+    await page.selectOption('#featureSelect', { index: 0 });
     await page.waitForTimeout(500);
     const specNode = page.locator('.pipeline-node', { hasText: 'Spec' });
     const badge = specNode.locator('.pipeline-clarify-badge');
@@ -173,7 +173,7 @@ test.describe('DOM Structure Snapshots', () => {
 
   test('Plan view structure', async ({ page }) => {
     await waitForDashboard(page);
-    await page.selectOption('#featureSelect', { index: 1 });
+    await page.selectOption('#featureSelect', { index: 0 });
     await page.waitForTimeout(500);
     await switchToTab(page, 'Plan');
     await page.waitForSelector('.planview-view, .planview-empty', { timeout: 10000 });
@@ -185,7 +185,7 @@ test.describe('DOM Structure Snapshots', () => {
 
   test('Checklist view structure', async ({ page }) => {
     await waitForDashboard(page);
-    await page.selectOption('#featureSelect', { index: 1 });
+    await page.selectOption('#featureSelect', { index: 0 });
     await page.waitForTimeout(500);
     await switchToTab(page, 'Checklist');
     await page.waitForTimeout(500);
@@ -196,7 +196,7 @@ test.describe('DOM Structure Snapshots', () => {
 
   test('Testify view structure', async ({ page }) => {
     await waitForDashboard(page);
-    await page.selectOption('#featureSelect', { index: 1 });
+    await page.selectOption('#featureSelect', { index: 0 });
     await page.waitForTimeout(500);
     await switchToTab(page, 'Testify');
     await page.waitForTimeout(500);
@@ -207,7 +207,7 @@ test.describe('DOM Structure Snapshots', () => {
 
   test('Analyze view structure', async ({ page }) => {
     await waitForDashboard(page);
-    await page.selectOption('#featureSelect', { index: 1 });
+    await page.selectOption('#featureSelect', { index: 0 });
     await page.waitForTimeout(500);
     await switchToTab(page, 'Analyze');
     await page.waitForTimeout(500);

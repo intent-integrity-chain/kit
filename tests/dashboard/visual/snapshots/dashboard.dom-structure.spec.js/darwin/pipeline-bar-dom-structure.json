@@ -81,6 +81,12 @@
           "classes": [
             "pipeline-progress"
           ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "pipeline-clarify-badge"
+          ]
         }
       ]
     },
@@ -100,7 +106,41 @@
         {
           "tag": "div",
           "classes": [
-            "not_started",
+            "complete",
+            "pipeline-dot"
+          ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "pipeline-label"
+          ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "pipeline-progress"
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "div",
+      "classes": [
+        "complete",
+        "pipeline-connector"
+      ]
+    },
+    {
+      "tag": "button",
+      "classes": [
+        "pipeline-node"
+      ],
+      "children": [
+        {
+          "tag": "div",
+          "classes": [
+            "in_progress",
             "pipeline-dot"
           ]
         },
@@ -133,7 +173,7 @@
         {
           "tag": "div",
           "classes": [
-            "not_started",
+            "complete",
             "pipeline-dot"
           ]
         },
@@ -154,39 +194,7 @@
     {
       "tag": "div",
       "classes": [
-        "pipeline-connector"
-      ]
-    },
-    {
-      "tag": "button",
-      "classes": [
-        "pipeline-node"
-      ],
-      "children": [
-        {
-          "tag": "div",
-          "classes": [
-            "not_started",
-            "pipeline-dot"
-          ]
-        },
-        {
-          "tag": "span",
-          "classes": [
-            "pipeline-label"
-          ]
-        },
-        {
-          "tag": "span",
-          "classes": [
-            "pipeline-progress"
-          ]
-        }
-      ]
-    },
-    {
-      "tag": "div",
-      "classes": [
+        "complete",
         "pipeline-connector"
       ]
     },
@@ -241,7 +249,7 @@
         {
           "tag": "div",
           "classes": [
-            "not_started",
+            "complete",
             "pipeline-dot"
           ]
         },
@@ -262,6 +270,7 @@
     {
       "tag": "div",
       "classes": [
+        "complete",
         "pipeline-connector"
       ]
     },
@@ -278,7 +287,7 @@
         {
           "tag": "div",
           "classes": [
-            "not_started",
+            "in_progress",
             "pipeline-dot"
           ]
         },

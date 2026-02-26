@@ -110,7 +110,8 @@ test.describe('Story Map View', () => {
     await switchToTab(page, 'Spec');
     await page.waitForTimeout(500);
     const content = page.locator('#contentArea');
-    await expect(content).toHaveScreenshot('storymap-view.png');
+    // Force-directed graph layout is nondeterministic — allow higher pixel diff
+    await expect(content).toHaveScreenshot('storymap-view.png', { maxDiffPixelRatio: 0.05 });
   });
 });
 

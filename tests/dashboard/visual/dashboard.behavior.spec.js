@@ -36,7 +36,7 @@ async function switchToTab(page, phaseName) {
   await page.waitForTimeout(800);
 }
 
-/** Select feature by index (features are sorted newest-first: 002-payments=0, 001-auth=1) */
+/** Select feature by index (features are sorted by last-active mtime: 001-auth=0, 002-payments=1) */
 async function selectFeatureByIndex(page, index) {
   await page.selectOption('#featureSelect', { index });
   await page.waitForTimeout(500);
@@ -168,7 +168,7 @@ test.describe('Feature Switching', () => {
     const initialNodes = await page.locator('.pipeline-node').count();
     expect(initialNodes).toBe(8);
 
-    // Switch to second feature
+    // Switch to second feature (002-payments)
     await selectFeatureByIndex(page, 1);
     await page.waitForTimeout(500);
 
@@ -269,7 +269,7 @@ test.describe('Checklist View', () => {
   test('shows progress rings for each checklist file', async ({ page }) => {
     await waitForDashboard(page);
     // Feature 001-auth is at index 1 (sorted newest first: 002=0, 001=1)
-    await selectFeatureByIndex(page, 1);
+    await selectFeatureByIndex(page, 0);
     await switchToTab(page, 'Checklist');
 
     // Rings use .checklist-ring-wrapper
@@ -280,7 +280,7 @@ test.describe('Checklist View', () => {
 
   test('shows gate status', async ({ page }) => {
     await waitForDashboard(page);
-    await selectFeatureByIndex(page, 1);
+    await selectFeatureByIndex(page, 0);
     await switchToTab(page, 'Checklist');
 
     // Gate indicator: .gate-indicator with .gate-label
@@ -290,7 +290,7 @@ test.describe('Checklist View', () => {
 
   test('clicking a ring expands checklist detail', async ({ page }) => {
     await waitForDashboard(page);
-    await selectFeatureByIndex(page, 1);
+    await selectFeatureByIndex(page, 0);
     await switchToTab(page, 'Checklist');
 
     // Click a ring wrapper to expand
@@ -312,7 +312,7 @@ test.describe('Checklist View', () => {
 test.describe('Story Map View', () => {
   test('renders story cards with titles', async ({ page }) => {
     await waitForDashboard(page);
-    await selectFeatureByIndex(page, 1); // 001-auth
+    await selectFeatureByIndex(page, 0); // 001-auth
     await switchToTab(page, 'Spec');
 
     const storyCards = page.locator('.story-card');
@@ -322,7 +322,7 @@ test.describe('Story Map View', () => {
 
   test('renders requirement nodes in the graph', async ({ page }) => {
     await waitForDashboard(page);
-    await selectFeatureByIndex(page, 1);
+    await selectFeatureByIndex(page, 0);
     await switchToTab(page, 'Spec');
 
     // Graph SVG should be present
@@ -335,7 +335,7 @@ test.describe('Story Map View', () => {
 
   test('clicking a story card shows detail panel', async ({ page }) => {
     await waitForDashboard(page);
-    await selectFeatureByIndex(page, 1);
+    await selectFeatureByIndex(page, 0);
     await switchToTab(page, 'Spec');
 
     const card = page.locator('.story-card').first();
@@ -354,7 +354,7 @@ test.describe('Story Map View', () => {
 test.describe('Analyze View', () => {
   test('shows health score gauge', async ({ page }) => {
     await waitForDashboard(page);
-    await selectFeatureByIndex(page, 1); // 001-auth
+    await selectFeatureByIndex(page, 0); // 001-auth
     await switchToTab(page, 'Analyze');
 
     // Gauge uses .gauge-score text element inside SVG
@@ -363,7 +363,7 @@ test.describe('Analyze View', () => {
 
   test('shows issues with severity badges', async ({ page }) => {
     await waitForDashboard(page);
-    await selectFeatureByIndex(page, 1);
+    await selectFeatureByIndex(page, 0);
     await switchToTab(page, 'Analyze');
 
     // Issues use .severity-badge
@@ -374,7 +374,7 @@ test.describe('Analyze View', () => {
 
   test('shows coverage heatmap table', async ({ page }) => {
     await waitForDashboard(page);
-    await selectFeatureByIndex(page, 1);
+    await selectFeatureByIndex(page, 0);
     await switchToTab(page, 'Analyze');
 
     await expect(page.locator('.heatmap-table')).toBeVisible();
@@ -392,7 +392,7 @@ test.describe('Analyze View', () => {
 test.describe('Plan View', () => {
   test('shows tech stack badges', async ({ page }) => {
     await waitForDashboard(page);
-    await selectFeatureByIndex(page, 1); // 001-auth
+    await selectFeatureByIndex(page, 0); // 001-auth
     await switchToTab(page, 'Plan');
     // Plan view is async (Claude API call) — wait for content to render
     await page.waitForSelector('.planview-view, .planview-empty', { timeout: 10000 });
@@ -409,7 +409,7 @@ test.describe('Plan View', () => {
 
   test('shows architecture diagram container', async ({ page }) => {
     await waitForDashboard(page);
-    await selectFeatureByIndex(page, 1);
+    await selectFeatureByIndex(page, 0);
     await switchToTab(page, 'Plan');
     await page.waitForSelector('.planview-view, .planview-empty', { timeout: 10000 });
     await page.waitForTimeout(500);
@@ -422,7 +422,7 @@ test.describe('Plan View', () => {
 
   test('shows file structure section', async ({ page }) => {
     await waitForDashboard(page);
-    await selectFeatureByIndex(page, 1);
+    await selectFeatureByIndex(page, 0);
     await switchToTab(page, 'Plan');
     await page.waitForSelector('.planview-view, .planview-empty', { timeout: 10000 });
     await page.waitForTimeout(500);
@@ -445,7 +445,7 @@ test.describe('Plan View', () => {
 test.describe('Testify View', () => {
   test('shows sankey traceability nodes', async ({ page }) => {
     await waitForDashboard(page);
-    await selectFeatureByIndex(page, 1); // 001-auth
+    await selectFeatureByIndex(page, 0); // 001-auth
     await switchToTab(page, 'Testify');
 
     const nodes = page.locator('.sankey-node');
@@ -455,7 +455,7 @@ test.describe('Testify View', () => {
 
   test('shows test pyramid group labels', async ({ page }) => {
     await waitForDashboard(page);
-    await selectFeatureByIndex(page, 1);
+    await selectFeatureByIndex(page, 0);
     await switchToTab(page, 'Testify');
 
     // Pyramid tiers shown as sankey group labels
@@ -466,7 +466,7 @@ test.describe('Testify View', () => {
 
   test('shows integrity seal', async ({ page }) => {
     await waitForDashboard(page);
-    await selectFeatureByIndex(page, 1);
+    await selectFeatureByIndex(page, 0);
     await switchToTab(page, 'Testify');
 
     await expect(page.locator('.testify-seal')).toBeVisible();
@@ -480,7 +480,7 @@ test.describe('Testify View', () => {
 test.describe('Cross-Panel Navigation', () => {
   test('Cmd+click on task ID in board navigates to testify', async ({ page }) => {
     await waitForDashboard(page);
-    await selectFeatureByIndex(page, 1); // 001-auth
+    await selectFeatureByIndex(page, 0); // 001-auth
     await switchToTab(page, 'Implement');
 
     // Expand a task list
@@ -499,7 +499,7 @@ test.describe('Cross-Panel Navigation', () => {
 
   test('Cmd+click on card ID in board navigates to spec', async ({ page }) => {
     await waitForDashboard(page);
-    await selectFeatureByIndex(page, 1); // 001-auth
+    await selectFeatureByIndex(page, 0); // 001-auth
     await switchToTab(page, 'Implement');
 
     // Cmd+click a card ID (US link)
@@ -513,7 +513,7 @@ test.describe('Cross-Panel Navigation', () => {
 
   test('clarify view shows clarification entries from spec', async ({ page }) => {
     await waitForDashboard(page);
-    await selectFeatureByIndex(page, 1); // 001-auth (has clarifications)
+    await selectFeatureByIndex(page, 0); // 001-auth (has clarifications)
 
     // Navigate to clarify view programmatically
     await page.evaluate(() => window._switchTab('clarify'));
@@ -534,7 +534,7 @@ test.describe('Cross-Panel Navigation', () => {
 
   test('programmatic switchTab to clarify renders clarify-specific view', async ({ page }) => {
     await waitForDashboard(page);
-    await selectFeatureByIndex(page, 1);
+    await selectFeatureByIndex(page, 0);
     await page.waitForTimeout(500);
 
     // Navigate to clarify via JS (no pipeline node exists)

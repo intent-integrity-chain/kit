@@ -75,10 +75,10 @@
           "tag": "div",
           "classes": [
             "integrity-badge",
-            "missing"
+            "tampered"
           ],
           "ariaAttrs": {
-            "aria-label": "Test integrity: no hash data available"
+            "aria-label": "Test integrity: tampered - assertions may have been modified"
           },
           "role": "status",
           "children": [

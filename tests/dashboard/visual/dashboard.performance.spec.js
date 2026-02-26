@@ -74,7 +74,7 @@ test.describe('Performance Baselines', () => {
     await page.goto(url());
     await page.waitForSelector('.pipeline-node', { timeout: 10000 });
     await page.waitForSelector('#contentArea:not(:empty)', { timeout: 10000 });
-    await page.selectOption('#featureSelect', { index: 1 });
+    await page.selectOption('#featureSelect', { index: 0 });
     await page.waitForTimeout(500);
 
     const start = Date.now();
@@ -90,7 +90,7 @@ test.describe('Performance Baselines', () => {
     await page.goto(url());
     await page.waitForSelector('.pipeline-node', { timeout: 10000 });
     await page.waitForSelector('#contentArea:not(:empty)', { timeout: 10000 });
-    await page.selectOption('#featureSelect', { index: 1 });
+    await page.selectOption('#featureSelect', { index: 0 });
     await page.waitForTimeout(500);
 
     const start = Date.now();
@@ -106,7 +106,7 @@ test.describe('Performance Baselines', () => {
     await page.goto(url());
     await page.waitForSelector('.pipeline-node', { timeout: 10000 });
     await page.waitForSelector('#contentArea:not(:empty)', { timeout: 10000 });
-    await page.selectOption('#featureSelect', { index: 1 });
+    await page.selectOption('#featureSelect', { index: 0 });
     await page.waitForTimeout(500);
 
     const start = Date.now();
@@ -122,7 +122,7 @@ test.describe('Performance Baselines', () => {
     await page.goto(url());
     await page.waitForSelector('.pipeline-node', { timeout: 10000 });
     await page.waitForSelector('#contentArea:not(:empty)', { timeout: 10000 });
-    await page.selectOption('#featureSelect', { index: 1 });
+    await page.selectOption('#featureSelect', { index: 0 });
     await page.waitForTimeout(500);
 
     const start = Date.now();
@@ -138,7 +138,7 @@ test.describe('Performance Baselines', () => {
     await page.goto(url());
     await page.waitForSelector('.pipeline-node', { timeout: 10000 });
     await page.waitForSelector('#contentArea:not(:empty)', { timeout: 10000 });
-    await page.selectOption('#featureSelect', { index: 1 });
+    await page.selectOption('#featureSelect', { index: 0 });
     await page.waitForTimeout(500);
 
     const start = Date.now();
@@ -155,7 +155,7 @@ test.describe('Performance Baselines', () => {
     await page.goto(url());
     await page.waitForSelector('.pipeline-node', { timeout: 10000 });
     await page.waitForSelector('#contentArea:not(:empty)', { timeout: 10000 });
-    await page.selectOption('#featureSelect', { index: 1 });
+    await page.selectOption('#featureSelect', { index: 0 });
     await page.waitForTimeout(500);
 
     const start = Date.now();
@@ -173,7 +173,7 @@ test.describe('Performance Baselines', () => {
 
     const start = Date.now();
     // Select feature with clarifications to trigger badge rendering
-    await page.selectOption('#featureSelect', { index: 1 });
+    await page.selectOption('#featureSelect', { index: 0 });
     await page.waitForSelector('.pipeline-clarify-badge', { timeout: 10000 });
     const elapsed = Date.now() - start;
 
@@ -208,7 +208,7 @@ test.describe('Performance Baselines', () => {
     await page.waitForTimeout(500);
 
     const start = Date.now();
-    await page.selectOption('#featureSelect', { index: 1 });
+    await page.selectOption('#featureSelect', { index: 0 });
     // Wait for board to re-render with new feature data
     await page.waitForSelector('.card, .board-container, .empty-state', { timeout: 10000 });
     const elapsed = Date.now() - start;
@@ -222,7 +222,7 @@ test.describe('Performance Baselines', () => {
     await page.goto(url());
     await page.waitForSelector('.pipeline-node', { timeout: 10000 });
     await page.waitForSelector('#contentArea:not(:empty)', { timeout: 10000 });
-    await page.selectOption('#featureSelect', { index: 1 });
+    await page.selectOption('#featureSelect', { index: 0 });
     await page.waitForTimeout(500);
 
     const tabs = [
