@@ -48,18 +48,21 @@ jobs:
         working-directory: tests/dashboard
         run: npx playwright test --config=playwright.config.js
 
-      - name: Run Playwright visual dashboard tests
+      - name: Update Playwright visual snapshots
         working-directory: tests/dashboard
-        run: npx playwright test --config=playwright-visual.config.js --update-snapshots
+        run: npx playwright test --config=playwright-visual.config.js --update-snapshots || true
 
       - name: Commit updated snapshots
-        if: success()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add tests/dashboard/visual/
           git diff --cached --quiet || git commit -m "ci: update Playwright visual snapshots [skip ci]"
           git push || true
+
+      - name: Run Playwright visual dashboard tests
+        working-directory: tests/dashboard
+        run: npx playwright test --config=playwright-visual.config.js
 
       - name: Install PowerShell
         run: |
