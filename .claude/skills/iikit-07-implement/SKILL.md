@@ -20,19 +20,19 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
-> **Windows**: Replace `bash …/iikit-core/scripts/bash/*.sh` with `pwsh …/iikit-core/scripts/powershell/*.ps1` (same flags, `-PascalCase`).
+> **Windows**: Replace `bash …/iikit-07-implement/scripts/bash/*.sh` with `pwsh …/iikit-07-implement/scripts/powershell/*.ps1` (same flags, `-PascalCase`).
 
 ## Constitution Loading
 
-Load constitution per [constitution-loading.md](../iikit-core/references/constitution-loading.md) (enforcement mode — extract rules, declare hard gate, validate before every file write).
+Load constitution per [constitution-loading.md](./references/constitution-loading.md) (enforcement mode — extract rules, declare hard gate, validate before every file write).
 
 ## Prerequisites Check
 
-1. Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase 07 --json`
+1. Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-07-implement/scripts/bash/check-prerequisites.sh --phase 07 --json`
 2. Parse for `FEATURE_DIR` and `AVAILABLE_DOCS`. If missing tasks.md: ERROR.
-3. If JSON contains `needs_selection: true`: present the `features` array as a numbered table (name and stage columns). Follow the options presentation pattern in [conversation-guide.md](../iikit-core/references/conversation-guide.md). After user selects, run:
+3. If JSON contains `needs_selection: true`: present the `features` array as a numbered table (name and stage columns). Follow the options presentation pattern in [conversation-guide.md](./references/conversation-guide.md). After user selects, run:
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selection>
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-07-implement/scripts/bash/set-active-feature.sh --json <selection>
    ```
    Then re-run the prerequisites check from step 1.
 
@@ -79,12 +79,12 @@ Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path) — updates 
 If `tests/features/` directory exists (contains `.feature` files), verify assertion integrity:
 
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh comprehensive-check "FEATURE_DIR/tests/features" "CONSTITUTION.md"
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-07-implement/scripts/bash/testify-tdd.sh comprehensive-check "FEATURE_DIR/tests/features" "CONSTITUTION.md"
 ```
 
 **Windows (PowerShell):**
 ```powershell
-pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/testify-tdd.ps1 comprehensive-check "FEATURE_DIR/tests/features" "CONSTITUTION.md"
+pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-07-implement/scripts/powershell/testify-tdd.ps1 comprehensive-check "FEATURE_DIR/tests/features" "CONSTITUTION.md"
 ```
 
 Parse JSON response: `PASS` (proceed), `BLOCKED` (halt, show remediation), `WARN` (proceed with caution).
@@ -99,7 +99,7 @@ When `.feature` files exist, the full BDD verification chain applies to each imp
 
 **Step 2 — Verify step coverage**: All `.feature` steps must have matching step definitions.
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/verify-steps.sh --json "FEATURE_DIR/tests/features" "FEATURE_DIR/plan.md"
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-07-implement/scripts/bash/verify-steps.sh --json "FEATURE_DIR/tests/features" "FEATURE_DIR/plan.md"
 ```
 Must return `PASS` before continuing. If `BLOCKED`: fix missing step definitions. If `DEGRADED`: proceed with caution (no BDD framework available).
 
@@ -111,7 +111,7 @@ Must return `PASS` before continuing. If `BLOCKED`: fix missing step definitions
 
 **Step 6 — Verify step quality**: Ensure step definitions have meaningful assertions (not empty bodies or tautologies).
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/verify-step-quality.sh --json "FEATURE_DIR/tests/step_definitions" "<language>"
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-07-implement/scripts/bash/verify-step-quality.sh --json "FEATURE_DIR/tests/step_definitions" "<language>"
 ```
 Must return `PASS` before marking the task complete. If `BLOCKED`: fix the flagged step definitions.
 
@@ -124,7 +124,7 @@ Must return `PASS` before marking the task complete. If `BLOCKED`: fix the flagg
 Tests **MUST** be run, not just written. After writing a test: run it immediately (expect red). After implementing: run it (expect green). If tests fail: fix code, not tests. Never mark a test task `[x]` without execution output.
 
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/verify-test-execution.sh verify "FEATURE_DIR/tests/features" "$(cat test-output.log)"
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-07-implement/scripts/bash/verify-test-execution.sh verify "FEATURE_DIR/tests/features" "$(cat test-output.log)"
 ```
 
 Block on any status other than `PASS`.
@@ -138,35 +138,52 @@ A task is NOT complete until:
 
 Do NOT mark `[x]` in tasks.md until all three gates pass.
 
-### 3. Tessl Integration
+### 3. Install Dependencies
 
-If Tessl installed, query tiles before implementing library code. See [tessl-integration.md](references/tessl-integration.md).
+Before writing any source code, install the project's runtime and dev dependencies as specified in plan.md:
 
-### 4. Project Setup
+1. **Detect package manager** from plan.md Technical Context (npm/yarn/pnpm, pip/poetry, go mod, cargo, maven/gradle, dotnet, etc.)
+2. **Initialize project** if no manifest exists (e.g., `npm init -y`, `go mod init`, create `pyproject.toml`)
+3. **Add dependencies** listed in plan.md (e.g., `npm install express bcrypt jsonwebtoken`, `pip install fastapi sqlalchemy`)
+4. **Add dev dependencies** for testing (e.g., `npm install -D jest supertest`, `pip install -D pytest`)
+5. **Commit** the manifest and lockfile (package.json + package-lock.json, requirements.txt, go.sum, etc.)
+
+### 4. Tessl Tile Installation
+
+After installing dependencies, install Tessl documentation tiles for each major dependency so you have accurate API knowledge when writing code:
+
+1. **For each dependency** in plan.md, search for a Tessl tile: `tessl search <package-name>` or use `query_library_docs`
+2. **Install available tiles**: `tessl install <workspace/tile-name>`
+3. **Query tile docs** before writing code that uses that library — use `query_library_docs` with specific questions about API usage, patterns, and best practices
+4. If no tile exists for a dependency, rely on the library's built-in documentation or README
+
+See [tessl-integration.md](references/tessl-integration.md) for the full procedure.
+
+### 5. Project Scaffolding
 
 For scaffolding tools in existing directories, use force/overwrite flags. See [ignore-patterns.md](references/ignore-patterns.md) for gitignore patterns by stack.
 
-### 5. Parse and Execute Tasks
+### 6. Parse and Execute Tasks
 
-**5.1 Task extraction**: parse tasks.md for phase, completion status (`[x]` = skip), dependencies, [P] markers, [USn] labels. Build in-memory task graph.
+**6.1 Task extraction**: parse tasks.md for phase, completion status (`[x]` = skip), dependencies, [P] markers, [USn] labels. Build in-memory task graph.
 
-**5.2 Execution strategy — read [parallel-execution.md](references/parallel-execution.md) BEFORE proceeding**:
-If tasks.md contains `[P]` markers, you **MUST** use the `Task` tool to dispatch parallel batches as concurrent subagents (one worker per task). Only fall back to sequential execution if the runtime has no subagent dispatch mechanism. Report mode per [formatting-guide.md](../iikit-core/references/formatting-guide.md) (Execution Mode Header).
+**6.2 Execution strategy — read [parallel-execution.md](references/parallel-execution.md) BEFORE proceeding**:
+If tasks.md contains `[P]` markers, you **MUST** use the `Task` tool to dispatch parallel batches as concurrent subagents (one worker per task). Only fall back to sequential execution if the runtime has no subagent dispatch mechanism. Report mode per [formatting-guide.md](./references/formatting-guide.md) (Execution Mode Header).
 
-**5.3 Phase-by-phase**:
+**6.3 Phase-by-phase**:
 1. Collect eligible tasks (dependencies satisfied)
 2. Build parallel batches from [P] tasks with no mutual dependencies
 3. Dispatch — parallel: launch one `Task` tool subagent per `[P]` task in the batch; sequential: one at a time
-4. Collect results, checkpoint `[x]` in tasks.md per batch, then commit per task (§5.6)
+4. Collect results, checkpoint `[x]` in tasks.md per batch, then commit per task (§6.6)
 5. Repeat until phase complete
 
 Cross-story parallelism: independent stories can run as parallel workstreams after Phase 2 (verify no shared file modifications).
 
-**5.4 Rules**: query Tessl tiles before library code, tests before code if TDD, run tests after writing them, only orchestrator updates tasks.md.
+**6.4 Rules**: install dependencies (§3) and Tessl tiles (§4) before writing code, query tiles before library code, tests before code if TDD, run tests after writing them, only orchestrator updates tasks.md.
 
-**5.5 Failure handling**: let in-flight siblings finish, mark successes, report failures, halt phase. Constitutional violations in workers: worker stops, reports to orchestrator, treated as task failure.
+**6.5 Failure handling**: let in-flight siblings finish, mark successes, report failures, halt phase. Constitutional violations in workers: worker stops, reports to orchestrator, treated as task failure.
 
-**5.6 Task Commits**: After each task is marked `[x]`, stage its changed files (`git add` specific files, NOT `-A`) and commit:
+**6.6 Task Commits**: After each task is marked `[x]`, stage its changed files (`git add` specific files, NOT `-A`) and commit:
 
 - `<feature-id>` = `FEATURE_DIR` with `specs/` prefix and trailing `/` stripped (e.g. `001-user-auth`)
 - Subject: `feat(<feature-id>): <task-id> <task description>` (use `fix(…)` for `T-B` tasks)
@@ -174,7 +191,7 @@ Cross-story parallelism: independent stories can run as parallel workstreams aft
 - Skip if no files changed; for parallel batches commit each task individually after batch completes
 - After each commit, regenerate the dashboard so the board reflects the latest task state:
   ```bash
-  bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
+  bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-07-implement/scripts/bash/generate-dashboard-safe.sh
   ```
 
 ### 6. Output Validation
@@ -193,7 +210,7 @@ After completing bug fix tasks (tasks with `T-B` prefix pattern):
 2. For each completed bug (all T-BNNN tasks for a BUG-NNN marked `[x]`):
    - Read the `GitHub Issue` field from the bug's entry in bugs.md
    - If a GitHub issue is linked (e.g., `#42`):
-     - **Close via commit**: include `Fixes #<number>` in the last task's commit message (§5.6) — GitHub auto-closes the issue when pushed/merged
+     - **Close via commit**: include `Fixes #<number>` in the last task's commit message (§6.6) — GitHub auto-closes the issue when pushed/merged
      - **Post a comment**: use `gh issue comment` if available, otherwise `curl` the GitHub API (`POST /repos/{owner}/{repo}/issues/{number}/comments`). Comment content: root cause from bugs.md, completed fix tasks, and fix reference
    - If no GitHub issue is linked: skip silently
 
@@ -215,15 +232,15 @@ All tasks `[x]`, features validated against spec, test execution enforcement (§
 
 ## Next Steps
 
-Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/next-step.sh --phase 07 --json`
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/next-step.ps1 -Phase 07 -Json`
+Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-07-implement/scripts/bash/next-step.sh --phase 07 --json`
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-07-implement/scripts/powershell/next-step.ps1 -Phase 07 -Json`
 
 Parse the JSON and present:
 1. If `clear_after` is true: suggest `/clear` before proceeding
 2. If `next_step` is `/iikit-07-implement` (feature incomplete): suggest resuming implementation
 3. If `next_step` is null (feature complete): congratulate and list alt_steps
 4. If `alt_steps` non-empty: list as alternatives (e.g., `/iikit-08-taskstoissues`)
-5. Look up `model_tier` in [model-recommendations.md](../iikit-core/references/model-recommendations.md) — if tier differs from current, add a `Tip:` with the agent-specific switch command. Check expiration date; refresh via web search if expired.
+5. Look up `model_tier` in [model-recommendations.md](./references/model-recommendations.md) — if tier differs from current, add a `Tip:` with the agent-specific switch command. Check expiration date; refresh via web search if expired.
 6. Append dashboard link
 
 If on a feature branch, offer to merge. Ask the user which approach they prefer:
