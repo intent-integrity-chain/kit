@@ -4,7 +4,7 @@
 
 An AI coding assistant toolkit that preserves your intent from idea to implementation, with cryptographic verification at each step. Compatible with Claude Code, OpenAI Codex, Google Gemini, and OpenCode.
 
-## What's New in v2.7.1
+## What's New in v2.7.2
 
 - **27 bug fixes** from E2E testing across 12 projects (101 phases, 596 unit tests, 32 integration tests — all green).
 - **Clarification badge fix**: Badges now count `- Q:` items (not session headings), and track clarifications on checklist, analyze, and tasks phases (were hardcoded to 0).
