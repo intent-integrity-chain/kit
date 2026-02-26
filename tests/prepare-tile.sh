@@ -197,8 +197,8 @@ rm -rf iikit-core/references
 echo "✓ Removed iikit-core/references/ (fully distributed)"
 
 # Remove templates only referenced from SKILL.md (now distributed as local copies)
-# Keep templates referenced by scripts: agent-file-template.md, spec-template.md, plan-template.md
-for tmpl in constitution-template.md premise-template.md checklist-template.md tasks-template.md testspec-template.md; do
+# Keep templates referenced by scripts: agent-file-template.md, spec-template.md, plan-template.md, premise-template.md
+for tmpl in constitution-template.md checklist-template.md tasks-template.md testspec-template.md; do
     rm -f "iikit-core/templates/$tmpl"
 done
 echo "✓ Removed distributed-only templates from iikit-core/templates/"
