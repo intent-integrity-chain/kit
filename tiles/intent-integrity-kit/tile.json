@@ -1,6 +1,6 @@
 {
   "name": "tessl-labs/intent-integrity-kit",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "summary": "Closing the intent-to-code chasm - specification-driven development with BDD verification chain",
   "description": "Intent Integrity Kit (IIKit) preserves your intent from idea to implementation through specification-driven development with BDD verification chain. Compatible with Claude Code, Codex, Gemini, and OpenCode.\n\nWhat's new in v2.6.0: Externalized next-step state machine. All 12 skills, session hooks, and status queries now call a single next-step.sh script — one source of truth for workflow transitions, model tier suggestions, and /clear recommendations. Mandatory path: 00→01→02→[04 if TDD]→05→07. Steps 03 (checklist), 06 (analyze), 08 (tasks-to-issues) are optional and appear as alt_steps.\n\nv2.0.0: BREAKING — testify generates Gherkin .feature files (replaces test-specs.md). Full BDD verification chain: hash integrity, step coverage, step quality, framework scaffolding. Static dashboard. Analyze skill .feature tag traceability. Implement skill enforces red-green-verify cycle.",
   "entrypoint": "README.md",
