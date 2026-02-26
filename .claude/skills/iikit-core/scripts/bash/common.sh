@@ -383,7 +383,7 @@ validate_constitution() {
     # Check minimum principle count — supports both heading style (### I. Name)
     # and bullet style (- **Name**: ...)
     local principle_count
-    principle_count=$(grep -cE "^### [IVX]+\.|^### [0-9]+\.|^- \*\*[A-Z]" "$constitution" 2>/dev/null) || principle_count=0
+    principle_count=$(grep -cE "^### [IVX]+\.|^### [0-9]+\.|^### [A-Z][A-Za-z -]+|^- \*\*[A-Z]" "$constitution" 2>/dev/null) || principle_count=0
     if [[ "$principle_count" -lt 3 ]]; then
         echo "WARNING: Constitution has only $principle_count principle(s) — minimum 3 recommended" >&2
     fi
@@ -413,8 +413,8 @@ validate_spec() {
         ((errors++))
     fi
 
-    if ! grep -q "^## User Scenarios\|^### User Story" "$spec_file" 2>/dev/null; then
-        echo "ERROR: spec.md missing 'User Scenarios' or 'User Story' section" >&2
+    if ! grep -q "^## User Scenarios\|^## User Stories\|^### User Story" "$spec_file" 2>/dev/null; then
+        echo "ERROR: spec.md missing 'User Scenarios', 'User Stories', or 'User Story' section" >&2
         ((errors++))
     fi
 
@@ -486,7 +486,7 @@ calculate_spec_quality() {
     grep -q "^## Success Criteria" "$spec_file" 2>/dev/null && ((score+=2))
 
     # +2 for having user scenarios
-    grep -q "^## User Scenarios\|^### User Story" "$spec_file" 2>/dev/null && ((score+=2))
+    grep -q "^## User Scenarios\|^## User Stories\|^### User Story" "$spec_file" 2>/dev/null && ((score+=2))
 
     # +1 for having at least 3 requirements
     local req_count

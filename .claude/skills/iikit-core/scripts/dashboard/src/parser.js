@@ -242,7 +242,9 @@ function hasClarifications(specContent) {
 
 /**
  * Count clarification Q&A items in content (any artifact).
- * Clarifications are lines starting with `- Q:` under ## Clarifications.
+ * Counts `- Q:` lines from clarify sessions. These are resolved Q&A pairs —
+ * the badge shows how many questions were asked and answered.
+ * Note: `[NEEDS CLARIFICATION]` markers are unresolved ambiguities, not badge material.
  *
  * @param {string} content - Raw markdown content
  * @returns {number} Number of clarification items found
@@ -287,25 +289,76 @@ function parseConstitutionPrinciples(projectPath) {
   const lines = content.split('\n');
   const principles = [];
 
-  // Find principles: ### N. Name pattern (Roman numerals)
-  const principleRegex = /^### ([IVXLC]+)\.\s+(.+?)(?:\s+\(.*\))?\s*$/;
+  // Find principles under ## Core Principles (or similar ## heading):
+  //   ### I. Name / ### 1. Name (numbered) or ### Name (bare) or - **Name**: desc (bullet)
+  const numberedPrincipleRegex = /^### ([IVXLC]+|\d+)\.\s+(.+?)(?:\s+\(.*\))?\s*$/;
+  const barePrincipleRegex = /^### ([A-Z][A-Za-z -]+?)(?:\s+\(.*\))?\s*$/;
+  const bulletPrincipleRegex = /^- \*\*([A-Z][A-Za-z -]+)\*\*:\s*(.+)$/;
 
   let currentPrinciple = null;
+  let inPrinciplesSection = false;
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    const match = line.match(principleRegex);
 
-    if (match) {
+    // Track whether we're inside a ## Principles section (for bare ### matching)
+    if (/^## .*Principles/i.test(line)) {
+      inPrinciplesSection = true;
+      continue;
+    }
+    if (inPrinciplesSection && /^## /.test(line) && !/Principles/i.test(line)) {
+      // Left the principles section
+      inPrinciplesSection = false;
+      if (currentPrinciple) {
+        finalizePrinciple(currentPrinciple);
+        principles.push(currentPrinciple);
+        currentPrinciple = null;
+      }
+      continue;
+    }
+
+    const numberedMatch = line.match(numberedPrincipleRegex);
+    const bareMatch = !numberedMatch && inPrinciplesSection ? line.match(barePrincipleRegex) : null;
+    const bulletMatch = !numberedMatch && !bareMatch ? line.match(bulletPrincipleRegex) : null;
+
+    if (numberedMatch) {
       // Save previous principle
       if (currentPrinciple) {
         finalizePrinciple(currentPrinciple);
         principles.push(currentPrinciple);
       }
       currentPrinciple = {
-        number: match[1],
-        name: match[2].trim(),
+        number: numberedMatch[1],
+        name: numberedMatch[2].trim(),
         text: '',
+        rationale: '',
+        level: 'SHOULD'
+      };
+    } else if (bareMatch) {
+      // Bare ### Name inside principles section
+      if (currentPrinciple) {
+        finalizePrinciple(currentPrinciple);
+        principles.push(currentPrinciple);
+      }
+      const idx = principles.length + 1;
+      currentPrinciple = {
+        number: String(idx),
+        name: bareMatch[1].trim(),
+        text: '',
+        rationale: '',
+        level: 'SHOULD'
+      };
+    } else if (bulletMatch) {
+      // Bullet-style principle: - **Name**: Description
+      if (currentPrinciple) {
+        finalizePrinciple(currentPrinciple);
+        principles.push(currentPrinciple);
+      }
+      const idx = principles.length + 1;
+      currentPrinciple = {
+        number: String(idx),
+        name: bulletMatch[1].trim(),
+        text: bulletMatch[2].trim() + '\n',
         rationale: '',
         level: 'SHOULD'
       };
