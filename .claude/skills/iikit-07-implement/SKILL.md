@@ -243,7 +243,7 @@ Parse the JSON and present:
 5. Look up `model_tier` in [model-recommendations.md](../iikit-core/references/model-recommendations.md) — if tier differs from current, add a `Tip:` with the agent-specific switch command. Check expiration date; refresh via web search if expired.
 6. Append dashboard link
 
-If on a feature branch, offer to merge. Ask the user which approach they prefer:
+Push commits to remote if available: `git push`. If on a feature branch, offer to merge. Ask the user which approach they prefer:
 - **A) Merge locally**: `git checkout main && git merge <branch>`
 - **B) Create PR**: `gh pr create` if available, otherwise provide the GitHub URL to create one manually
 - **C) Skip**: user will handle it
