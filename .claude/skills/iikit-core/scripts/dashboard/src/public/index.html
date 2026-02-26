@@ -2073,6 +2073,52 @@
       animation: highlight-pulse 1.5s ease-out;
     }
 
+    /* Clarify FAB + Slide-out Panel */
+    .clarify-fab {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--color-inprogress);
+      color: #fff;
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+    .clarify-fab:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+    .clarify-fab.visible { display: flex; }
+    .clarify-fab.panel-open { transform: rotate(45deg); background: var(--color-text-muted); }
+    .clarify-fab.panel-open:hover { transform: rotate(45deg) scale(1.1); }
+
+    .clarify-slide-panel {
+      position: fixed;
+      top: 0;
+      right: -420px;
+      width: 400px;
+      height: 100vh;
+      background: var(--color-bg);
+      border-left: 1px solid var(--color-border);
+      box-shadow: -4px 0 24px rgba(0,0,0,0.3);
+      z-index: 999;
+      overflow-y: auto;
+      transition: right 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      padding: 20px;
+    }
+    .clarify-slide-panel.open { right: 0; }
+    .clarify-slide-panel .clarify-view { padding: 0; max-width: none; }
+
     .sankey-node.task-checked .sankey-node-rect {
       stroke: var(--color-done);
       stroke-width: 2;
@@ -2799,6 +2845,9 @@
     </div>
   </main>
 
+  <button class="clarify-fab" id="clarifyFab" title="Clarifications">?0</button>
+  <div class="clarify-slide-panel" id="clarifyPanel"></div>
+
   <script>
     (function() {
       'use strict';
@@ -2891,13 +2940,13 @@
           `;
 
           node.addEventListener('click', () => switchTab(phase.id));
-          // Make clarify badge clickable — navigates to clarify view
+          // Make clarify badge clickable — opens slide-out panel
           const badge = node.querySelector('.pipeline-clarify-badge');
           if (badge) {
             badge.style.cursor = 'pointer';
             badge.addEventListener('click', (e) => {
-              e.stopPropagation(); // Don't trigger the node's tab switch
-              switchTab('clarify');
+              e.stopPropagation();
+              if (!clarifyPanelOpen) toggleClarifyPanel();
             });
           }
           pipelineBar.appendChild(node);
@@ -4386,6 +4435,69 @@
         navigateToPanel('spec', refId);
       }
 
+      // ====== Clarify FAB + Slide Panel ======
+      const clarifyFab = document.getElementById('clarifyFab');
+      const clarifyPanel = document.getElementById('clarifyPanel');
+      let clarifyPanelOpen = false;
+
+      function updateClarifyFab() {
+        // Sum all clarification counts across pipeline phases
+        const total = (currentPipeline?.phases || []).reduce((sum, p) => sum + (p.clarifications || 0), 0);
+        if (total > 0) {
+          clarifyFab.textContent = '?' + total;
+          clarifyFab.classList.add('visible');
+        } else {
+          clarifyFab.classList.remove('visible');
+        }
+      }
+
+      function toggleClarifyPanel() {
+        clarifyPanelOpen = !clarifyPanelOpen;
+        clarifyPanel.classList.toggle('open', clarifyPanelOpen);
+        clarifyFab.classList.toggle('panel-open', clarifyPanelOpen);
+        if (clarifyPanelOpen) {
+          renderClarifyPanelContent();
+        }
+      }
+
+      function renderClarifyPanelContent() {
+        const clarifications = currentStoryMap?.clarifications || [];
+        if (!clarifications.length) {
+          clarifyPanel.innerHTML = '<div class="clarify-view"><div class="clarify-empty"><div class="placeholder-view-title">No clarifications yet</div></div></div>';
+          return;
+        }
+        const sessions = {};
+        for (const c of clarifications) {
+          if (!sessions[c.session]) sessions[c.session] = [];
+          sessions[c.session].push(c);
+        }
+        let html = `<div class="clarify-view">
+          <div class="clarify-header">
+            <span class="clarify-title">Clarifications</span>
+            <span class="clarify-count">${clarifications.length} Q&amp;A${clarifications.length !== 1 ? 's' : ''}</span>
+          </div>`;
+        for (const [session, entries] of Object.entries(sessions)) {
+          html += `<div class="clarify-session">
+            <div class="clarify-session-label">Session ${escapeHtml(session)}</div>
+            <div class="clarify-entries">`;
+          for (const c of entries) {
+            const refsHtml = (c.refs && c.refs.length)
+              ? `<div class="clarify-refs">${c.refs.map(r => `<a class="clarify-ref" href="#">${escapeHtml(r)}</a>`).join('')}</div>`
+              : '';
+            html += `<div class="clarify-entry">
+              <div class="clarify-question"><span class="clarify-q-label">Q</span> ${escapeHtml(c.question)}</div>
+              <div class="clarify-answer"><span class="clarify-a-label">A</span> ${escapeHtml(c.answer)}</div>
+              ${refsHtml}
+            </div>`;
+          }
+          html += '</div></div>';
+        }
+        html += '</div>';
+        clarifyPanel.innerHTML = html;
+      }
+
+      clarifyFab.addEventListener('click', toggleClarifyPanel);
+
       // ====== Constitution View ======
       let currentConstitution = null;
       let currentPremise = null;
@@ -5763,11 +5875,13 @@
             currentPipeline = fd.pipeline;
             currentBoard = fd.board;
             currentBugs = fd.bugs;
+            currentStoryMap = fd.storyMap;
             if (!activeTab) activeTab = selectDefaultTab(fd.pipeline);
             renderPipeline(fd.pipeline);
             renderBoard(fd.board);
             updateIntegrity(fd.board.integrity);
             if (fd.bugs && currentPipeline) renderPipeline(currentPipeline);
+            updateClarifyFab();
             switchTab(activeTab);
           }
         }
