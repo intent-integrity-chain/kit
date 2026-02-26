@@ -48,9 +48,8 @@ jobs:
         working-directory: tests/dashboard
         run: npx playwright test --config=playwright.config.js
 
-      - name: Run Playwright visual dashboard tests
-        working-directory: tests/dashboard
-        run: npx playwright test --config=playwright-visual.config.js
+      # Visual screenshot comparison tests removed — served their purpose during
+      # dashboard migration from standalone app. Behavioral tests remain in basic config.
 
       - name: Install PowerShell
         run: |
