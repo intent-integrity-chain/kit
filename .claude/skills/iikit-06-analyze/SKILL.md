@@ -170,12 +170,23 @@ Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/sc
 
 ## Next Steps
 
-You MUST read [model-recommendations.md](../iikit-core/references/model-recommendations.md), check the expiration date (refresh via web search if expired), detect the agent via env vars, and include a model switch tip in the output below if the next phase needs a different model tier.
+Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/next-step.sh --phase 06 --json`
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/next-step.ps1 -Phase 06 -Json`
 
+Parse the JSON and present:
+1. If `clear_after` is true: suggest `/clear` before proceeding
+2. If CRITICAL issues were found: suggest resolving them, then re-run `/iikit-06-analyze`
+3. If no CRITICAL: present `next_step` as the primary recommendation
+4. If `alt_steps` non-empty: list as alternatives
+5. Look up `model_tier` in [model-recommendations.md](../iikit-core/references/model-recommendations.md) — if tier differs from current, add a `Tip:` with the agent-specific switch command. Check expiration date; refresh via web search if expired.
+6. Append dashboard link
+
+Format:
 ```
 Analysis complete!
-- CRITICAL issues found: resolve, then re-run /iikit-06-analyze
-- No CRITICAL: /clear then /iikit-07-implement (implementation benefits from max context)
-Tip: <model switch suggestion if tier mismatch, omit if already on the right model>
+[- CRITICAL issues found: resolve, then re-run /iikit-06-analyze]
+Next: [/clear → ] <next_step>
+[- <alt_step> — <reason>]
+[Tip: <model suggestion>]
 - Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
 ```

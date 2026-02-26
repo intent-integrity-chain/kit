@@ -91,14 +91,21 @@ Output: issues created (count + numbers), failures (count + details), link to re
 
 ## Next Steps
 
-```
-Issues exported! Review in GitHub, assign team members, add to project boards.
-- Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
-```
+Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/next-step.sh --phase 08 --json`
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/next-step.ps1 -Phase 08 -Json`
+
+Parse the JSON and present:
+1. `next_step` will be null (workflow complete)
+2. If `alt_steps` non-empty: list as alternatives
+3. Append dashboard link
 
 If on a feature branch, offer to merge:
 - **A) Merge locally**: `git checkout main && git merge <branch>`
 - **B) Create PR**: `gh pr create`
 - **C) Skip**: user will handle it
 
-You MUST read [model-recommendations.md](../iikit-core/references/model-recommendations.md), check the expiration date (refresh via web search if expired), detect the agent via env vars, and include a `Tip:` line in the Issues created output above if the next phase needs a different model tier.
+Format:
+```
+Issues exported! Review in GitHub, assign team members, add to project boards.
+- Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
+```

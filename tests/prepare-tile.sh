@@ -100,6 +100,27 @@ generate-dashboard-safe.sh"
 generate-dashboard-safe.ps1"
     fi
 
+    # Add next-step when check-prerequisites is present (transitive dep —
+    # check-prerequisites.sh calls bash "$SCRIPT_DIR/next-step.sh" at runtime)
+    if [[ -n "$bash_scripts" ]] && echo "$bash_scripts" | grep -q "^check-prerequisites\.sh$" && \
+       ! echo "$bash_scripts" | grep -q "^next-step\.sh$"; then
+        bash_scripts="$bash_scripts
+next-step.sh"
+    fi
+    if [[ -n "$ps_scripts" ]] && echo "$ps_scripts" | grep -q "^check-prerequisites\.ps1$" && \
+       ! echo "$ps_scripts" | grep -q "^next-step\.ps1$"; then
+        ps_scripts="$ps_scripts
+next-step.ps1"
+    fi
+
+    # Add next-step when session-context-hook is present (transitive dep —
+    # session hooks call bash "$SCRIPT_DIR/next-step.sh" at runtime)
+    if [[ -n "$bash_scripts" ]] && echo "$bash_scripts" | grep -q "^session-context-hook\.sh$" && \
+       ! echo "$bash_scripts" | grep -q "^next-step\.sh$"; then
+        bash_scripts="$bash_scripts
+next-step.sh"
+    fi
+
     # Copy bash scripts
     if [[ -n "$bash_scripts" ]]; then
         mkdir -p "$skill_dir/scripts/bash"

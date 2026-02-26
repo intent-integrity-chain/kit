@@ -215,17 +215,27 @@ All tasks `[x]`, features validated against spec, test execution enforcement (§
 
 ## Next Steps
 
-```
-Implementation complete!
-- Run tests to verify
-- Push commits
-- /iikit-08-taskstoissues - (Optional) Export to GitHub Issues
-- Merge feature branch into main (if on a feature branch)
-```
+Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/next-step.sh --phase 07 --json`
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/next-step.ps1 -Phase 07 -Json`
+
+Parse the JSON and present:
+1. If `clear_after` is true: suggest `/clear` before proceeding
+2. If `next_step` is `/iikit-07-implement` (feature incomplete): suggest resuming implementation
+3. If `next_step` is null (feature complete): congratulate and list alt_steps
+4. If `alt_steps` non-empty: list as alternatives (e.g., `/iikit-08-taskstoissues`)
+5. Look up `model_tier` in [model-recommendations.md](../iikit-core/references/model-recommendations.md) — if tier differs from current, add a `Tip:` with the agent-specific switch command. Check expiration date; refresh via web search if expired.
+6. Append dashboard link
 
 If on a feature branch, offer to merge. Ask the user which approach they prefer:
 - **A) Merge locally**: `git checkout main && git merge <branch>`
 - **B) Create PR**: `gh pr create` if available, otherwise provide the GitHub URL to create one manually
 - **C) Skip**: user will handle it
 
-You MUST read [model-recommendations.md](../iikit-core/references/model-recommendations.md), check the expiration date (refresh via web search if expired), detect the agent via env vars, and include a `Tip:` line in the Implementation complete block above if the next phase needs a different model tier.
+Format:
+```
+Implementation complete!
+Next: [/clear → ] <next_step or "All tasks done!">
+[- <alt_step> — <reason>]
+[Tip: <model suggestion>]
+- Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
+```

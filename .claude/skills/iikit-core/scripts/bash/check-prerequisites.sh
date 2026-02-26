@@ -388,34 +388,11 @@ if [[ "$P_EXTRAS" == *"status_mode"* ]]; then
         READY_FOR="08"
     fi
 
-    # --- Next step + clear_before (deterministic) ---
-    NEXT_STEP=""
-    CLEAR_BEFORE=false
-    if ! $A_CONSTITUTION; then
-        NEXT_STEP="/iikit-00-constitution"
-        CLEAR_BEFORE=false
-    elif $STATUS_NO_FEATURE || [[ -z "$FEATURE_DIR" ]] || [[ ! -d "$FEATURE_DIR" ]]; then
-        NEXT_STEP="/iikit-01-specify <description>"
-        CLEAR_BEFORE=false
-    elif ! $V_SPEC; then
-        NEXT_STEP="/iikit-01-specify <description>"
-        CLEAR_BEFORE=false
-    elif ! $V_PLAN; then
-        NEXT_STEP="/iikit-02-plan"
-        CLEAR_BEFORE=true
-    elif $A_CHECKLISTS && [[ "$CHECKLIST_TOTAL" -gt 0 ]] && ! $CHECKLIST_COMPLETE; then
-        NEXT_STEP="/iikit-03-checklist"
-        CLEAR_BEFORE=false
-    elif ! $V_TASKS; then
-        NEXT_STEP="/iikit-05-tasks"
-        CLEAR_BEFORE=true
-    elif [[ "$FEATURE_STAGE" == "complete" ]]; then
-        NEXT_STEP=""
-        CLEAR_BEFORE=false
-    else
-        NEXT_STEP="/iikit-07-implement"
-        CLEAR_BEFORE=true
-    fi
+    # --- Next step via next-step.sh (single source of truth) ---
+    NEXT_STEP_JSON=$(bash "$SCRIPT_DIR/next-step.sh" --phase status --json --project-root "$REPO_ROOT" 2>/dev/null) || NEXT_STEP_JSON='{}'
+    NEXT_STEP=$(echo "$NEXT_STEP_JSON" | jq -r '.next_step // empty')
+    CLEAR_BEFORE=$(echo "$NEXT_STEP_JSON" | jq -r '.clear_before // false')
+    MODEL_TIER=$(echo "$NEXT_STEP_JSON" | jq -r '.model_tier // empty')
 
     # --- Available docs ---
     docs=()
@@ -466,11 +443,18 @@ if [[ "$P_EXTRAS" == *"status_mode"* ]]; then
             json_next_step="\"$NEXT_STEP\""
         fi
 
+        # Build model_tier (null or string)
+        if [[ -z "$MODEL_TIER" || "$MODEL_TIER" == "null" ]]; then
+            json_model_tier="null"
+        else
+            json_model_tier="\"$MODEL_TIER\""
+        fi
+
         # Build base JSON
-        json_output=$(printf '{"phase":"status","FEATURE_DIR":"%s","FEATURE_SPEC":"%s","IMPL_PLAN":"%s","TASKS":"%s","BRANCH":"%s","HAS_GIT":%s,"REPO_ROOT":"%s","AVAILABLE_DOCS":%s,"validated":%s,"warnings":%s,"artifacts":%s,"feature_stage":"%s","ready_for":"%s","next_step":%s,"clear_before":%s,"checklist_checked":%s,"checklist_total":%s}' \
+        json_output=$(printf '{"phase":"status","FEATURE_DIR":"%s","FEATURE_SPEC":"%s","IMPL_PLAN":"%s","TASKS":"%s","BRANCH":"%s","HAS_GIT":%s,"REPO_ROOT":"%s","AVAILABLE_DOCS":%s,"validated":%s,"warnings":%s,"artifacts":%s,"feature_stage":"%s","ready_for":"%s","next_step":%s,"clear_before":%s,"model_tier":%s,"checklist_checked":%s,"checklist_total":%s}' \
             "$FEATURE_DIR" "$FEATURE_SPEC" "$IMPL_PLAN" "$TASKS" "$CURRENT_BRANCH" "$HAS_GIT" "$REPO_ROOT" \
             "$json_docs" "$json_validated" "$json_warnings" "$json_artifacts" \
-            "$FEATURE_STAGE" "$READY_FOR" "$json_next_step" "$CLEAR_BEFORE" \
+            "$FEATURE_STAGE" "$READY_FOR" "$json_next_step" "$CLEAR_BEFORE" "$json_model_tier" \
             "$CHECKLIST_CHECKED" "$CHECKLIST_TOTAL")
 
         printf '%s\n' "$json_output"
@@ -479,10 +463,13 @@ if [[ "$P_EXTRAS" == *"status_mode"* ]]; then
         echo "Feature stage: $FEATURE_STAGE"
         echo "Ready for: phase $READY_FOR"
         if [[ -n "$NEXT_STEP" ]]; then
-            if $CLEAR_BEFORE; then
+            if [[ "$CLEAR_BEFORE" == "true" ]]; then
                 echo "Next step: /clear, then $NEXT_STEP"
             else
                 echo "Next step: $NEXT_STEP"
+            fi
+            if [[ -n "$MODEL_TIER" && "$MODEL_TIER" != "null" ]]; then
+                echo "Model tier: $MODEL_TIER"
             fi
         else
             echo "Next step: (none - feature complete)"

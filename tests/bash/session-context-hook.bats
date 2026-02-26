@@ -39,12 +39,12 @@ teardown() {
 }
 
 # =============================================================================
-# Active feature with stages
+# Active feature with stages — next-step.sh artifact-state fallback
 # =============================================================================
 
 @test "session-hook: shows specified stage with next steps" {
     mkdir -p specs/001-test-feature
-    echo "# Spec" > specs/001-test-feature/spec.md
+    cp "$FIXTURES_DIR/spec.md" specs/001-test-feature/spec.md
     mkdir -p .specify
     echo "001-test-feature" > .specify/active-feature
 
@@ -56,21 +56,21 @@ teardown() {
 }
 
 @test "session-hook: shows planned stage with next steps" {
-    mkdir -p specs/001-test-feature
-    echo "# Spec" > specs/001-test-feature/spec.md
-    echo "# Plan" > specs/001-test-feature/plan.md
+    create_mock_feature "001-test-feature"
     mkdir -p .specify
     echo "001-test-feature" > .specify/active-feature
 
     run "$HOOK_SCRIPT"
     [[ "$status" -eq 0 ]]
     assert_contains "$output" "planned"
+    # TDD mandatory (fixture constitution) with .feature files → /iikit-05-tasks
     assert_contains "$output" "/iikit-05-tasks"
 }
 
 @test "session-hook: shows tasks-ready stage with next steps" {
-    mkdir -p specs/001-test-feature
-    printf '%s\n%s\n' '- [ ] T001 Do something' '- [ ] T002 Do another' > specs/001-test-feature/tasks.md
+    create_complete_mock_feature "001-test-feature"
+    # Overwrite tasks to be all incomplete
+    printf '%s\n%s\n' '- [ ] T001 Do something' '- [ ] T002 Do another' > "$TEST_DIR/specs/001-test-feature/tasks.md"
     mkdir -p .specify
     echo "001-test-feature" > .specify/active-feature
 
@@ -80,28 +80,27 @@ teardown() {
     assert_contains "$output" "/iikit-07-implement"
 }
 
-@test "session-hook: shows implementing stage with resume" {
-    mkdir -p specs/001-test-feature
-    printf '%s\n%s\n' '- [x] T001 Done' '- [ ] T002 Not done' > specs/001-test-feature/tasks.md
+@test "session-hook: shows implementing stage" {
+    create_complete_mock_feature "001-test-feature"
     mkdir -p .specify
     echo "001-test-feature" > .specify/active-feature
 
     run "$HOOK_SCRIPT"
     [[ "$status" -eq 0 ]]
     assert_contains "$output" "implementing"
-    assert_contains "$output" "resume"
+    assert_contains "$output" "/iikit-07-implement"
 }
 
 @test "session-hook: shows complete stage" {
-    mkdir -p specs/001-test-feature
-    printf '%s\n%s\n' '- [x] T001 Done' '- [x] T002 Also done' > specs/001-test-feature/tasks.md
+    create_mock_feature "001-test-feature"
+    printf '%s\n%s\n' '- [x] T001 Done' '- [x] T002 Also done' > "$TEST_DIR/specs/001-test-feature/tasks.md"
     mkdir -p .specify
     echo "001-test-feature" > .specify/active-feature
 
     run "$HOOK_SCRIPT"
     [[ "$status" -eq 0 ]]
     assert_contains "$output" "complete"
-    assert_contains "$output" "/iikit-08-taskstoissues"
+    assert_contains "$output" "All tasks complete"
 }
 
 # =============================================================================

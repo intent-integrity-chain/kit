@@ -25,25 +25,16 @@ if [[ -z "$FEATURE" ]]; then
 fi
 
 STAGE=$(get_feature_stage "$REPO_ROOT" "$FEATURE")
-FEATURE_DIR="$REPO_ROOT/specs/$FEATURE"
 
 # Build context summary
 echo "IIKit active feature: $FEATURE (stage: $STAGE)"
 
-case "$STAGE" in
-    specified)
-        echo "Next: /iikit-clarify or /iikit-02-plan"
-        ;;
-    planned)
-        echo "Next: /iikit-03-checklist or /iikit-05-tasks"
-        ;;
-    tasks-ready)
-        echo "Next: /iikit-06-analyze or /iikit-07-implement"
-        ;;
-    implementing-*)
-        echo "Next: /iikit-07-implement (resume)"
-        ;;
-    complete)
-        echo "All tasks complete. /iikit-08-taskstoissues to export."
-        ;;
-esac
+# Get next step from single source of truth
+NS_JSON=$(bash "$SCRIPT_DIR/next-step.sh" --phase status --json --project-root "$REPO_ROOT" 2>/dev/null) || NS_JSON='{}'
+NS=$(echo "$NS_JSON" | jq -r '.next_step // empty' 2>/dev/null)
+
+if [[ -n "$NS" ]]; then
+    echo "Next: $NS"
+elif [[ "$STAGE" == "complete" ]]; then
+    echo "All tasks complete."
+fi

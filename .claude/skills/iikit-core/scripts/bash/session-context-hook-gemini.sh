@@ -30,13 +30,17 @@ build_context() {
 
     local context="IIKit active feature: $feature (stage: $stage)"
 
-    case "$stage" in
-        specified)     context="$context. Next: /iikit-clarify or /iikit-02-plan" ;;
-        planned)       context="$context. Next: /iikit-03-checklist or /iikit-05-tasks" ;;
-        tasks-ready)   context="$context. Next: /iikit-06-analyze or /iikit-07-implement" ;;
-        implementing*) context="$context. Next: /iikit-07-implement (resume)" ;;
-        complete)      context="$context. All tasks complete. /iikit-08-taskstoissues to export." ;;
-    esac
+    # Get next step from single source of truth
+    local ns_json
+    ns_json=$(bash "$SCRIPT_DIR/next-step.sh" --phase status --json --project-root "$repo_root" 2>/dev/null) || ns_json='{}'
+    local ns
+    ns=$(echo "$ns_json" | jq -r '.next_step // empty' 2>/dev/null)
+
+    if [[ -n "$ns" ]]; then
+        context="$context. Next: $ns"
+    elif [[ "$stage" == "complete" ]]; then
+        context="$context. All tasks complete."
+    fi
 
     echo "$context"
 }

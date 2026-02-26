@@ -29,7 +29,7 @@ teardown() {
 
 @test "gemini-hook: outputs JSON with additionalContext for active feature" {
     mkdir -p specs/001-test-feature
-    echo "# Spec" > specs/001-test-feature/spec.md
+    cp "$FIXTURES_DIR/spec.md" specs/001-test-feature/spec.md
     mkdir -p .specify
     echo "001-test-feature" > .specify/active-feature
 
@@ -50,20 +50,19 @@ teardown() {
 }
 
 @test "gemini-hook: includes next step in context" {
-    mkdir -p specs/001-test-feature
-    echo "# Spec" > specs/001-test-feature/spec.md
-    echo "# Plan" > specs/001-test-feature/plan.md
+    create_mock_feature "001-test-feature"
     mkdir -p .specify
     echo "001-test-feature" > .specify/active-feature
 
     result=$("$HOOK_SCRIPT")
     context=$(echo "$result" | jq -r '.hookSpecificOutput.additionalContext')
+    # TDD mandatory (fixture constitution) with .feature files → /iikit-05-tasks
     [[ "$context" == *"/iikit-05-tasks"* ]]
 }
 
 @test "gemini-hook: no plain text on stdout" {
     mkdir -p specs/001-test-feature
-    echo "# Spec" > specs/001-test-feature/spec.md
+    cp "$FIXTURES_DIR/spec.md" specs/001-test-feature/spec.md
     mkdir -p .specify
     echo "001-test-feature" > .specify/active-feature
 

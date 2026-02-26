@@ -715,13 +715,14 @@ EOF
 # Status next_step for incomplete checklists
 # =============================================================================
 
-@test "check-prerequisites: --phase status next_step is /iikit-03-checklist for incomplete checklists" {
+@test "check-prerequisites: --phase status next_step skips checklist (optional) when incomplete" {
     create_mock_feature "001-test-feature"
     mkdir -p "$TEST_DIR/specs/001-test-feature/checklists"
     printf -- '- [ ] Item 1\n- [x] Item 2\n- [ ] Item 3\n' > "$TEST_DIR/specs/001-test-feature/checklists/quality.md"
 
     result=$("$CHECK_SCRIPT" --phase status --json)
 
+    # Checklist is optional — next-step.sh skips past it on the mandatory path
     next_step=$(echo "$result" | jq -r '.next_step')
-    [[ "$next_step" == "/iikit-03-checklist" ]]
+    [[ "$next_step" == "/iikit-05-tasks" ]]
 }

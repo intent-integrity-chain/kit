@@ -248,7 +248,11 @@ Files modified:
   - <feature_dir>/tests/features/bugfix_BUG-NNN.feature (created, TDD only)
 
 Next step:
-  - /iikit-07-implement — runs in bugfix mode (relaxed gates: no checklist or plan required, traces to bugs.md instead of spec)
+  Run: bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/next-step.sh --phase bugfix --json
+  Parse `next_step` (will be /iikit-07-implement) and `model_tier`.
+  Look up model_tier in model-recommendations.md — add Tip if tier mismatch.
+  - <next_step> — runs in bugfix mode (relaxed gates: no checklist or plan required, traces to bugs.md instead of spec)
+  [Tip: <model suggestion>]
   - Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
 ```
 

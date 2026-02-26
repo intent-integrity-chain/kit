@@ -1,5 +1,14 @@
 # Changelog
 
+## v2.6.0
+
+- **Externalized next-step state machine**: New `next-step.sh` / `next-step.ps1` scripts serve as the single source of truth for all workflow transitions. All 12 SKILL.md files, `check-prerequisites.sh` status mode, and both session hooks (`session-context-hook.sh`, `session-context-hook-gemini.sh`) now delegate to this script instead of maintaining independent next-step logic.
+- **Mandatory/optional path clarity**: Mandatory path: `00→01→02→[04 if TDD]→05→07`. Steps 03 (checklist), 06 (analyze), and 08 (tasks-to-issues) are optional and presented as `alt_steps` in JSON output.
+- **Model tier in status output**: `check-prerequisites.sh --phase status --json` now includes a `model_tier` field, codified from `model-recommendations.md` (light/medium/heavy).
+- **Clear recommendations**: Each transition includes `clear_before` and `clear_after` flags based on context consumption patterns (e.g., plan/implement consume heavy context → suggest `/clear` after).
+- **Comprehensive test coverage**: 56 new BATS tests for `next-step.sh` covering all phase transitions, TDD branching, artifact-state fallback, clear logic, model tiers, and alt steps. Pester tests for PowerShell parity.
+- **Packaging transitive dependencies**: `prepare-tile.sh` updated to ensure `next-step.sh/ps1` are distributed as transitive deps when `check-prerequisites.sh` or session hooks are present.
+
 ## v2.5.1
 
 - **Clarify next-step fix**: Clarify now uses feature state to determine the correct next-step suggestion instead of hardcoded phase logic.

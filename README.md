@@ -4,7 +4,14 @@
 
 An AI coding assistant toolkit that preserves your intent from idea to implementation, with cryptographic verification at each step. Compatible with Claude Code, OpenAI Codex, Google Gemini, and OpenCode.
 
-## What's New in v2.5.1
+## What's New in v2.6.0
+
+- **Externalized next-step state machine**: All 12 skills, session hooks, and status queries now call a single `next-step.sh` script — one source of truth for workflow transitions, model tier suggestions, and `/clear` recommendations. Eliminates 12 independent copies of next-step logic that drifted out of sync.
+- **Mandatory/optional path clarity**: Mandatory path is `00→01→02→[04 if TDD]→05→07`. Steps 03 (checklist), 06 (analyze), and 08 (tasks-to-issues) are optional and appear as `alt_steps` in the JSON output.
+- **Model tier in status output**: `check-prerequisites.sh --phase status --json` now includes `model_tier` field, codified from `model-recommendations.md`.
+- **Clear recommendations**: Each transition includes `clear_before`/`clear_after` flags based on context consumption patterns.
+
+### v2.5.1
 
 - **Clarify next-step fix**: Clarify now uses feature state to determine the correct next-step suggestion instead of hardcoded phase logic.
 

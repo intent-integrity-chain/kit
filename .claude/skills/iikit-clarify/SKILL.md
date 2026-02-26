@@ -173,14 +173,21 @@ Output: questions asked/answered, target artifact and path, sections touched, tr
 
 ## Next Steps
 
-Run `check-prerequisites.sh --json status` to get `next_step` and look up its model tier in [model-recommendations.md](../iikit-core/references/model-recommendations.md) (check the expiration date — refresh via web search if expired). Detect the agent via env vars and include a model switch tip if the next phase needs a different tier.
+Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/next-step.sh --phase clarify --json`
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/next-step.ps1 -Phase clarify -Json`
 
+Parse the JSON and present:
+1. If `clear_after` is true: suggest `/clear` before proceeding (always true for clarify — Q&A sessions consume significant context)
+2. Present `next_step` as the primary recommendation
+3. If `alt_steps` non-empty: list as alternatives
+4. Look up `model_tier` in [model-recommendations.md](../iikit-core/references/model-recommendations.md) — if tier differs from current, add a `Tip:` with the agent-specific switch command. Check expiration date; refresh via web search if expired.
+5. Append dashboard link
+
+Format:
 ```
 Clarification complete!
-
-Next: /clear → <next_step from check-prerequisites.sh>
-Tip: <model switch suggestion if tier mismatch, omit if already on the right model>
+Next: /clear → <next_step>
+[- <alt_step> — <reason>]
+[Tip: <model suggestion>]
 - Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
 ```
-
-`/clear` is always strongly recommended — Q&A sessions consume significant context and the next phase benefits from a fresh window.
