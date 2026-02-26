@@ -207,7 +207,15 @@ CURRENT_BRANCH=$(get_current_branch)
 # Check feature branch (may set SPECIFY_FEATURE, may exit 2 for needs_selection)
 STATUS_NO_FEATURE=false
 BRANCH_EXIT=0
-check_feature_branch "$CURRENT_BRANCH" "$HAS_GIT" || BRANCH_EXIT=$?
+if [[ "$P_EXTRAS" == *"status_mode"* ]]; then
+    # Status mode: suppress stderr from branch validation (info goes in JSON only)
+    check_feature_branch "$CURRENT_BRANCH" "$HAS_GIT" 2>/dev/null || BRANCH_EXIT=$?
+elif [[ "$PHASE" == "00" ]]; then
+    # Constitution phase: skip feature branch validation entirely
+    BRANCH_EXIT=0
+else
+    check_feature_branch "$CURRENT_BRANCH" "$HAS_GIT" || BRANCH_EXIT=$?
+fi
 if [[ $BRANCH_EXIT -eq 2 ]]; then
     # Multiple features, no active one — caller should present picker
     FEATURES_JSON=$(list_features_json)
@@ -295,6 +303,10 @@ if [[ "$P_EXTRAS" == *"status_mode"* ]]; then
     [[ -n "$FEATURE_DIR" && -f "$FEATURE_DIR/tasks.md" ]] && A_TASKS=true
     [[ -n "$FEATURE_DIR" && -d "$FEATURE_DIR/checklists" ]] && A_CHECKLISTS=true
     [[ -n "$FEATURE_DIR" && -f "$FEATURE_DIR/tests/test-specs.md" ]] && A_TEST_SPECS=true
+    # Also check for .feature files in tests/features/
+    if [[ -n "$FEATURE_DIR" && -d "$FEATURE_DIR/tests/features" ]] && [[ -n "$(ls "$FEATURE_DIR/tests/features/"*.feature 2>/dev/null)" ]]; then
+        A_TEST_SPECS=true
+    fi
 
     # --- Non-fatal validation ---
     V_CONSTITUTION=false
@@ -349,7 +361,7 @@ if [[ "$P_EXTRAS" == *"status_mode"* ]]; then
         local_feature=$(basename "$FEATURE_DIR")
         FEATURE_STAGE=$(get_feature_stage "$REPO_ROOT" "$local_feature")
     elif $STATUS_NO_FEATURE; then
-        FEATURE_STAGE="no-feature"
+        FEATURE_STAGE="unknown"
     fi
 
     # --- Ready-for computation (walk phases in order) ---
@@ -393,6 +405,41 @@ if [[ "$P_EXTRAS" == *"status_mode"* ]]; then
     NEXT_STEP=$(echo "$NEXT_STEP_JSON" | jq -r '.next_step // empty')
     CLEAR_BEFORE=$(echo "$NEXT_STEP_JSON" | jq -r '.clear_before // false')
     MODEL_TIER=$(echo "$NEXT_STEP_JSON" | jq -r '.model_tier // empty')
+
+    # Clamp ready_for to match next_step (they should agree)
+    if [[ -n "$NEXT_STEP" ]]; then
+        NS_PHASE=$(echo "$NEXT_STEP_JSON" | jq -r '.next_phase // empty')
+        if [[ -n "$NS_PHASE" ]]; then
+            # If next_step says phase NN, ready_for should be at most NN
+            NS_NUM=99
+            case "$NS_PHASE" in
+                00) NS_NUM=0 ;;
+                01) NS_NUM=1 ;;
+                02) NS_NUM=2 ;;
+                03) NS_NUM=3 ;;
+                04) NS_NUM=4 ;;
+                05) NS_NUM=5 ;;
+                06) NS_NUM=6 ;;
+                07) NS_NUM=7 ;;
+                08) NS_NUM=8 ;;
+            esac
+            RF_NUM=99
+            case "$READY_FOR" in
+                00) RF_NUM=0 ;;
+                01) RF_NUM=1 ;;
+                02) RF_NUM=2 ;;
+                03) RF_NUM=3 ;;
+                04) RF_NUM=4 ;;
+                05) RF_NUM=5 ;;
+                06) RF_NUM=6 ;;
+                07) RF_NUM=7 ;;
+                08) RF_NUM=8 ;;
+            esac
+            if [[ "$RF_NUM" -gt "$NS_NUM" ]]; then
+                READY_FOR="$NS_PHASE"
+            fi
+        fi
+    fi
 
     # --- Available docs ---
     docs=()
@@ -500,8 +547,8 @@ V_SPEC=false
 V_PLAN=false
 V_TASKS=false
 
-# Feature directory check (needed for any validation phase except clarify)
-if [[ "$PHASE" != "clarify" ]] && [[ ! -d "$FEATURE_DIR" ]]; then
+# Feature directory check (needed for any validation phase except clarify, 00, bugfix)
+if [[ "$PHASE" != "clarify" ]] && [[ "$PHASE" != "00" ]] && [[ "$PHASE" != "bugfix" ]] && [[ ! -d "$FEATURE_DIR" ]]; then
     echo "ERROR: Feature directory not found: $FEATURE_DIR" >&2
     echo "Run /iikit-01-specify first to create the feature structure." >&2
     exit 1

@@ -257,4 +257,58 @@ describe('computePipelineState', () => {
       expect(typeof phase.clarifications).toBe('number');
     }
   });
+
+  // =========================================================================
+  // Bug regression tests (from e2e test findings)
+  // =========================================================================
+
+  test('BUG-6: checklist phase tracks clarification count', () => {
+    createFeature(projectPath, '001-test', {
+      'spec.md': '# Spec\n## Requirements\n- FR-001\n## Success Criteria\n- SC-001\n## User Scenarios\n### US1\n',
+      'plan.md': '# Plan',
+      'checklists/quality.md': `# Checklist
+- [x] CL-001 Item one
+- [x] CL-002 Item two
+
+## Clarifications
+
+### Session 2026-02-26
+
+- Q: Is the threshold correct? -> A: Yes, 80% is fine [CL-001]
+- Q: Missing any checks? -> A: No, coverage is complete [CL-002]
+`,
+    });
+
+    const result = computePipelineState(projectPath, '001-test');
+    const checklist = result.phases.find(p => p.id === 'checklist');
+    // Checklist clarifications should be tracked, not hardcoded to 0
+    expect(checklist.clarifications).toBeGreaterThan(0);
+  });
+
+  test('BUG-12: story cards reflect correct task counts for tagged tasks', () => {
+    createFeature(projectPath, '001-test', {
+      'spec.md': `# Spec
+## Requirements
+- FR-001: First
+- FR-002: Second
+## Success Criteria
+- SC-001: Test
+## User Scenarios
+### User Story 1 - Login (Priority: P1)
+Given a user, When they login, Then they are authenticated.
+`,
+      'plan.md': '# Plan',
+      'tasks.md': `# Tasks
+## Phase 1
+- [x] T001 [US1] First task
+- [x] T002 [US1] Second task
+- [x] T003 Untagged task
+`,
+    });
+
+    const result = computePipelineState(projectPath, '001-test');
+    const implement = result.phases.find(p => p.id === 'implement');
+    // All 3 tasks are done, implement should be complete
+    expect(implement.status).toBe('complete');
+  });
 });

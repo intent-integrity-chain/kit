@@ -114,25 +114,24 @@ if [[ -n "$STAGED_CODE_FILES" ]]; then
         PLAN_FILE="$feat_dir/plan.md"
 
         # ── Gate 1: Step definitions directory must exist with at least one file ──
+        # Warning only — agent may not have created step_definitions yet
         STEP_DEFS_DIR="$feat_dir/tests/step_definitions"
         if [[ ! -d "$STEP_DEFS_DIR" ]] || [[ -z "$(ls -A "$STEP_DEFS_DIR" 2>/dev/null)" ]]; then
-            BDD_BLOCKED=true
-            BDD_BLOCK_MESSAGES+=("BLOCKED: specs/$FEAT_NAME — missing step definitions")
-            BDD_BLOCK_MESSAGES+=("  Expected: specs/$FEAT_NAME/tests/step_definitions/ with at least one file")
-            BDD_BLOCK_MESSAGES+=("  .feature files exist but no step definitions wire them to code.")
-            BDD_BLOCK_MESSAGES+=("  Run /iikit-07-implement to generate step definitions.")
+            echo "[iikit] Warning: specs/$FEAT_NAME — missing step definitions" >&2
+            echo "[iikit]   Expected: specs/$FEAT_NAME/tests/step_definitions/ with at least one file" >&2
+            echo "[iikit]   Run /iikit-07-implement to generate step definitions." >&2
             continue
         fi
 
         # ── Gate 2: BDD runner dependency present in project dep files ──
+        # Warning only — dependency may not be installed yet
         FRAMEWORK_RESULT=$(detect_framework "$PLAN_FILE" 2>/dev/null)
         FRAMEWORK=$(echo "$FRAMEWORK_RESULT" | cut -d'|' -f1)
 
         if [[ -n "$FRAMEWORK" ]]; then
             if ! DEP_FILE=$(check_bdd_dependency "$FRAMEWORK" "$REPO_ROOT"); then
-                BDD_BLOCKED=true
-                BDD_BLOCK_MESSAGES+=("BLOCKED: specs/$FEAT_NAME — BDD runner dependency '$FRAMEWORK' not found")
-                BDD_BLOCK_MESSAGES+=("  Add '$FRAMEWORK' to your project dependencies.")
+                echo "[iikit] Warning: specs/$FEAT_NAME — BDD runner dependency '$FRAMEWORK' not found" >&2
+                echo "[iikit]   Add '$FRAMEWORK' to your project dependencies." >&2
                 continue
             fi
         fi

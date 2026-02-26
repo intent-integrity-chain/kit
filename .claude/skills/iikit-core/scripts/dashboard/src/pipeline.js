@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { parseTasks, parseChecklists, parseConstitutionTDD, hasClarifications, countClarificationSessions } = require('./parser');
+const { parseTasks, parseChecklists, parseConstitutionTDD, hasClarifications, countClarifications } = require('./parser');
 const { getFeatureFiles } = require('./testify');
 
 /**
@@ -48,6 +48,16 @@ function computePipelineState(projectPath, featureId) {
   // Read constitution content for clarifications check
   const constitutionContent = constitutionExists ? fs.readFileSync(constitutionPath, 'utf-8') : '';
 
+  // Read checklist content for clarifications check
+  let checklistContent = '';
+  if (fs.existsSync(checklistDir)) {
+    const clFiles = fs.readdirSync(checklistDir).filter(f => f.endsWith('.md'));
+    checklistContent = clFiles.map(f => fs.readFileSync(path.join(checklistDir, f), 'utf-8')).join('\n');
+  }
+
+  // Read analysis content for clarifications check
+  const analysisContent = analysisExists ? fs.readFileSync(analysisPath, 'utf-8') : '';
+
   // TDD requirement check — read from .specify/context.json first, fallback to parsing
   const contextPath = path.join(projectPath, '.specify', 'context.json');
   let tddRequired = false;
@@ -64,12 +74,14 @@ function computePipelineState(projectPath, featureId) {
     tddRequired = constitutionExists ? parseConstitutionTDD(constitutionPath) : false;
   }
 
-  // Count clarification sessions per artifact
+  // Count clarification items per artifact
   const clarifications = {
-    constitution: countClarificationSessions(constitutionContent),
-    spec: countClarificationSessions(specContent),
-    plan: countClarificationSessions(planContent),
-    tasks: countClarificationSessions(tasksContent)
+    constitution: countClarifications(constitutionContent),
+    spec: countClarifications(specContent),
+    plan: countClarifications(planContent),
+    checklist: countClarifications(checklistContent),
+    tasks: countClarifications(tasksContent),
+    analysis: countClarifications(analysisContent)
   };
 
   const phases = [
@@ -109,7 +121,7 @@ function computePipelineState(projectPath, featureId) {
         ? `${Math.round((checklistStatus.checked / checklistStatus.total) * 100)}%`
         : null,
       optional: false,
-      clarifications: 0
+      clarifications: clarifications.checklist
     },
     {
       id: 'testify',
@@ -135,7 +147,7 @@ function computePipelineState(projectPath, featureId) {
       status: analysisExists ? 'complete' : 'not_started',
       progress: null,
       optional: false,
-      clarifications: 0
+      clarifications: clarifications.analysis
     },
     {
       id: 'implement',

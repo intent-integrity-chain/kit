@@ -357,7 +357,7 @@ EOF
 # BDD runner enforcement tests
 # =============================================================================
 
-@test "hook: blocks code commit when .feature files exist but no step_definitions" {
+@test "hook: warns (not blocks) when .feature files exist but no step_definitions" {
     # Create feature with .feature files
     mkdir -p "$TEST_DIR/specs/001-feature/tests/features"
     cat > "$TEST_DIR/specs/001-feature/tests/features/login.feature" << 'EOF'
@@ -376,18 +376,17 @@ EOF
     git -C "$TEST_DIR" add -A >/dev/null 2>&1
     git -C "$TEST_DIR" commit -m "add feature files" >/dev/null 2>&1
 
-    # Now stage a code file — should trigger BDD enforcement
+    # Now stage a code file — should warn but NOT block
     echo "def login(): pass" > "$TEST_DIR/app.py"
     git -C "$TEST_DIR" add app.py
 
     cd "$TEST_DIR"
     run bash .git/hooks/pre-commit
-    [ "$status" -eq 1 ]
-    assert_contains "$output" "BDD RUNNER ENFORCEMENT FAILED"
+    [ "$status" -eq 0 ]
     assert_contains "$output" "missing step definitions"
 }
 
-@test "hook: blocks code commit when step_definitions exist but dependency missing" {
+@test "hook: warns (not blocks) when step_definitions exist but dependency missing" {
     # Create feature with .feature files AND step definitions
     mkdir -p "$TEST_DIR/specs/001-feature/tests/features"
     mkdir -p "$TEST_DIR/specs/001-feature/tests/step_definitions"
@@ -415,8 +414,7 @@ EOF
 
     cd "$TEST_DIR"
     run bash .git/hooks/pre-commit
-    [ "$status" -eq 1 ]
-    assert_contains "$output" "BDD RUNNER ENFORCEMENT FAILED"
+    [ "$status" -eq 0 ]
     assert_contains "$output" "pytest-bdd"
     assert_contains "$output" "not found"
 }
@@ -587,4 +585,47 @@ EOF
     run bash .git/hooks/pre-commit
     [ "$status" -eq 0 ]
     assert_contains "$output" "Warning"
+}
+
+# =============================================================================
+# Bug regression tests (from e2e test findings)
+# =============================================================================
+
+@test "BUG-23: pre-commit allows commit when .feature files exist but step_definitions missing" {
+    # TDD mandatory constitution
+    create_complete_mock_feature "001-test-feature"
+    mkdir -p "$TEST_DIR/specs/001-test-feature/tests/features"
+    echo "Feature: Test" > "$TEST_DIR/specs/001-test-feature/tests/features/auth.feature"
+    # Store assertion hash so hash check passes
+    cd "$TEST_DIR"
+    bash "$TESTIFY_SCRIPT" store-hash "$TEST_DIR/specs/001-test-feature/tests/features" 2>/dev/null || true
+
+    # Stage a code file (not a spec/test file)
+    mkdir -p "$TEST_DIR/src"
+    echo "console.log('hello');" > "$TEST_DIR/src/index.js"
+    git -C "$TEST_DIR" add src/index.js
+
+    # Pre-commit should NOT block just because step_definitions/ is missing
+    # The agent hasn't had a chance to create them yet
+    run bash .git/hooks/pre-commit
+    [[ "$status" -eq 0 ]]
+}
+
+@test "BUG-24: pre-commit allows commit when BDD runner not in package.json" {
+    create_complete_mock_feature "001-test-feature"
+    mkdir -p "$TEST_DIR/specs/001-test-feature/tests/features"
+    echo "Feature: Test" > "$TEST_DIR/specs/001-test-feature/tests/features/auth.feature"
+    cd "$TEST_DIR"
+    bash "$TESTIFY_SCRIPT" store-hash "$TEST_DIR/specs/001-test-feature/tests/features" 2>/dev/null || true
+
+    # Create package.json WITHOUT @cucumber/cucumber
+    echo '{"name":"test","version":"1.0.0"}' > "$TEST_DIR/package.json"
+
+    mkdir -p "$TEST_DIR/src"
+    echo "module.exports = {};" > "$TEST_DIR/src/app.js"
+    git -C "$TEST_DIR" add src/app.js package.json
+
+    # Pre-commit should NOT block for missing dependency before npm install
+    run bash .git/hooks/pre-commit
+    [[ "$status" -eq 0 ]]
 }

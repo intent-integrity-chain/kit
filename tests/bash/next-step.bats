@@ -387,6 +387,7 @@ teardown() {
 }
 
 @test "next-step: alt_steps empty when no artifacts" {
+    rm -f "$TEST_DIR/CONSTITUTION.md"
     result=$("$NEXT_STEP_SCRIPT" --phase 00 --json)
     alt_count=$(echo "$result" | jq '.alt_steps | length')
     [[ "$alt_count" -eq 0 ]]
@@ -477,4 +478,50 @@ teardown() {
 
     result=$("$SCRIPTS_DIR/check-prerequisites.sh" --phase status --json)
     echo "$result" | jq '.model_tier' >/dev/null
+}
+
+# =============================================================================
+# Bug regression tests (from e2e test findings)
+# =============================================================================
+
+@test "BUG-14: alt_steps includes clarify after phase 00 when constitution exists" {
+    # Constitution is a clarifiable artifact — clarify should be offered
+    result=$("$NEXT_STEP_SCRIPT" --phase 00 --json)
+    alts=$(echo "$result" | jq -r '.alt_steps[].step' 2>/dev/null || echo "")
+    [[ "$alts" == *"/iikit-clarify"* ]]
+}
+
+@test "BUG-15: --phase status includes same alt_steps as --phase NN" {
+    create_mock_feature "001-test-feature"
+    mkdir -p "$TEST_DIR/.specify"
+    echo "001-test-feature" > "$TEST_DIR/.specify/active-feature"
+
+    # After plan exists (phase 02 equivalent), status should include analyze in alts
+    # just like --phase 05 does
+    cp "$FIXTURES_DIR/tasks.md" "$TEST_DIR/specs/001-test-feature/tasks.md"
+
+    phase_result=$("$NEXT_STEP_SCRIPT" --phase 05 --json)
+    status_result=$("$NEXT_STEP_SCRIPT" --phase status --json)
+
+    phase_alts=$(echo "$phase_result" | jq -r '[.alt_steps[].step] | sort | join(",")')
+    status_alts=$(echo "$status_result" | jq -r '[.alt_steps[].step] | sort | join(",")')
+
+    [[ "$phase_alts" == "$status_alts" ]]
+}
+
+@test "BUG-16: --phase 01 warns when constitution is missing" {
+    rm -f "$TEST_DIR/CONSTITUTION.md"
+    create_mock_feature "001-test-feature"
+    mkdir -p "$TEST_DIR/.specify"
+    echo "001-test-feature" > "$TEST_DIR/.specify/active-feature"
+
+    result=$("$NEXT_STEP_SCRIPT" --phase 01 --json)
+
+    # Should either: include /iikit-00-constitution in alt_steps,
+    # or redirect to constitution instead of plan
+    alts=$(echo "$result" | jq -r '.alt_steps[].step' 2>/dev/null || echo "")
+    next=$(echo "$result" | jq -r '.next_step')
+
+    # At minimum, constitution should be mentioned somewhere
+    [[ "$alts" == *"/iikit-00-constitution"* ]] || [[ "$next" == "/iikit-00-constitution" ]]
 }

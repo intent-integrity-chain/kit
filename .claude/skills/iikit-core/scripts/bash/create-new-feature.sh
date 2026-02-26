@@ -106,8 +106,11 @@ get_highest_from_specs() {
 }
 
 # Function to get highest number from git branches
+# Excludes the current branch to avoid self-inflation when creating a new feature
 get_highest_from_branches() {
     local highest=0
+    local current_branch
+    current_branch=$(git branch --show-current 2>/dev/null || echo "")
 
     branches=$(git branch -a 2>/dev/null || echo "")
 
@@ -115,8 +118,11 @@ get_highest_from_branches() {
         while IFS= read -r branch; do
             clean_branch=$(echo "$branch" | sed 's/^[* ]*//; s|^remotes/[^/]*/||')
 
-            if echo "$clean_branch" | grep -q '^[0-9]\+-'; then
-                number=$(echo "$clean_branch" | grep -o '^[0-9]\+' || echo "0")
+            # Skip current branch (avoid self-inflation)
+            [ "$clean_branch" = "$current_branch" ] && continue
+
+            if echo "$clean_branch" | grep -qE '^[0-9]{3}-'; then
+                number=$(echo "$clean_branch" | grep -oE '^[0-9]{3}' || echo "0")
                 number=$((10#$number))
                 if [ "$number" -gt "$highest" ]; then
                     highest=$number
@@ -283,9 +289,18 @@ source "$SCRIPT_DIR/common.sh"
 write_active_feature "$BRANCH_NAME" "$REPO_ROOT"
 
 if $JSON_MODE; then
+    # Check for constitution warning
+    CONSTITUTION_WARNING=""
+    if [[ ! -f "$REPO_ROOT/CONSTITUTION.md" ]]; then
+        CONSTITUTION_WARNING=',"warnings":["CONSTITUTION.md not found. Run /iikit-00-constitution to define project governance."]'
+        echo "[specify] Warning: CONSTITUTION.md not found. Run /iikit-00-constitution to define project governance." >&2
+    fi
     # Output HAS_GIT as proper JSON boolean (no quotes) for consistency with PowerShell
-    printf '{"BRANCH_NAME":"%s","SPEC_FILE":"%s","FEATURE_NUM":"%s","HAS_GIT":%s}\n' "$BRANCH_NAME" "$SPEC_FILE" "$FEATURE_NUM" "$HAS_GIT"
+    printf '{"BRANCH_NAME":"%s","SPEC_FILE":"%s","FEATURE_DIR":"%s","FEATURE_NUM":"%s","HAS_GIT":%s%s}\n' "$BRANCH_NAME" "$SPEC_FILE" "$FEATURE_DIR" "$FEATURE_NUM" "$HAS_GIT" "$CONSTITUTION_WARNING"
 else
+    if [[ ! -f "$REPO_ROOT/CONSTITUTION.md" ]]; then
+        echo "[specify] Warning: CONSTITUTION.md not found. Run /iikit-00-constitution to define project governance." >&2
+    fi
     echo "BRANCH_NAME: $BRANCH_NAME"
     echo "SPEC_FILE: $SPEC_FILE"
     echo "FEATURE_NUM: $FEATURE_NUM"

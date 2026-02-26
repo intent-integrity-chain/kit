@@ -188,12 +188,21 @@ build_alt_steps() {
     local alts=""
 
     # /iikit-clarify is always an option when any artifact exists
-    if $A_SPEC || $A_PLAN || $A_TASKS; then
+    if $A_CONSTITUTION || $A_SPEC || $A_PLAN || $A_TASKS; then
         alts="${alts}{\"step\":\"/iikit-clarify\",\"reason\":\"Resolve ambiguities\",\"model_tier\":\"medium\"},"
     fi
 
     # Phase-specific alternatives
     case "$completed" in
+        00)
+            # After constitution: no extra alts beyond clarify
+            ;;
+        01)
+            # After specify: suggest constitution if missing
+            if ! $A_CONSTITUTION; then
+                alts="${alts}{\"step\":\"/iikit-00-constitution\",\"reason\":\"Define project governance\",\"model_tier\":\"heavy\"},"
+            fi
+            ;;
         02)
             # After plan: checklist is optional, testify is optional if TDD not mandatory
             alts="${alts}{\"step\":\"/iikit-03-checklist\",\"reason\":\"Optional quality checklist\",\"model_tier\":\"light\"},"
@@ -215,6 +224,22 @@ build_alt_steps() {
             # After implement: tasks-to-issues is optional
             if [[ "$FEATURE_STAGE" == "complete" ]]; then
                 alts="${alts}{\"step\":\"/iikit-08-taskstoissues\",\"reason\":\"Export tasks to GitHub Issues\",\"model_tier\":\"light\"},"
+            fi
+            ;;
+        clarify|core|status)
+            # Build phase-specific alts based on artifact state
+            if $A_PLAN && ! $A_TASKS; then
+                # After plan: same alts as phase 02
+                alts="${alts}{\"step\":\"/iikit-03-checklist\",\"reason\":\"Optional quality checklist\",\"model_tier\":\"light\"},"
+                if ! $TDD_MANDATORY; then
+                    alts="${alts}{\"step\":\"/iikit-04-testify\",\"reason\":\"Optional test specifications\",\"model_tier\":\"medium\"},"
+                fi
+            elif $A_TASKS; then
+                # After tasks: same alts as phase 05
+                alts="${alts}{\"step\":\"/iikit-06-analyze\",\"reason\":\"Optional consistency analysis\",\"model_tier\":\"heavy\"},"
+                if [[ "$FEATURE_STAGE" == "complete" ]]; then
+                    alts="${alts}{\"step\":\"/iikit-08-taskstoissues\",\"reason\":\"Export tasks to GitHub Issues\",\"model_tier\":\"light\"},"
+                fi
             fi
             ;;
     esac

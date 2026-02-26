@@ -171,8 +171,14 @@ function loadTemplate() {
   // Try template.js first (published tiles)
   const templateJs = path.join(__dirname, '..', 'template.js');
   if (fs.existsSync(templateJs)) {
-    _cachedTemplate = require(templateJs);
-    return _cachedTemplate;
+    try {
+      _cachedTemplate = require(templateJs);
+      return _cachedTemplate;
+    } catch {
+      // require() may fail in ESM projects — fall back to readFileSync
+      _cachedTemplate = fs.readFileSync(templateJs, 'utf-8');
+      return _cachedTemplate;
+    }
   }
   // Fall back to public/index.html (dev layout)
   const templatePath = path.join(__dirname, 'public', 'index.html');
@@ -228,11 +234,10 @@ async function main() {
     process.exit(1);
   }
 
-  // Validate CONSTITUTION.md exists (exit 3)
+  // Warn if CONSTITUTION.md missing but continue (dashboard still useful)
   const constitutionPath = path.join(projectPath, 'CONSTITUTION.md');
   if (!fs.existsSync(constitutionPath)) {
-    process.stderr.write('Error: CONSTITUTION.md not found in project root. Create one using /iikit-00-constitution.\n');
-    process.exit(3);
+    process.stderr.write('Warning: CONSTITUTION.md not found in project root. Dashboard will show constitution as missing.\n');
   }
 
   // Check write permissions (exit 4)

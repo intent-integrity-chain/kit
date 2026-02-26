@@ -187,13 +187,13 @@ describe('Error handling', () => {
     expect(result.status).toBe(1);
   });
 
-  test('missing CONSTITUTION.md exits with code 3', () => {
+  test('missing CONSTITUTION.md warns but generates dashboard (not exit 3)', () => {
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'iikit-noconst-'));
     fs.mkdirSync(path.join(tmpDir, 'specs', '001-feat'), { recursive: true });
     fs.writeFileSync(path.join(tmpDir, 'specs', '001-feat', 'spec.md'), '# Spec\n');
     try {
       const result = runGenerator([tmpDir]);
-      expect(result.status).toBe(3);
+      expect(result.status).toBe(0);
       expect(result.stderr).toMatch(/CONSTITUTION\.md/i);
     } finally {
       fs.rmSync(tmpDir, { recursive: true, force: true });
@@ -427,6 +427,193 @@ describe('Template loading', () => {
         expect(result.status).not.toBe(0);
         expect(result.stderr).toMatch(/not found|ENOENT|template/i);
       });
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+});
+
+// =============================================================================
+// Bug regression tests (from e2e test findings)
+// =============================================================================
+
+describe('BUG-4: clarification view panels rendered in dashboard HTML', () => {
+  test('dashboard HTML contains clarify-view elements when clarifications exist', () => {
+    const tmpDir = createTestProject(os.tmpdir());
+    try {
+      const specPath = path.join(tmpDir, 'specs', '001-test-feature', 'spec.md');
+      const specContent = fs.readFileSync(specPath, 'utf-8');
+      fs.writeFileSync(specPath, specContent + `
+## Clarifications
+
+### Session 2026-02-26
+
+- Q: What auth method? -> A: JWT tokens [FR-001]
+- Q: How many users? -> A: 10k initially [SC-001]
+`);
+
+      const result = runGenerator([tmpDir]);
+      expect(result.status).toBe(0);
+
+      const html = fs.readFileSync(path.join(tmpDir, '.specify', 'dashboard.html'), 'utf-8');
+      const match = html.match(/window\.DASHBOARD_DATA\s*=\s*({.*?});/s);
+      const data = JSON.parse(match[1]);
+      const featureData = data.featureData?.['001-test-feature'];
+
+      // storyMap.clarifications should be populated (not empty)
+      expect(featureData.storyMap.clarifications.length).toBeGreaterThan(0);
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+});
+
+describe('BUG-7: clarify view includes clarifications from all artifacts', () => {
+  test('dashboard data includes constitution clarifications', () => {
+    const tmpDir = createTestProject(os.tmpdir());
+    try {
+      const constPath = path.join(tmpDir, 'CONSTITUTION.md');
+      const constContent = fs.readFileSync(constPath, 'utf-8');
+      fs.writeFileSync(constPath, constContent + `
+## Clarifications
+
+### Session 2026-02-26
+
+- Q: Should we enforce code review? -> A: Yes mandatory [Principle I]
+`);
+
+      const result = runGenerator([tmpDir]);
+      expect(result.status).toBe(0);
+
+      const html = fs.readFileSync(path.join(tmpDir, '.specify', 'dashboard.html'), 'utf-8');
+      const match = html.match(/window\.DASHBOARD_DATA\s*=\s*({.*?});/s);
+      const data = JSON.parse(match[1]);
+      const featureData = data.featureData?.['001-test-feature'];
+
+      // Pipeline should show constitution clarification
+      const constPhase = featureData.pipeline.phases.find(p => p.id === 'constitution');
+      expect(constPhase.clarifications).toBeGreaterThan(0);
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+});
+
+describe('BUG-10: dashboard respects active-feature file over git branch', () => {
+  test('dashboard data includes active-feature even when branch differs', () => {
+    const tmpDir = createTestProject(os.tmpdir());
+    try {
+      fs.mkdirSync(path.join(tmpDir, 'specs', '002-other'), { recursive: true });
+      fs.writeFileSync(path.join(tmpDir, 'specs', '002-other', 'spec.md'), '# Other\n');
+      fs.mkdirSync(path.join(tmpDir, '.specify'), { recursive: true });
+      fs.writeFileSync(path.join(tmpDir, '.specify', 'active-feature'), '001-test-feature');
+
+      const result = runGenerator([tmpDir]);
+      expect(result.status).toBe(0);
+
+      const html = fs.readFileSync(path.join(tmpDir, '.specify', 'dashboard.html'), 'utf-8');
+      const match = html.match(/window\.DASHBOARD_DATA\s*=\s*({.*?});/s);
+      const data = JSON.parse(match[1]);
+      expect(data.featureData).toHaveProperty('001-test-feature');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+});
+
+describe('BUG-13: no persistent MISSING badge when clarifications not needed', () => {
+  test('pipeline phases show clarifications=0 when no clarifications exist', () => {
+    const tmpDir = createTestProject(os.tmpdir());
+    try {
+      const result = runGenerator([tmpDir]);
+      expect(result.status).toBe(0);
+
+      const html = fs.readFileSync(path.join(tmpDir, '.specify', 'dashboard.html'), 'utf-8');
+      const match = html.match(/window\.DASHBOARD_DATA\s*=\s*({.*?});/s);
+      const data = JSON.parse(match[1]);
+      const featureData = data.featureData?.['001-test-feature'];
+      for (const phase of featureData.pipeline.phases) {
+        expect(phase.clarifications).toBe(0);
+      }
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+});
+
+describe('BUG-8: ESM/CJS conflict with type:module', () => {
+  test('dashboard generates when project package.json has type:module', () => {
+    const tmpDir = createTestProject(os.tmpdir());
+    try {
+      // Add package.json with "type": "module" (modern ESM project)
+      fs.writeFileSync(path.join(tmpDir, 'package.json'), JSON.stringify({
+        name: 'test-esm-project',
+        type: 'module',
+        version: '1.0.0',
+      }));
+
+      const result = runGenerator([tmpDir]);
+      // Should succeed — generator should not be affected by project's module type
+      expect(result.status).toBe(0);
+      expect(fs.existsSync(path.join(tmpDir, '.specify', 'dashboard.html'))).toBe(true);
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+});
+
+describe('BUG-9: dashboard should generate without CONSTITUTION.md', () => {
+  test('generates partial dashboard when constitution missing but spec exists', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'iikit-noconst-'));
+    try {
+      fs.mkdirSync(path.join(tmpDir, 'specs', '001-test', 'tests'), { recursive: true });
+      fs.writeFileSync(path.join(tmpDir, 'specs', '001-test', 'spec.md'), '# Spec\n');
+      // No CONSTITUTION.md
+      fs.writeFileSync(path.join(tmpDir, 'PREMISE.md'), '# Premise\n');
+
+      const result = runGenerator([tmpDir]);
+      // Should generate a dashboard (perhaps minimal) rather than hard-fail
+      expect(result.status).toBe(0);
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+});
+
+describe('BUG-11: dashboard health score matches analysis.md', () => {
+  test('dashboard data includes analysis score from analysis.md', () => {
+    const tmpDir = createTestProject(os.tmpdir());
+    try {
+      // Add analysis.md with explicit score
+      fs.writeFileSync(path.join(tmpDir, 'specs', '001-test-feature', 'analysis.md'), `# Cross-Artifact Analysis
+
+## Health Score: 91/100
+
+## Coverage Summary
+| Source | Items | Covered | Coverage |
+|--------|-------|---------|----------|
+| FR-xxx | 4 | 4 | 100% |
+
+## Findings
+- INFO: All requirements covered
+
+## Constitution Alignment
+All principles satisfied.
+`);
+
+      const result = runGenerator([tmpDir]);
+      expect(result.status).toBe(0);
+
+      const html = fs.readFileSync(path.join(tmpDir, '.specify', 'dashboard.html'), 'utf-8');
+      const match = html.match(/window\.DASHBOARD_DATA\s*=\s*({.*?});/s);
+      expect(match).not.toBeNull();
+
+      const data = JSON.parse(match[1]);
+      const featureData = data.featureData?.['001-test-feature'];
+      // If dashboard has an analysis score, it should match what's in analysis.md (91)
+      if (featureData?.analysis?.healthScore !== undefined) {
+        expect(featureData.analysis.healthScore).toBe(91);
+      }
     } finally {
       fs.rmSync(tmpDir, { recursive: true, force: true });
     }

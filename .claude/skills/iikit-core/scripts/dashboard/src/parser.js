@@ -241,15 +241,15 @@ function hasClarifications(specContent) {
 }
 
 /**
- * Count clarification sessions in content (any artifact).
- * Sessions are marked by ### Session YYYY-MM-DD headings under ## Clarifications.
+ * Count clarification Q&A items in content (any artifact).
+ * Clarifications are lines starting with `- Q:` under ## Clarifications.
  *
  * @param {string} content - Raw markdown content
- * @returns {number} Number of clarification sessions found
+ * @returns {number} Number of clarification items found
  */
-function countClarificationSessions(content) {
+function countClarifications(content) {
   if (!content || typeof content !== 'string') return 0;
-  const matches = content.match(/^### Session \d{4}-\d{2}-\d{2}/gm);
+  const matches = content.match(/^- Q: /gm);
   return matches ? matches.length : 0;
 }
 
@@ -1293,4 +1293,4 @@ function extractField(section, fieldName) {
   return value;
 }
 
-module.exports = { parseSpecStories, parseTasks, parseChecklists, parseChecklistsDetailed, parseConstitutionTDD, hasClarifications, countClarificationSessions, parseConstitutionPrinciples, parsePremise, parseRequirements, parseSuccessCriteria, parseClarifications, parseStoryRequirementRefs, parseTechContext, parseFileStructure, parseAsciiDiagram, parseTesslJson, parseResearchDecisions, parseTestSpecs, parseTaskTestRefs, parseAnalysisFindings, parseAnalysisCoverage, parseAnalysisMetrics, parseConstitutionAlignment, parsePhaseSeparation, parseBugs };
+module.exports = { parseSpecStories, parseTasks, parseChecklists, parseChecklistsDetailed, parseConstitutionTDD, hasClarifications, countClarifications, countClarificationSessions: countClarifications, parseConstitutionPrinciples, parsePremise, parseRequirements, parseSuccessCriteria, parseClarifications, parseStoryRequirementRefs, parseTechContext, parseFileStructure, parseAsciiDiagram, parseTesslJson, parseResearchDecisions, parseTestSpecs, parseTaskTestRefs, parseAnalysisFindings, parseAnalysisCoverage, parseAnalysisMetrics, parseConstitutionAlignment, parsePhaseSeparation, parseBugs };

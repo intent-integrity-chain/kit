@@ -168,3 +168,33 @@ teardown() {
     # GitHub limit is 244 bytes
     [[ ${#branch_name} -le 244 ]]
 }
+
+# =============================================================================
+# Bug regression tests (from e2e test findings)
+# =============================================================================
+
+@test "BUG-21: auto-numbering correct when on branch named 001-*" {
+    # Switch to a branch named 001-something
+    git checkout -b 001-existing-feature >/dev/null 2>&1
+
+    result=$("$CREATE_SCRIPT" --json "New feature after existing")
+
+    feature_dir=$(echo "$result" | jq -r '.FEATURE_DIR')
+    # Should create 001-* (first feature), NOT 002-*
+    # The branch name should not confuse the auto-numbering
+    [[ "$feature_dir" == *"/specs/001-"* ]]
+}
+
+@test "BUG-22: create-new-feature warns when constitution missing" {
+    rm -f CONSTITUTION.md
+
+    result=$("$CREATE_SCRIPT" --json "Some feature" 2>&1)
+
+    # Should either: warn about missing constitution, or include a warning field in JSON
+    # At minimum, the output should mention constitution
+    echo "$result" | grep -qi "constitution" || {
+        # If no warning in output, check that the JSON has a warning field
+        warning=$(echo "$result" | jq -r '.warnings[]?' 2>/dev/null || echo "")
+        [[ "$warning" == *"constitution"* ]] || [[ "$warning" == *"CONSTITUTION"* ]]
+    }
+}

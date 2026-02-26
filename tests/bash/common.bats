@@ -522,3 +522,50 @@ EOF
     assert_contains "$result" "specified"
     assert_contains "$result" "planned"
 }
+
+# =============================================================================
+# Bug regression tests (from e2e test findings)
+# =============================================================================
+
+@test "BUG-27: get_feature_stage returns testified after testify" {
+    mkdir -p "$TEST_DIR/specs/001-test-feature"
+    echo "# Spec" > "$TEST_DIR/specs/001-test-feature/spec.md"
+    echo "# Plan" > "$TEST_DIR/specs/001-test-feature/plan.md"
+    mkdir -p "$TEST_DIR/specs/001-test-feature/tests/features"
+    echo "Feature: Test" > "$TEST_DIR/specs/001-test-feature/tests/features/test.feature"
+    # No tasks.md — plan exists, test specs exist, but no tasks
+
+    result=$(get_feature_stage "$TEST_DIR" "001-test-feature")
+    # Should indicate test specs exist, not just "planned"
+    [[ "$result" != "planned" ]]
+}
+
+@test "BUG-25: feature_stage percentage accounts for bugfix tasks correctly" {
+    mkdir -p "$TEST_DIR/specs/001-test-feature"
+    # 3 done out of 5 original = 60%
+    printf '%s\n%s\n%s\n%s\n%s\n' \
+        '- [x] T001 Task one' \
+        '- [x] T002 Task two' \
+        '- [x] T003 Task three' \
+        '- [ ] T004 Task four' \
+        '- [ ] T005 Task five' \
+        > "$TEST_DIR/specs/001-test-feature/tasks.md"
+
+    result1=$(get_feature_stage "$TEST_DIR" "001-test-feature")
+    [[ "$result1" == "implementing-60%" ]]
+
+    # Add 2 bugfix tasks (both unchecked) — now 3 done out of 7
+    printf '%s\n%s\n' \
+        '- [ ] T-B001 Fix bug' \
+        '- [ ] T-B002 Test fix' \
+        >> "$TEST_DIR/specs/001-test-feature/tasks.md"
+
+    result2=$(get_feature_stage "$TEST_DIR" "001-test-feature")
+    # Adding unchecked bugfix tasks should not decrease the displayed percentage
+    # Progress must not go backward — confuses agents and users
+    pct2=${result2#implementing-}
+    pct2=${pct2%\%}
+    pct1=${result1#implementing-}
+    pct1=${pct1%\%}
+    [[ "$pct2" -ge "$pct1" ]]
+}

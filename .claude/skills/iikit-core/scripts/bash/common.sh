@@ -35,7 +35,7 @@ write_active_feature() {
 }
 
 # Detect feature stage from artifacts present in the feature directory
-# Returns: specified | planned | tasks-ready | implementing-NN% | complete
+# Returns: specified | planned | testified | tasks-ready | implementing-NN% | complete
 get_feature_stage() {
     local repo_root="$1"
     local feature="$2"
@@ -50,22 +50,41 @@ get_feature_stage() {
     if [[ -f "$feature_dir/tasks.md" ]]; then
         local total=0
         local done=0
+        local bugfix_total=0
+        local bugfix_done=0
         local re_task='^- \[[ xX]\]'
         local re_done='^- \[[xX]\]'
+        local re_bugfix='T-B[0-9]'
         while IFS= read -r line; do
             if [[ "$line" =~ $re_task ]]; then
-                total=$((total + 1))
-                if [[ "$line" =~ $re_done ]]; then
-                    done=$((done + 1))
+                if [[ "$line" =~ $re_bugfix ]]; then
+                    bugfix_total=$((bugfix_total + 1))
+                    if [[ "$line" =~ $re_done ]]; then
+                        bugfix_done=$((bugfix_done + 1))
+                    fi
+                else
+                    total=$((total + 1))
+                    if [[ "$line" =~ $re_done ]]; then
+                        done=$((done + 1))
+                    fi
                 fi
             fi
         done < "$feature_dir/tasks.md"
 
-        if [[ "$total" -gt 0 ]]; then
-            if [[ "$done" -eq "$total" ]]; then
+        # Overall: all tasks (original + bugfix) must be complete for "complete"
+        local all_total=$((total + bugfix_total))
+        local all_done=$((done + bugfix_done))
+
+        if [[ "$all_total" -gt 0 ]]; then
+            if [[ "$all_done" -eq "$all_total" ]]; then
                 echo "complete"
-            elif [[ "$done" -gt 0 ]]; then
-                local pct=$(( (done * 100) / total ))
+            elif [[ "$all_done" -gt 0 ]]; then
+                # Percentage based on original tasks only (bugfix tasks don't decrease progress)
+                if [[ "$total" -gt 0 ]]; then
+                    local pct=$(( (done * 100) / total ))
+                else
+                    local pct=$(( (all_done * 100) / all_total ))
+                fi
                 echo "implementing-${pct}%"
             else
                 echo "tasks-ready"
@@ -74,7 +93,19 @@ get_feature_stage() {
         fi
     fi
 
+    # Check for testified stage (plan + test specs but no tasks)
     if [[ -f "$feature_dir/plan.md" ]]; then
+        local has_test_specs=false
+        [[ -f "$feature_dir/tests/test-specs.md" ]] && has_test_specs=true
+        if [[ -d "$feature_dir/tests/features" ]] && [[ -n "$(ls "$feature_dir/tests/features/"*.feature 2>/dev/null)" ]]; then
+            has_test_specs=true
+        fi
+
+        if $has_test_specs; then
+            echo "testified"
+            return
+        fi
+
         echo "planned"
         return
     fi
@@ -472,6 +503,12 @@ calculate_spec_quality() {
 
     # +1 for having edge cases section
     grep -q "^### Edge Cases\|^## Edge Cases" "$spec_file" 2>/dev/null && ((score+=1))
+
+    # -3 for bracket placeholders like [PLACEHOLDER], [Feature Name], [Brief description]
+    if grep -qE '\[[A-Z][A-Za-z_ ]*\]' "$spec_file" 2>/dev/null; then
+        score=$((score - 3))
+        [[ $score -lt 0 ]] && score=0
+    fi
 
     echo "$score"
 }

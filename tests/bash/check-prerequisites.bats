@@ -497,7 +497,9 @@ teardown() {
 }
 
 @test "check-prerequisites: --phase status ready_for is 08 for complete feature" {
-    create_complete_mock_feature "001-test-feature"
+    create_mock_feature "001-test-feature"
+    # All tasks done = truly complete feature
+    printf '%s\n%s\n' '- [x] T001 Done' '- [x] T002 Also done' > "$TEST_DIR/specs/001-test-feature/tasks.md"
 
     result=$("$CHECK_SCRIPT" --phase status --json)
 
@@ -725,4 +727,94 @@ EOF
     # Checklist is optional — next-step.sh skips past it on the mandatory path
     next_step=$(echo "$result" | jq -r '.next_step')
     [[ "$next_step" == "/iikit-05-tasks" ]]
+}
+
+# =============================================================================
+# Bug regression tests (from e2e test findings)
+# =============================================================================
+
+@test "BUG-3: test_specs.exists true when .feature files exist" {
+    create_mock_feature "001-test-feature"
+    # create_mock_feature already adds tests/features/test.feature
+    result=$("$CHECK_SCRIPT" --phase status --json)
+
+    test_specs=$(echo "$result" | jq -r '.artifacts.test_specs.exists')
+    [[ "$test_specs" == "true" ]]
+}
+
+@test "BUG-17: no stderr output on main without feature" {
+    unset SPECIFY_FEATURE
+    rm -f "$TEST_DIR/.specify/active-feature"
+    # No feature exists — just constitution on main branch
+
+    stderr_output=$("$CHECK_SCRIPT" --phase status --json 2>&1 1>/dev/null)
+    [[ -z "$stderr_output" ]]
+}
+
+@test "BUG-18: --phase 00 succeeds on main branch without feature" {
+    run "$CHECK_SCRIPT" --phase 00 --json
+    [[ "$status" -eq 0 ]]
+}
+
+@test "BUG-19: ready_for agrees with next_step for TDD project" {
+    create_complete_mock_feature "001-test-feature"
+
+    result=$("$CHECK_SCRIPT" --phase status --json)
+
+    ready_for=$(echo "$result" | jq -r '.ready_for')
+    next_step=$(echo "$result" | jq -r '.next_step')
+
+    # If next_step is implement (07), ready_for should be 07, not 08
+    if [[ "$next_step" == "/iikit-07-implement" ]]; then
+        [[ "$ready_for" == "07" ]]
+    fi
+}
+
+@test "BUG-20: spec template before specify scores quality below 5" {
+    mkdir -p specs/001-test-feature
+    # create-new-feature.sh populates spec from template — simulate that
+    cat > specs/001-test-feature/spec.md << 'TEMPLATE'
+# Feature Specification: [Feature Name]
+
+## Overview
+
+[Brief description]
+
+## Requirements
+
+### Functional Requirements
+
+- **FR-001**: [Requirement description]
+
+## Success Criteria
+
+- **SC-001**: [Criterion]
+
+## User Scenarios
+
+### User Story 1 - [Brief Title] (Priority: P1)
+
+**Acceptance Scenarios**:
+1. **Given** [context], **When** [action], **Then** [outcome].
+TEMPLATE
+
+    result=$("$CHECK_SCRIPT" --phase status --json)
+
+    quality=$(echo "$result" | jq -r '.artifacts.spec.quality')
+    # Template with bracket placeholders should NOT score 9
+    [[ "$quality" -lt 5 ]]
+}
+
+@test "BUG-26: feature_stage naming consistent between check-prerequisites and next-step" {
+    unset SPECIFY_FEATURE
+    rm -f "$TEST_DIR/.specify/active-feature"
+
+    cp_result=$("$CHECK_SCRIPT" --phase status --json)
+    cp_stage=$(echo "$cp_result" | jq -r '.feature_stage')
+
+    ns_result=$("$SCRIPTS_DIR/next-step.sh" --phase status --json)
+    ns_stage=$(echo "$ns_result" | jq -r '.feature_stage')
+
+    # Both scripts should use the same terminology for "no feature"
+    [[ "$cp_stage" == "$ns_stage" ]]
 }

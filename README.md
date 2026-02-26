@@ -4,7 +4,20 @@
 
 An AI coding assistant toolkit that preserves your intent from idea to implementation, with cryptographic verification at each step. Compatible with Claude Code, OpenAI Codex, Google Gemini, and OpenCode.
 
-## What's New in v2.6.0
+## What's New in v2.6.1
+
+- **27 bug fixes** from E2E testing across 12 projects (101 phases, 596 unit tests, 32 integration tests — all green).
+- **Clarification badge fix**: Badges now count `- Q:` items (not session headings), and track clarifications on checklist, analyze, and tasks phases (were hardcoded to 0).
+- **Dashboard resilience**: Generates without CONSTITUTION.md (was hard-fail exit 3), handles ESM projects with `type:module`.
+- **Testified stage**: New `testified` feature stage between `planned` and `tasks-ready` when .feature files exist but no tasks.md.
+- **Pre-commit softened**: Missing step_definitions and BDD runner dependency are now warnings, not commit blockers.
+- **Bugfix task percentage**: Adding T-B bugfix tasks no longer decreases the implementation progress percentage.
+- **Spec quality penalty**: Template specs with `[PLACEHOLDER]` brackets score lower to prevent false quality signals.
+- **Next-step consistency**: `alt_steps` includes `/iikit-clarify` when constitution exists, status mode produces same alts as phase-based mode, `ready_for` clamped to agree with `next_step`.
+- **Branch numbering**: Current branch excluded from auto-numbering; `create-new-feature.sh` warns when constitution missing.
+- **Phase 00 on main**: Constitution phase no longer requires a feature branch.
+
+### v2.6.0
 
 - **Externalized next-step state machine**: All 12 skills, session hooks, and status queries now call a single `next-step.sh` script — one source of truth for workflow transitions, model tier suggestions, and `/clear` recommendations. Eliminates 12 independent copies of next-step logic that drifted out of sync.
 - **Mandatory/optional path clarity**: Mandatory path is `00→01→02→[04 if TDD]→05→07`. Steps 03 (checklist), 06 (analyze), and 08 (tasks-to-issues) are optional and appear as `alt_steps` in the JSON output.

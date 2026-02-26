@@ -295,14 +295,14 @@ describe('countClarificationSessions', () => {
     expect(countClarificationSessions(content)).toBe(2);
   });
 
-  test('returns 0 for Session heading without date', () => {
+  test('counts Q lines even under Session heading without date', () => {
     const content = '# Spec\n## Clarifications\n### Session\n- Q: x -> A: y\n';
-    expect(countClarificationSessions(content)).toBe(0);
+    expect(countClarificationSessions(content)).toBe(1);
   });
 
-  test('returns 0 for malformed date', () => {
+  test('counts Q lines even under malformed date heading', () => {
     const content = '# Spec\n## Clarifications\n### Session 2026-1-5\n- Q: x -> A: y\n';
-    expect(countClarificationSessions(content)).toBe(0);
+    expect(countClarificationSessions(content)).toBe(1);
   });
 
   test('counts sessions across different artifact types', () => {
@@ -1987,5 +1987,57 @@ describe('parseTasks extended for bug fix tasks', () => {
     expect(tasks[1]).toMatchObject({ id: 'T005', storyTag: 'US2', checked: false, isBugFix: false });
     expect(tasks[2]).toMatchObject({ id: 'T006', storyTag: 'US1', isBugFix: false });
     expect(tasks[3]).toMatchObject({ id: 'T001', storyTag: null, isBugFix: false });
+  });
+});
+
+// =============================================================================
+// Bug regression tests (from e2e test findings)
+// =============================================================================
+
+describe('BUG-5: countClarificationSessions should count Q&A items, not sessions', () => {
+  test('counts Q&A items not session headings', () => {
+    const content = `## Clarifications
+
+### Session 2026-02-10
+
+- Q: How do story cards map to columns? -> A: Columns are Todo / In Progress / Done [FR-001, US-2]
+- Q: When does the dashboard launch? -> A: Only during implementation phase [FR-005, SC-001]
+- Q: When is a story "Done"? -> A: All tasks checked [FR-003, FR-004, US-1]
+
+### Session 2026-02-12
+
+- Q: Should errors show inline or as toasts? -> A: Inline within the affected component [FR-010, US-4]
+`;
+    // Should be 4 (questions), not 2 (sessions)
+    expect(countClarificationSessions(content)).toBe(4);
+  });
+
+  test('counts correctly for single session with multiple questions', () => {
+    const content = `## Clarifications
+
+### Session 2026-02-26
+
+- Q: What auth method? -> A: JWT [FR-001]
+- Q: How many tenants? -> A: 1000 [SC-006]
+- Q: SAML or OIDC? -> A: Both [FR-002]
+`;
+    // 3 questions, 1 session — should return 3
+    expect(countClarificationSessions(content)).toBe(3);
+  });
+
+  test('cumulative across multiple sessions', () => {
+    const content = `## Clarifications
+
+### Session 2026-02-26
+
+- Q: First question? -> A: First answer [FR-001]
+- Q: Second question? -> A: Second answer [FR-002]
+
+### Session 2026-02-27
+
+- Q: Third question? -> A: Third answer [FR-003]
+`;
+    // 3 total Q&A items across 2 sessions
+    expect(countClarificationSessions(content)).toBe(3);
   });
 });
