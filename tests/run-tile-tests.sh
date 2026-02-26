@@ -267,31 +267,32 @@ test_bash_prefix() {
 }
 
 test_tdd_conditional_next_steps() {
-    log_section "TDD Conditional Next Steps"
+    log_section "TDD Conditional Next Steps (via next-step.sh)"
     local base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills"
 
-    # Plan skill must show TDD as "REQUIRED by constitution" when mandatory
+    # Plan skill delegates to next-step.sh which handles TDD routing
     ((TESTS_RUN++))
-    if grep -q "REQUIRED by constitution.*test specifications\|REQUIRED by constitution) Generate test" "$base/iikit-02-plan/SKILL.md"; then
-        log_pass "plan shows testify as REQUIRED when TDD mandatory"
+    if grep -A10 "## Next Steps" "$base/iikit-02-plan/SKILL.md" | grep -q "next-step"; then
+        log_pass "plan delegates to next-step.sh (handles TDD routing)"
     else
-        log_fail "plan missing REQUIRED testify for mandatory TDD"
+        log_fail "plan missing next-step.sh in Next Steps"
     fi
 
-    # Plan skill must show TDD as "Optional" when not required
+    # Checklist skill delegates to next-step.sh
     ((TESTS_RUN++))
-    if grep -q "(Optional).*test specifications for TDD\|(Optional) Generate test specifications" "$base/iikit-02-plan/SKILL.md"; then
-        log_pass "plan shows testify as Optional when TDD not mandatory"
+    if grep -A10 "## Next Steps" "$base/iikit-03-checklist/SKILL.md" | grep -q "next-step"; then
+        log_pass "checklist delegates to next-step.sh"
     else
-        log_fail "plan missing Optional testify for non-mandatory TDD"
+        log_fail "checklist missing next-step.sh in Next Steps"
     fi
 
-    # Checklist skill must include testify in next steps
+    # next-step.sh itself routes to testify when TDD mandatory
     ((TESTS_RUN++))
-    if grep -A20 "## Next Steps" "$base/iikit-03-checklist/SKILL.md" | grep -q "iikit-04-testify"; then
-        log_pass "checklist includes testify in next steps"
+    local ns_script="$base/iikit-core/scripts/bash/next-step.sh"
+    if grep -q "iikit-04-testify" "$ns_script" 2>/dev/null; then
+        log_pass "next-step.sh contains testify routing logic"
     else
-        log_fail "checklist missing testify in next steps"
+        log_fail "next-step.sh missing testify routing"
     fi
 }
 
@@ -1228,10 +1229,12 @@ test_skill_numbering_consistency() {
         fi
     fi
 
-    # Tasks (06) should suggest analyze (07) and implement (08)
-    if ! grep -A15 "## Next Steps" "$base/iikit-05-tasks/SKILL.md" 2>/dev/null | grep -q "/iikit-06-analyze"; then
+    # Tasks (06) delegates to next-step.sh which suggests analyze as alt_step
+    if grep -A10 "## Next Steps" "$base/iikit-05-tasks/SKILL.md" 2>/dev/null | grep -q "next-step"; then
+        : # Correct — delegates to next-step.sh
+    else
         ((wrong_numbering++))
-        log_info "tasks doesn't suggest analyze (07)"
+        log_info "tasks doesn't delegate to next-step.sh"
     fi
 
     if [[ "$wrong_numbering" -eq 0 ]]; then
