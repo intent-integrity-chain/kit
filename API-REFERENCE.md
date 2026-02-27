@@ -20,7 +20,7 @@
 | 1 | Specify | `/iikit-01-specify` | Feature description (required) | `specs/NNN-feature/spec.md` | Constitution (warn if missing) |
 | 2 | Plan | `/iikit-02-plan` | None (reads spec) | `plan.md`, `research.md`, `data-model.md`, `contracts/` | constitution.md, spec.md |
 | 3 | Checklist | `/iikit-03-checklist` | Domain focus (optional) | `checklists/*.md` | spec.md |
-| 4 | Testify | `/iikit-04-testify` | None (reads artifacts) | `tests/test-specs.md` | constitution.md, spec.md, plan.md |
+| 4 | Testify | `/iikit-04-testify` | None (reads artifacts) | `tests/features/*.feature` | constitution.md, spec.md, plan.md |
 | 5 | Tasks | `/iikit-05-tasks` | None (reads plan) | `tasks.md` | plan.md |
 | 6 | Analyze | `/iikit-06-analyze` | None (reads all) | Console report | spec.md, plan.md, tasks.md |
 | 7 | Implement | `/iikit-07-implement` | None (reads tasks) | Implementation code | tasks.md, checklists (100%) |
@@ -69,6 +69,21 @@
 │   07-implement   │ ◄── REQUIRES: checklists 100%
 └──────────────────┘
 ```
+
+---
+
+## Feature Stages
+
+The feature stage is computed from the artifacts present in the feature directory (see `get_feature_stage` in `common.sh`). The `status` subcommand and the next-step state machine both rely on these stages:
+
+| Stage | Condition | Next Skill |
+|-------|-----------|------------|
+| `specified` | `spec.md` exists, no `plan.md` | `/iikit-02-plan` |
+| `planned` | `plan.md` exists, no `.feature` files and no `tasks.md` | `/iikit-04-testify` or `/iikit-05-tasks` |
+| `testified` | `plan.md` exists and `tests/features/*.feature` files are present, but no `tasks.md` | `/iikit-05-tasks` |
+| `tasks-ready` | `tasks.md` exists, no tasks checked off | `/iikit-07-implement` |
+| `implementing-NN%` | `tasks.md` exists with some tasks checked off | `/iikit-07-implement` (resume) |
+| `complete` | All tasks checked off | Done |
 
 ---
 
@@ -174,7 +189,7 @@ If no subcommand provided, shows help.
 
 **Output**:
 - Updated artifact with clarifications section
-- Maximum 5 questions asked per run
+- Clarification continues until all critical ambiguities are resolved
 
 **Prerequisites**:
 - Any artifact must exist (spec, plan, checklist, tasks, or constitution)
@@ -257,7 +272,7 @@ If no subcommand provided, shows help.
 **Input**: None (reads artifacts automatically)
 
 **Output**:
-- `tests/test-specs.md`
+- `tests/features/*.feature` (Gherkin BDD scenarios, one file per user story or logical grouping)
 - Assertion hash stored in `.specify/context.json`
 - Assertion hash stored as git note (backup)
 
@@ -271,6 +286,8 @@ Analyzes constitution for TDD requirements:
 - `mandatory`: Constitution requires TDD
 - `optional`: No TDD requirement
 - `forbidden`: Constitution prohibits TDD (skill halts)
+
+**Note**: The `tdd_determination` value is cached in `.specify/context.json` by the constitution skill (`/iikit-00-constitution`). Subsequent skills (testify, implement) read the cached value rather than re-analyzing the constitution.
 
 **Test Types Generated**:
 | Source | Type | Example |
@@ -380,7 +397,7 @@ Components:
 - `constitution.md` must exist
 - `tasks.md` must exist
 - All checklists must be 100% complete (prompts if not)
-- If TDD mandatory: `tests/test-specs.md` must exist
+- If TDD mandatory: `tests/features/*.feature` files must exist
 - Assertion integrity verification (blocks on tamper)
 
 **Pre-Implementation Validation**:
@@ -397,7 +414,24 @@ Components:
 ╰─────────────────────────────────────────────────────╯
 ```
 
-**Tessl Integration**:
+**Step 3 - Install Dependencies**:
+
+Before writing source code, the implement skill installs runtime and dev dependencies from plan.md:
+1. Detect package manager from plan.md Technical Context
+2. Initialize project if no manifest exists (e.g., `npm init -y`, `go mod init`)
+3. Add runtime dependencies listed in plan.md
+4. Add dev dependencies for testing
+5. Commit the manifest and lockfile
+
+**Step 4 - Tessl Tile Installation**:
+
+After installing dependencies, install Tessl documentation tiles for each major dependency:
+1. Search for a tile per dependency: `tessl search <package-name>` or `query_library_docs`
+2. Install available tiles: `tessl install <workspace/tile-name>`
+3. Query tile docs before writing code that uses that library
+4. If no tile exists, rely on the library's built-in documentation
+
+**Tessl Integration** (during execution):
 - Queries documentation tiles before implementing library code
 - Invokes skill tiles when relevant
 - Reports tile usage at completion
@@ -459,7 +493,7 @@ Components:
 | `tasks.md not found` | 06, 07, 08 | Run `/iikit-05-tasks` |
 | `No acceptance scenarios` | 04 | Run `/iikit-clarify` |
 | `TDD forbidden` | 04 | Constitution prohibits TDD |
-| `Assertion integrity failed` | 07 | Restore test-specs.md or re-run `/iikit-04-testify` |
+| `Assertion integrity failed` | 07 | Restore `.feature` files or re-run `/iikit-04-testify` |
 | `Checklists incomplete` | 07 | Complete checklists or confirm proceed |
 | `Not a GitHub remote` | 08 | Only works with GitHub repositories |
 | `gh CLI not installed` | 08 | Install GitHub CLI |
@@ -478,9 +512,9 @@ Components:
 | contracts/ | 02 | 07 | `specs/NNN-feature/` |
 | quickstart.md | 02 | 07 | `specs/NNN-feature/` |
 | checklists/*.md | 01, 03 | 07 | `specs/NNN-feature/checklists/` |
-| tests/test-specs.md | 04 | 05, 07 | `specs/NNN-feature/tests/` |
+| tests/features/*.feature | 04 | 05, 07 | `specs/NNN-feature/tests/features/` |
 | tasks.md | 05 | 06, 07, 08 | `specs/NNN-feature/` |
-| context.json | 04 | 07 | `.specify/` |
+| context.json | 00, 04 | 04, 07 | `.specify/` |
 
 ---
 

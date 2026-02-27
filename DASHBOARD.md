@@ -26,7 +26,7 @@ The pipeline bar at the top shows all nine IIKit workflow phases. Click any phas
 |-------|------|
 | **Constitution** | Radar chart of governance principles with obligation levels (MUST / SHOULD / MAY) and version timeline |
 | **Spec** | Story map with swim lanes by priority + interactive force-directed requirements graph (US / FR / SC nodes and edges) with detail side-panel |
-| **Clarify** | Q&A trail from clarification sessions grouped by date, with clickable spec-item references that navigate to the Spec view |
+| ~~Clarify~~ | _Not a pipeline phase node._ Clarify is a utility — its output surfaces as amber `?N` badges on the pipeline nodes of the artifacts that have open questions. `N` counts `- Q:` items (not session headings). Clicking a badge opens the FAB panel (see below). |
 | **Plan** | Tech context key-value pairs, interactive file-structure tree (existing vs. planned files), rendered architecture diagram, and Tessl tile cards with live eval scores |
 | **Checklist** | Progress rings per checklist file with color coding (red/yellow/green), gate traffic light (OPEN/BLOCKED), and accordion detail view with CHK IDs and tag badges |
 | **Testify** | Assertion integrity seal (Verified/Tampered/Missing), Sankey traceability diagram (Requirements → Test Specs → Tasks), test pyramid, and gap highlighting for untested requirements |
@@ -37,9 +37,10 @@ The pipeline bar at the top shows all nine IIKit workflow phases. Click any phas
 ## Features
 
 - **Live updates** — all views refresh in real time via file watcher as project files change
-- **Pipeline navigation** — phase nodes show status (complete / in-progress / skipped / not started) with progress percentages
+- **Pipeline navigation** — phase nodes show status (complete / in-progress / skipped / not started) with progress percentages. Nodes with open clarification questions display an amber `?N` badge (where `N` counts `- Q:` items, not session headings); clicking the badge opens the FAB panel.
+- **Clarify FAB button** — a floating action button in the bottom-right corner showing `?N` (total open `- Q:` items across all artifacts). Clicking it opens a slide-out panel listing Q&A entries grouped by clarification session, with clickable spec-item references that navigate to the corresponding view.
 - **Cross-panel navigation** — Cmd/Ctrl+click any FR, US, SC, or task identifier to jump to its linked panel
-- **Feature selector** — dropdown to switch between features in `specs/`, sorted newest-first
+- **Feature selector** — dropdown to switch between features in `specs/`, sorted by last-active mtime (file modification time of artifacts)
 - **Project label** — header shows the project directory name with full path on hover
 - **Integrity badges** — shows whether test assertions have been tampered with (verified / tampered / missing)
 - **Tessl eval scores** — Plan view tile cards display live eval data when available

@@ -1,5 +1,22 @@
 # Changelog
 
+## v2.7.2
+
+- **27 bug fixes** from E2E testing across 12 projects (101 phases, 596 unit tests, 32 integration tests — all green).
+- **Clarification badge fix**: Badges now count `- Q:` items (not session headings), and track clarifications on checklist, analyze, and tasks phases (were hardcoded to 0).
+- **Dashboard resilience**: Generates without CONSTITUTION.md (was hard-fail exit 3), handles ESM projects with `type:module`.
+- **Testified stage**: New `testified` feature stage between `planned` and `tasks-ready` when .feature files exist but no tasks.md.
+- **Pre-commit softened**: Missing step_definitions and BDD runner dependency are now warnings, not commit blockers.
+- **Bugfix task percentage**: Adding T-B bugfix tasks no longer decreases the implementation progress percentage.
+- **Spec quality penalty**: Template specs with `[PLACEHOLDER]` brackets score lower to prevent false quality signals.
+- **Next-step consistency**: `alt_steps` includes `/iikit-clarify` when constitution exists, status mode produces same alts as phase-based mode, `ready_for` clamped to agree with `next_step`.
+- **Branch numbering**: Current branch excluded from auto-numbering; `create-new-feature.sh` warns when constitution missing.
+- **Phase 00 on main**: Constitution phase no longer requires a feature branch.
+
+## v2.7.1
+
+## v2.7.0
+
 ## v2.6.0
 
 - **Externalized next-step state machine**: New `next-step.sh` / `next-step.ps1` scripts serve as the single source of truth for all workflow transitions. All 12 SKILL.md files, `check-prerequisites.sh` status mode, and both session hooks (`session-context-hook.sh`, `session-context-hook-gemini.sh`) now delegate to this script instead of maintaining independent next-step logic.
@@ -23,8 +40,8 @@
 
 ## v2.4.0
 
-- **BDD in bugfix workflow**: When the constitution mandates TDD/BDD, `/iikit-bugfix` creates `bugfix_BUG-NNN.feature` files with Gherkin scenarios and re-hashes the features directory. `/iikit-08-implement` bugfix mode applies the full BDD verification chain when `.feature` files are present.
-- **Testify enforcement across phases**: `check-prerequisites.sh` gates phases 06-09 on `.feature` file existence when TDD/BDD is mandatory. All four defense lines (skill, rule, script, hook) now enforce testify.
+- **BDD in bugfix workflow**: When the constitution mandates TDD/BDD, `/iikit-bugfix` creates `bugfix_BUG-NNN.feature` files with Gherkin scenarios and re-hashes the features directory. `/iikit-07-implement` bugfix mode applies the full BDD verification chain when `.feature` files are present.
+- **Testify enforcement across phases**: `check-prerequisites.sh` gates phases 05-08 on `.feature` file existence when TDD/BDD is mandatory. All four defense lines (skill, rule, script, hook) now enforce testify.
 - **Cached TDD determination**: Constitution skill writes `tdd_determination` to `.specify/context.json` on ratification. All consumers read from cache instead of re-parsing the constitution.
 - **BDD/behavior-driven detection**: Constitution scanner recognizes BDD, behavior-driven, and behaviour-driven as synonyms for TDD.
 - **Dashboard refresh rule**: Always-on rule ensures dashboard regeneration after any file change in `specs/` or project root. Skills also regenerate explicitly (testify, tasks, checklist, analyze).
@@ -76,16 +93,16 @@
 
 - **Git/GitHub setup in init**: `/iikit-core init` now detects the git environment (repo, remotes, `gh` CLI) and offers git init, `gh repo create`, or clone before bootstrapping IIKit.
 - **PRD seeding**: `/iikit-core init [doc]` reads an existing PRD/SDD document, extracts features, and creates labeled GitHub issues as a backlog.
-- **Auto-commit per task**: `/iikit-08-implement` commits after each completed task with Conventional Commits format (`feat(<feature-id>): <task-id> <desc>`) and `iikit-feature`/`iikit-task` trailers for spec-to-commit traceability.
+- **Auto-commit per task**: `/iikit-07-implement` commits after each completed task with Conventional Commits format (`feat(<feature-id>): <task-id> <desc>`) and `iikit-feature`/`iikit-task` trailers for spec-to-commit traceability.
 
 ## v1.6.0
 
 - **Bugfix skill**: New `/iikit-bugfix` utility skill for reporting and fixing bugs without the full specify/clarify/plan/checklist workflow. Creates structured `bugs.md` records, generates fix tasks, and integrates with GitHub Issues (inbound import and outbound creation). Cross-platform scripts (bash + PowerShell).
 - **Multi-feature support**: Sticky feature selection via `.specify/active-feature` file that survives session restarts. Detection cascade: active-feature file > `SPECIFY_FEATURE` env > git branch > single feature auto-select.
 - **SessionStart hooks**: Hooks for Gemini CLI and OpenCode that set terminal title and load context on session start.
-- **Tessl eval integration**: `/iikit-03-plan` now queries Tessl evals for tech selection and dashboard metrics.
+- **Tessl eval integration**: `/iikit-02-plan` now queries Tessl evals for tech selection and dashboard metrics.
 - **Bug detection in specify**: `/iikit-01-specify` now detects bug-fix-like descriptions and suggests redirecting to `/iikit-bugfix`.
-- **Post-fix GitHub comments**: `/iikit-08-implement` comments on linked GitHub issues after completing bug fix tasks.
+- **Post-fix GitHub comments**: `/iikit-07-implement` comments on linked GitHub issues after completing bug fix tasks.
 - **Improved skill definitions**: Conciseness improvements and progressive disclosure across all skills.
 - **Unified docs**: Tile `index.md` symlinked to `README.md` for single source of truth.
 
@@ -110,7 +127,7 @@
 
 ## v1.2.0
 
-- **Live kanban dashboard**: The implement skill (`/iikit-08-implement`) now automatically launches a browser-based kanban board via `npx iikit-kanban`. Watch user stories move through Todo / In Progress / Done columns as the AI agent checks off tasks in real time. Dark/light theme, collapsible task lists, integrity badges. Gracefully skips if Node.js is not available.
+- **Live kanban dashboard**: The implement skill (`/iikit-07-implement`) now automatically launches a browser-based kanban board via `npx iikit-kanban`. Watch user stories move through Todo / In Progress / Done columns as the AI agent checks off tasks in real time. Dark/light theme, collapsible task lists, integrity badges. Gracefully skips if Node.js is not available.
 
 ## v1.1.0
 

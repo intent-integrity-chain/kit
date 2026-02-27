@@ -105,16 +105,21 @@ validating its execution context.
 
 This project uses its own specification-driven workflow. Features MUST follow:
 
-0. Constitution (if governance changes needed)
-1. Specification (requirements and acceptance criteria)
-2. Clarification (resolve ambiguities)
-3. Planning (technical approach)
-4. Checklist (quality validation)
-5. Testify (test specifications for TDD, if constitutionally required)
-6. Task breakdown (actionable items)
-7. Analyze (cross-artifact consistency)
-8. Implementation (code changes)
-9. Tasks to Issues (GitHub export, optional)
+**Utilities** (run anytime):
+- Core — project initialization, status, help
+- Clarify — resolve ambiguities in any artifact
+- Bugfix — report and fix bugs without full specification workflow
+
+**Phases** (sequential):
+0. Constitution (`/iikit-00-constitution`) — project governance
+1. Specify (`/iikit-01-specify`) — requirements and acceptance criteria
+2. Plan (`/iikit-02-plan`) — technical approach
+3. Checklist (`/iikit-03-checklist`) — quality validation
+4. Testify (`/iikit-04-testify`) — test specifications for TDD, if constitutionally required
+5. Tasks (`/iikit-05-tasks`) — actionable work items
+6. Analyze (`/iikit-06-analyze`) — cross-artifact consistency
+7. Implement (`/iikit-07-implement`) — code changes
+8. Tasks to Issues (`/iikit-08-taskstoissues`) — GitHub export, optional
 
 Skipping phases is NOT permitted without explicit justification.
 

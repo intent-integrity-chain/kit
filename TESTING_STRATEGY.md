@@ -107,6 +107,7 @@ status (pending/done).
 | 3 | /iikit-clarify | /iikit.clarify | Utility — run after any phase as needed |
 | 4 | /iikit-02-plan | /iikit.plan | |
 | 5 | /iikit-03-checklist | /iikit.checklist | |
+| 5b | /iikit-04-testify | /iikit.testify | Conditional — run when TDD is constitutionally required |
 | 6 | /iikit-05-tasks | /iikit.tasks | |
 | 7 | /iikit-06-analyze | /iikit.analyze | |
 | 8 | /iikit-07-implement | /iikit.implement | |

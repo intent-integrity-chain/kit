@@ -63,7 +63,7 @@ specs/                       # Feature specifications (created per feature)
     contracts/               # API contracts
     checklists/              # Quality checklists
     tests/                   # Test specifications (created by /iikit-04-testify)
-      test-specs.md          # Generated test specifications
+      features/              # Gherkin .feature files (locked by assertion hash)
 ```
 
 > **Distribution note**: The `.claude/skills/` layout above is the development structure. In development, skills reference shared files in `iikit-core/` via `../iikit-core/` paths. During CI publish, these are copied into each skill and links are rewritten for self-containment. Use `tessl install tessl-labs/intent-integrity-kit` for correct setup — cloning the repo directly does not produce self-contained skills.
@@ -144,7 +144,7 @@ The `/iikit-04-testify` skill generates test specifications from requirements be
 
 - **When mandatory**: If the constitution contains TDD requirements (e.g., "test-first MUST be used"), testify is required before implementation
 - **When optional**: If no TDD requirements exist, testify can be skipped
-- **What it produces**: A `tests/test-specs.md` file with acceptance, contract, and validation test specifications derived from spec.md, plan.md, and data-model.md
+- **What it produces**: Gherkin `.feature` files in the `tests/features/` directory with acceptance, contract, and validation test specifications derived from spec.md, plan.md, and data-model.md
 
 Test specifications serve as acceptance criteria for implementation. The implement skill warns against modifying test assertions to match buggy code.
 

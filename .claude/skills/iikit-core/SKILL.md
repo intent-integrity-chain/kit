@@ -143,7 +143,7 @@ The `$ARGUMENTS` after `use` is the feature selector: a number (`1`, `001`), par
    ```
    Parse JSON for `active_feature` and `stage`.
 
-2. **Report** active feature, stage, and suggest next command: `specified` → `/iikit-clarify` or `/iikit-02-plan` | `planned` → `/iikit-03-checklist` or `/iikit-05-tasks` | `tasks-ready` → `/iikit-07-implement` | `implementing-NN%` → `/iikit-07-implement` (resume) | `complete` → done. Suggest `/clear` before next skill when appropriate.
+2. **Report** active feature, stage, and suggest next command: `specified` → `/iikit-clarify` or `/iikit-02-plan` | `planned` → `/iikit-03-checklist` or `/iikit-05-tasks` | `testified` → `/iikit-05-tasks` | `tasks-ready` → `/iikit-07-implement` | `implementing-NN%` → `/iikit-07-implement` (resume) | `complete` → done. Suggest `/clear` before next skill when appropriate.
 
 If no selector, no match, or ambiguous match: show available features with stages and ask user to pick.
 

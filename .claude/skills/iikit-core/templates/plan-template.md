@@ -3,7 +3,7 @@
 **Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
 **Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
 
-**Note**: This template is filled in by the `/iikit-plan` command.
+**Note**: This template is filled in by the `/iikit-02-plan` command.
 
 ## Summary
 
@@ -44,7 +44,7 @@ specs/[###-feature]/
   data-model.md        # Phase 1 output (/iikit-plan command)
   quickstart.md        # Phase 1 output (/iikit-plan command)
   contracts/           # Phase 1 output (/iikit-plan command)
-  tasks.md             # Phase 2 output (/iikit-tasks command - NOT created by /iikit-plan)
+  tasks.md             # Phase 5 output (/iikit-05-tasks command - NOT created by /iikit-02-plan)
 ```
 
 ### Source Code (repository root)

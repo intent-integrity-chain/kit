@@ -127,7 +127,7 @@ All features must have comprehensive test coverage before being considered compl
 
 ---
 
-## 4. Tasks (`/iikit-05-tasks`)
+## 5. Tasks (`/iikit-05-tasks`)
 
 **Purpose**: Break down the plan into actionable work items.
 
