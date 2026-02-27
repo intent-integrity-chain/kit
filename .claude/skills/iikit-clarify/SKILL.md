@@ -26,17 +26,17 @@ If the user provides a target argument (e.g., `plan`, `spec`, `checklist`, `test
 
 ## Constitution Loading
 
-Load constitution per [constitution-loading.md](../iikit-core/references/constitution-loading.md) (soft mode — parse if exists, continue if not).
+Load constitution per [constitution-loading.md](./references/constitution-loading.md) (soft mode — parse if exists, continue if not).
 
 ## Prerequisites Check
 
-1. Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase clarify --json`
-   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/check-prerequisites.ps1 -Phase clarify -Json`
-2. Parse JSON. If `needs_selection: true`: present the `features` array as a numbered table (name and stage columns). Follow the options presentation pattern in [conversation-guide.md](../iikit-core/references/conversation-guide.md). After user selects, run:
+1. Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-clarify/scripts/bash/check-prerequisites.sh --phase clarify --json`
+   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-clarify/scripts/powershell/check-prerequisites.ps1 -Phase clarify -Json`
+2. Parse JSON. If `needs_selection: true`: present the `features` array as a numbered table (name and stage columns). Follow the options presentation pattern in [conversation-guide.md](./references/conversation-guide.md). After user selects, run:
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selection>
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-clarify/scripts/bash/set-active-feature.sh --json <selection>
    ```
-   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selection>`
+   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-clarify/scripts/powershell/set-active-feature.ps1 -Json <selection>`
 
    Then re-run the prerequisites check from step 1.
 3. Determine the target artifact (see "Target Detection" below).
@@ -69,51 +69,7 @@ If no clarifiable artifact exists: ERROR with `No artifacts to clarify. Run /iik
 
 ### 1. Scan for Ambiguities
 
-Load the target artifact and perform a structured scan using the taxonomy for that artifact type. Mark each area: Clear / Partial / Missing.
-
-**Spec** (`spec.md`):
-- Functional Scope: core goals, out-of-scope declarations, user roles
-- Domain & Data Model: entities, identity rules, state transitions, scale
-- Interaction & UX: critical journeys, error/empty/loading states, accessibility
-- Non-Functional: performance, scalability, reliability, observability, security, compliance
-- Integrations: external APIs, data formats, protocol assumptions
-- Edge Cases: negative scenarios, rate limiting, conflict resolution
-- Constraints: technical constraints, rejected alternatives
-- Terminology: canonical terms, deprecated synonyms
-- Completion Signals: acceptance criteria testability, measurable DoD
-
-**Plan** (`plan.md`):
-- Framework Choice: rationale, alternatives considered, migration risk
-- Architecture: component boundaries, data flow, failure modes
-- Trade-offs: performance vs. complexity, build vs. buy, consistency vs. availability
-- Scalability: bottleneck awareness, horizontal/vertical limits
-- Dependency Risks: version pinning, license compatibility, maintenance status
-- Integration Points: API contracts, protocol assumptions, error propagation
-
-**Checklist** (`checklists/*.md`):
-- Threshold Appropriateness: are numeric thresholds realistic and measurable?
-- Missing Checks: gaps in coverage for the spec requirements
-- False Positives: checks that would pass for wrong reasons
-- Prioritization: are critical checks distinguishable from nice-to-haves?
-
-**Testify** (`features/*.feature`):
-- Scenario Precision: are Given/When/Then steps unambiguous?
-- Missing Paths: unhappy paths, edge cases, boundary conditions
-- Given/When/Then Completeness: missing preconditions, unclear actions, vague expectations
-- Data Variety: are test data examples representative?
-
-**Tasks** (`tasks.md`):
-- Dependency Correctness: are blockers accurate? circular dependencies?
-- Ordering: does the sequence make implementation sense?
-- Scope: are tasks appropriately sized? any too large or too small?
-- Parallelization: are parallel markers (`[P]`) accurate?
-
-**Constitution** (`CONSTITUTION.md`):
-- Principle Clarity: are principles actionable or vague?
-- Threshold Specificity: are numeric gates defined (e.g., "high coverage" → what number)?
-- Conflict Resolution: do any principles contradict each other?
-- Completeness: are there governance areas not covered?
-- Enforcement Gaps: which principles lack verification mechanisms?
+Load the target artifact and perform a structured scan using the taxonomy for that artifact type from [ambiguity-taxonomies.md](./references/ambiguity-taxonomies.md). Mark each area: Clear / Partial / Missing.
 
 ### 2. Generate Question Queue
 
@@ -133,7 +89,7 @@ Load the target artifact and perform a structured scan using the taxonomy for th
 
 Present ONE question at a time.
 
-**For multiple-choice**: follow the options presentation pattern in [conversation-guide.md](../iikit-core/references/conversation-guide.md). Analyze options, state recommendation with reasoning, render options table. User can reply with letter, "yes"/"recommended", or custom text.
+**For multiple-choice**: follow the options presentation pattern in [conversation-guide.md](./references/conversation-guide.md). Analyze options, state recommendation with reasoning, render options table. User can reply with letter, "yes"/"recommended", or custom text.
 
 **After answer**: validate against constraints, record, move to next.
 
@@ -173,14 +129,14 @@ Output: questions asked/answered, target artifact and path, sections touched, tr
 
 ## Next Steps
 
-Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/next-step.sh --phase clarify --json`
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/next-step.ps1 -Phase clarify -Json`
+Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-clarify/scripts/bash/next-step.sh --phase clarify --json`
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-clarify/scripts/powershell/next-step.ps1 -Phase clarify -Json`
 
 Parse the JSON and present:
 1. If `clear_after` is true: suggest `/clear` before proceeding (always true for clarify — Q&A sessions consume significant context)
 2. Present `next_step` as the primary recommendation
 3. If `alt_steps` non-empty: list as alternatives
-4. Look up `model_tier` in [model-recommendations.md](../iikit-core/references/model-recommendations.md) — if tier differs from current, add a `Tip:` with the agent-specific switch command. Check expiration date; refresh via web search if expired.
+4. Look up `model_tier` in [model-recommendations.md](./references/model-recommendations.md) — if tier differs from current, add a `Tip:` with the agent-specific switch command. Check expiration date; refresh via web search if expired.
 5. Append dashboard link
 
 Format:
