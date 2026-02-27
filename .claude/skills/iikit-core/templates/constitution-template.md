@@ -3,27 +3,27 @@
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
+### I. [PRINCIPLE_1_NAME]
 <!-- Example: I. Library-First -->
 [PRINCIPLE_1_DESCRIPTION]
 <!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
 
-### [PRINCIPLE_2_NAME]
+### II. [PRINCIPLE_2_NAME]
 <!-- Example: II. CLI Interface -->
 [PRINCIPLE_2_DESCRIPTION]
 <!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args -> stdout, errors -> stderr; Support JSON + human-readable formats -->
 
-### [PRINCIPLE_3_NAME]
+### III. [PRINCIPLE_3_NAME]
 <!-- Example: III. Test-First (NON-NEGOTIABLE) -->
 [PRINCIPLE_3_DESCRIPTION]
 <!-- Example: TDD mandatory: Tests written -> User approved -> Tests fail -> Then implement; Red-Green-Refactor cycle strictly enforced -->
 
-### [PRINCIPLE_4_NAME]
+### IV. [PRINCIPLE_4_NAME]
 <!-- Example: IV. Integration Testing -->
 [PRINCIPLE_4_DESCRIPTION]
 <!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
 
-### [PRINCIPLE_5_NAME]
+### V. [PRINCIPLE_5_NAME]
 <!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
 [PRINCIPLE_5_DESCRIPTION]
 <!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
