@@ -286,10 +286,9 @@ IIKit extends Spec-Kit with:
 
 ## Learn More
 
-- [Dashboard views and features](DASHBOARD.md) - Visual dashboard documentation
+- [Dashboard views and features](https://github.com/intent-integrity-chain/kit/blob/main/DASHBOARD.md) - Visual dashboard documentation
 - [GitHub Spec-Kit](https://github.com/github/spec-kit) - The original specification-driven development framework
 - [Intent Integrity Chain explained](https://github.com/jbaruch/intent-integrity-chain) - The methodology behind IIKit
-- [Back to the Future of Software](https://speaking.jbaru.ch/DVCzoZ/back-to-the-future-of-software-how-to-survive-ai-with-intent-integrity-chain) - Conference talk on IIC
 
 ## License
 
