@@ -1,0 +1,41 @@
+{
+  "context": "Evaluates fixing Playwright tests to work with mtime-based feature ordering after listFeatures() sorting changed from reverse-alphabetical to last-active-mtime. The fix requires making fixture mtimes deterministic and updating feature selection indices.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "fixture_sets_deterministic_mtimes",
+      "example": "helpers.js adds fs.utimesSync() calls: oldTime = new Date('2026-01-01T00:00:00Z') applied to 002-payments files, newTime = new Date('2026-02-15T00:00:00Z') applied to 001-auth files",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "The fixture helper explicitly sets deterministic modification times on fixture feature directories using a filesystem API (e.g., utimesSync or equivalent), so that feature ordering under mtime-based sorting is predictable and reproducible across environments."
+    },
+    {
+      "name": "auth_feature_is_most_recent",
+      "example": "helpers.js: newTime (2026-02-15) applied to 001-auth files; oldTime (2026-01-01) applied to 002-payments files — making 001-auth index 0 and 002-payments index 1",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "The fixture sets the 001-auth feature (rich data fixture) as having the most recent modification time, so that it appears at index 0 in the mtime-sorted feature list."
+    },
+    {
+      "name": "test_indices_updated",
+      "example": "dashboard.behavior.spec.js, dashboard.dom-structure.spec.js, dashboard.performance.spec.js: all occurrences of selectFeatureByIndex(page, 1) or page.selectOption('#featureSelect', { index: 1 }) for 001-auth changed to index 0",
+      "category": "INTEGRATION",
+      "max_score": 1,
+      "description": "All test cases that previously selected the 001-auth feature using index 1 (old alphabetical ordering) are updated to use index 0 (new mtime ordering). The update is applied consistently across all spec files."
+    },
+    {
+      "name": "visual_snapshot_pixel_tolerance",
+      "example": "dashboard.visual.spec.js: expect(content).toHaveScreenshot('storymap-view.png', { maxDiffPixelRatio: 0.05 }) — allows up to 5% pixel difference",
+      "category": "EDGE_CASE",
+      "max_score": 1,
+      "description": "The visual snapshot test for the story map view adds a pixel difference tolerance to account for nondeterminism in the force-directed graph layout, rather than requiring an exact pixel match."
+    },
+    {
+      "name": "no_production_code_changes",
+      "example": "Ground truth modifies only: tests/dashboard/visual/helpers.js, tests/dashboard/visual/dashboard.behavior.spec.js, tests/dashboard/visual/dashboard.dom-structure.spec.js, tests/dashboard/visual/dashboard.performance.spec.js, tests/dashboard/visual/dashboard.visual.spec.js (plus snapshot artifacts)",
+      "category": "MUST_NOT",
+      "max_score": 1,
+      "description": "The solution does not modify any production/source code files. Changes are scoped entirely to test infrastructure (fixture helpers and test spec files)."
+    }
+  ]
+}

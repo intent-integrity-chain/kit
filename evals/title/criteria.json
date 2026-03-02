@@ -1,0 +1,76 @@
+{
+  "context": "Dashboard UI fix: adds a floating action button (FAB) with slide-out panel for viewing clarification Q&A entries from any dashboard view, replacing the previous behavior of navigating to the Clarify tab.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "fab_shows_clarification_count",
+      "example": "function updateClarifyFab() { const total = (currentPipeline?.phases || []).reduce((sum, p) => sum + (p.clarifications || 0), 0); if (total > 0) { clarifyFab.textContent = '?' + total; clarifyFab.classList.add('visible'); } else { clarifyFab.classList.remove('visible'); } }",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "Solution adds a persistent UI element (e.g., a floating button) that displays the total number of clarifications. The count must be derived by summing clarification counts from the pipeline phases and displayed as a label on the element."
+    },
+    {
+      "name": "fab_visible_only_with_clarifications",
+      "example": "if (total > 0) { clarifyFab.classList.add('visible'); } else { clarifyFab.classList.remove('visible'); } — and CSS: .clarify-fab { display: none; } .clarify-fab.visible { display: flex; }",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "The FAB/button is only shown when there are one or more clarifications; it is hidden (not rendered or not visible) when the count is zero."
+    },
+    {
+      "name": "click_opens_slide_panel_with_qna",
+      "example": "clarifyFab.addEventListener('click', toggleClarifyPanel); function toggleClarifyPanel() { clarifyPanelOpen = !clarifyPanelOpen; clarifyPanel.classList.toggle('open', clarifyPanelOpen); clarifyFab.classList.toggle('panel-open', clarifyPanelOpen); if (clarifyPanelOpen) { renderClarifyPanelContent(); } }",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "Clicking the FAB/button opens a panel or overlay that displays all clarification Q&A entries. The panel renders each entry with its question and answer. Clicking again (or a close mechanism) dismisses the panel."
+    },
+    {
+      "name": "panel_groups_entries_by_session",
+      "example": "const sessions = {}; for (const c of clarifications) { if (!sessions[c.session]) sessions[c.session] = []; sessions[c.session].push(c); } — then renders a 'clarify-session' group per session key.",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "The clarification panel groups Q&A entries by session. Each session is shown as a labeled group containing its associated entries."
+    },
+    {
+      "name": "reads_clarifications_from_story_map",
+      "example": "const clarifications = currentStoryMap?.clarifications || [];",
+      "category": "INTEGRATION",
+      "max_score": 1,
+      "description": "The panel content reads clarification data from the story map data structure (e.g., `currentStoryMap.clarifications`), not from pipeline phase data or another source."
+    },
+    {
+      "name": "fab_updated_on_data_load",
+      "example": "currentStoryMap = fd.storyMap; ... updateClarifyFab(); — added to the data-load handler alongside existing renderPipeline/renderBoard calls.",
+      "category": "INTEGRATION",
+      "max_score": 1,
+      "description": "When dashboard data is loaded/refreshed, the FAB count is updated and `currentStoryMap` is captured from the incoming data so the panel has access to clarifications."
+    },
+    {
+      "name": "pipeline_badge_opens_panel_instead_of_tab",
+      "example": "badge.addEventListener('click', (e) => { e.stopPropagation(); if (!clarifyPanelOpen) toggleClarifyPanel(); }); — previously called switchTab('clarify').",
+      "category": "INTEGRATION",
+      "max_score": 1,
+      "description": "Clicking the clarification badge on a pipeline phase node now opens the clarification panel rather than switching to the clarify tab. The badge click handler is updated accordingly."
+    },
+    {
+      "name": "panel_is_fixed_position_slide_out",
+      "example": ".clarify-slide-panel { position: fixed; top: 0; right: -420px; width: 400px; height: 100vh; ... transition: right 0.3s ...; } .clarify-slide-panel.open { right: 0; }",
+      "category": "DESIGN",
+      "max_score": 1,
+      "description": "The clarification panel uses a fixed-position slide-out pattern anchored to the right edge of the viewport, sliding in from off-screen when opened."
+    },
+    {
+      "name": "fab_is_fixed_position_corner",
+      "example": ".clarify-fab { position: fixed; bottom: 24px; right: 24px; ... z-index: 1000; }",
+      "category": "DESIGN",
+      "max_score": 1,
+      "description": "The FAB is a fixed-position element anchored to a corner of the viewport (bottom-right), overlapping page content rather than being inline."
+    },
+    {
+      "name": "no_unrelated_changes",
+      "example": "Ground truth modifies only: .claude/skills/iikit-core/scripts/dashboard/public/index.html, .claude/skills/iikit-core/scripts/dashboard/src/public/index.html, .claude/skills/iikit-core/scripts/dashboard/template.js (build artifact), .github/workflows/ci.yml",
+      "category": "MUST_NOT",
+      "max_score": 1,
+      "description": "Solution does not modify files or components outside the scope of the task. Changes are confined to the dashboard UI (HTML/JS/CSS) and do not alter unrelated views, data models, or backend logic."
+    }
+  ]
+}

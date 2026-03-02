@@ -1,0 +1,34 @@
+{
+  "context": "Fix broken links in the README 'Learn More' section: convert a relative DASHBOARD.md link to an absolute GitHub URL and remove a 404 conference talk link",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "dashboard_link_uses_absolute_url",
+      "example": "Changed `(DASHBOARD.md)` to `(https://github.com/intent-integrity-chain/kit/blob/main/DASHBOARD.md)`",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "The link to the dashboard documentation is changed from a relative path to an absolute URL that resolves correctly outside the repository context"
+    },
+    {
+      "name": "broken_conference_talk_link_removed",
+      "example": "Removed: `- [Back to the Future of Software](https://speaking.jbaru.ch/DVCzoZ/back-to-the-future-of-software-how-to-survive-ai-with-intent-integrity-chain) - Conference talk on IIC`",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "The broken link to the conference talk (speaking.jbaru.ch URL that returns 404) is removed from the README"
+    },
+    {
+      "name": "other_links_preserved",
+      "example": "Ground truth preserves `[GitHub Spec-Kit](https://github.com/github/spec-kit)` and `[Intent Integrity Chain explained](https://github.com/jbaruch/intent-integrity-chain)` links untouched",
+      "category": "EDGE_CASE",
+      "max_score": 1,
+      "description": "All other links in the 'Learn More' section remain unchanged (GitHub Spec-Kit link, Intent Integrity Chain explained link)"
+    },
+    {
+      "name": "no_unrelated_changes",
+      "example": "Ground truth modifies only: README.md (Learn More section)",
+      "category": "MUST_NOT",
+      "max_score": 1,
+      "description": "Solution does not modify files or components outside the scope of the task"
+    }
+  ]
+}

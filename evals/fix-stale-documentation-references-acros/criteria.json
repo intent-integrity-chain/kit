@@ -1,0 +1,90 @@
+{
+  "context": "Documentation audit for IIKit: fixing 20+ stale references including test-specs.md → .feature files migration, testified stage addition, phase numbering corrections, and clarify utility reclassification",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "update_testspecs_references_to_feature_files",
+      "example": "API-REFERENCE.md, AGENTS.md, and other docs: `tests/test-specs.md` → `tests/features/*.feature` in the skill output table, artifact table, error messages, and prerequisite sections",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "All references to `tests/test-specs.md` are replaced with references to `tests/features/*.feature` (or equivalent Gherkin .feature file paths) across documentation files"
+    },
+    {
+      "name": "add_testified_stage_documentation",
+      "example": "API-REFERENCE.md: new Feature Stages table row — `testified` | `plan.md` exists and `tests/features/*.feature` files are present, but no `tasks.md` | `/iikit-05-tasks`",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "The `testified` feature stage is documented in the API reference, describing that it occurs when `.feature` files exist but no `tasks.md` yet, and that the next step is `/iikit-05-tasks`"
+    },
+    {
+      "name": "fix_framework_principles_phase_structure",
+      "example": "FRAMEWORK-PRINCIPLES.md: old numbered list 0-9 with clarify as step 2 replaced by 'Utilities' section listing clarify/bugfix/core, and 'Phases' section listing 0-8 with correct skill names",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "FRAMEWORK-PRINCIPLES.md separates utilities (clarify, bugfix, core) from numbered pipeline phases, and lists phases with accurate current skill command names (e.g., `/iikit-00-constitution` through `/iikit-08-taskstoissues`)"
+    },
+    {
+      "name": "remove_clarify_question_cap",
+      "example": "API-REFERENCE.md: `Maximum 5 questions asked per run` → `Clarification continues until all critical ambiguities are resolved`",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "Documentation for the clarify skill no longer states a maximum of 5 questions per run; instead it indicates clarification continues until all critical ambiguities are resolved"
+    },
+    {
+      "name": "update_stale_command_names_in_templates",
+      "example": "plan-template.md: `/iikit-plan` → `/iikit-02-plan`, `/iikit-tasks` → `/iikit-05-tasks`; CHANGELOG.md: `/iikit-03-plan` → `/iikit-02-plan`",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "Templates and skill files that referenced old command names (e.g., `/iikit-plan`, `/iikit-tasks`) are updated to use current numbered equivalents (e.g., `/iikit-02-plan`, `/iikit-05-tasks`)"
+    },
+    {
+      "name": "update_agents_md_test_directory_structure",
+      "example": "AGENTS.md: `test-specs.md          # Generated test specifications` → `features/              # Gherkin .feature files (locked by assertion hash)`",
+      "category": "INTEGRATION",
+      "max_score": 1,
+      "description": "AGENTS.md directory tree is updated to reflect that the `tests/` subdirectory contains a `features/` subdirectory with Gherkin `.feature` files rather than a single `test-specs.md` file"
+    },
+    {
+      "name": "add_testified_to_state_machine_skill",
+      "example": "SKILL.md: `tasks-ready` suggestion chain updated to include `| testified → /iikit-05-tasks |` between the `planned` and `tasks-ready` entries",
+      "category": "INTEGRATION",
+      "max_score": 1,
+      "description": "The iikit-core SKILL.md state machine is updated to include `testified` as a stage, mapping it to the appropriate next skill command"
+    },
+    {
+      "name": "add_feature_stages_table_to_api_reference",
+      "example": "API-REFERENCE.md: new 'Feature Stages' section with table covering `specified`, `planned`, `testified`, `tasks-ready`, `implementing-NN%`, `complete`",
+      "category": "INTEGRATION",
+      "max_score": 1,
+      "description": "A Feature Stages table is added to the API reference that documents all stages from `specified` through `complete` with the conditions for each stage and the suggested next skill"
+    },
+    {
+      "name": "fix_phase_separation_section_numbering",
+      "example": "PHASE-SEPARATION.md: `## 4. Tasks` → `## 5. Tasks`",
+      "category": "EDGE_CASE",
+      "max_score": 1,
+      "description": "Section numbering in PHASE-SEPARATION.md is corrected so that the Tasks section heading matches the actual skill number (5, not 4)"
+    },
+    {
+      "name": "add_testspec_template_file",
+      "example": "New file `.claude/skills/iikit-04-testify/templates/testspec-template.md` with tag conventions (@TS-XXX, @FR-XXX, @SC-XXX, etc.) and Gherkin template with Background, Scenario, Scenario Outline, Rule examples",
+      "category": "REUSE",
+      "max_score": 1,
+      "description": "A Gherkin feature file template is added in the testify skill's templates directory, documenting tag conventions and example scenario structures"
+    },
+    {
+      "name": "bump_version_consistently",
+      "example": "tile.json: `2.7.2` → `2.7.3`; README.md: `What's New in v2.7.2` → `What's New in v2.7.3`",
+      "category": "DESIGN",
+      "max_score": 1,
+      "description": "The version number is updated consistently across the tile metadata and README, with both pointing to the same new version"
+    },
+    {
+      "name": "no_unrelated_changes",
+      "example": "Ground truth modifies only documentation files: AGENTS.md, API-REFERENCE.md, CHANGELOG.md, DASHBOARD.md, FRAMEWORK-PRINCIPLES.md, PHASE-SEPARATION.md, README.md, TESTING_STRATEGY.md, tile.json, and skill template/config files (.claude/skills/iikit-core/SKILL.md, plan-template.md, testspec-template.md)",
+      "category": "MUST_NOT",
+      "max_score": 1,
+      "description": "Solution does not modify files or components outside the scope of the documentation audit task (no changes to shell scripts, skill logic, or source code files)"
+    }
+  ]
+}

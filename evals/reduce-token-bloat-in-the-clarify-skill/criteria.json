@@ -1,0 +1,48 @@
+{
+  "context": "Refactoring of the iikit-clarify SKILL.md to extract inline ambiguity taxonomy content into a dedicated reference file, reducing token usage while keeping taxonomies accessible via a reference link. Also corrects path references from iikit-core to iikit-clarify.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "taxonomy_extracted_to_reference_file",
+      "example": "New file .claude/skills/iikit-clarify/references/ambiguity-taxonomies.md is created containing all six artifact taxonomy sections (Spec, Plan, Checklist, Testify, Tasks, Constitution) that were previously inline in SKILL.md.",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "The per-artifact ambiguity scanning categories are extracted out of SKILL.md into a new, standalone reference file within the iikit-clarify skill's references/ subdirectory."
+    },
+    {
+      "name": "skill_md_references_taxonomy_file",
+      "example": "In SKILL.md, the large inline taxonomy block is replaced with: 'Load the target artifact and perform a structured scan using the taxonomy for that artifact type from [ambiguity-taxonomies.md](./references/ambiguity-taxonomies.md).'",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "SKILL.md's ambiguity scanning step is updated to replace the inline taxonomy block with a single link reference to the new taxonomy file, rather than repeating the content inline."
+    },
+    {
+      "name": "taxonomy_content_preserved",
+      "example": "ambiguity-taxonomies.md includes all sections: Spec (9 categories), Plan (6 categories), Checklist (4 categories), Testify (4 categories), Tasks (4 categories), Constitution (5 categories).",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "The extracted taxonomy reference file contains all six artifact type sections with their full category lists — no taxonomy content is lost, only relocated."
+    },
+    {
+      "name": "reference_file_placed_in_references_directory",
+      "example": "File is created at .claude/skills/iikit-clarify/references/ambiguity-taxonomies.md — mirrors existing files like conversation-guide.md and model-recommendations.md in the same references/ location.",
+      "category": "DESIGN",
+      "max_score": 1,
+      "description": "The new taxonomy file is placed inside a references/ subdirectory of the iikit-clarify skill, consistent with the pattern used for other reference materials in this skill."
+    },
+    {
+      "name": "paths_localized_to_iikit_clarify",
+      "example": "Multiple references updated: '../iikit-core/references/constitution-loading.md' → './references/constitution-loading.md'; script paths updated from 'iikit-core/scripts/' to 'iikit-clarify/scripts/' for check-prerequisites.sh, set-active-feature.sh, and next-step.sh.",
+      "category": "INTEGRATION",
+      "max_score": 1,
+      "description": "Path references in SKILL.md that incorrectly pointed to iikit-core (for scripts, reference files, or other resources) are updated to point locally within iikit-clarify."
+    },
+    {
+      "name": "no_unrelated_changes",
+      "example": "Ground truth modifies only: .claude/skills/iikit-clarify/SKILL.md (existing file, updated) and .claude/skills/iikit-clarify/references/ambiguity-taxonomies.md (new file). No other files are touched.",
+      "category": "MUST_NOT",
+      "max_score": 1,
+      "description": "Solution does not modify files or components outside the scope of the task"
+    }
+  ]
+}
