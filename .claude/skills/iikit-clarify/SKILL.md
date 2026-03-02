@@ -26,13 +26,13 @@ If the user provides a target argument (e.g., `plan`, `spec`, `checklist`, `test
 
 ## Constitution Loading
 
-Load constitution per [constitution-loading.md](../iikit-core/references/constitution-loading.md) (soft mode — parse if exists, continue if not).
+Load constitution per [constitution-loading.md](references/constitution-loading.md) (soft mode — parse if exists, continue if not).
 
 ## Prerequisites Check
 
 1. Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase clarify --json`
    Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/check-prerequisites.ps1 -Phase clarify -Json`
-2. Parse JSON. If `needs_selection: true`: present the `features` array as a numbered table (name and stage columns). Follow the options presentation pattern in [conversation-guide.md](../iikit-core/references/conversation-guide.md). After user selects, run:
+2. Parse JSON. If `needs_selection: true`: present the `features` array as a numbered table (name and stage columns). Follow the options presentation pattern in [conversation-guide.md](references/conversation-guide.md). After user selects, run:
    ```bash
    bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selection>
    ```
@@ -69,7 +69,7 @@ If no clarifiable artifact exists: ERROR with `No artifacts to clarify. Run /iik
 
 ### 1. Scan for Ambiguities
 
-Load the target artifact and perform a structured scan using the taxonomy for that artifact type from [ambiguity-taxonomies.md](../iikit-core/references/ambiguity-taxonomies.md). Mark each area: Clear / Partial / Missing.
+Load the target artifact and perform a structured scan using the taxonomy for that artifact type from [ambiguity-taxonomies.md](references/ambiguity-taxonomies.md). Mark each area: Clear / Partial / Missing.
 
 ### 2. Generate Question Queue
 
@@ -136,7 +136,7 @@ Parse the JSON and present:
 1. If `clear_after` is true: suggest `/clear` before proceeding (always true for clarify — Q&A sessions consume significant context)
 2. Present `next_step` as the primary recommendation
 3. If `alt_steps` non-empty: list as alternatives
-4. Look up `model_tier` in [model-recommendations.md](../iikit-core/references/model-recommendations.md) — if tier differs from current, add a `Tip:` with the agent-specific switch command. Check expiration date; refresh via web search if expired.
+4. Look up `model_tier` in [model-recommendations.md](references/model-recommendations.md) — if tier differs from current, add a `Tip:` with the agent-specific switch command. Check expiration date; refresh via web search if expired.
 5. Append dashboard link
 
 Format:

@@ -1,0 +1,15 @@
+{
+  "type": "coding",
+  "fixture": {
+    "ref": "fc63c7abf2f2d5a80aa963b714e7f78c9ebc69f3",
+    "type": "commit",
+    "exclude": [
+      "*.mdc",
+      "*.md",
+      "tile.json",
+      "tessl.json",
+      ".tessl/"
+    ],
+    "repoUrl": "https://github.com/intent-integrity-chain/kit.git"
+  }
+}

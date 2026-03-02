@@ -1,0 +1,55 @@
+{
+  "context": "Evaluates a fix to post-publish verification tests that were checking old hardcoded step patterns after a v2.6.0 refactor centralized workflow routing into next-step.sh. The solution must update the test assertions to verify the new delegation pattern.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "plan_skill_checks_next_step_delegation",
+      "example": "grep -A10 '## Next Steps' \"$base/iikit-02-plan/SKILL.md\" | grep -q 'next-step' — replaces the old check: grep -q 'REQUIRED by constitution.*test specifications'",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "The test for the Plan skill verifies that its 'Next Steps' section delegates to next-step.sh rather than checking for hardcoded REQUIRED/Optional testify references."
+    },
+    {
+      "name": "checklist_skill_checks_next_step_delegation",
+      "example": "grep -A10 '## Next Steps' \"$base/iikit-03-checklist/SKILL.md\" | grep -q 'next-step' — replaces old check for 'Optional.*test specifications'",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "The test for the Checklist skill verifies that its 'Next Steps' section delegates to next-step.sh rather than checking for hardcoded testify references."
+    },
+    {
+      "name": "testify_routing_verified_in_next_step_script",
+      "example": "grep -q 'iikit-04-testify' \"$base/iikit-core/scripts/bash/next-step.sh\" — replaces check for iikit-04-testify in checklist SKILL.md Next Steps",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "The test verifies that next-step.sh contains the testify routing logic, rather than checking that SKILL.md files directly list testify as a next step."
+    },
+    {
+      "name": "tasks_skill_checks_next_step_delegation",
+      "example": "grep -A10 '## Next Steps' \"$base/iikit-05-tasks/SKILL.md\" | grep -q 'next-step' — replaces check for '/iikit-06-analyze' in Tasks next steps",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "The test for the Tasks skill verifies it delegates to next-step.sh, rather than checking that it hardcodes an analyze step reference."
+    },
+    {
+      "name": "grep_next_steps_section_scoped",
+      "example": "grep -A10 '## Next Steps' \"$base/iikit-02-plan/SKILL.md\" | grep -q 'next-step'",
+      "category": "DESIGN",
+      "max_score": 1,
+      "description": "Checks on SKILL.md files use grep scoped to the '## Next Steps' section (e.g., grep -A10 or similar) rather than searching the whole file, ensuring the assertion is specific to where delegation occurs."
+    },
+    {
+      "name": "next_step_script_path_correct",
+      "example": "local ns_script=\"$base/iikit-core/scripts/bash/next-step.sh\"; grep -q 'iikit-04-testify' \"$ns_script\" 2>/dev/null",
+      "category": "INTEGRATION",
+      "max_score": 1,
+      "description": "The assertion that checks next-step.sh for routing logic uses the correct path to the next-step.sh script within the tile's iikit-core/scripts/bash/ directory."
+    },
+    {
+      "name": "no_unrelated_changes",
+      "example": "Ground truth modifies only: tests/run-tile-tests.sh",
+      "category": "MUST_NOT",
+      "max_score": 1,
+      "description": "Solution does not modify files or components outside the scope of the task"
+    }
+  ]
+}

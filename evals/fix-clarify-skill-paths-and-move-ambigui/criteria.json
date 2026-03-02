@@ -1,0 +1,55 @@
+{
+  "context": "Fix iikit-clarify skill to use shared iikit-core paths, extract ambiguity taxonomy to shared location, and add Roman numerals to constitution template principle headings.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "clarify_skill_uses_iikit_core_references",
+      "example": "In the ground truth diff, iikit-clarify/SKILL.md changes paths like `[constitution-loading.md](./references/constitution-loading.md)` to `[constitution-loading.md](../iikit-core/references/constitution-loading.md)`. Same pattern applied to conversation-guide.md, model-recommendations.md, and ambiguity-taxonomies.md.",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "The iikit-clarify SKILL.md uses `../iikit-core/references/` paths for shared reference documents (constitution-loading, conversation-guide, model-recommendations, ambiguity-taxonomies). No shared reference documents are referenced via local `./references/` paths."
+    },
+    {
+      "name": "clarify_skill_uses_iikit_core_scripts",
+      "example": "Ground truth changes `bash .tessl/tiles/.../skills/iikit-clarify/scripts/bash/check-prerequisites.sh` to `bash .tessl/tiles/.../skills/iikit-core/scripts/bash/check-prerequisites.sh`. Same for set-active-feature.sh and next-step.sh.",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "The iikit-clarify SKILL.md uses `iikit-core/scripts/` for shared script invocations (check-prerequisites, set-active-feature, next-step). Script paths no longer reference `iikit-clarify/scripts/` for these shared utilities."
+    },
+    {
+      "name": "ambiguity_taxonomies_in_core_references",
+      "example": "Ground truth creates `.claude/skills/iikit-core/references/ambiguity-taxonomies.md` with sections for Spec, Plan, Checklist, Testify, Tasks, and Constitution, totaling 53 lines of taxonomy definitions.",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "A file containing per-artifact ambiguity scanning taxonomies (for spec, plan, checklist, testify/features, tasks, and constitution artifact types) is placed in the shared iikit-core/references/ directory."
+    },
+    {
+      "name": "ambiguity_taxonomies_reference_updated_in_skill_md",
+      "example": "Ground truth changes `[ambiguity-taxonomies.md](./references/ambiguity-taxonomies.md)` to `[ambiguity-taxonomies.md](../iikit-core/references/ambiguity-taxonomies.md)` in the 'Scan for Ambiguities' section.",
+      "category": "INTEGRATION",
+      "max_score": 1,
+      "description": "The reference to the ambiguity taxonomies document in iikit-clarify SKILL.md points to the shared `../iikit-core/references/ambiguity-taxonomies.md` location."
+    },
+    {
+      "name": "constitution_template_roman_numerals",
+      "example": "Ground truth changes `### [PRINCIPLE_1_NAME]` → `### I. [PRINCIPLE_1_NAME]`, `### [PRINCIPLE_2_NAME]` → `### II. [PRINCIPLE_2_NAME]`, and so on through V.",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "The constitution-template.md principle heading placeholders use Roman numeral prefixes (I., II., III., IV., V.) matching the numbering pattern shown in the template comments."
+    },
+    {
+      "name": "path_pattern_matches_other_skills",
+      "example": "Other SKILL.md files in the parent commit (iikit-01-specify, iikit-02-plan) already use `../iikit-core/references/` and `iikit-core/scripts/`. The fix aligns iikit-clarify to the same pattern.",
+      "category": "REUSE",
+      "max_score": 1,
+      "description": "The path correction pattern in iikit-clarify SKILL.md matches the pattern already used by other iikit-* skills (e.g., iikit-01-specify, iikit-02-plan), where all shared references and scripts route through `iikit-core`."
+    },
+    {
+      "name": "no_unrelated_changes",
+      "example": "Ground truth modifies only: .claude/skills/iikit-clarify/SKILL.md, .claude/skills/iikit-core/templates/constitution-template.md, adds .claude/skills/iikit-core/references/ambiguity-taxonomies.md, and updates tiles/intent-integrity-kit/tile.json and README.md for version bump.",
+      "category": "MUST_NOT",
+      "max_score": 1,
+      "description": "Solution does not modify files or components outside the scope of the task. Changes are limited to: iikit-clarify/SKILL.md (path corrections), iikit-core/references/ambiguity-taxonomies.md (new shared file), iikit-core/templates/constitution-template.md (Roman numerals), and version metadata files (tile.json, README.md)."
+    }
+  ]
+}

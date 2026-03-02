@@ -1,0 +1,62 @@
+{
+  "context": "Evaluates fixes to the IIKit dashboard: making pipeline clarify badges clickable (navigating to the clarify panel) and updating parseClarifications to handle multi-line Q&A entries.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "clarify_badge_click_handler",
+      "example": "Ground truth queries `.pipeline-clarify-badge` on the node and calls `badge.addEventListener('click', (e) => { e.stopPropagation(); switchTab('clarify'); })`",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "Solution attaches a click event listener to the clarify badge element within each pipeline phase node, so that clicking it navigates to the clarify panel/tab."
+    },
+    {
+      "name": "click_propagation_stopped",
+      "example": "Ground truth calls `e.stopPropagation()` inside the badge's click handler before calling `switchTab('clarify')`",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "The click handler on the clarify badge stops event propagation so that clicking the badge does not also trigger the parent pipeline node's click handler (which switches to a different tab)."
+    },
+    {
+      "name": "multiline_qa_parsing",
+      "example": "Ground truth adds a separate branch matching `^- Q:` without `-> A:` on the same line, then scans ahead through subsequent lines to find `-> A:` and collect the full question and answer.",
+      "category": "INTENT",
+      "max_score": 1,
+      "description": "parseClarifications handles Q&A entries where the question text spans multiple lines and `-> A:` appears on a continuation line rather than the same line as `Q:`."
+    },
+    {
+      "name": "multiline_refs_extraction",
+      "example": "Ground truth applies the same `refsMatch` regex to `fullAnswer` for multi-line entries as it does for single-line entries, splitting on comma and trimming.",
+      "category": "EDGE_CASE",
+      "max_score": 1,
+      "description": "Reference tags (e.g., `[FR-001, US-002]`) in multi-line answer entries are extracted and populated in the `refs` field, consistent with single-line entry handling."
+    },
+    {
+      "name": "multiline_boundary_detection",
+      "example": "Ground truth breaks the lookahead loop on `/^- Q:/`, `/^### /`, and `/^## /` patterns.",
+      "category": "EDGE_CASE",
+      "max_score": 1,
+      "description": "The multi-line parser stops accumulating lines when it encounters a new Q entry, a new session heading, or a section heading, preventing bleed-over between adjacent entries."
+    },
+    {
+      "name": "badge_cursor_style",
+      "example": "Ground truth sets `badge.style.cursor = 'pointer'` after finding the badge element.",
+      "category": "DESIGN",
+      "max_score": 1,
+      "description": "The clarify badge is given a pointer cursor style to visually indicate to the user that it is interactive/clickable."
+    },
+    {
+      "name": "badge_handler_in_node_render_loop",
+      "example": "Ground truth places the badge query and event listener attachment immediately after `node.addEventListener('click', () => switchTab(phase.id))` inside the `phases.forEach` loop.",
+      "category": "INTEGRATION",
+      "max_score": 1,
+      "description": "The clarify badge click setup is performed inside the same pipeline node rendering loop that creates each phase node element, rather than as a separate post-render pass."
+    },
+    {
+      "name": "no_unrelated_changes",
+      "example": "Ground truth modifies only: `.claude/skills/iikit-core/scripts/dashboard/src/public/index.html` (badge click handler), `.claude/skills/iikit-core/scripts/dashboard/src/parser.js` (multi-line parsing), and derived/compiled output files.",
+      "category": "MUST_NOT",
+      "max_score": 1,
+      "description": "Solution does not modify files or components outside the scope of the task (clarify badge click handling and multi-line Q&A parsing)."
+    }
+  ]
+}
