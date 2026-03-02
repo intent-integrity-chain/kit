@@ -127,6 +127,13 @@ Output: questions asked/answered, target artifact and path, sections touched, tr
 - Respect early termination signals ("stop", "done", "proceed")
 - For non-spec artifacts, adapt reference format to the artifact's native ID scheme
 
+## Dashboard Refresh
+
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
+```
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
+
 ## Next Steps
 
 Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/next-step.sh --phase clarify --json`
