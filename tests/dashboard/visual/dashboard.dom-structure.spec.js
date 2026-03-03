@@ -148,7 +148,7 @@ test.describe('DOM Structure Snapshots', () => {
     const specBadge = specNode.locator('.pipeline-clarify-badge');
     await expect(specBadge).toBeVisible();
     const badgeText = await specBadge.textContent();
-    expect(badgeText).toBe('?1'); // exactly 1 session in fixture
+    expect(badgeText).toBe('Q&A'); // badge shows Q&A label
 
     // Plan node should NOT have a badge (no clarifications in plan.md)
     const planNode = page.locator('.pipeline-node', { hasText: 'Plan' });
@@ -168,7 +168,7 @@ test.describe('DOM Structure Snapshots', () => {
     const specNode = page.locator('.pipeline-node', { hasText: 'Spec' });
     const badge = specNode.locator('.pipeline-clarify-badge');
     const title = await badge.getAttribute('title');
-    expect(title).toBe('1 clarification session'); // singular, not plural
+    expect(title).toBe('1 Q&A item'); // singular
   });
 
   test('Plan view structure', async ({ page }) => {
