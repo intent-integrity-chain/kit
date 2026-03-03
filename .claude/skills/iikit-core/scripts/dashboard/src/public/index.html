@@ -2119,6 +2119,38 @@
     .clarify-slide-panel.open { right: 0; }
     .clarify-slide-panel .clarify-view { padding: 0; max-width: none; }
 
+    .clarify-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: 8px;
+    }
+    .clarify-tab {
+      background: none;
+      border: none;
+      color: var(--color-text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background var(--transition-fast), color var(--transition-fast);
+    }
+    .clarify-tab:hover { background: var(--color-surface-hover); color: var(--color-text); }
+    .clarify-tab.active { background: var(--color-accent); color: #fff; }
+
+    .clarify-panel-close {
+      background: none;
+      border: none;
+      color: var(--color-text-muted);
+      font-size: 20px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+    }
+    .clarify-panel-close:hover { color: var(--color-text); background: var(--color-surface-hover); }
+
     .sankey-node.task-checked .sankey-node-rect {
       stroke: var(--color-done);
       stroke-width: 2;
@@ -2936,17 +2968,17 @@
             <div class="pipeline-dot ${phase.status}">${PHASE_ICONS[phase.status] || ''}</div>
             <span class="pipeline-label${phase.name.includes('\n') ? ' pipeline-label-multiline' : ''}">${phase.name.includes('\n') ? phase.name.split('\n').map(l => `<span class="pipeline-label-line">${escapeHtml(l)}</span>`).join('') : escapeHtml(phase.name)}${phase.id === 'tasks' ? ' <span class="pipeline-redirect" title="Opens Implement board">&#x2197;</span>' : ''}</span>
             <span class="pipeline-progress">${phase.progress || ''}</span>
-            ${phase.clarifications > 0 ? '<span class="pipeline-clarify-badge" title="' + phase.clarifications + ' clarification session' + (phase.clarifications > 1 ? 's' : '') + '">?' + phase.clarifications + '</span>' : ''}
+            ${phase.clarifications > 0 ? '<span class="pipeline-clarify-badge" title="' + phase.clarifications + ' Q&amp;A item' + (phase.clarifications > 1 ? 's' : '') + '">Q&amp;A</span>' : ''}
           `;
 
           node.addEventListener('click', () => switchTab(phase.id));
-          // Make clarify badge clickable — opens slide-out panel
+          // Make clarify badge clickable — opens slide-out panel for this phase
           const badge = node.querySelector('.pipeline-clarify-badge');
           if (badge) {
             badge.style.cursor = 'pointer';
             badge.addEventListener('click', (e) => {
               e.stopPropagation();
-              if (!clarifyPanelOpen) toggleClarifyPanel();
+              toggleClarifyPanel(phase.id);
             });
           }
           pipelineBar.appendChild(node);
@@ -4440,47 +4472,92 @@
       const clarifyPanel = document.getElementById('clarifyPanel');
       let clarifyPanelOpen = false;
 
+      let clarifyPanelPhase = null; // Which phase's Q&A to show (null = active tab)
+
       function updateClarifyFab() {
-        // Sum all clarification counts across pipeline phases
         const total = (currentPipeline?.phases || []).reduce((sum, p) => sum + (p.clarifications || 0), 0);
         if (total > 0) {
-          clarifyFab.textContent = '?' + total;
+          clarifyFab.textContent = clarifyPanelOpen ? '\u00d7' : 'Q&A';
           clarifyFab.classList.add('visible');
         } else {
           clarifyFab.classList.remove('visible');
         }
+        if (clarifyPanelOpen) renderClarifyPanelContent();
       }
 
-      function toggleClarifyPanel() {
-        clarifyPanelOpen = !clarifyPanelOpen;
+      function toggleClarifyPanel(forPhase) {
+        if (typeof forPhase === 'string') {
+          // Opening for a specific phase
+          if (clarifyPanelOpen && clarifyPanelPhase === forPhase) {
+            // Already showing this phase — close
+            clarifyPanelOpen = false;
+          } else {
+            clarifyPanelPhase = forPhase;
+            clarifyPanelOpen = true;
+          }
+        } else {
+          // Toggle: FAB click or close button
+          clarifyPanelOpen = !clarifyPanelOpen;
+          if (clarifyPanelOpen) clarifyPanelPhase = activeTab || null;
+        }
         clarifyPanel.classList.toggle('open', clarifyPanelOpen);
         clarifyFab.classList.toggle('panel-open', clarifyPanelOpen);
-        if (clarifyPanelOpen) {
-          renderClarifyPanelContent();
-        }
+        clarifyFab.textContent = clarifyPanelOpen ? '\u00d7' : 'Q&A';
+        if (clarifyPanelOpen) renderClarifyPanelContent();
+      }
+
+      function getPhaseEntries(phaseId) {
+        if (!currentPipeline?.phases) return [];
+        const phase = currentPipeline.phases.find(p => p.id === phaseId);
+        return phase?.clarificationEntries || [];
       }
 
       function renderClarifyPanelContent() {
-        const clarifications = currentStoryMap?.clarifications || [];
-        if (!clarifications.length) {
-          clarifyPanel.innerHTML = '<div class="clarify-view"><div class="clarify-empty"><div class="placeholder-view-title">No clarifications yet</div></div></div>';
+        const phase = clarifyPanelPhase || activeTab;
+        const entries = getPhaseEntries(phase);
+        const phaseObj = currentPipeline?.phases?.find(p => p.id === phase);
+        const phaseName = phaseObj?.name?.replace('\n', ' ') || phase;
+
+        // Build tab bar for phases that have Q&A
+        const phasesWithQA = (currentPipeline?.phases || []).filter(p => p.clarifications > 0);
+        let tabsHtml = '';
+        if (phasesWithQA.length > 1) {
+          tabsHtml = '<div class="clarify-tabs">' + phasesWithQA.map(p => {
+            const name = p.name.replace('\n', ' ');
+            const active = p.id === phase ? ' active' : '';
+            return `<button class="clarify-tab${active}" data-phase="${p.id}">${escapeHtml(name)}</button>`;
+          }).join('') + '</div>';
+        }
+
+        if (!entries.length) {
+          clarifyPanel.innerHTML = `<div class="clarify-view">
+            <div class="clarify-header">
+              <span class="clarify-title">${escapeHtml(phaseName)} Q&amp;A</span>
+              <button class="clarify-panel-close" title="Close">\u00d7</button>
+            </div>
+            ${tabsHtml}
+            <div class="clarify-empty"><div class="placeholder-view-title">No Q&amp;A for this phase</div></div>
+          </div>`;
+          wireTabsAndClose();
           return;
         }
+
         const sessions = {};
-        for (const c of clarifications) {
+        for (const c of entries) {
           if (!sessions[c.session]) sessions[c.session] = [];
           sessions[c.session].push(c);
         }
         let html = `<div class="clarify-view">
           <div class="clarify-header">
-            <span class="clarify-title">Clarifications</span>
-            <span class="clarify-count">${clarifications.length} Q&amp;A${clarifications.length !== 1 ? 's' : ''}</span>
-          </div>`;
-        for (const [session, entries] of Object.entries(sessions)) {
+            <span class="clarify-title">${escapeHtml(phaseName)} Q&amp;A</span>
+            <button class="clarify-panel-close" title="Close">\u00d7</button>
+          </div>
+          ${tabsHtml}`;
+        for (const [session, items] of Object.entries(sessions)) {
           html += `<div class="clarify-session">
             <div class="clarify-session-label">Session ${escapeHtml(session)}</div>
             <div class="clarify-entries">`;
-          for (const c of entries) {
+          for (const c of items) {
             const refsHtml = (c.refs && c.refs.length)
               ? `<div class="clarify-refs">${c.refs.map(r => `<a class="clarify-ref" href="#">${escapeHtml(r)}</a>`).join('')}</div>`
               : '';
@@ -4494,9 +4571,21 @@
         }
         html += '</div>';
         clarifyPanel.innerHTML = html;
+        wireTabsAndClose();
       }
 
-      clarifyFab.addEventListener('click', toggleClarifyPanel);
+      function wireTabsAndClose() {
+        const closeBtn = clarifyPanel.querySelector('.clarify-panel-close');
+        if (closeBtn) closeBtn.addEventListener('click', () => toggleClarifyPanel());
+        clarifyPanel.querySelectorAll('.clarify-tab').forEach(tab => {
+          tab.addEventListener('click', () => {
+            clarifyPanelPhase = tab.dataset.phase;
+            renderClarifyPanelContent();
+          });
+        });
+      }
+
+      clarifyFab.addEventListener('click', () => toggleClarifyPanel());
 
       // ====== Constitution View ======
       let currentConstitution = null;

@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { parseTasks, parseChecklists, parseConstitutionTDD, hasClarifications, countClarifications } = require('./parser');
+const { parseTasks, parseChecklists, parseConstitutionTDD, hasClarifications, countClarifications, parseClarifications } = require('./parser');
 const { getFeatureFiles } = require('./testify');
 
 /**
@@ -74,7 +74,7 @@ function computePipelineState(projectPath, featureId) {
     tddRequired = constitutionExists ? parseConstitutionTDD(constitutionPath) : false;
   }
 
-  // Count clarification items per artifact
+  // Count and parse clarification items per artifact
   const clarifications = {
     constitution: countClarifications(constitutionContent),
     spec: countClarifications(specContent),
@@ -84,6 +84,16 @@ function computePipelineState(projectPath, featureId) {
     analysis: countClarifications(analysisContent)
   };
 
+  // Parse full Q&A entries per artifact for the clarify panel
+  const clarificationEntries = {
+    constitution: parseClarifications(constitutionContent),
+    spec: parseClarifications(specContent),
+    plan: parseClarifications(planContent),
+    checklist: parseClarifications(checklistContent),
+    tasks: parseClarifications(tasksContent),
+    analysis: parseClarifications(analysisContent)
+  };
+
   const phases = [
     {
       id: 'constitution',
@@ -91,7 +101,8 @@ function computePipelineState(projectPath, featureId) {
       status: constitutionExists ? 'complete' : 'not_started',
       progress: null,
       optional: false,
-      clarifications: clarifications.constitution
+      clarifications: clarifications.constitution,
+      clarificationEntries: clarificationEntries.constitution
     },
     {
       id: 'spec',
@@ -99,7 +110,8 @@ function computePipelineState(projectPath, featureId) {
       status: specExists ? 'complete' : 'not_started',
       progress: null,
       optional: false,
-      clarifications: clarifications.spec
+      clarifications: clarifications.spec,
+      clarificationEntries: clarificationEntries.spec
     },
     {
       id: 'plan',
@@ -107,7 +119,8 @@ function computePipelineState(projectPath, featureId) {
       status: planExists ? 'complete' : 'not_started',
       progress: null,
       optional: false,
-      clarifications: clarifications.plan
+      clarifications: clarifications.plan,
+      clarificationEntries: clarificationEntries.plan
     },
     {
       id: 'checklist',
@@ -121,7 +134,8 @@ function computePipelineState(projectPath, featureId) {
         ? `${Math.round((checklistStatus.checked / checklistStatus.total) * 100)}%`
         : null,
       optional: false,
-      clarifications: clarifications.checklist
+      clarifications: clarifications.checklist,
+      clarificationEntries: clarificationEntries.checklist
     },
     {
       id: 'testify',
@@ -131,7 +145,8 @@ function computePipelineState(projectPath, featureId) {
         : (!tddRequired && planExists ? 'skipped' : 'not_started'),
       progress: null,
       optional: !tddRequired,
-      clarifications: 0
+      clarifications: 0,
+      clarificationEntries: []
     },
     {
       id: 'tasks',
@@ -139,7 +154,8 @@ function computePipelineState(projectPath, featureId) {
       status: tasksExists ? 'complete' : 'not_started',
       progress: null,
       optional: false,
-      clarifications: clarifications.tasks
+      clarifications: clarifications.tasks,
+      clarificationEntries: clarificationEntries.tasks
     },
     {
       id: 'analyze',
@@ -147,7 +163,8 @@ function computePipelineState(projectPath, featureId) {
       status: analysisExists ? 'complete' : 'not_started',
       progress: null,
       optional: false,
-      clarifications: clarifications.analysis
+      clarifications: clarifications.analysis,
+      clarificationEntries: clarificationEntries.analysis
     },
     {
       id: 'implement',
