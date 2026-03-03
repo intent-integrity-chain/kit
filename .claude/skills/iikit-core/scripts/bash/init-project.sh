@@ -60,6 +60,15 @@ else
     GIT_STATUS="initialized"
 fi
 
+# Check if git user identity is configured (required for commits)
+GIT_USER_CONFIGURED=true
+if ! git -C "$PROJECT_ROOT" config user.email >/dev/null 2>&1; then
+    GIT_USER_CONFIGURED=false
+fi
+if ! git -C "$PROJECT_ROOT" config user.name >/dev/null 2>&1; then
+    GIT_USER_CONFIGURED=false
+fi
+
 # Install git hooks for assertion integrity enforcement
 # install_hook <hook_type> <source_file> <marker>
 # Sets RESULT_installed (true/false) and RESULT_status (installed/updated/installed_alongside/source_not_found/skipped)
@@ -164,8 +173,8 @@ report_hook_status() {
 }
 
 if $JSON_MODE; then
-    printf '{"success":true,"git_initialized":%s,"git_status":"%s","constitution_committed":%s,"hook_installed":%s,"hook_status":"%s","post_hook_installed":%s,"post_hook_status":"%s","project_root":"%s"}\n' \
-        "$GIT_INITIALIZED" "$GIT_STATUS" "$CONSTITUTION_COMMITTED" "$HOOK_INSTALLED" "$HOOK_STATUS" "$POST_HOOK_INSTALLED" "$POST_HOOK_STATUS" "$PROJECT_ROOT"
+    printf '{"success":true,"git_initialized":%s,"git_status":"%s","git_user_configured":%s,"constitution_committed":%s,"hook_installed":%s,"hook_status":"%s","post_hook_installed":%s,"post_hook_status":"%s","project_root":"%s"}\n' \
+        "$GIT_INITIALIZED" "$GIT_STATUS" "$GIT_USER_CONFIGURED" "$CONSTITUTION_COMMITTED" "$HOOK_INSTALLED" "$HOOK_STATUS" "$POST_HOOK_INSTALLED" "$POST_HOOK_STATUS" "$PROJECT_ROOT"
 else
     if [ "$GIT_INITIALIZED" = true ]; then
         echo "[specify] Git repository initialized at $PROJECT_ROOT"

@@ -81,6 +81,13 @@ bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash
 
 Installs pre-commit (assertion validation) and post-commit (hash storage) hooks.
 
+If `git_user_configured` is `false`: ask the user for their name and email, then run:
+```bash
+git config user.name "<name>"
+git config user.email "<email>"
+```
+Do NOT guess from hostname or system username.
+
 #### Step 5 — Create PREMISE.md
 
 If `PREMISE.md` does not exist, create it from the user's input using [premise-template.md](templates/premise-template.md). Extract from the user's init description:

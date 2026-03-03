@@ -240,7 +240,7 @@ Parse the JSON and present:
 2. If `next_step` is `/iikit-07-implement` (feature incomplete): suggest resuming implementation
 3. If `next_step` is null (feature complete): congratulate and list alt_steps
 4. If `alt_steps` non-empty: list as alternatives (e.g., `/iikit-08-taskstoissues`)
-5. Look up `model_tier` in [model-recommendations.md](../iikit-core/references/model-recommendations.md) — if tier differs from current, add a `Tip:` with the agent-specific switch command. Check expiration date; refresh via web search if expired.
+5. For `next_step` and each `alt_step`, include the `model_tier` from the JSON so the user knows which model is best for each option. Look up tiers in [model-recommendations.md](../iikit-core/references/model-recommendations.md) for agent-specific switch commands.
 6. Append dashboard link
 
 Push commits to remote if available: `git push`. If on a feature branch, offer to merge. Ask the user which approach they prefer:
@@ -252,7 +252,7 @@ Format:
 ```
 Implementation complete!
 Next: [/clear → ] <next_step or "All tasks done!">
-[- <alt_step> — <reason>]
-[Tip: <model suggestion>]
+[- <alt_step> — <reason> (model: <tier>)]
+
 - Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
 ```

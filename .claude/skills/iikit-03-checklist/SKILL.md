@@ -109,7 +109,7 @@ Parse the JSON and present:
 1. If `clear_after` is true: suggest `/clear` before proceeding
 2. Present `next_step` as the primary recommendation
 3. If `alt_steps` non-empty: list as alternatives
-4. Look up `model_tier` in [model-recommendations.md](../iikit-core/references/model-recommendations.md) — if tier differs from current, add a `Tip:` with the agent-specific switch command. Check expiration date; refresh via web search if expired.
+4. For `next_step` and each `alt_step`, include the `model_tier` from the JSON so the user knows which model is best for each option. Look up tiers in [model-recommendations.md](../iikit-core/references/model-recommendations.md) for agent-specific switch commands.
 5. Append dashboard link
 
 If deferred items remain, warn that downstream skills will flag incomplete checklists.
@@ -117,8 +117,8 @@ If deferred items remain, warn that downstream skills will flag incomplete check
 Format:
 ```
 Checklist complete!
-Next: [/clear → ] <next_step>
-[- <alt_step> — <reason>]
-[Tip: <model suggestion>]
+Next: [/clear → ] <next_step> (model: <tier>)
+[- <alt_step> — <reason> (model: <tier>)]
+
 - Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
 ```

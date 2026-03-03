@@ -250,9 +250,9 @@ Files modified:
 Next step:
   Run: bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/next-step.sh --phase bugfix --json
   Parse `next_step` (will be /iikit-07-implement) and `model_tier`.
-  Look up model_tier in model-recommendations.md — add Tip if tier mismatch.
+  Include `model_tier` for next_step and any alt_steps so user knows best model per option.
   - <next_step> — runs in bugfix mode (relaxed gates: no checklist or plan required, traces to bugs.md instead of spec)
-  [Tip: <model suggestion>]
+  
   - Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
 ```
 

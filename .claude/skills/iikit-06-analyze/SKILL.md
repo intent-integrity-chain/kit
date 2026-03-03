@@ -178,15 +178,15 @@ Parse the JSON and present:
 2. If CRITICAL issues were found: suggest resolving them, then re-run `/iikit-06-analyze`
 3. If no CRITICAL: present `next_step` as the primary recommendation
 4. If `alt_steps` non-empty: list as alternatives
-5. Look up `model_tier` in [model-recommendations.md](../iikit-core/references/model-recommendations.md) — if tier differs from current, add a `Tip:` with the agent-specific switch command. Check expiration date; refresh via web search if expired.
+5. For `next_step` and each `alt_step`, include the `model_tier` from the JSON so the user knows which model is best for each option. Look up tiers in [model-recommendations.md](../iikit-core/references/model-recommendations.md) for agent-specific switch commands.
 6. Append dashboard link
 
 Format:
 ```
 Analysis complete!
 [- CRITICAL issues found: resolve, then re-run /iikit-06-analyze]
-Next: [/clear → ] <next_step>
-[- <alt_step> — <reason>]
-[Tip: <model suggestion>]
+Next: [/clear → ] <next_step> (model: <tier>)
+[- <alt_step> — <reason> (model: <tier>)]
+
 - Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
 ```
