@@ -165,8 +165,8 @@ function computePipelineState(projectPath, featureId) {
       status: tasksExists ? 'complete' : 'not_started',
       progress: null,
       optional: false,
-      clarifications: clarifications.tasks,
-      clarificationEntries: clarificationEntries.tasks
+      clarifications: 0,
+      clarificationEntries: []
     },
     {
       id: 'analyze',
@@ -189,7 +189,8 @@ function computePipelineState(projectPath, featureId) {
         ? `${Math.round((checkedCount / totalCount) * 100)}%`
         : null,
       optional: false,
-      clarifications: 0
+      clarifications: clarifications.tasks,
+      clarificationEntries: clarificationEntries.tasks
     }
   ];
 
