@@ -58,6 +58,13 @@ function computePipelineState(projectPath, featureId) {
   // Read analysis content for clarifications check
   const analysisContent = analysisExists ? fs.readFileSync(analysisPath, 'utf-8') : '';
 
+  // Read .feature file content for testify clarifications check
+  let testifyContent = '';
+  const featureFiles = getFeatureFiles(featureDir);
+  if (featureFiles.length > 0) {
+    testifyContent = featureFiles.map(f => fs.readFileSync(f, 'utf-8')).join('\n');
+  }
+
   // TDD requirement check — read from .specify/context.json first, fallback to parsing
   const contextPath = path.join(projectPath, '.specify', 'context.json');
   let tddRequired = false;
@@ -80,6 +87,7 @@ function computePipelineState(projectPath, featureId) {
     spec: countClarifications(specContent),
     plan: countClarifications(planContent),
     checklist: countClarifications(checklistContent),
+    testify: countClarifications(testifyContent),
     tasks: countClarifications(tasksContent),
     analysis: countClarifications(analysisContent)
   };
@@ -90,6 +98,7 @@ function computePipelineState(projectPath, featureId) {
     spec: parseClarifications(specContent),
     plan: parseClarifications(planContent),
     checklist: parseClarifications(checklistContent),
+    testify: parseClarifications(testifyContent),
     tasks: parseClarifications(tasksContent),
     analysis: parseClarifications(analysisContent)
   };
@@ -145,8 +154,8 @@ function computePipelineState(projectPath, featureId) {
         : (!tddRequired && planExists ? 'skipped' : 'not_started'),
       progress: null,
       optional: !tddRequired,
-      clarifications: 0,
-      clarificationEntries: []
+      clarifications: clarifications.testify,
+      clarificationEntries: clarificationEntries.testify
     },
     {
       id: 'tasks',

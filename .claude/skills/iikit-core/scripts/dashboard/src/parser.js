@@ -101,11 +101,8 @@ function parseChecklists(checklistDir) {
 
   const allFiles = fs.readdirSync(checklistDir).filter(f => f.endsWith('.md'));
 
-  // Exclude requirements.md — it's a spec quality checklist created by /iikit-01-specify,
-  // not a domain checklist from /iikit-03-checklist. Including it falsely marks checklist phase complete.
-  const files = allFiles.filter(f => f !== 'requirements.md');
-
-  if (files.length === 0) return result;
+  if (allFiles.length === 0) return result;
+  const files = allFiles;
 
   for (const file of files) {
     const content = fs.readFileSync(path.join(checklistDir, file), 'utf-8');
@@ -128,15 +125,13 @@ function parseChecklists(checklistDir) {
  * Parse all checklist files in a directory and return detailed per-file data
  * with individual items, categories, CHK IDs, and tags.
  *
- * Excludes requirements.md (spec quality checklist from /iikit-01-specify).
- *
  * @param {string} checklistDir - Path to checklists/ directory
  * @returns {Array<{name: string, filename: string, total: number, checked: number, items: Array}>}
  */
 function parseChecklistsDetailed(checklistDir) {
   if (!fs.existsSync(checklistDir)) return [];
 
-  const files = fs.readdirSync(checklistDir).filter(f => f.endsWith('.md') && f !== 'requirements.md');
+  const files = fs.readdirSync(checklistDir).filter(f => f.endsWith('.md'));
 
   if (files.length === 0) return [];
 

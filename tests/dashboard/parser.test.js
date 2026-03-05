@@ -194,19 +194,19 @@ describe('parseChecklists', () => {
     expect(result.total).toBe(0);
   });
 
-  test('excludes requirements.md (spec quality checklist from specify phase)', () => {
+  test('includes requirements.md in checklist counts', () => {
     fs.writeFileSync(path.join(tmpDir, 'requirements.md'), '- [x] CHK001 Done\n- [x] CHK002 Done\n');
     const result = parseChecklists(tmpDir);
-    expect(result).toEqual({ total: 0, checked: 0, percentage: 0 });
+    expect(result).toEqual({ total: 2, checked: 2, percentage: 100 });
   });
 
-  test('excludes requirements.md but counts domain checklists', () => {
+  test('counts requirements.md alongside domain checklists', () => {
     fs.writeFileSync(path.join(tmpDir, 'requirements.md'), '- [x] CHK001 Done\n');
     fs.writeFileSync(path.join(tmpDir, 'domain.md'), '- [x] CHK002 Done\n- [ ] CHK003 Not done\n');
     const result = parseChecklists(tmpDir);
-    expect(result.total).toBe(2);
-    expect(result.checked).toBe(1);
-    expect(result.percentage).toBe(50);
+    expect(result.total).toBe(3);
+    expect(result.checked).toBe(2);
+    expect(result.percentage).toBe(67);
   });
 });
 
@@ -1166,21 +1166,21 @@ describe('parseChecklistsDetailed', () => {
     expect(result[0].checked).toBe(0);
   });
 
-  // Test 8: requirements.md is excluded (spec quality checklist from /iikit-01-specify)
-  test('requirements.md is excluded from checklist parsing', () => {
+  // Test 8: requirements.md is included in checklist parsing
+  test('requirements.md is included in checklist parsing', () => {
     fs.writeFileSync(path.join(tmpDir, 'requirements.md'), '- [x] CHK-001 Done\n- [ ] CHK-002 Not done\n');
     const result = parseChecklistsDetailed(tmpDir);
-    expect(result.length).toBe(0);
+    expect(result.length).toBe(1);
+    expect(result[0].filename).toBe('requirements.md');
+    expect(result[0].items.length).toBe(2);
   });
 
-  // Test 8b: requirements.md excluded but domain checklists still parsed
-  test('requirements.md excluded but domain checklists still parsed', () => {
+  // Test 8b: requirements.md alongside domain checklists
+  test('requirements.md parsed alongside domain checklists', () => {
     fs.writeFileSync(path.join(tmpDir, 'requirements.md'), '- [x] CHK-001 Done\n');
     fs.writeFileSync(path.join(tmpDir, 'domain.md'), '- [x] CHK-002 Done\n- [ ] CHK-003 Not done\n');
     const result = parseChecklistsDetailed(tmpDir);
-    expect(result.length).toBe(1);
-    expect(result[0].filename).toBe('domain.md');
-    expect(result[0].items.length).toBe(2);
+    expect(result.length).toBe(2);
   });
 
   // Test 9: Missing directory returns empty array
