@@ -1083,13 +1083,17 @@ function parseTaskTestRefs(tasks) {
  * Extract a markdown section by heading (## Title), returning content until next ## heading.
  */
 function extractSection(content, heading) {
-  const regex = new RegExp(`^## ${heading}\\s*$`, 'm');
+  // Match "## Heading" or "**Heading**" (agents produce both formats)
+  const escapedHeading = heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`^(?:## ${escapedHeading}|\\*\\*${escapedHeading}\\*\\*)\\s*$`, 'm');
   const match = content.match(regex);
   if (!match) return null;
 
   const start = match.index + match[0].length;
-  const nextSection = content.indexOf('\n## ', start);
-  return content.substring(start, nextSection >= 0 ? nextSection : content.length).trim();
+  // Stop at next ## heading or **Bold Heading** line
+  const remaining = content.substring(start);
+  const nextSection = remaining.match(/\n(?:## |\*\*[A-Z])/);
+  return remaining.substring(0, nextSection ? nextSection.index : remaining.length).trim();
 }
 
 /**
@@ -1116,7 +1120,10 @@ function parseMarkdownTable(text) {
 function parseAnalysisFindings(content) {
   if (!content || typeof content !== 'string') return [];
 
-  const section = extractSection(content, 'Findings');
+  // Try "## Findings" first, fall back to "## Specification Analysis Report"
+  // (skill template puts the findings table directly under the report heading)
+  let section = extractSection(content, 'Findings');
+  if (!section) section = extractSection(content, 'Specification Analysis Report');
   if (!section) return [];
 
   const rows = parseMarkdownTable(section);
@@ -1160,33 +1167,49 @@ function parseAnalysisCoverage(content) {
   const rows = parseMarkdownTable(section);
   if (rows.length === 0) return [];
 
-  // Detect format by number of columns in first data row
-  const hasPlanCols = rows[0].length >= 8;
-  const isDetailed = rows[0].length >= 6;
+  // Detect format by header row content (more reliable than column count)
+  // Formats seen in the wild:
+  //   3-col: Requirement | Has Task | Notes
+  //   5-col: Requirement | Has Task? | Task IDs | Has Plan? | Plan Refs
+  //   6-col: Requirement | Has Task? | Task IDs | Has Test? | Test IDs | Status
+  //   8-col: Requirement | Has Task? | Task IDs | Has Test? | Test IDs | Has Plan? | Plan Refs | Status
+  const headerLine = section.split('\n').find(l => l.includes('|') && !l.match(/^\s*\|[\s-|]+\|/));
+  const headerLower = (headerLine || '').toLowerCase();
+  const hasTestCol = headerLower.includes('has test') || headerLower.includes('test id');
+  const hasPlanCol = headerLower.includes('has plan') || headerLower.includes('plan ref');
 
   return rows.map(cells => {
     const id = cells[0];
     const hasTask = /^yes$/i.test(cells[1]);
+    const taskIds = parseIdList(cells[2]);
 
-    if (isDetailed) {
-      // Detailed: Requirement | Has Task? | Task IDs | Has Test? | Test IDs | [Has Plan? | Plan Refs |] Status
-      const taskIds = parseIdList(cells[2]);
+    if (hasTestCol && hasPlanCol) {
+      // 8-col: ... | Has Test? | Test IDs | Has Plan? | Plan Refs | Status
       const hasTest = /^yes$/i.test(cells[3]);
       const testIds = parseIdList(cells[4]);
-
-      if (hasPlanCols) {
-        const hasPlan = /^yes$/i.test(cells[5]);
-        const planRefs = parseIdList(cells[6]);
-        const status = cells[7] && cells[7] !== '—' && cells[7] !== '-' ? cells[7] : null;
-        return { id, hasTask, taskIds, hasTest, testIds, hasPlan, planRefs, status, notes: '' };
-      }
-
+      const hasPlan = /^yes$/i.test(cells[5]);
+      const planRefs = parseIdList(cells[6]);
+      const status = cells[7] && cells[7] !== '—' && cells[7] !== '-' ? cells[7] : null;
+      return { id, hasTask, taskIds, hasTest, testIds, hasPlan, planRefs, status, notes: '' };
+    } else if (hasTestCol) {
+      // 6-col: ... | Has Test? | Test IDs | Status
+      const hasTest = /^yes$/i.test(cells[3]);
+      const testIds = parseIdList(cells[4]);
       const status = cells[5] && cells[5] !== '—' && cells[5] !== '-' ? cells[5] : null;
       return { id, hasTask, taskIds, hasTest, testIds, status, notes: '' };
+    } else if (hasPlanCol) {
+      // 5-col: ... | Has Plan? | Plan Refs (skill template format)
+      // "Has Plan?" may be "Yes", "Implicit", or other truthy text (anything except "No" or empty)
+      const planCell = (cells[3] || '').trim();
+      const hasPlan = planCell.length > 0 && !/^no$/i.test(planCell) && planCell !== '—' && planCell !== '-';
+      const planRefs = parseIdList(cells[4]);
+      return { id, hasTask, taskIds, hasTest: false, testIds: [], hasPlan, planRefs, status: null, notes: '' };
+    } else if (cells.length <= 3) {
+      // 3-col: ... | Notes
+      return { id, hasTask, taskIds: [], hasTest: false, testIds: [], status: null, notes: cells[2] || '' };
     } else {
-      // Simple: Requirement | Has Task? | Notes
-      const notes = cells[2] || '';
-      return { id, hasTask, taskIds: [], hasTest: false, testIds: [], status: null, notes };
+      // Unknown format — best effort
+      return { id, hasTask, taskIds, hasTest: false, testIds: [], status: null, notes: '' };
     }
   });
 }
