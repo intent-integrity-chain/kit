@@ -1278,13 +1278,13 @@ function parseAnalysisMetrics(content) {
     return null;
   }
 
-  const reqCovRaw = findValue(['requirement coverage']);
-  const testCovRaw = findValue(['test coverage']);
+  const reqCovRaw = findValue(['requirement coverage', 'fr coverage by task', 'fr coverage']);
+  const testCovRaw = findValue(['test coverage', 'sc coverage', 'coverage by feature']);
 
   return {
-    totalRequirements: parseInt(findValue(['total requirements']) || '0', 10),
+    totalRequirements: parseInt(findValue(['total requirements', 'total functional req']) || '0', 10),
     totalTasks: parseInt(findValue(['total tasks']) || '0', 10),
-    totalTestSpecs: parseInt(findValue(['total test spec']) || '0', 10),
+    totalTestSpecs: parseInt(findValue(['total test spec', 'test specifications']) || '0', 10),
     requirementCoverage: reqCovRaw || '',
     requirementCoveragePct: extractPct(reqCovRaw) || 0,
     testCoverage: testCovRaw || null,
