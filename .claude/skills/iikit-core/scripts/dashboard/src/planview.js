@@ -8,8 +8,6 @@ const { parseTechContext, parseFileStructure, parseAsciiDiagram, parseTesslJson,
 
 module.exports = { computePlanViewState, classifyNodeTypes, fetchTesslEvalData };
 
-// In-memory cache for LLM classification results per feature
-const classificationCache = new Map();
 
 /**
  * Compute plan view state from parsed plan.md data.
@@ -63,11 +61,8 @@ async function computePlanViewState(projectPath, featureId, options = {}) {
   // Parse ASCII diagram
   let diagram = parseAsciiDiagram(planContent);
   if (diagram && diagram.nodes.length > 0) {
-    // Classify node types: context.json pre-computed > LLM cache > LLM API > default
-    const cacheKey = `${featureId}:${planContent.length}`;
-    let types = null;
-
-    // Try pre-computed classifications from context.json (written by /iikit-02-plan)
+    // Read pre-computed node classifications from context.json (written by /iikit-02-plan)
+    let types = {};
     const contextPath = path.join(projectPath, '.specify', 'context.json');
     if (fs.existsSync(contextPath)) {
       try {
@@ -78,16 +73,6 @@ async function computePlanViewState(projectPath, featureId, options = {}) {
       } catch { /* malformed context.json */ }
     }
 
-    if (!types && classificationCache.has(cacheKey)) {
-      types = classificationCache.get(cacheKey);
-    }
-
-    if (!types) {
-      const labels = diagram.nodes.map(n => n.label);
-      types = await classifyNodeTypes(labels);
-    }
-
-    classificationCache.set(cacheKey, types);
     diagram.nodes = diagram.nodes.map(n => ({
       ...n,
       type: types[n.label] || 'default'
@@ -150,57 +135,16 @@ function buildFilePath(entries, targetEntry, rootName) {
 }
 
 /**
- * Classify diagram node labels into component types using LLM.
- * Falls back to all "default" if API key is missing or call fails.
+ * Classify diagram node labels into component types.
+ * Node classifications are pre-computed by /iikit-02-plan and stored in context.json.
+ * This function is a no-op stub kept for backward compatibility.
  *
  * @param {string[]} labels - Node labels to classify
- * @returns {Promise<Object>} Mapping of label -> type
+ * @returns {Promise<Object>} Mapping of label -> "default"
  */
 async function classifyNodeTypes(labels) {
   const result = {};
   for (const label of labels) result[label] = 'default';
-
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey || labels.length === 0) return result;
-
-  try {
-    const Anthropic = require('@anthropic-ai/sdk');
-    const client = new Anthropic({ apiKey });
-
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
-
-    const response = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 256,
-      messages: [{
-        role: 'user',
-        content: `Classify each of these software architecture diagram component labels into exactly one category: "client", "server", "storage", or "external".
-
-Labels: ${JSON.stringify(labels)}
-
-Respond with ONLY a JSON object mapping each label to its category. Example: {"Browser": "client", "API Server": "server"}
-No explanation, just the JSON.`
-      }]
-    }, { signal: controller.signal });
-
-    clearTimeout(timeout);
-
-    const text = response.content[0]?.text || '';
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      const parsed = JSON.parse(jsonMatch[0]);
-      const validTypes = new Set(['client', 'server', 'storage', 'external']);
-      for (const [label, type] of Object.entries(parsed)) {
-        if (validTypes.has(type)) {
-          result[label] = type;
-        }
-      }
-    }
-  } catch {
-    // Fallback: all nodes get "default" type
-  }
-
   return result;
 }
 
@@ -306,15 +250,3 @@ function invalidateEvalCache() {
 
 module.exports.invalidateEvalCache = invalidateEvalCache;
 
-/**
- * Invalidate classification cache for a feature.
- */
-function invalidateCache(featureId) {
-  for (const key of classificationCache.keys()) {
-    if (key.startsWith(`${featureId}:`)) {
-      classificationCache.delete(key);
-    }
-  }
-}
-
-module.exports.invalidateCache = invalidateCache;
