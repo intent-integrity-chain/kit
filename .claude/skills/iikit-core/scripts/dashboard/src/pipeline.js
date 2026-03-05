@@ -42,8 +42,26 @@ function computePipelineState(projectPath, featureId) {
   const checkedCount = tasks.filter(t => t.checked).length;
   const totalCount = tasks.length;
 
-  // Parse checklists
-  const checklistStatus = parseChecklists(checklistDir);
+  // Read context.json for phase metadata
+  const contextPath = path.join(projectPath, '.specify', 'context.json');
+  let ctx = {};
+  if (fs.existsSync(contextPath)) {
+    try { ctx = JSON.parse(fs.readFileSync(contextPath, 'utf-8')); } catch { /* malformed */ }
+  }
+
+  // TDD requirement check
+  let tddRequired = false;
+  if (ctx.tdd_determination) {
+    tddRequired = ctx.tdd_determination === 'mandatory';
+  } else {
+    tddRequired = constitutionExists ? parseConstitutionTDD(constitutionPath) : false;
+  }
+
+  // Checklist phase was run (not just requirements.md from specify)
+  const checklistReviewed = !!ctx.checklist_reviewed_at;
+
+  // Parse checklists (include requirements.md only after checklist phase was run)
+  const checklistStatus = parseChecklists(checklistDir, { includeRequirements: checklistReviewed });
 
   // Read constitution content for clarifications check
   const constitutionContent = constitutionExists ? fs.readFileSync(constitutionPath, 'utf-8') : '';
@@ -63,22 +81,6 @@ function computePipelineState(projectPath, featureId) {
   const featureFiles = getFeatureFiles(featureDir);
   if (featureFiles.length > 0) {
     testifyContent = featureFiles.map(f => fs.readFileSync(f, 'utf-8')).join('\n');
-  }
-
-  // TDD requirement check — read from .specify/context.json first, fallback to parsing
-  const contextPath = path.join(projectPath, '.specify', 'context.json');
-  let tddRequired = false;
-  if (fs.existsSync(contextPath)) {
-    try {
-      const ctx = JSON.parse(fs.readFileSync(contextPath, 'utf-8'));
-      if (ctx.tdd_determination) {
-        tddRequired = ctx.tdd_determination === 'mandatory';
-      } else {
-        tddRequired = constitutionExists ? parseConstitutionTDD(constitutionPath) : false;
-      }
-    } catch { tddRequired = constitutionExists ? parseConstitutionTDD(constitutionPath) : false; }
-  } else {
-    tddRequired = constitutionExists ? parseConstitutionTDD(constitutionPath) : false;
   }
 
   // Count and parse clarification items per artifact

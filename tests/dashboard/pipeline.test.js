@@ -106,9 +106,9 @@ describe('computePipelineState', () => {
     const result = computePipelineState(projectPath, '001-test');
     const checklist = result.phases.find(p => p.id === 'checklist');
 
-    // Both requirements.md and domain.md count
+    // Only domain.md counts (requirements.md excluded until checklist phase runs)
     expect(checklist.status).toBe('in_progress');
-    expect(checklist.progress).toBe('50%');
+    expect(checklist.progress).toBe('33%');
   });
 
   // TS-021: Checklist detection — complete when all 100%
@@ -120,7 +120,7 @@ describe('computePipelineState', () => {
     });
 
     const result = computePipelineState(projectPath, '001-test');
-    // Both files count, all items checked
+    // Only domain.md counts (requirements.md excluded until checklist phase runs)
     expect(result.phases.find(p => p.id === 'checklist').status).toBe('complete');
   });
 

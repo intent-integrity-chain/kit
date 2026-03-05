@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require('fs');
 const path = require('path');
 const { parseChecklistsDetailed } = require('./parser');
 
@@ -49,7 +50,18 @@ function computeGateStatus(files) {
  */
 function computeChecklistViewState(projectPath, featureId) {
   const checklistDir = path.join(projectPath, 'specs', featureId, 'checklists');
-  const parsed = parseChecklistsDetailed(checklistDir);
+
+  // Include requirements.md only if checklist phase was run
+  let checklistReviewed = false;
+  const contextPath = path.join(projectPath, '.specify', 'context.json');
+  if (fs.existsSync(contextPath)) {
+    try {
+      const ctx = JSON.parse(fs.readFileSync(contextPath, 'utf-8'));
+      checklistReviewed = !!ctx.checklist_reviewed_at;
+    } catch { /* malformed */ }
+  }
+
+  const parsed = parseChecklistsDetailed(checklistDir, { includeRequirements: checklistReviewed });
 
   const files = parsed.map(file => {
     const percentage = file.total > 0 ? Math.round((file.checked / file.total) * 100) : 0;

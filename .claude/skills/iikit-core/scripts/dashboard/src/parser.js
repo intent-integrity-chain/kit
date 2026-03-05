@@ -94,15 +94,20 @@ function parseTasks(content) {
  * @param {string} checklistDir - Path to checklists/ directory
  * @returns {{total: number, checked: number, percentage: number}}
  */
-function parseChecklists(checklistDir) {
+function parseChecklists(checklistDir, options) {
   const result = { total: 0, checked: 0, percentage: 0 };
 
   if (!fs.existsSync(checklistDir)) return result;
 
   const allFiles = fs.readdirSync(checklistDir).filter(f => f.endsWith('.md'));
 
-  if (allFiles.length === 0) return result;
-  const files = allFiles;
+  // Exclude requirements.md unless checklist phase was run.
+  // requirements.md is created by /iikit-01-specify; including it before /iikit-03-checklist
+  // falsely shows the checklist as done. Domain-specific files always count.
+  const includeRequirements = options && options.includeRequirements;
+  const files = allFiles.filter(f => f !== 'requirements.md' || includeRequirements);
+
+  if (files.length === 0) return result;
 
   for (const file of files) {
     const content = fs.readFileSync(path.join(checklistDir, file), 'utf-8');
@@ -128,10 +133,11 @@ function parseChecklists(checklistDir) {
  * @param {string} checklistDir - Path to checklists/ directory
  * @returns {Array<{name: string, filename: string, total: number, checked: number, items: Array}>}
  */
-function parseChecklistsDetailed(checklistDir) {
+function parseChecklistsDetailed(checklistDir, options) {
   if (!fs.existsSync(checklistDir)) return [];
 
-  const files = fs.readdirSync(checklistDir).filter(f => f.endsWith('.md'));
+  const includeRequirements = options && options.includeRequirements;
+  const files = fs.readdirSync(checklistDir).filter(f => f.endsWith('.md') && (f !== 'requirements.md' || includeRequirements));
 
   if (files.length === 0) return [];
 

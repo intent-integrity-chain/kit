@@ -90,6 +90,16 @@ Continue until all items are `[x]` or explicitly deferred.
 
 Output: checklist path, item counts (total/checked/deferred), gap resolution summary, completion percentage.
 
+## Record Phase Completion
+
+Write a timestamp to `.specify/context.json` so the dashboard knows the checklist phase was run (not just that requirements.md exists from specify):
+
+```bash
+CONTEXT_FILE=".specify/context.json"
+[[ -f "$CONTEXT_FILE" ]] || echo '{}' > "$CONTEXT_FILE"
+jq --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '.checklist_reviewed_at = $ts' "$CONTEXT_FILE" > "$CONTEXT_FILE.tmp" && mv "$CONTEXT_FILE.tmp" "$CONTEXT_FILE"
+```
+
 ## Dashboard Refresh
 
 Regenerate the dashboard so the pipeline reflects checklist completion:

@@ -194,19 +194,25 @@ describe('parseChecklists', () => {
     expect(result.total).toBe(0);
   });
 
-  test('includes requirements.md in checklist counts', () => {
+  test('excludes requirements.md by default', () => {
     fs.writeFileSync(path.join(tmpDir, 'requirements.md'), '- [x] CHK001 Done\n- [x] CHK002 Done\n');
     const result = parseChecklists(tmpDir);
+    expect(result).toEqual({ total: 0, checked: 0, percentage: 0 });
+  });
+
+  test('includes requirements.md when includeRequirements option set', () => {
+    fs.writeFileSync(path.join(tmpDir, 'requirements.md'), '- [x] CHK001 Done\n- [x] CHK002 Done\n');
+    const result = parseChecklists(tmpDir, { includeRequirements: true });
     expect(result).toEqual({ total: 2, checked: 2, percentage: 100 });
   });
 
-  test('counts requirements.md alongside domain checklists', () => {
+  test('counts domain checklists regardless of includeRequirements', () => {
     fs.writeFileSync(path.join(tmpDir, 'requirements.md'), '- [x] CHK001 Done\n');
     fs.writeFileSync(path.join(tmpDir, 'domain.md'), '- [x] CHK002 Done\n- [ ] CHK003 Not done\n');
     const result = parseChecklists(tmpDir);
-    expect(result.total).toBe(3);
-    expect(result.checked).toBe(2);
-    expect(result.percentage).toBe(67);
+    expect(result.total).toBe(2);
+    expect(result.checked).toBe(1);
+    expect(result.percentage).toBe(50);
   });
 });
 
@@ -1166,21 +1172,25 @@ describe('parseChecklistsDetailed', () => {
     expect(result[0].checked).toBe(0);
   });
 
-  // Test 8: requirements.md is included in checklist parsing
-  test('requirements.md is included in checklist parsing', () => {
+  test('excludes requirements.md by default', () => {
     fs.writeFileSync(path.join(tmpDir, 'requirements.md'), '- [x] CHK-001 Done\n- [ ] CHK-002 Not done\n');
     const result = parseChecklistsDetailed(tmpDir);
-    expect(result.length).toBe(1);
-    expect(result[0].filename).toBe('requirements.md');
-    expect(result[0].items.length).toBe(2);
+    expect(result.length).toBe(0);
   });
 
-  // Test 8b: requirements.md alongside domain checklists
-  test('requirements.md parsed alongside domain checklists', () => {
+  test('includes requirements.md when includeRequirements option set', () => {
+    fs.writeFileSync(path.join(tmpDir, 'requirements.md'), '- [x] CHK-001 Done\n- [ ] CHK-002 Not done\n');
+    const result = parseChecklistsDetailed(tmpDir, { includeRequirements: true });
+    expect(result.length).toBe(1);
+    expect(result[0].filename).toBe('requirements.md');
+  });
+
+  test('domain checklists parsed alongside excluded requirements.md', () => {
     fs.writeFileSync(path.join(tmpDir, 'requirements.md'), '- [x] CHK-001 Done\n');
     fs.writeFileSync(path.join(tmpDir, 'domain.md'), '- [x] CHK-002 Done\n- [ ] CHK-003 Not done\n');
     const result = parseChecklistsDetailed(tmpDir);
-    expect(result.length).toBe(2);
+    expect(result.length).toBe(1);
+    expect(result[0].filename).toBe('domain.md');
   });
 
   // Test 9: Missing directory returns empty array
