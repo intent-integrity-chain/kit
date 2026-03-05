@@ -76,11 +76,11 @@ function computePipelineState(projectPath, featureId) {
   // Read analysis content for clarifications check
   const analysisContent = analysisExists ? fs.readFileSync(analysisPath, 'utf-8') : '';
 
-  // Read .feature file content for testify clarifications check
+  // Read testify clarifications from companion markdown file (not .feature files — Gherkin can't hold markdown)
+  const testifyClarificationsPath = path.join(featureDir, 'tests', 'clarifications.md');
   let testifyContent = '';
-  const featureFiles = getFeatureFiles(featureDir);
-  if (featureFiles.length > 0) {
-    testifyContent = featureFiles.map(f => fs.readFileSync(f, 'utf-8')).join('\n');
+  if (fs.existsSync(testifyClarificationsPath)) {
+    testifyContent = fs.readFileSync(testifyClarificationsPath, 'utf-8');
   }
 
   // Count and parse clarification items per artifact

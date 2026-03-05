@@ -50,7 +50,7 @@ If the user provided a target argument, map it:
 | `spec` | `{FEATURE_DIR}/spec.md` |
 | `plan` | `{FEATURE_DIR}/plan.md` |
 | `checklist` | `{FEATURE_DIR}/checklists/*.md` (all files) |
-| `testify` | `{FEATURE_DIR}/tests/features/*.feature` (all files) |
+| `testify` | `{FEATURE_DIR}/tests/features/*.feature` (read for scanning), `{FEATURE_DIR}/tests/clarifications.md` (write Q&A) |
 | `tasks` | `{FEATURE_DIR}/tasks.md` |
 | `constitution` | `{REPO_ROOT}/CONSTITUTION.md` |
 
@@ -103,6 +103,11 @@ Present ONE question at a time.
    - If cross-cutting, reference all materially affected items
 3. Apply clarification to the appropriate section of the artifact
 4. **Save artifact after each integration** to minimize context loss
+
+**Testify exception**: `.feature` files are Gherkin syntax — do NOT add markdown sections to them. Instead:
+- **Scan** `.feature` files for ambiguities (step 1)
+- **Write** Q&A to `{FEATURE_DIR}/tests/clarifications.md` (create if missing)
+- **Apply** changes to the `.feature` files themselves (update scenarios, add/remove steps)
 
 See [clarification-format.md](references/clarification-format.md) for format details.
 
