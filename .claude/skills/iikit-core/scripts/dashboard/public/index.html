@@ -2552,20 +2552,33 @@
       display: flex; flex-direction: column; padding: 14px 18px;
       background: var(--color-surface-elevated); border: 1px solid var(--color-border-subtle);
       border-radius: var(--radius-md); min-width: 200px;
-      border-left: 3px solid var(--color-done); box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
       transition: all var(--transition-fast);
     }
     .tessl-tile-card:hover { box-shadow: var(--shadow-card); transform: translateY(-1px); }
+    .tessl-tile-card.score-green { border-left: 3px solid var(--color-done); }
+    .tessl-tile-card.score-yellow { border-left: 3px solid var(--color-inprogress); }
+    .tessl-tile-card.score-red { border-left: 3px solid var(--color-p1); }
+    .tessl-tile-card.score-none { border-left: 3px solid var(--color-border); }
+    .tessl-tile-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .tessl-tile-name { font-size: 13px; font-weight: 600; color: var(--color-text); font-family: var(--font-mono); }
     .tessl-tile-version { font-size: 11px; color: var(--color-text-muted); margin-top: 4px; }
-    .tessl-tile-eval { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--color-border-subtle); }
-    .tessl-eval-score { font-size: 28px; font-weight: 700; color: var(--color-done); }
-    .tessl-eval-bar { height: 4px; background: var(--color-border); border-radius: 2px; margin-top: 6px; overflow: hidden; }
-    .tessl-eval-bar-fill { height: 100%; background: var(--color-done); border-radius: 2px; }
-    .tessl-eval-multiplier {
-      display: inline-block; margin-top: 6px; padding: 2px 10px; border-radius: 12px;
-      background: rgba(39, 201, 63, 0.15); color: var(--color-done); font-size: 11px; font-weight: 600;
+    .tessl-tile-scores { display: flex; gap: 6px; align-items: center; margin-top: 8px; }
+    .tessl-score-badge {
+      display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
+      border-radius: 10px; font-size: 11px; font-weight: 600;
     }
+    .tessl-score-badge.green { background: rgba(39, 201, 63, 0.15); color: var(--color-done); }
+    .tessl-score-badge.yellow { background: rgba(245, 166, 35, 0.15); color: var(--color-inprogress); }
+    .tessl-score-badge.red { background: rgba(255, 71, 87, 0.15); color: var(--color-p1); }
+    .tessl-score-badge.muted { background: rgba(107, 113, 137, 0.1); color: var(--color-text-muted); }
+    .tessl-score-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.3px; }
+    .tessl-tile-eval { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--color-border-subtle); }
+    .tessl-eval-bar { height: 4px; background: var(--color-border); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+    .tessl-eval-bar-fill { height: 100%; border-radius: 2px; }
+    .tessl-eval-bar-fill.green { background: var(--color-done); }
+    .tessl-eval-bar-fill.yellow { background: var(--color-inprogress); }
+    .tessl-eval-bar-fill.red { background: var(--color-p1); }
     /* File Structure Tree — VS Code style */
     .file-tree { font-family: var(--font-mono); font-size: 13px; }
     .file-tree-entry {
@@ -5709,18 +5722,34 @@
           html += '<div class="planview-section-title">Tessl Tiles</div>';
           html += '<div class="tessl-tiles">';
           for (const tile of data.tesslTiles) {
-            html += `<div class="tessl-tile-card">`;
-            html += `<span class="tessl-tile-name">${escapeHtml(tile.name)}</span>`;
+            const bestScore = tile.eval ? tile.eval.score : tile.reviewScore;
+            const colorClass = bestScore != null ? (bestScore >= 80 ? 'green' : bestScore >= 50 ? 'yellow' : 'red') : 'none';
+            html += `<div class="tessl-tile-card score-${colorClass}">`;
+            html += `<div class="tessl-tile-header"><span class="tessl-tile-name">${escapeHtml(tile.name)}</span></div>`;
             html += `<span class="tessl-tile-version">v${escapeHtml(tile.version)}</span>`;
+
+            // Score badges
+            const badges = [];
             if (tile.eval) {
+              const ec = tile.eval.score >= 80 ? 'green' : tile.eval.score >= 50 ? 'yellow' : 'red';
+              badges.push(`<span class="tessl-score-badge ${ec}"><span class="tessl-score-label">Eval</span> ${tile.eval.score}%</span>`);
+            }
+            if (tile.reviewScore != null) {
+              const rc = tile.reviewScore >= 80 ? 'green' : tile.reviewScore >= 50 ? 'yellow' : 'red';
+              badges.push(`<span class="tessl-score-badge ${rc}"><span class="tessl-score-label">Review</span> ${tile.reviewScore}</span>`);
+            }
+            if (badges.length === 0) {
+              badges.push(`<span class="tessl-score-badge muted"><span class="tessl-score-label">No scores</span></span>`);
+            }
+            html += `<div class="tessl-tile-scores">${badges.join('')}</div>`;
+
+            // Eval detail bar
+            if (tile.eval && tile.eval.chartData) {
               const chartTotal = tile.eval.chartData.pass + tile.eval.chartData.fail;
               const barPct = chartTotal > 0 ? Math.round(tile.eval.chartData.pass / chartTotal * 100) : tile.eval.score;
+              const bc = tile.eval.score >= 80 ? 'green' : tile.eval.score >= 50 ? 'yellow' : 'red';
               html += `<div class="tessl-tile-eval">`;
-              html += `<span class="tessl-eval-score">${tile.eval.score}%</span>`;
-              html += `<div class="tessl-eval-bar" title="${tile.eval.chartData.pass} pass, ${tile.eval.chartData.fail} fail"><div class="tessl-eval-bar-fill" style="width:${barPct}%"></div></div>`;
-              if (tile.eval.multiplier) {
-                html += `<span class="tessl-eval-multiplier">\u2191 ${tile.eval.multiplier}x</span>`;
-              }
+              html += `<div class="tessl-eval-bar" title="${tile.eval.chartData.pass} pass, ${tile.eval.chartData.fail} fail"><div class="tessl-eval-bar-fill ${bc}" style="width:${barPct}%"></div></div>`;
               html += `</div>`;
             }
             html += `</div>`;

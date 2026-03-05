@@ -105,7 +105,7 @@ myproject/
 
     const result = await computePlanViewState(tmpDir, '001-test-feature', { fetchEvalData: async () => null });
     expect(result.tesslTiles).toHaveLength(1);
-    expect(result.tesslTiles[0]).toEqual({ name: 'tessl/npm-express', version: '5.1.0', eval: null });
+    expect(result.tesslTiles[0]).toEqual({ name: 'tessl/npm-express', version: '5.1.0', eval: null, reviewScore: null });
   });
 
   // TS-042: eval scores displayed when Tessl API returns eval data

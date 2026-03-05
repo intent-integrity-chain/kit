@@ -79,13 +79,15 @@ async function computePlanViewState(projectPath, featureId, options = {}) {
     }));
   }
 
-  // Parse tessl.json and enrich with eval data
+  // Parse tessl.json and enrich with eval + review data
   const tesslTiles = parseTesslJson(projectPath);
-  const evalResults = await Promise.all(
-    tesslTiles.map(tile => evalFetcher(tile.name).catch(() => null))
-  );
+  const [evalResults, reviewScores] = await Promise.all([
+    Promise.all(tesslTiles.map(tile => evalFetcher(tile.name).catch(() => null))),
+    fetchTesslReviewScores(tesslTiles.map(t => t.name)).catch(() => ({}))
+  ]);
   tesslTiles.forEach((tile, i) => {
     tile.eval = evalResults[i];
+    tile.reviewScore = reviewScores[tile.name] ?? null;
   });
 
   return {
@@ -146,6 +148,45 @@ async function classifyNodeTypes(labels) {
   const result = {};
   for (const label of labels) result[label] = 'default';
   return result;
+}
+
+/**
+ * Fetch review scores for tiles by parsing `tessl search` output.
+ * Batches all tile names into individual searches (tessl search has no batch mode).
+ *
+ * @param {string[]} tileNames - Tile names to look up
+ * @returns {Promise<Object>} Mapping of tileName -> score (number) or null
+ */
+async function fetchTesslReviewScores(tileNames) {
+  if (!tileNames || tileNames.length === 0) return {};
+
+  try {
+    const execAsync = promisify(childProcess.exec);
+    // Check tessl is available
+    await execAsync('command -v tessl', { timeout: 2000 });
+
+    const results = {};
+    await Promise.all(tileNames.map(async (name) => {
+      try {
+        const { stdout } = await execAsync(`tessl search "${name}"`, { timeout: 10000 });
+        // Parse: "name | score | version [type]" — score is a number or "- ⧗-"
+        const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const match = stdout.match(new RegExp(`${escapedName}\\s*\\|\\s*(\\d+|[^|]+)\\s*\\|`));
+        if (match) {
+          const scoreStr = match[1].trim();
+          const score = parseInt(scoreStr, 10);
+          results[name] = isNaN(score) ? null : score;
+        } else {
+          results[name] = null;
+        }
+      } catch {
+        results[name] = null;
+      }
+    }));
+    return results;
+  } catch {
+    return {};
+  }
 }
 
 // In-memory cache for eval data per tile name
