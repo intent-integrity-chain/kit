@@ -57,7 +57,9 @@ Read from FEATURE_DIR: `spec.md` (required), `plan.md` (optional), `tasks.md` (o
 
 ### 3. Generate Checklist
 
-Create `FEATURE_DIR/checklists/[domain].md`.
+**Starting point**: `FEATURE_DIR/checklists/requirements.md` already exists (created by `/iikit-01-specify`). Review it, extend it with additional items, and resolve gaps. Do NOT create a duplicate — work with the existing file.
+
+**Additional domain checklists** (optional): if the spec has distinct domains that warrant separate review (e.g., security, performance, accessibility), create additional files as `FEATURE_DIR/checklists/[domain].md`. These supplement `requirements.md`, not replace it.
 
 **Item structure**: question format about requirement quality, with quality dimension tag and spec reference.
 
