@@ -562,6 +562,39 @@ describe('BUG-8: ESM/CJS conflict with type:module', () => {
   });
 });
 
+describe('BUG-25: dashboard shows empty state (not spinner) when only constitution+premise exist', () => {
+  test('generates dashboard with empty features and showEmptyState in static init', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'iikit-nofeatures-'));
+    try {
+      // Only constitution + premise, NO specs directory
+      fs.writeFileSync(path.join(tmpDir, 'CONSTITUTION.md'),
+        '# Constitution\n## Core Principles\n### I. Quality\nCode quality required.\n');
+      fs.writeFileSync(path.join(tmpDir, 'PREMISE.md'), '# Premise\nA test project.\n');
+
+      const result = runGenerator([tmpDir]);
+      expect(result.status).toBe(0);
+
+      const html = fs.readFileSync(path.join(tmpDir, '.specify', 'dashboard.html'), 'utf-8');
+      const match = html.match(/window\.DASHBOARD_DATA\s*=\s*({.*?});/s);
+      expect(match).not.toBeNull();
+
+      const data = JSON.parse(match[1]);
+      // Features must be empty — no specs exist
+      expect(data.features).toEqual([]);
+      expect(Object.keys(data.featureData)).toHaveLength(0);
+      // Constitution and premise should still be populated
+      expect(data.constitution).toBeDefined();
+      expect(data.premise).toBeDefined();
+
+      // The static-mode init code must call showEmptyState() when features are empty
+      // (regression: previously left the loading spinner spinning forever)
+      expect(html).toMatch(/else\s*\{\s*\n?\s*showEmptyState\(/);
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+});
+
 describe('BUG-9: dashboard should generate without CONSTITUTION.md', () => {
   test('generates partial dashboard when constitution missing but spec exists', () => {
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'iikit-noconst-'));
