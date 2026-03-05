@@ -194,17 +194,22 @@ STAGED_FILES_ALL=$(git diff --cached --name-only 2>/dev/null) || true
 if [[ -n "$STAGED_FEATURE_FILES" ]]; then
     # Group staged .feature files by feature directory
     # e.g., specs/001-feature/tests/features/login.feature -> specs/001-feature
-    declare -A FEATURE_DIRS_MAP
+    # Collect unique feature directories (bash 3.2 compatible — no associative arrays)
+    FEATURE_DIRS_LIST=""
     while IFS= read -r staged_path; do
         [[ -z "$staged_path" ]] && continue
         # Derive feature dir: specs/NNN/tests/features/x.feature -> specs/NNN
         FEATURES_DIR=$(dirname "$staged_path")                    # tests/features
         TESTS_DIR=$(dirname "$FEATURES_DIR")                      # tests
         FEAT_DIR=$(dirname "$TESTS_DIR")                          # specs/NNN-feature
-        FEATURE_DIRS_MAP["$FEAT_DIR"]=1
+        FEATURE_DIRS_LIST="$FEATURE_DIRS_LIST$FEAT_DIR"$'\n'
     done <<< "$STAGED_FEATURE_FILES"
 
-    for FEAT_DIR in "${!FEATURE_DIRS_MAP[@]}"; do
+    # Deduplicate feature directories
+    FEATURE_DIRS_UNIQUE=$(echo "$FEATURE_DIRS_LIST" | sort -u)
+
+    while IFS= read -r FEAT_DIR; do
+        [[ -z "$FEAT_DIR" ]] && continue
         FEATURES_DIR_ABS="$REPO_ROOT/$FEAT_DIR/tests/features"
         CONTEXT_FILE="$REPO_ROOT/$FEAT_DIR/context.json"
         CONTEXT_REL_PATH="$FEAT_DIR/context.json"
@@ -298,7 +303,7 @@ if [[ -n "$STAGED_FEATURE_FILES" ]]; then
                 fi
                 ;;
         esac
-    done
+    done <<< "$FEATURE_DIRS_UNIQUE"
 fi
 
 # ============================================================================

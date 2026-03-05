@@ -66,16 +66,21 @@ FULL_NOTE="$EXISTING_NOTE"
 
 # --- .feature files: group by feature directory, compute combined hash ---
 if [[ -n "$COMMITTED_FEATURE_FILES" ]]; then
-    declare -A COMMITTED_FEAT_DIRS
+    # Collect unique feature directories (bash 3.2 compatible — no associative arrays)
+    COMMITTED_FEAT_DIRS_LIST=""
     while IFS= read -r committed_path; do
         [[ -z "$committed_path" ]] && continue
         FEATURES_DIR=$(dirname "$committed_path")
         TESTS_DIR=$(dirname "$FEATURES_DIR")
         FEAT_DIR=$(dirname "$TESTS_DIR")
-        COMMITTED_FEAT_DIRS["$FEAT_DIR"]=1
+        COMMITTED_FEAT_DIRS_LIST="$COMMITTED_FEAT_DIRS_LIST$FEAT_DIR"$'\n'
     done <<< "$COMMITTED_FEATURE_FILES"
 
-    for FEAT_DIR in "${!COMMITTED_FEAT_DIRS[@]}"; do
+    # Deduplicate feature directories
+    COMMITTED_FEAT_DIRS_UNIQUE=$(echo "$COMMITTED_FEAT_DIRS_LIST" | sort -u)
+
+    while IFS= read -r FEAT_DIR; do
+        [[ -z "$FEAT_DIR" ]] && continue
         # Extract all committed .feature files for this feature to temp dir
         TEMP_FEATURES_DIR=$(mktemp -d)
         FEAT_FILES=$(echo "$COMMITTED_FEATURE_FILES" | grep "^$FEAT_DIR/")
@@ -118,7 +123,7 @@ $ENTRY"
         fi
 
         echo "[iikit] Assertion hash stored as git note for $FEATURES_REL_PATH" >&2
-    done
+    done <<< "$COMMITTED_FEAT_DIRS_UNIQUE"
 fi
 
 # --- Legacy test-specs.md files ---
