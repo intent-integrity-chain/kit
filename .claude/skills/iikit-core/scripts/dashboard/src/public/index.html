@@ -2262,30 +2262,83 @@
     }
 
     .premise-section {
-      margin-bottom: 24px;
+      margin-bottom: 28px;
     }
-    .premise-summary {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
+    .premise-section-title {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--color-text-secondary);
       margin-bottom: 12px;
     }
-    .premise-summary-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 6px 8px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--color-text);
-      border-bottom: 1px solid var(--color-border-subtle);
-      cursor: pointer;
-      border-radius: var(--radius-sm);
-      transition: background var(--transition-fast);
+    .premise-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 8px;
     }
-    .premise-summary-item:last-child { border-bottom: none; }
-    .premise-summary-item:hover { background: var(--color-surface-hover); }
-    .premise-summary-item.selected { background: var(--color-surface-elevated); border-left: 3px solid var(--color-accent); }
+    .premise-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .premise-card:hover {
+      background: var(--color-surface-hover);
+      border-color: var(--color-text-muted);
+    }
+    .premise-card.selected {
+      border-color: var(--color-accent);
+      background: var(--color-surface-elevated);
+    }
+    .premise-card-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--color-text-muted);
+      margin-bottom: 6px;
+    }
+    .premise-card.selected .premise-card-label {
+      color: var(--color-accent);
+    }
+    .premise-card-preview {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--color-text-secondary);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .premise-card.selected .premise-card-preview {
+      display: none;
+    }
+    .premise-card-body {
+      display: none;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--color-text-secondary);
+    }
+    .premise-card.selected .premise-card-body {
+      display: block;
+      animation: cardEnter 0.25s ease;
+    }
+    .premise-card-body p {
+      margin: 0 0 6px;
+    }
+    .premise-card-body ul {
+      margin: 4px 0 8px 16px;
+      padding: 0;
+    }
+    .premise-card-body li {
+      margin-bottom: 3px;
+    }
+    .premise-card-body strong {
+      color: var(--color-text);
+    }
 
     .constitution-layout {
       display: flex;
@@ -4643,21 +4696,24 @@
 
         // Premise section
         let premiseSectionCount = 0;
-        let premiseRightHtml = '';
+        let premiseHtml = '';
         if (currentPremise && currentPremise.exists) {
           const premiseResult = renderPremiseContent(currentPremise.content);
-          premiseRightHtml = `<div class="premise-section"><div class="premise-summary">${premiseResult.summaryHtml}</div>${premiseResult.detailHtml}</div>`;
+          premiseHtml = `<div class="premise-section">
+            <div class="premise-section-title">Premise</div>
+            <div class="premise-grid">${premiseResult.cardsHtml}</div>
+          </div>`;
           premiseSectionCount = premiseResult.sectionCount;
         }
 
         contentArea.innerHTML = `
           <div class="constitution-view">
+            ${premiseHtml}
             <div class="constitution-layout">
               <div class="constitution-left">
                 <div class="radar-container">${radarSvg}</div>
               </div>
               <div class="constitution-right">
-                ${premiseRightHtml}
                 <div class="constitution-summary">${summaryHtml}</div>
                 ${detailHtml}
               </div>
@@ -4728,27 +4784,30 @@
         const { title, sections } = parsePremiseMarkdown(markdown);
         parsedPremiseSections = sections;
 
-        const summaryHtml = sections.map((s, i) => {
+        const cardsHtml = sections.map((s, i) => {
           const isSelected = selectedPremiseSection === i;
-          return `<div class="premise-summary-item${isSelected ? ' selected' : ''}" id="premise-item-${i}">${escapeHtml(s.heading)}</div>`;
+          const preview = s.body.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+          const previewText = preview.length > 120 ? preview.slice(0, 117) + '...' : preview;
+          return `<div class="premise-card${isSelected ? ' selected' : ''}" id="premise-item-${i}" role="button" tabindex="0">
+            <div class="premise-card-label">${escapeHtml(s.heading)}</div>
+            <div class="premise-card-preview">${escapeHtml(previewText)}</div>
+            <div class="premise-card-body">${s.body}</div>
+          </div>`;
         }).join('');
 
-        const detailHtml = selectedPremiseSection !== null && sections[selectedPremiseSection]
-          ? `<div class="detail-card"><div class="detail-text">${sections[selectedPremiseSection].body}</div></div>`
-          : '';
-
-        return { summaryHtml, detailHtml, sectionCount: sections.length };
+        return { cardsHtml, sectionCount: sections.length };
       }
 
       function attachPremiseHandlers(sectionCount) {
         for (let i = 0; i < sectionCount; i++) {
           const el = document.getElementById(`premise-item-${i}`);
           if (!el) continue;
-          el.addEventListener('click', () => {
+          function handler() {
             selectedPremiseSection = selectedPremiseSection === i ? null : i;
-            // Re-render the whole constitution view to update both premise and principle state
             renderConstitutionContent(currentConstitution);
-          });
+          }
+          el.addEventListener('click', handler);
+          el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handler(); } });
         }
       }
 
