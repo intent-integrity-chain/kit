@@ -149,6 +149,15 @@ Output: branch name, plan path, generated artifacts (research.md, data-model.md,
 
 If plan.md exists: compare tech stack, architecture, dependencies. Show diff per [formatting-guide.md](../iikit-core/references/formatting-guide.md) (Semantic Diff section) with downstream impact. Flag breaking changes.
 
+## Dashboard Refresh
+
+Regenerate the dashboard so the pipeline reflects the new plan:
+
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
+```
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
+
 ## Next Steps
 
 Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/next-step.sh --phase 02 --json`

@@ -45,13 +45,6 @@ If bug-fix intent is detected:
 4. If the user confirms it is a new feature: proceed to Step 1
 5. If the user wants bugfix: stop and suggest they run `/iikit-bugfix`
 
-### 0.1 Generate Dashboard (optional, never blocks)
-
-```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
-```
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
-
 ### 1. Generate Branch Name
 
 Create 2-4 word action-noun name from description:
@@ -112,6 +105,15 @@ Output: branch name, spec file path, checklist results, readiness for next phase
 ## Semantic Diff on Re-run
 
 If spec.md already exists: extract semantic elements (stories, requirements, criteria), compare with new content per [formatting-guide.md](../iikit-core/references/formatting-guide.md) (Semantic Diff section), show downstream impact warnings, ask confirmation before overwriting.
+
+## Dashboard Refresh
+
+Regenerate the dashboard so the pipeline reflects the new spec:
+
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
+```
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
 
 ## Next Steps
 

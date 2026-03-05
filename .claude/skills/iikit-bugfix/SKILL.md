@@ -28,13 +28,6 @@ Load constitution per [constitution-loading.md](../iikit-core/references/constit
 
 The text after `/iikit-bugfix` is either a `#number` (GitHub issue) or a text bug description.
 
-### 0. Generate Dashboard (optional, never blocks)
-
-```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
-```
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
-
 ### 1. Parse Input
 
 Determine the input type:
@@ -229,7 +222,16 @@ Append to existing `<feature_dir>/tasks.md`. If tasks.md does not exist, create 
 
 Do NOT modify existing entries or task IDs in tasks.md.
 
-### 12. Report
+### 12. Dashboard Refresh (optional, never blocks)
+
+Regenerate the dashboard so the pipeline reflects the new bug and tasks:
+
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
+```
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
+
+### 13. Report
 
 Output a summary:
 

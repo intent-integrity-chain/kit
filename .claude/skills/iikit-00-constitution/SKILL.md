@@ -41,12 +41,6 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 1. **Load existing constitution** — identify placeholder tokens `[ALL_CAPS_IDENTIFIER]`. Adapt to user's needs (more or fewer principles than template).
 
-1.1. **Generate Dashboard** (optional, never blocks):
-```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
-```
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
-
 2. **Collect values for placeholders**:
    - From user input, or infer from repo context
    - `RATIFICATION_DATE`: original adoption date
@@ -79,7 +73,13 @@ Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/sc
 
 11. **Commit**: `git add CONSTITUTION.md .specify/context.json && git commit -m "Add project constitution"`
 
-12. **Report**: version, bump rationale, TDD determination, git status, suggested next steps
+12. **Dashboard Refresh** (optional, never blocks):
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
+```
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
+
+13. **Report**: version, bump rationale, TDD determination, git status, suggested next steps
 
 ## Formatting
 
