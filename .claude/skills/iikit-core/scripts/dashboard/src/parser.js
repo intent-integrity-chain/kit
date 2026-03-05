@@ -753,8 +753,8 @@ function parseFileStructure(content) {
 function parseAsciiDiagram(content) {
   if (!content || typeof content !== 'string') return null;
 
-  // Find Architecture Overview section
-  const sectionMatch = content.match(/^## Architecture Overview\s*$/m);
+  // Find Architecture section (matches "## Architecture", "## Architecture Overview", "## System Architecture", etc.)
+  const sectionMatch = content.match(/^## (?:System )?Architecture(?:\s+\w+)?\s*$/m);
   if (!sectionMatch) return null;
 
   const afterSection = content.substring(sectionMatch.index);

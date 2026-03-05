@@ -63,23 +63,35 @@ async function computePlanViewState(projectPath, featureId, options = {}) {
   // Parse ASCII diagram
   let diagram = parseAsciiDiagram(planContent);
   if (diagram && diagram.nodes.length > 0) {
-    // Classify node types via LLM (with cache and fallback)
+    // Classify node types: context.json pre-computed > LLM cache > LLM API > default
     const cacheKey = `${featureId}:${planContent.length}`;
-    if (classificationCache.has(cacheKey)) {
-      const cached = classificationCache.get(cacheKey);
-      diagram.nodes = diagram.nodes.map(n => ({
-        ...n,
-        type: cached[n.label] || 'default'
-      }));
-    } else {
-      const labels = diagram.nodes.map(n => n.label);
-      const types = await classifyNodeTypes(labels);
-      classificationCache.set(cacheKey, types);
-      diagram.nodes = diagram.nodes.map(n => ({
-        ...n,
-        type: types[n.label] || 'default'
-      }));
+    let types = null;
+
+    // Try pre-computed classifications from context.json (written by /iikit-02-plan)
+    const contextPath = path.join(projectPath, '.specify', 'context.json');
+    if (fs.existsSync(contextPath)) {
+      try {
+        const ctx = JSON.parse(fs.readFileSync(contextPath, 'utf-8'));
+        if (ctx.planview && ctx.planview.nodeClassifications) {
+          types = ctx.planview.nodeClassifications;
+        }
+      } catch { /* malformed context.json */ }
     }
+
+    if (!types && classificationCache.has(cacheKey)) {
+      types = classificationCache.get(cacheKey);
+    }
+
+    if (!types) {
+      const labels = diagram.nodes.map(n => n.label);
+      types = await classifyNodeTypes(labels);
+    }
+
+    classificationCache.set(cacheKey, types);
+    diagram.nodes = diagram.nodes.map(n => ({
+      ...n,
+      type: types[n.label] || 'default'
+    }));
   }
 
   // Parse tessl.json and enrich with eval data
