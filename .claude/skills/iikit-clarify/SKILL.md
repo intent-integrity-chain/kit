@@ -132,6 +132,15 @@ Output: questions asked/answered, target artifact and path, sections touched, tr
 - Respect early termination signals ("stop", "done", "proceed")
 - For non-spec artifacts, adapt reference format to the artifact's native ID scheme
 
+## Commit
+
+Commit the modified artifact(s):
+
+```bash
+git add -u
+git commit -m "clarify: <target-artifact> Q&A"
+```
+
 ## Dashboard Refresh
 
 ```bash

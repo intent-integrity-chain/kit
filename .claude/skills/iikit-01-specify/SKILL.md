@@ -106,6 +106,13 @@ Output: branch name, spec file path, checklist results, readiness for next phase
 
 If spec.md already exists: extract semantic elements (stories, requirements, criteria), compare with new content per [formatting-guide.md](../iikit-core/references/formatting-guide.md) (Semantic Diff section), show downstream impact warnings, ask confirmation before overwriting.
 
+## Commit
+
+```bash
+git add specs/*/spec.md specs/*/checklists/requirements.md .specify/active-feature
+git commit -m "spec: <feature-short-name> specification"
+```
+
 ## Dashboard Refresh
 
 Regenerate the dashboard so the pipeline reflects the new spec:

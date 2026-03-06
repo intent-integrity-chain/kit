@@ -149,6 +149,13 @@ Output: branch name, plan path, generated artifacts (research.md, data-model.md,
 
 If plan.md exists: compare tech stack, architecture, dependencies. Show diff per [formatting-guide.md](../iikit-core/references/formatting-guide.md) (Semantic Diff section) with downstream impact. Flag breaking changes.
 
+## Commit
+
+```bash
+git add specs/*/plan.md specs/*/research.md specs/*/data-model.md specs/*/quickstart.md specs/*/contracts/ .specify/context.json
+git commit -m "plan: <feature-short-name> technical design"
+```
+
 ## Dashboard Refresh
 
 Regenerate the dashboard so the pipeline reflects the new plan:

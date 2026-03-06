@@ -158,6 +158,13 @@ Ask: "Suggest concrete remediation edits for the top N issues?" Do NOT apply aut
 - Prioritize constitution violations, use specific examples over exhaustive rules
 - Report zero issues gracefully with coverage statistics
 
+## Commit
+
+```bash
+git add specs/*/analysis.md .specify/score-history.json
+git commit -m "analyze: <feature-short-name> consistency report"
+```
+
 ## Dashboard Refresh
 
 Regenerate the dashboard so the pipeline reflects the analysis results:

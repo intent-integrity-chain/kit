@@ -142,6 +142,13 @@ Output: TDD determination, scenario counts by source (acceptance/contract/valida
 | No acceptance scenarios | ERROR: Run /iikit-clarify |
 | .feature syntax error | FIX: Auto-correct and report |
 
+## Commit
+
+```bash
+git add specs/*/tests/features/ specs/*/context.json .specify/context.json
+git commit -m "testify: <feature-short-name> BDD scenarios"
+```
+
 ## Dashboard Refresh
 
 Regenerate the dashboard so the pipeline reflects the new testify artifacts:

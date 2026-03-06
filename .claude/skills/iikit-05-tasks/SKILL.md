@@ -123,6 +123,13 @@ Output: path to tasks.md, total count, count per story, parallel opportunities, 
 
 If tasks.md exists: preserve `[x]` completion status, map old IDs to new by similarity, warn about changes to completed tasks. Ask confirmation before overwriting. Use format from [formatting-guide.md](../iikit-core/references/formatting-guide.md) (Semantic Diff section).
 
+## Commit
+
+```bash
+git add specs/*/tasks.md
+git commit -m "tasks: <feature-short-name> task breakdown"
+```
+
 ## Dashboard Refresh
 
 Regenerate the dashboard so the pipeline reflects the new tasks:

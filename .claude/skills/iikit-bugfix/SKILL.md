@@ -222,7 +222,14 @@ Append to existing `<feature_dir>/tasks.md`. If tasks.md does not exist, create 
 
 Do NOT modify existing entries or task IDs in tasks.md.
 
-### 12. Dashboard Refresh (optional, never blocks)
+### 12. Commit
+
+```bash
+git add specs/*/bugs.md specs/*/tasks.md specs/*/tests/features/
+git commit -m "bugfix: <BUG-ID> <short-description>"
+```
+
+### 13. Dashboard Refresh (optional, never blocks)
 
 Regenerate the dashboard so the pipeline reflects the new bug and tasks:
 
