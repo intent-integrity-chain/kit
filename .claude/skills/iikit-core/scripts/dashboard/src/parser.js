@@ -1313,11 +1313,22 @@ function parseConstitutionAlignment(content) {
 
   const rows = parseMarkdownTable(section);
   return rows.map(cells => {
-    if (cells.length < 3) return null;
+    if (cells.length < 2) return null;
+
+    // Find the status column: the one containing ALIGNED/PARTIAL/VIOLATION
+    const statusPattern = /aligned|partial|violation/i;
+    let statusIdx = cells.findIndex(c => statusPattern.test(c));
+    if (statusIdx < 0) return null;
+
+    // Principle name is the column before status (skip leading # column if present)
+    const principleIdx = statusIdx > 0 ? statusIdx - 1 : 0;
+    // Evidence/notes is the column after status (if exists)
+    const evidenceIdx = statusIdx + 1 < cells.length ? statusIdx + 1 : -1;
+
     return {
-      principle: cells[0],
-      status: cells[1],
-      evidence: cells[2]
+      principle: cells[principleIdx],
+      status: cells[statusIdx],
+      evidence: evidenceIdx >= 0 ? cells[evidenceIdx] : ''
     };
   }).filter(Boolean);
 }
