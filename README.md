@@ -6,22 +6,31 @@ An AI coding assistant toolkit that preserves your intent from idea to implement
 
 ## What's New in v2.7.12
 
+- **Premise card grid**: Constitution tab shows premise as a responsive card grid with click-to-expand, replacing the old flat text block.
+- **Dashboard empty state**: No more spinning loader when only constitution + premise exist. Shows premise and constitution immediately.
+- **Architecture diagram fix**: Parser now matches `## Architecture`, `## Architecture Overview`, `## System Architecture` (was hardcoded to one variant). Node classifications read from context.json instead of dead Anthropic API call.
+- **Analyze parser fix**: Handles bold sub-section headings (`**Coverage Summary**`) and the 5-column coverage table format from the analyze skill. Health score now reads metrics correctly.
+- **Tile review scores**: Plan view tile cards show eval and/or review scores with color-coded badges (green/yellow/red). Falls back to registry review scores when no eval data exists.
+- **Testify clarifications**: Clarify skill writes Q&A to `tests/clarifications.md` (not into .feature files which are Gherkin). Dashboard reads the companion file for testify Q&A badges.
+- **Tasks Q&A on implement**: Tasks phase has no screen (redirects to implement), so tasks clarifications now show on the implement pipeline node.
+- **Checklist gating**: `requirements.md` from specify only shows in checklist tab after `/iikit-03-checklist` writes `checklist_reviewed_at` to context.json.
+- **Commit after every phase**: All skills now commit their artifacts before dashboard refresh. Previously only constitution and implement committed.
+- **Dashboard after artifacts**: Dashboard generation moved after artifact writing in constitution, specify, plan, and bugfix skills (was before).
+- **Bash 3.2 compatibility**: Pre-commit and post-commit hooks replaced `declare -A` (bash 4+) with `sort -u` for macOS compatibility.
+
+### v2.7.5
+
 - **27 bug fixes** from E2E testing across 12 projects (101 phases, 596 unit tests, 32 integration tests — all green).
 - **Clarification badge fix**: Badges now count `- Q:` items (not session headings), and track clarifications on checklist, analyze, and tasks phases (were hardcoded to 0).
 - **Dashboard resilience**: Generates without CONSTITUTION.md (was hard-fail exit 3), handles ESM projects with `type:module`.
 - **Testified stage**: New `testified` feature stage between `planned` and `tasks-ready` when .feature files exist but no tasks.md.
 - **Pre-commit softened**: Missing step_definitions and BDD runner dependency are now warnings, not commit blockers.
-- **Bugfix task percentage**: Adding T-B bugfix tasks no longer decreases the implementation progress percentage.
-- **Spec quality penalty**: Template specs with `[PLACEHOLDER]` brackets score lower to prevent false quality signals.
-- **Next-step consistency**: `alt_steps` includes `/iikit-clarify` when constitution exists, status mode produces same alts as phase-based mode, `ready_for` clamped to agree with `next_step`.
-- **Branch numbering**: Current branch excluded from auto-numbering; `create-new-feature.sh` warns when constitution missing.
-- **Phase 00 on main**: Constitution phase no longer requires a feature branch.
 
 ### v2.6.0
 
-- **Externalized next-step state machine**: All 12 skills, session hooks, and status queries now call a single `next-step.sh` script — one source of truth for workflow transitions, model tier suggestions, and `/clear` recommendations. Eliminates 12 independent copies of next-step logic that drifted out of sync.
+- **Externalized next-step state machine**: All 12 skills, session hooks, and status queries now call a single `next-step.sh` script — one source of truth for workflow transitions, model tier suggestions, and `/clear` recommendations.
 - **Mandatory/optional path clarity**: Mandatory path is `00→01→02→[04 if TDD]→05→07`. Steps 03 (checklist), 06 (analyze), and 08 (tasks-to-issues) are optional and appear as `alt_steps` in the JSON output.
-- **Model tier in status output**: `check-prerequisites.sh --phase status --json` now includes `model_tier` field, codified from `model-recommendations.md`.
+- **Model tier in status output**: `check-prerequisites.sh --phase status --json` now includes `model_tier` field.
 - **Clear recommendations**: Each transition includes `clear_before`/`clear_after` flags based on context consumption patterns.
 
 ### v2.5.1
