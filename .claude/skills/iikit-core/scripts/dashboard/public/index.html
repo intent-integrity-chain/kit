@@ -3331,13 +3331,19 @@
             ).join(', ');
           }
 
+          // Make FR/SC/TS/T refs in description clickable
+          const descHtml = escapeHtml(bug.description || '\u2014')
+            .replace(/\b(FR-\d+|SC-\d+)\b/g, '<span class="cross-link" data-cross-target="spec" data-cross-id="$1" style="cursor:pointer;color:var(--color-accent)">$1</span>')
+            .replace(/\b(TS-\d+)\b/g, '<span class="cross-link" data-cross-target="testify" data-cross-id="$1" style="cursor:pointer;color:var(--color-accent)">$1</span>')
+            .replace(/\b(T\d{3,})\b/g, '<span class="cross-link" data-cross-target="implement" data-cross-id="$1" style="cursor:pointer;color:var(--color-accent)">$1</span>');
+
           tableRows += `
             <tr class="bug-row" data-bug-id="${bug.id}">
               <td class="bug-id">${bug.id}</td>
               <td><span class="severity-badge severity-${bug.severity}">${bug.severity}</span></td>
               <td class="bug-status ${bug.status === 'fixed' ? 'fixed' : ''}">${bug.status}</td>
               <td class="bug-progress">${progressText}${taskLinks ? '<br>' + taskLinks : ''}</td>
-              <td class="bug-description" title="${escapeHtml(bug.description || '')}">${escapeHtml(bug.description || '\u2014')}</td>
+              <td class="bug-description" title="${escapeHtml(bug.description || '')}">${descHtml}</td>
               <td>${githubHtml}</td>
             </tr>`;
         }
