@@ -4,7 +4,7 @@
 
 An AI coding assistant toolkit that preserves your intent from idea to implementation, with cryptographic verification at each step. Compatible with Claude Code, OpenAI Codex, Google Gemini, and OpenCode.
 
-## What's New in v2.7.14
+## What's New in v2.7.15
 
 - **Premise card grid**: Constitution tab shows premise as a responsive card grid with click-to-expand, replacing the old flat text block.
 - **Dashboard empty state**: No more spinning loader when only constitution + premise exist. Shows premise and constitution immediately.
