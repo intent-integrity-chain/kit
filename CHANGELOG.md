@@ -1,17 +1,26 @@
 # Changelog
 
-## v2.7.2
+## v2.7.13
+
+- **Premise card grid**: Constitution tab shows premise as a responsive card grid with click-to-expand.
+- **Dashboard empty state**: Shows premise + constitution immediately instead of infinite spinner when no features exist.
+- **Architecture diagram fix**: Parser matches flexible heading names (`## Architecture`, `## Architecture Overview`, etc.). Node classifications from context.json instead of dead LLM API call.
+- **Analyze parser**: Handles bold sub-section headings, 5-column coverage table, flexible metric key names, and constitution alignment column detection by content.
+- **Tile review scores**: Color-coded eval and review score badges on plan view tile cards.
+- **Testify clarifications**: Clarify writes Q&A to `tests/clarifications.md` (Gherkin can't hold markdown). Tasks Q&A shown on implement node.
+- **Checklist gating**: `requirements.md` gated on `checklist_reviewed_at` in context.json. Checklist skill reviews existing file instead of creating duplicates.
+- **Commit after every phase**: All artifact-producing skills now commit before dashboard refresh.
+- **Dashboard after artifacts**: Generation moved after work in constitution, specify, plan, and bugfix skills.
+- **Bash 3.2 compatibility**: Pre-commit and post-commit hooks use `sort -u` instead of `declare -A`.
+- **Bug cross-links**: FR/SC/TS/T references in bug descriptions auto-link. Description column no longer truncates.
+
+## v2.7.5
 
 - **27 bug fixes** from E2E testing across 12 projects (101 phases, 596 unit tests, 32 integration tests — all green).
 - **Clarification badge fix**: Badges now count `- Q:` items (not session headings), and track clarifications on checklist, analyze, and tasks phases (were hardcoded to 0).
 - **Dashboard resilience**: Generates without CONSTITUTION.md (was hard-fail exit 3), handles ESM projects with `type:module`.
 - **Testified stage**: New `testified` feature stage between `planned` and `tasks-ready` when .feature files exist but no tasks.md.
 - **Pre-commit softened**: Missing step_definitions and BDD runner dependency are now warnings, not commit blockers.
-- **Bugfix task percentage**: Adding T-B bugfix tasks no longer decreases the implementation progress percentage.
-- **Spec quality penalty**: Template specs with `[PLACEHOLDER]` brackets score lower to prevent false quality signals.
-- **Next-step consistency**: `alt_steps` includes `/iikit-clarify` when constitution exists, status mode produces same alts as phase-based mode, `ready_for` clamped to agree with `next_step`.
-- **Branch numbering**: Current branch excluded from auto-numbering; `create-new-feature.sh` warns when constitution missing.
-- **Phase 00 on main**: Constitution phase no longer requires a feature branch.
 
 ## v2.7.1
 

@@ -17,6 +17,8 @@ An AI coding assistant toolkit that preserves your intent from idea to implement
 - **Commit after every phase**: All skills now commit their artifacts before dashboard refresh. Previously only constitution and implement committed.
 - **Dashboard after artifacts**: Dashboard generation moved after artifact writing in constitution, specify, plan, and bugfix skills (was before).
 - **Bash 3.2 compatibility**: Pre-commit and post-commit hooks replaced `declare -A` (bash 4+) with `sort -u` for macOS compatibility.
+- **Bug cross-links**: FR/SC/TS/T references in bug descriptions auto-link as clickable cross-navigation spans. Bug description column no longer truncates with ellipsis.
+- **Constitution alignment parser**: Finds the ALIGNED/PARTIAL/VIOLATION column by content instead of assuming fixed column order.
 
 ### v2.7.5
 
