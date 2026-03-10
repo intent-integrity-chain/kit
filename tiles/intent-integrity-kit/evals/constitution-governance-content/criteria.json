@@ -1,0 +1,56 @@
+{
+  "context": "Tests whether the agent creates a CONSTITUTION.md that strictly follows IIKit governance rules: spec-agnostic (no technology choices), at least 3 principles, correct semver versioning, and TDD determination stored in .specify/context.json via jq merge.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "No technology stack in constitution",
+      "max_score": 15,
+      "description": "CONSTITUTION.md does NOT contain specific technology choices such as database names (PostgreSQL, DynamoDB, MySQL), frameworks (FastAPI, Django, React), languages (Python, Node.js), or library/tool versions"
+    },
+    {
+      "name": "No implementation details",
+      "max_score": 10,
+      "description": "CONSTITUTION.md does NOT contain implementation specifics like file structures, API schemas, data models, architecture diagrams, or service configurations"
+    },
+    {
+      "name": "At least 3 principles",
+      "max_score": 10,
+      "description": "CONSTITUTION.md contains at least 3 distinct named principles (sections or subsections identifying governance rules)"
+    },
+    {
+      "name": "Governance content present",
+      "max_score": 8,
+      "description": "CONSTITUTION.md contains governance content: non-negotiable development rules, quality standards, compliance expectations, and/or amendment procedures"
+    },
+    {
+      "name": "Semver version present",
+      "max_score": 8,
+      "description": "CONSTITUTION.md includes a version number in semver format (e.g., 1.0.0, 0.1.0) with a CONSTITUTION_VERSION or equivalent field"
+    },
+    {
+      "name": "Dates in ISO format",
+      "max_score": 5,
+      "description": "Any dates in CONSTITUTION.md are in ISO 8601 format (YYYY-MM-DD)"
+    },
+    {
+      "name": ".specify/context.json created",
+      "max_score": 15,
+      "description": "A .specify/context.json file exists containing a tdd_determination field"
+    },
+    {
+      "name": "TDD determination value valid",
+      "max_score": 12,
+      "description": "The tdd_determination value in .specify/context.json is one of: 'mandatory', 'optional', or 'forbidden'"
+    },
+    {
+      "name": "Principles are declarative",
+      "max_score": 8,
+      "description": "Constitution principles use declarative language (MUST, SHALL, REQUIRED, PROHIBITED) rather than vague aspirational language"
+    },
+    {
+      "name": "Amendment procedure present",
+      "max_score": 9,
+      "description": "CONSTITUTION.md includes a section or description of how the constitution can be amended (versioning, ratification, or change process)"
+    }
+  ]
+}

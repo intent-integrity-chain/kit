@@ -1,0 +1,51 @@
+{
+  "context": "Tests whether the agent uses IIKit's bug fix task format: T-BNNN task IDs, TS-NNN references when TDD is mandatory, structured bugs.md fields with BUG-NNN identifiers, and no modification of existing tasks in tasks.md.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "T-BNNN task ID format",
+      "max_score": 15,
+      "description": "All bug fix tasks use the T-BNNN format (e.g., T-B001, T-B002) rather than T001, T002 or any other format"
+    },
+    {
+      "name": "At least 1 fix task with TS ref",
+      "max_score": 15,
+      "description": "Since TDD is mandatory (tdd_determination=mandatory in context.json), at least one bug fix task references a test spec ID (TS-NNN) in its description, ensuring the fix is test-driven"
+    },
+    {
+      "name": "TDD task references test spec",
+      "max_score": 10,
+      "description": "The implement fix task explicitly references a test spec ID (TS-NNN) in its description"
+    },
+    {
+      "name": "bugs.md BUG-NNN entry",
+      "max_score": 10,
+      "description": "bugs.md contains a structured entry with a BUG-NNN identifier (e.g., BUG-001)"
+    },
+    {
+      "name": "bugs.md required fields",
+      "max_score": 10,
+      "description": "The bugs.md entry includes: a bug description, severity, status (reported), and reproduction steps"
+    },
+    {
+      "name": "bugs.md date format",
+      "max_score": 5,
+      "description": "The Reported date in bugs.md is in YYYY-MM-DD format"
+    },
+    {
+      "name": "Existing tasks unmodified",
+      "max_score": 12,
+      "description": "The existing tasks T001 through T008 (all marked [x]) are preserved unchanged in tasks.md — the new bug fix tasks are appended, not merged into existing sections"
+    },
+    {
+      "name": "Bug ID in task descriptions",
+      "max_score": 10,
+      "description": "Each bug fix task description includes the BUG-NNN identifier (e.g., '[BUG-001]') linking task to bug record"
+    },
+    {
+      "name": "New .feature file created",
+      "max_score": 13,
+      "description": "Since TDD is mandatory, a new .feature file (e.g., bugfix_BUG-001.feature) is created in the tests/features/ directory with a scenario for the bug"
+    }
+  ]
+}

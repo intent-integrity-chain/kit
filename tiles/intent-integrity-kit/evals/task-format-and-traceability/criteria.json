@@ -1,0 +1,56 @@
+{
+  "context": "Tests whether the agent generates tasks.md following IIKit's strict task format: sequential T-prefixed IDs, [P] markers only for parallelizable tasks, [USn] labels only for user story tasks, comma-separated TS-XXX references (not prose ranges), and the correct phase structure (Setup, Foundational, User Stories, Polish).",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Sequential T-prefixed IDs",
+      "max_score": 12,
+      "description": "All tasks have sequential IDs in the format T001, T002, T003... (three-digit zero-padded numbers with T prefix)"
+    },
+    {
+      "name": "[P] marker usage",
+      "max_score": 10,
+      "description": "Tasks that work on different files with no mutual dependencies are marked [P], and tasks with dependencies or shared file access are NOT marked [P]"
+    },
+    {
+      "name": "[USn] label on story tasks",
+      "max_score": 10,
+      "description": "Tasks that implement user story functionality include a [US1], [US2], or [US3] label, while Setup and Foundational tasks do NOT include a [USn] label"
+    },
+    {
+      "name": "Comma-separated TS references",
+      "max_score": 15,
+      "description": "When multiple test spec IDs are referenced, they are listed as a comma-separated list (e.g., [TS-001, TS-002]) NOT as prose ranges like 'TS-001 through TS-002'"
+    },
+    {
+      "name": "Phase 1 Setup section",
+      "max_score": 8,
+      "description": "tasks.md contains a Phase 1 (or equivalent) section for project initialization/setup tasks (e.g., project structure, pyproject.toml, database setup)"
+    },
+    {
+      "name": "Phase 2 Foundational section",
+      "max_score": 8,
+      "description": "tasks.md contains a Phase 2 (or equivalent) Foundational section for shared prerequisites that must complete before user story tasks (e.g., base models, database connection)"
+    },
+    {
+      "name": "User Story phases ordered by priority",
+      "max_score": 8,
+      "description": "US-1 (P1) and US-2 (P1) tasks appear in earlier phases than US-3 (P2) tasks, reflecting priority ordering from the spec"
+    },
+    {
+      "name": "File paths in descriptions",
+      "max_score": 10,
+      "description": "Task descriptions include specific file paths (e.g., 'src/models/item.py', 'tests/step_definitions/') rather than vague descriptions without paths"
+    },
+    {
+      "name": "Checkbox format",
+      "max_score": 9,
+      "description": "All tasks use the markdown checkbox format `- [ ]` (with space inside the brackets)"
+    },
+    {
+      "name": "Polish/Final phase",
+      "max_score": 10,
+      "description": "tasks.md contains a final Polish or Cross-Cutting Concerns phase for integration testing, documentation, or cleanup tasks"
+    }
+  ]
+}

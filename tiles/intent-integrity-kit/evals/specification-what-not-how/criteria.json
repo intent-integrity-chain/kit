@@ -1,0 +1,56 @@
+{
+  "context": "Tests whether the agent writes a feature spec that is technology-agnostic (WHAT not HOW), uses FR-XXX and SC-XXX numbered requirements, includes Given/When/Then acceptance scenarios, uses a 2-4 word action-noun branch name, and avoids leaving many [NEEDS CLARIFICATION] placeholders by making reasonable assumptions.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "No technology stack in spec",
+      "max_score": 15,
+      "description": "spec.md does NOT mention specific technologies, frameworks, databases, languages, or architectural patterns (e.g., no mention of REST, GraphQL, WebSocket, PostgreSQL, Redis, React, microservices)"
+    },
+    {
+      "name": "FR-XXX numbered requirements",
+      "max_score": 10,
+      "description": "spec.md contains at least 4 functional requirements numbered with the FR-XXX pattern (e.g., FR-001, FR-002)"
+    },
+    {
+      "name": "SC-XXX success criteria",
+      "max_score": 8,
+      "description": "spec.md contains at least 2 success criteria numbered with the SC-XXX pattern (e.g., SC-001, SC-002)"
+    },
+    {
+      "name": "Given/When/Then scenarios",
+      "max_score": 10,
+      "description": "spec.md contains at least 4 acceptance scenarios in Given/When/Then format covering the sharing permission use cases"
+    },
+    {
+      "name": "User stories present",
+      "max_score": 8,
+      "description": "spec.md contains explicitly labeled user stories (US-1, US-2, or similar) with role-based framing ('As a [role], I want to...')"
+    },
+    {
+      "name": "Measurable success criteria",
+      "max_score": 8,
+      "description": "At least one SC-XXX success criterion includes a measurable/quantifiable element (a number, percentage, time measurement, or explicit condition)"
+    },
+    {
+      "name": "Max 3 NEEDS CLARIFICATION",
+      "max_score": 10,
+      "description": "spec.md contains at most 3 [NEEDS CLARIFICATION] markers (agent makes reasonable assumptions rather than leaving many unresolved questions)"
+    },
+    {
+      "name": "No implementation details",
+      "max_score": 12,
+      "description": "spec.md does NOT describe HOW the system will work internally (no database schemas, API endpoints, service names, file structures, or deployment configurations)"
+    },
+    {
+      "name": "2-4 word branch name",
+      "max_score": 10,
+      "description": "spec-report.md mentions a feature branch name that is 2-4 hyphenated words in action-noun format (e.g., 'doc-sharing', 'document-permissions', 'share-document-access')"
+    },
+    {
+      "name": "Requirements.md checklist created",
+      "max_score": 9,
+      "description": "specs/004-doc-sharing/checklists/requirements.md exists and contains checklist items that evaluate requirement quality (not implementation correctness)"
+    }
+  ]
+}
