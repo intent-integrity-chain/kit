@@ -36,28 +36,13 @@ Load constitution per [constitution-loading.md](../iikit-core/references/constit
    ```
    Then re-run the prerequisites check from step 1.
 
-## Bugfix Detection
-
-Scan tasks.md for unchecked tasks (`[ ]`). If **every** unchecked task has a `T-B` prefix (bugfix tasks from `/iikit-bugfix`), this is a **bugfix-only run**. Set `BUGFIX_ONLY=true` for gate relaxation below.
-
 ## Pre-Implementation Validation
 
-**Standard mode** (`BUGFIX_ONLY=false`):
-1. **Artifact completeness**: constitution.md, spec.md (requirements + criteria), plan.md (tech context), tasks.md (has tasks), checklists/*.md (at least one)
-2. **Cross-artifact consistency**: spec FR-XXX -> tasks, plan tech stack -> task file paths, constitution -> plan compliance
-3. Report readiness: READY or BLOCKED
+**Bugfix detection**: if every unchecked task has a `T-B` prefix, this is a **bugfix-only run** — relaxed gates below.
 
-**Bugfix mode** (`BUGFIX_ONLY=true`):
-1. **Artifact completeness**: tasks.md (has T-B tasks), bugs.md (has matching BUG-NNN entries). plan.md, checklists, and spec.md are NOT required.
-2. **BDD chain**: If `tests/features/` exists with `.feature` files, the BDD verification chain (sections 2.1–2.4) still applies — bugfix tests use the same BDD framework as feature tests.
-3. **Cross-artifact consistency**: skip (bugfix tasks trace to bugs.md, not spec FR-XXX)
-4. Report readiness: READY or BLOCKED
+**Standard mode**: Verify artifact completeness (constitution, spec, plan, tasks, checklists), cross-artifact consistency (FR-XXX → tasks, tech stack → file paths), and checklist completion (all 100% or ask user). Report READY or BLOCKED.
 
-## Checklist Gating
-
-**Skip entirely if `BUGFIX_ONLY=true`** — bugfix tasks are not gated on checklists.
-
-Read each checklist in `FEATURE_DIR/checklists/`. All must be 100% complete. If incomplete: ask user to proceed or halt.
+**Bugfix mode**: Only require tasks.md (T-B tasks) and bugs.md (matching BUG-NNN). Skip spec/plan/checklist gates. BDD chain (§2.1–2.4) still applies if `.feature` files exist.
 
 ## Dashboard
 
@@ -70,9 +55,7 @@ Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path) — updates 
 
 ### 1. Load Context
 
-**Standard mode**: Required: `tasks.md`, `plan.md`. Optional: `data-model.md`, `contracts/`, `research.md`, `quickstart.md`, `tests/features/` (BDD .feature files)
-
-**Bugfix mode**: Required: `tasks.md`, `bugs.md`. Optional: `plan.md`, `tests/features/` (if present, BDD chain applies — bugfix tests must use the same BDD framework)
+Read `tasks.md` + `plan.md` (standard) or `tasks.md` + `bugs.md` (bugfix). Optional: `data-model.md`, `contracts/`, `research.md`, `quickstart.md`, `tests/features/`.
 
 ### 2. TDD Support Check
 
@@ -133,30 +116,12 @@ A task is NOT complete until:
 
 Do NOT mark `[x]` in tasks.md until all three gates pass.
 
-### 3. Install Dependencies
+### 3. Setup (Dependencies, Tiles, Scaffolding)
 
-Before writing any source code, install the project's runtime and dev dependencies as specified in plan.md:
-
-1. **Detect package manager** from plan.md Technical Context (npm/yarn/pnpm, pip/poetry, go mod, cargo, maven/gradle, dotnet, etc.)
-2. **Initialize project** if no manifest exists (e.g., `npm init -y`, `go mod init`, create `pyproject.toml`)
-3. **Add dependencies** listed in plan.md (e.g., `npm install express bcrypt jsonwebtoken`, `pip install fastapi sqlalchemy`)
-4. **Add dev dependencies** for testing (e.g., `npm install -D jest supertest`, `pip install -D pytest`)
-5. **Commit** the manifest and lockfile (package.json + package-lock.json, requirements.txt, go.sum, etc.)
-
-### 4. Tessl Tile Installation
-
-After installing dependencies, install Tessl documentation tiles for each major dependency so you have accurate API knowledge when writing code:
-
-1. **For each dependency** in plan.md, search for a Tessl tile: `tessl search <package-name>` or use `query_library_docs`
-2. **Install available tiles**: `tessl install <workspace/tile-name>`
-3. **Query tile docs** before writing code that uses that library — use `query_library_docs` with specific questions about API usage, patterns, and best practices
-4. If no tile exists for a dependency, rely on the library's built-in documentation or README
-
-See [tessl-integration.md](references/tessl-integration.md) for the full procedure.
-
-### 5. Project Scaffolding
-
-For scaffolding tools in existing directories, use force/overwrite flags. See [ignore-patterns.md](references/ignore-patterns.md) for gitignore patterns by stack.
+Before writing source code:
+1. **Install dependencies** from plan.md Technical Context (detect package manager, add runtime + dev deps, commit manifest + lockfile)
+2. **Install Tessl tiles** for each major dependency: `tessl search <pkg>` then `tessl install <tile>`. Query tile docs before writing library code. See [tessl-integration.md](references/tessl-integration.md).
+3. **Scaffold project** if needed. For existing directories, use force/overwrite flags. See [ignore-patterns.md](references/ignore-patterns.md) for gitignore patterns.
 
 ### 6. Parse and Execute Tasks
 
@@ -215,15 +180,7 @@ All tasks `[x]`, features validated against spec, test execution enforcement (§
 
 ## Error Handling
 
-| Condition | Response |
-|-----------|----------|
-| Tasks missing | STOP with run instructions |
-| Plan missing (standard mode) | STOP with run instructions |
-| Constitution violation | STOP, explain, suggest alternative |
-| Checklist incomplete | Ask user, STOP if declined |
-| Task/parallel failure | Report, halt (see 6.5) |
-| Tests not run | STOP: execute first |
-| Tests failing | Fix code, re-run |
+Missing artifacts: STOP with run instructions. Constitution violations: STOP, explain, suggest alternative. Checklist incomplete: ask user. Task/parallel failure: report + halt (§6.5). Tests not run: STOP. Tests failing: fix code, re-run.
 
 ## Next Steps
 

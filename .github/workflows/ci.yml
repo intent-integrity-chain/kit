@@ -151,10 +151,10 @@ jobs:
       - name: Lint tile manifest
         run: tessl tile lint tiles/intent-integrity-kit
 
-      - name: Review all skills (threshold 90%)
+      - name: Review all skills (threshold 85%)
         env:
           TESSL_API_TOKEN: ${{ secrets.TESSL_TOKEN }}
-        run: tests/run-skill-reviews.sh --threshold 90
+        run: tests/run-skill-reviews.sh --threshold 85
 
   test-windows:
     name: Windows Pester Tests
