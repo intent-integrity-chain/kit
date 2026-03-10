@@ -1,0 +1,61 @@
+{
+  "context": "Tests whether the agent generates Gherkin .feature files that follow IIKit's mandatory tagging conventions (@TS-XXX, @FR-XXX, @SC-XXX, @US-XXX, priority, test type), covers the majority of success criteria, and includes the required DO NOT MODIFY header on each file.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "TS-XXX tags present",
+      "max_score": 10,
+      "description": "Every Scenario has a @TS-XXX tag (sequential numeric ID, e.g. @TS-001, @TS-002) on the line immediately before the Scenario keyword"
+    },
+    {
+      "name": "FR-XXX tags present",
+      "max_score": 10,
+      "description": "Every Scenario has at least one @FR-XXX tag referencing a functional requirement from spec.md"
+    },
+    {
+      "name": "SC-XXX tags present",
+      "max_score": 8,
+      "description": "At least some scenarios include @SC-XXX tags referencing success criteria from spec.md"
+    },
+    {
+      "name": "SC-XXX majority coverage",
+      "max_score": 10,
+      "description": "At least 3 of the 5 SC-XXX success criteria (SC-001 through SC-005) have at least one scenario tagged with them across the generated .feature files. System-level criteria that cannot be expressed as Gherkin scenarios may be excluded."
+    },
+    {
+      "name": "US-XXX tags present",
+      "max_score": 8,
+      "description": "Each Scenario has a @US-XXX tag referencing the parent user story"
+    },
+    {
+      "name": "Priority tags present",
+      "max_score": 8,
+      "description": "Every Scenario includes a priority tag (@P1, @P2, or @P3) matching the priority of its parent user story"
+    },
+    {
+      "name": "Test type tags present",
+      "max_score": 8,
+      "description": "Every Scenario includes a test-type tag (one of @acceptance, @contract, or @validation)"
+    },
+    {
+      "name": "DO NOT MODIFY header",
+      "max_score": 12,
+      "description": "Each .feature file starts with lines containing 'DO NOT MODIFY SCENARIOS' and instructions to write step definitions and not modify .feature files"
+    },
+    {
+      "name": "Feature-level US tag",
+      "max_score": 8,
+      "description": "Feature-level lines include @US-XXX tags for the parent user story"
+    },
+    {
+      "name": "All acceptance scenarios covered",
+      "max_score": 10,
+      "description": "All 8 Given/When/Then acceptance scenarios from the spec.md are represented as Gherkin Scenarios in the .feature files"
+    },
+    {
+      "name": "TS-XXX uniqueness",
+      "max_score": 8,
+      "description": "All @TS-XXX tags are unique across all .feature files (no two scenarios share the same TS-XXX number)"
+    }
+  ]
+}
