@@ -82,11 +82,6 @@ If `tests/features/` directory exists (contains `.feature` files), verify assert
 bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh comprehensive-check "FEATURE_DIR/tests/features" "CONSTITUTION.md"
 ```
 
-**Windows (PowerShell):**
-```powershell
-pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/testify-tdd.ps1 comprehensive-check "FEATURE_DIR/tests/features" "CONSTITUTION.md"
-```
-
 Parse JSON response: `PASS` (proceed), `BLOCKED` (halt, show remediation), `WARN` (proceed with caution).
 
 If TDD **mandatory** but `tests/features/` missing or empty: ERROR with `Run: /iikit-04-testify`.
