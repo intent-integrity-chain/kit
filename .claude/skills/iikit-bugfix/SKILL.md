@@ -181,6 +181,8 @@ If TDD is mandatory (`determination` = `mandatory`):
 
 ### 11. Generate Bug Fix Tasks
 
+**Bug fix tasks use the `T-B` prefix** (e.g., T-B001, T-B002) to distinguish them from regular tasks (T001, T002). This is mandatory — the dashboard and parsers rely on the `T-B` prefix to identify bug fix tasks and calculate implementation progress correctly.
+
 Get next task IDs:
 
 **Unix/macOS/Linux:**
