@@ -244,12 +244,15 @@ jobs:
             fi
           done
 
-      - name: Publish tile v${{ steps.version.outputs.new }}
+      - name: Setup Tessl CLI
         if: steps.version.outputs.changed == 'true'
-        uses: tesslio/publish@main
+        uses: tesslio/setup-tessl@v2
         with:
           token: ${{ secrets.TESSL_TOKEN }}
-          path: tiles/intent-integrity-kit
+
+      - name: Publish tile v${{ steps.version.outputs.new }}
+        if: steps.version.outputs.changed == 'true'
+        run: tessl tile publish tiles/intent-integrity-kit
 
       - uses: actions/setup-node@v4
         if: steps.version.outputs.changed == 'true'
