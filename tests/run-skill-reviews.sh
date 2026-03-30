@@ -45,8 +45,8 @@ for skill_dir in "$SKILLS_DIR"/iikit-*/; do
     # Run review and capture full output (human-readable)
     review_output=$(tessl skill review "$skill_md" 2>&1) || true
 
-    # Parse "Average Score: NN%" from output
-    avg_pct=$(echo "$review_output" | sed -n 's/.*Average Score: \([0-9]*\)%.*/\1/p')
+    # Parse "Review Score: NN%" from output
+    avg_pct=$(echo "$review_output" | sed -n 's/.*Review Score: \([0-9]*\)%.*/\1/p')
 
     if [[ -z "$avg_pct" ]]; then
         echo -e "${RED}[FAIL]${NC} $skill_name — could not parse score from review output"
