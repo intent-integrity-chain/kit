@@ -43,15 +43,27 @@ Load constitution per [constitution-loading.md](../iikit-core/references/constit
 
 ## Spec Quality Gate
 
-Before planning, validate spec.md:
+**MANDATORY on every run** (including re-runs when plan.md already exists) — you MUST complete this gate and report the results before proceeding to the Execution Flow. Do NOT skip this section.
+
+Validate spec.md and output the results:
 
 1. **Requirements**: count FR-XXX patterns (ERROR if 0, WARNING if <3)
-2. **Measurable criteria**: scan for numeric values, percentages, time measurements (WARNING if none)
+2. **Measurable criteria**: scan for numeric values, percentages, time measurements (WARNING if none found — report which SC-XXX lack measurable values)
 3. **Unresolved clarifications**: search for `[NEEDS CLARIFICATION]` — ask whether to proceed with assumptions
 4. **User story coverage**: verify each story has acceptance scenarios
 5. **Cross-references**: check for orphan requirements not linked to stories
 
-Report quality score per [formatting-guide.md](../iikit-core/references/formatting-guide.md) (Spec Quality section). If score < 6: recommend `/iikit-clarify` first.
+**Output the quality score** using this format (from [formatting-guide.md](../iikit-core/references/formatting-guide.md)):
+```
+Spec Quality: X/10
+  Requirements: N FR-XXX found [✓|⚠|✗]
+  Measurable criteria: N of M SC-XXX have numeric targets [✓|⚠|✗]
+  Clarifications: N unresolved [✓|⚠|✗]
+  Story coverage: N of M stories have scenarios [✓|⚠|✗]
+  Cross-references: N orphan requirements [✓|⚠|✗]
+```
+
+If score < 6: recommend `/iikit-clarify` first.
 
 ## Execution Flow
 
@@ -82,22 +94,19 @@ For each NEEDS CLARIFICATION item and dependency: research, document findings in
    ```
    Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/update-agent-context.ps1 -AgentType claude`
 
-### 5. Pre-compute Dashboard Data
+### 5. Update context.json with Dashboard Data
 
-After the plan is complete, write pre-computed data to `.specify/context.json` for static dashboard generation. Use `jq` to merge into the existing file (create if missing).
-
-#### 5a. Architecture Node Classifications
-
-If plan.md contains an architecture diagram (ASCII box-drawing), classify each named component as one of: `client`, `server`, `storage`, `external`.
-
-Write to `.specify/context.json` under `planview.nodeClassifications`:
+**MANDATORY** — you MUST update `.specify/context.json` after the plan is complete. This file drives the project dashboard. Use `jq` to merge into the existing file (create if missing). Do NOT overwrite existing fields.
 
 ```bash
-# Read existing or start fresh
 CONTEXT_FILE=".specify/context.json"
 [[ -f "$CONTEXT_FILE" ]] || echo '{}' > "$CONTEXT_FILE"
+```
 
-# Merge node classifications (replace example with actual nodes from the plan diagram)
+**Architecture Node Classifications:** If plan.md contains an architecture diagram, classify every named component in the diagram as one of `client`, `server`, `storage`, or `external` and write the map to `planview.nodeClassifications`:
+
+```bash
+# Replace example with actual component names from YOUR architecture diagram
 jq --argjson nodes '{
   "Browser SPA": "client",
   "API Gateway": "server",
@@ -106,28 +115,15 @@ jq --argjson nodes '{
 }' '.planview.nodeClassifications = $nodes' "$CONTEXT_FILE" > "$CONTEXT_FILE.tmp" && mv "$CONTEXT_FILE.tmp" "$CONTEXT_FILE"
 ```
 
-Classification rules:
-- **client**: browsers, CLIs, mobile apps, desktop apps — anything that initiates requests
-- **server**: APIs, gateways, workers, middleware, backend services — anything that processes requests
-- **storage**: databases, caches, queues, file stores, object storage — anything that persists data
-- **external**: third-party APIs, SaaS services, payment providers — anything outside the project boundary
+Classification rules: **client** = initiates requests (browsers, CLIs, mobile apps) | **server** = processes requests (APIs, workers, middleware) | **storage** = persists data (databases, caches, queues) | **external** = outside project boundary (third-party APIs, SaaS)
 
-If no architecture diagram exists in the plan, skip this step.
-
-#### 5b. Tessl Eval Scores
-
-If Tessl tiles were installed in step 2, collect eval scores from the `fetch-tile-evals.sh` outputs and write a summary to `context.json`:
+**Tessl Eval Scores:** If Tessl tiles were installed in step 2, write eval scores to `planview.evalScores`:
 
 ```bash
-# Merge eval scores (replace example with actual tile names and scores from step 2)
 jq --argjson evals '{
   "workspace/tile-name": {"score": 85, "pct": 85, "scenarios": 3, "scored_at": "2026-01-15T10:00:00Z"}
 }' '.planview.evalScores = $evals' "$CONTEXT_FILE" > "$CONTEXT_FILE.tmp" && mv "$CONTEXT_FILE.tmp" "$CONTEXT_FILE"
 ```
-
-Use the JSON output from each `fetch-tile-evals.sh --json` call (already run in step 2 via tessl-tile-discovery.md). Extract `score`, `pct`, `scenarios`, and `scored_at` fields for each tile.
-
-If no Tessl tiles were installed, skip this step.
 
 ### 6. Constitution Check (Post-Design)
 
@@ -147,7 +143,30 @@ Output: branch name, plan path, generated artifacts (research.md, data-model.md,
 
 ## Semantic Diff on Re-run
 
-If plan.md exists: compare tech stack, architecture, dependencies. Show diff per [formatting-guide.md](../iikit-core/references/formatting-guide.md) (Semantic Diff section) with downstream impact. Flag breaking changes.
+**On re-runs (plan.md already exists)**, after completing the Spec Quality Gate and Execution Flow above, you MUST compare the old and new plan and output a semantic diff. Use this exact format:
+
+```
++-----------------------------------------------------+
+|  SEMANTIC DIFF: plan.md                              |
++-----------------------------------------------------+
+|  Tech Stack:                                         |
+|    + Added: [new items]                              |
+|    ~ Changed: [modified items]                       |
+|    - Removed: [deleted items]                        |
+|  Architecture:                                       |
+|    + Added: [new components]                         |
+|    ~ Changed: [modified components]                  |
+|  Dependencies:                                       |
+|    + Added: [new deps]                               |
+|    - Removed: [old deps]                             |
++-----------------------------------------------------+
+|  DOWNSTREAM IMPACT                                   |
+|    ⚠ tasks.md may need regeneration                  |
+|    ⚠ [other affected artifacts]                      |
++-----------------------------------------------------+
+```
+
+Flag breaking changes that would invalidate existing tasks or test specs.
 
 ## Commit
 

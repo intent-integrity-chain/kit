@@ -1,0 +1,71 @@
+{
+  "context": "Tests whether the agent respects a constitutional offline-first constraint through spec and plan phases while producing properly structured artifacts. The PM explicitly pushes for specific network-dependent services (Google Vision, Firebase, SendGrid, exchange rate API), but the constitution mandates core operations work offline.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "No external API in core data path",
+      "max_score": 12,
+      "description": "plan.md does NOT place external API calls (Google Vision, currency APIs, Firebase, SendGrid) in the critical path of expense submission or approval. These may appear as async/optional enhancements only"
+    },
+    {
+      "name": "PM's specific service suggestions not adopted blindly",
+      "max_score": 10,
+      "description": "The PM explicitly suggested Google Vision API, Firebase Cloud Messaging, and SendGrid. plan.md does NOT adopt these as core dependencies — it either rejects them, defers them to online-only mode, or proposes offline alternatives"
+    },
+    {
+      "name": "Expense submission works offline in spec",
+      "max_score": 8,
+      "description": "spec.md explicitly states or implies that expense submission (photo, category, amount) works without network connectivity"
+    },
+    {
+      "name": "Currency conversion handled offline",
+      "max_score": 8,
+      "description": "plan.md addresses the currency requirement without requiring real-time API calls — e.g., cached exchange rates, manual entry, or periodic sync of rates when online"
+    },
+    {
+      "name": "Local storage as primary in plan",
+      "max_score": 7,
+      "description": "plan.md designs local/on-device storage as the primary data store (SQLite, Realm, or similar)"
+    },
+    {
+      "name": "Sync designed as optional enhancement",
+      "max_score": 7,
+      "description": "plan.md treats data synchronization as a background process that runs when connectivity is available — not as a prerequisite for any core operation"
+    },
+    {
+      "name": "Conflict resolution addressed",
+      "max_score": 6,
+      "description": "plan.md or data-model.md addresses what happens when offline edits conflict with server state during sync"
+    },
+    {
+      "name": "Spec uses numbered requirements",
+      "max_score": 8,
+      "description": "spec.md uses numbered functional requirements (FR-001, FR-002, etc.) and success criteria (SC-001, etc.) rather than unstructured prose"
+    },
+    {
+      "name": "Spec has acceptance scenarios",
+      "max_score": 8,
+      "description": "spec.md includes Given/When/Then acceptance scenarios for the core user stories"
+    },
+    {
+      "name": "Spec is technology-agnostic",
+      "max_score": 8,
+      "description": "spec.md describes WHAT the system does without prescribing specific technologies — no Google Vision, Firebase, SQLite, or other implementation choices in the specification"
+    },
+    {
+      "name": "Plan references spec requirements",
+      "max_score": 7,
+      "description": "plan.md or research.md references specific FR-XXX identifiers from the spec when justifying technical decisions"
+    },
+    {
+      "name": "No governance restated in plan",
+      "max_score": 5,
+      "description": "plan.md references the constitution but does NOT copy/paste the constitutional principles into the plan"
+    },
+    {
+      "name": "Spec does not promise network-dependent core features",
+      "max_score": 6,
+      "description": "spec.md does NOT describe receipt OCR, currency conversion, or push notifications as guaranteed core features. They may appear as optional enhancements"
+    }
+  ]
+}

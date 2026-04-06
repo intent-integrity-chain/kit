@@ -1,0 +1,66 @@
+{
+  "context": "Tests the full IIKit pipeline (specify→plan→testify→tasks) on a greenfield feature with TDD-mandatory constitution. Validates complete traceability chain: every FR-XXX in spec must trace to plan decisions, every FR has at least one TS-XXX in .feature files, every TS appears in at least one task, phase separation is maintained throughout, and TDD ordering is respected in the task breakdown.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Spec is technology-agnostic",
+      "max_score": 8,
+      "description": "spec.md does NOT mention Slack SDK, specific databases, programming languages, or frameworks. It describes WHAT the bot does, not HOW"
+    },
+    {
+      "name": "Plan has no governance content",
+      "max_score": 6,
+      "description": "plan.md does NOT restate constitutional principles about TDD, privacy, or minimal disruption. May reference the constitution but must not duplicate governance text"
+    },
+    {
+      "name": "FR-XXX to TS-XXX coverage",
+      "max_score": 15,
+      "description": "Every FR-XXX in spec.md has at least one @FR-XXX tag in the generated .feature files. No functional requirement is untested"
+    },
+    {
+      "name": "TS-XXX to task coverage",
+      "max_score": 12,
+      "description": "Every @TS-XXX tag in the .feature files is referenced by at least one task in tasks.md. No test scenario is orphaned without an implementation task"
+    },
+    {
+      "name": ".feature files have DO NOT MODIFY headers",
+      "max_score": 6,
+      "description": "Each generated .feature file starts with the DO NOT MODIFY header comment block warning against changing scenarios"
+    },
+    {
+      "name": ".feature files have required tags",
+      "max_score": 8,
+      "description": "Every Scenario in .feature files has @TS-XXX, @FR-XXX, @US-XXX, priority (@P1/@P2), and test type (@acceptance/@contract/@validation) tags"
+    },
+    {
+      "name": "Tasks ordered: Setup → Foundational → Stories → Polish",
+      "max_score": 6,
+      "description": "tasks.md follows the phase structure: Setup (project init), Foundational (shared infrastructure), User Story phases (by priority), Polish/Final"
+    },
+    {
+      "name": "TDD task ordering within story phases",
+      "max_score": 10,
+      "description": "Within each user story phase, test-related tasks (step definitions, test setup) appear before or alongside implementation tasks — consistent with the TDD-mandatory constitution"
+    },
+    {
+      "name": "No phantom requirements",
+      "max_score": 8,
+      "description": "No .feature scenarios, tasks, or plan components address features not in the spec (e.g., sprint planning integration, retrospective automation, Jira sync — all out of scope)"
+    },
+    {
+      "name": "Privacy constraint in .feature files",
+      "max_score": 7,
+      "description": "At least one .feature scenario tests the privacy requirement: cross-team blocker view shows only blocker text, not full standup responses"
+    },
+    {
+      "name": "No FR orphans in either direction",
+      "max_score": 8,
+      "description": "No FR-XXX in spec lacks plan coverage AND no plan component introduces requirements without spec FR basis. The traceability chain is bidirectional"
+    },
+    {
+      "name": "TS-XXX IDs are unique across files",
+      "max_score": 6,
+      "description": "All @TS-XXX tags across all .feature files are unique — no duplicate TS IDs"
+    }
+  ]
+}

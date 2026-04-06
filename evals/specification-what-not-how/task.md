@@ -4,9 +4,7 @@
 
 A SaaS company is building a real-time document collaboration product (similar to Google Docs) and has decided to add a permission and sharing system. The product manager has given a verbal description of the feature to the engineering team lead, who now needs to write a formal feature specification to kick off the development workflow.
 
-The spec will be reviewed by both the product manager (who cares about business outcomes) and engineers (who will use it to plan the technical solution). It needs to be thorough enough that the team can plan and build without going back to the PM, but must not prescribe implementation details — the architecture team hasn't finalized the tech stack yet.
-
-The spec should be written for business stakeholders, focusing on what users need and why. It should include user stories with acceptance criteria and enough measurable success conditions that the team can tell when the feature is done.
+The spec will be reviewed by both the product manager (who cares about business outcomes) and engineers (who will use it to plan the technical solution). It needs to be thorough enough that the team can plan and build without going back to the PM.
 
 ## Output Specification
 

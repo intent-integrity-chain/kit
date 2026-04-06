@@ -4,9 +4,7 @@
 
 The payments team at an e-commerce platform has discovered a bug in their checkout flow. When a payment fails due to a temporary network issue, the retry mechanism sometimes charges customers twice. This has been reported by 3 customers in the past week and the support team has confirmed the root cause points to the payment state machine not checking for existing pending charges before submitting a new one.
 
-The team uses a structured workflow for tracking bugs and implementation tasks. They need a formal bug record created and the appropriate fix tasks added to their existing tasks.md file, so the engineering team can pick it up in the next sprint.
-
-The project has a constitution that requires mandatory TDD (all development must follow test-first approach), and they already have .feature files set up for the payments feature.
+The team needs a formal bug record created and the appropriate fix tasks added to their existing tasks.md file, so the engineering team can pick it up in the next sprint.
 
 ## Output Specification
 
@@ -39,6 +37,24 @@ The following files are provided as inputs. Extract them before beginning.
 - [x] T006 [US1] Implement payment state machine in src/services/payment_service.py
 - [x] T007 [P] [US1] Create POST /payments endpoint in src/routers/payments.py
 - [x] T008 [P] [US1] Create GET /payments/{id} endpoint in src/routers/payments.py
+
+=============== FILE: CONSTITUTION.md ===============
+# Project Constitution v1.0.0
+
+## Principles
+
+### P1: Test-Driven Development
+Test-first development MUST be used for all features. Test specifications MUST be written before implementation begins. Modifying test assertions to make failing tests pass is PROHIBITED.
+
+### P2: Payment Integrity
+All payment state transitions MUST be idempotent. Duplicate charge prevention MUST be enforced at the service layer.
+
+### P3: Auditability
+All payment events MUST be logged with full transaction context for dispute resolution.
+
+## Amendment Procedure
+
+Amendments require engineering lead approval and version increment. P1 and P2 are immutable.
 
 =============== FILE: .specify/context.json ===============
 {

@@ -144,16 +144,21 @@ For text-input bugs only (NOT for GitHub inbound — issue already exists):
 
 ### 9. Assess TDD Requirements
 
-**Unix/macOS/Linux:**
-```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh assess-tdd "CONSTITUTION.md"
-```
-**Windows (PowerShell):**
-```powershell
-pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/testify-tdd.ps1 assess-tdd "CONSTITUTION.md"
-```
+Check TDD determination using this priority:
 
-Parse JSON response for `determination` field.
+1. **Read from `.specify/context.json`** — if it exists and contains `tdd_determination`, use that value directly.
+2. **Run the script** (if context.json doesn't have the field):
+   ```bash
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh assess-tdd "CONSTITUTION.md"
+   ```
+   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/testify-tdd.ps1 assess-tdd "CONSTITUTION.md"`
+3. **Determine from constitution text** (if script unavailable): scan CONSTITUTION.md for TDD indicators:
+   - MUST/REQUIRED + "TDD", "test-first", "red-green-refactor" → `mandatory`
+   - MUST + "test-driven", "tests before code" → `mandatory`
+   - Testing described as OPTIONAL → `optional`
+   - MUST + "test-after", "no unit tests" → `forbidden`
+
+The result is the `determination` value used in step 10 and 11.
 
 ### 10. BDD/TDD Flow (If Mandatory)
 
@@ -183,7 +188,11 @@ If TDD is mandatory (`determination` = `mandatory`):
 
 **Bug fix tasks use the `T-B` prefix** (e.g., T-B001, T-B002) to distinguish them from regular tasks (T001, T002). This is mandatory — the dashboard and parsers rely on the `T-B` prefix to identify bug fix tasks and calculate implementation progress correctly.
 
-Get next task IDs:
+**Select the task template based on TDD determination from Step 9:**
+- If `determination` = `mandatory`: use the **TDD task set** (count = 2)
+- Otherwise: use the **Non-TDD task set** (count = 3)
+
+Get next task IDs with the appropriate count:
 
 **Unix/macOS/Linux:**
 ```bash
@@ -194,7 +203,7 @@ bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash
 pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/bugfix-helpers.ps1 --next-task-ids "<feature_dir>" <count>
 ```
 
-**Non-TDD task set** (count = 3):
+**Non-TDD task set** (use when `determination` is NOT `mandatory`, count = 3):
 ```markdown
 ## Bug Fix Tasks
 
@@ -203,7 +212,7 @@ pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powe
 - [ ] T-BNNN+2 [BUG-NNN] Write regression test for BUG-NNN: <description>
 ```
 
-**TDD task set** (count = 2):
+**TDD task set** (use when `determination` = `mandatory`, count = 2). The TS-NNN reference MUST point to the test spec created in Step 10:
 ```markdown
 ## Bug Fix Tasks
 

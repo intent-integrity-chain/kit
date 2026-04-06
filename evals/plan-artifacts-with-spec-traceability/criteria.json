@@ -1,0 +1,71 @@
+{
+  "context": "Tests whether the agent produces a complete set of planning artifacts from a feature spec: structured technical context, technology decisions with rationale, data model with state transitions, API contracts traceable to requirements, and spec quality assessment before planning.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "plan.md exists",
+      "max_score": 5,
+      "description": "A plan.md file is created at specs/001-notification-service/plan.md"
+    },
+    {
+      "name": "Technical Context fields",
+      "max_score": 12,
+      "description": "plan.md contains a Technical Context section with all required fields filled in: Language/Version, Primary Dependencies, Storage, Testing, Target Platform, Project Type, Performance Goals, Constraints, Scale/Scope — none left as empty or placeholder-only"
+    },
+    {
+      "name": "No bare Option labels",
+      "max_score": 5,
+      "description": "plan.md does NOT contain 'Option 1:', 'Option 2:', 'Option 3:' labels or '[REMOVE IF UNUSED]' markers from the template"
+    },
+    {
+      "name": "research.md with rationale",
+      "max_score": 8,
+      "description": "research.md exists and contains at least one technology decision with explicit rationale and at least one alternative considered"
+    },
+    {
+      "name": "data-model.md entities",
+      "max_score": 8,
+      "description": "data-model.md exists and defines at least two entities (e.g., Notification, Channel, RetryPolicy) with their fields listed"
+    },
+    {
+      "name": "State transitions in data-model",
+      "max_score": 8,
+      "description": "data-model.md includes the notification status state machine or state transitions (queued → sending → delivered/failed)"
+    },
+    {
+      "name": "contracts/ directory",
+      "max_score": 6,
+      "description": "At least one API contract file exists in specs/001-notification-service/contracts/"
+    },
+    {
+      "name": "Contracts reference spec requirements",
+      "max_score": 8,
+      "description": "The API contract(s) reference specific functional requirements by identifier (FR-XXX) or clearly trace to individual requirements from the spec"
+    },
+    {
+      "name": "quickstart.md exists with scenarios",
+      "max_score": 6,
+      "description": "quickstart.md exists and contains specific test scenarios or example commands for exercising the notification feature (not just generic instructions)"
+    },
+    {
+      "name": "No governance content in plan",
+      "max_score": 8,
+      "description": "plan.md does NOT contain project-wide principles, non-negotiable rules applying to all features, or team workflow/process requirements — governance content belongs in CONSTITUTION.md"
+    },
+    {
+      "name": "Spec quality assessment performed",
+      "max_score": 12,
+      "description": "The agent assessed the spec quality before planning: checked FR count, flagged any missing measurable criteria, identified unresolved clarifications, and reported a quality score or summary"
+    },
+    {
+      "name": "Plan decisions trace to spec FRs",
+      "max_score": 8,
+      "description": "plan.md or research.md references specific FR-XXX identifiers from the spec when justifying technical decisions (e.g., choosing a message queue to satisfy FR-003 about retry policies)"
+    },
+    {
+      "name": "context.json updated",
+      "max_score": 6,
+      "description": ".specify/context.json is updated with plan-related data (e.g., architecture node classifications, eval scores, or other dashboard metadata) without overwriting existing fields"
+    }
+  ]
+}

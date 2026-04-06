@@ -1,0 +1,66 @@
+{
+  "context": "Tests the testify→tasks pipeline segment with a TDD-mandatory constitution. Validates that .feature files are generated with proper traceability tags before tasks are created, that every implementation task in user story phases references TS-XXX IDs, that test setup tasks precede production code tasks within each phase, and that assertion integrity is maintained (test scenarios match spec acceptance criteria, not invented).",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": ".feature files cover all FRs",
+      "max_score": 12,
+      "description": "Generated .feature files collectively have @FR-XXX tags covering all 10 functional requirements (FR-001 through FR-010). No functional requirement is left without a test scenario"
+    },
+    {
+      "name": "DO NOT MODIFY headers present",
+      "max_score": 6,
+      "description": "Every .feature file starts with the DO NOT MODIFY header comment block"
+    },
+    {
+      "name": "All required tags on every Scenario",
+      "max_score": 8,
+      "description": "Every Scenario has @TS-XXX (unique ID), @FR-XXX (requirement), @US-XXX (user story), priority (@P1 or @P2), and test type (@acceptance, @contract, or @validation)"
+    },
+    {
+      "name": "TS-XXX IDs unique across all files",
+      "max_score": 6,
+      "description": "No duplicate @TS-XXX tags exist across all .feature files"
+    },
+    {
+      "name": "Scenarios match spec acceptance criteria",
+      "max_score": 10,
+      "description": "Generated Gherkin scenarios correspond to the acceptance scenarios in spec.md — not invented test cases that go beyond what the spec describes. The concurrent booking scenario (US-1 scenario 3) must be present"
+    },
+    {
+      "name": "Privacy/auth scenario present",
+      "max_score": 6,
+      "description": "At least one .feature scenario tests the cross-provider access restriction (FR-010: Dr. Jones cannot view Dr. Smith's schedule → 403 error)"
+    },
+    {
+      "name": "Every story task references TS-XXX",
+      "max_score": 15,
+      "description": "In tasks.md, every task within user story phases (not Setup or Foundational) includes at least one TS-XXX reference, since the constitution mandates TDD and every implementation task MUST reference the test scenario(s) it satisfies"
+    },
+    {
+      "name": "TS references are comma-separated",
+      "max_score": 8,
+      "description": "Multiple TS references in tasks use comma-separated format [TS-001, TS-002] — not prose ranges like 'TS-001 through TS-003'"
+    },
+    {
+      "name": "Test tasks before production tasks per story",
+      "max_score": 10,
+      "description": "Within each user story phase, tasks for test infrastructure (step definitions, test fixtures, integration test setup) appear before or interleaved with production code tasks — not all production code first with tests at the end"
+    },
+    {
+      "name": "Task file paths match plan structure",
+      "max_score": 8,
+      "description": "Task descriptions reference file paths from the plan's Project Structure (e.g., internal/service/booking_service.go, internal/handler/booking_handler.go). No invented paths"
+    },
+    {
+      "name": "Phase structure and sequential IDs",
+      "max_score": 5,
+      "description": "tasks.md has Setup → Foundational → User Story (P1 before P2) → Polish phases, with sequential T001, T002, T003... IDs"
+    },
+    {
+      "name": "Concurrency test scenario present",
+      "max_score": 6,
+      "description": "A .feature scenario exists that tests concurrent slot booking (the spec's third acceptance scenario for US-1), and a corresponding task references it"
+    }
+  ]
+}

@@ -57,29 +57,42 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 7. **Phase separation validation**: scan for technology-specific content per [phase-separation-rules.md](../iikit-core/references/phase-separation-rules.md). Auto-fix violations, re-validate until clean.
 
-8. **Write** to `CONSTITUTION.md`
+8. **Write TWO files** — both are required outputs of this skill:
 
-9. **Store TDD determination** in `.specify/context.json` so all skills read from here instead of re-parsing the constitution:
+   **a) Write `CONSTITUTION.md`** with the finalized constitution content.
+
+   **b) Write `.specify/context.json`** with the TDD determination extracted from the constitution you just wrote. All downstream skills (testify, bugfix, implement) read TDD policy from this file. Determine the value from the constitution text:
+   - Constitution contains MUST/REQUIRED + "TDD", "test-first", or "red-green-refactor" → `mandatory`
+   - Constitution contains MUST + "test-driven" or "tests before code" → `mandatory`
+   - Constitution contains MUST + "test-after" or "no unit tests" → `forbidden`
+   - Testing is described as OPTIONAL or SHOULD → `optional`
+   - No testing policy stated → `optional`
+
+   Create the file:
    ```bash
-   TDD_DET=$(bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh get-tdd-determination "CONSTITUTION.md")
+   mkdir -p .specify
    ```
-   Write to `.specify/context.json` using `jq` (merge, don't overwrite):
-   ```bash
-   jq --arg det "$TDD_DET" '. + {tdd_determination: $det}' .specify/context.json > .specify/context.json.tmp && mv .specify/context.json.tmp .specify/context.json
+   Write `.specify/context.json` containing at minimum:
+   ```json
+   {
+     "tdd_determination": "<mandatory|optional|forbidden>"
+   }
    ```
-   If `.specify/context.json` doesn't exist, create it: `echo '{}' | jq --arg det "$TDD_DET" '{tdd_determination: $det}' > .specify/context.json`
+   If `.specify/context.json` already exists, merge (don't overwrite other fields). You can use `jq` if available, or write the file directly.
 
-10. **Git init** (if needed): `git init` to ensure project isolation
+   **Verify**: confirm `.specify/context.json` exists and contains `tdd_determination`.
 
-11. **Commit**: `git add CONSTITUTION.md .specify/context.json && git commit -m "Add project constitution"`
+9. **Git init** (if needed): `git init` to ensure project isolation
 
-12. **Dashboard Refresh** (optional, never blocks):
+10. **Commit**: `git add CONSTITUTION.md .specify/context.json && git commit -m "Add project constitution"`
+
+11. **Dashboard Refresh** (optional, never blocks):
 ```bash
 bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
 ```
 Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
 
-13. **Report**: version, bump rationale, TDD determination, git status, suggested next steps
+12. **Report**: version, bump rationale, TDD determination, git status, suggested next steps
 
 ## Formatting
 

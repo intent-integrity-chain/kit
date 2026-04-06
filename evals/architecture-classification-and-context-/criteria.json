@@ -1,0 +1,51 @@
+{
+  "context": "Tests whether the agent generates a plan with an ASCII architecture diagram and correctly populates .specify/context.json with node classifications, preserving existing data through a merge rather than overwrite.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "ASCII architecture diagram",
+      "max_score": 12,
+      "description": "plan.md contains an architecture diagram using ASCII box-drawing characters (e.g., +---, |, →, or similar)"
+    },
+    {
+      "name": "Named components in diagram",
+      "max_score": 10,
+      "description": "The architecture diagram names at least 3 distinct components (e.g., 'React SPA' or 'Web Client', 'Search Service' or 'API', 'PostgreSQL' or similar database, 'AI Ranking API' or similar external service)"
+    },
+    {
+      "name": "context.json exists",
+      "max_score": 8,
+      "description": ".specify/context.json exists and contains valid JSON"
+    },
+    {
+      "name": "planview.nodeClassifications key",
+      "max_score": 12,
+      "description": ".specify/context.json contains a 'planview' key with a 'nodeClassifications' sub-key"
+    },
+    {
+      "name": "Existing data preserved",
+      "max_score": 14,
+      "description": ".specify/context.json still contains the original keys from the input file ('projectName' and 'version') — the file was merged, not overwritten"
+    },
+    {
+      "name": "Client node classified",
+      "max_score": 11,
+      "description": "At least one component in nodeClassifications is classified as 'client' (browser, web app, CLI, or mobile app)"
+    },
+    {
+      "name": "Server node classified",
+      "max_score": 11,
+      "description": "At least one component in nodeClassifications is classified as 'server' (API, service, worker, or middleware)"
+    },
+    {
+      "name": "Storage node classified",
+      "max_score": 11,
+      "description": "At least one component in nodeClassifications is classified as 'storage' (database, cache, queue, or file store)"
+    },
+    {
+      "name": "External node classified",
+      "max_score": 11,
+      "description": "At least one component in nodeClassifications is classified as 'external' (third-party API, SaaS service, or system outside project boundary)"
+    }
+  ]
+}

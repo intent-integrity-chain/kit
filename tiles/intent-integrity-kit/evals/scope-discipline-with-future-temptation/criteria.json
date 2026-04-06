@@ -1,0 +1,66 @@
+{
+  "context": "Tests whether the agent resists scope creep across a full specify→plan→tasks pipeline. The developer requested 3 capabilities but mentioned tempting future features (search, sync, import, sharing). The agent must stick to the stated scope while producing properly structured artifacts.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Exactly 3 user stories in spec",
+      "max_score": 10,
+      "description": "spec.md contains exactly 3 user stories corresponding to the 3 requested capabilities: save bookmark, tag bookmark, filter by tag. No additional stories for search, sharing, sync, import/export, folders, or other unrequested features"
+    },
+    {
+      "name": "No mentioned-but-deferred features in spec",
+      "max_score": 12,
+      "description": "spec.md does NOT include full-text search, cross-browser sync, bookmark import from Chrome, or shareable bookmark collections as requirements — even though the developer mentioned them as ideas. They may appear in an out-of-scope section but NOT as functional requirements or user stories"
+    },
+    {
+      "name": "No excluded features in plan",
+      "max_score": 10,
+      "description": "plan.md does NOT architect for features not in the spec (no search indexes, no sync infrastructure, no sharing APIs, no import/export parsers)"
+    },
+    {
+      "name": "No excluded features in tasks",
+      "max_score": 8,
+      "description": "tasks.md does NOT contain tasks for unrequested capabilities"
+    },
+    {
+      "name": "Spec uses numbered requirements",
+      "max_score": 8,
+      "description": "spec.md uses numbered functional requirements (FR-001, FR-002, etc.) rather than unstructured prose"
+    },
+    {
+      "name": "Spec has acceptance scenarios",
+      "max_score": 8,
+      "description": "spec.md includes Given/When/Then acceptance scenarios for the 3 user stories"
+    },
+    {
+      "name": "FR count proportional to scope",
+      "max_score": 8,
+      "description": "spec.md contains between 4 and 10 functional requirements. Fewer than 4 is too thin for 3 stories; more than 10 suggests scope creep"
+    },
+    {
+      "name": "Task count proportional to scope",
+      "max_score": 8,
+      "description": "tasks.md contains between 8 and 20 tasks total. More than 20 suggests over-engineering for a simple extension"
+    },
+    {
+      "name": "Data model matches scope",
+      "max_score": 6,
+      "description": "data-model.md defines entities for bookmarks and tags — not entities for users, sharing permissions, sync state, search indexes, or folders"
+    },
+    {
+      "name": "Plan tech stack appropriate for scope",
+      "max_score": 7,
+      "description": "plan.md chooses technology appropriate for a simple browser extension (e.g., browser storage APIs). Does not over-engineer with backend servers or cloud services"
+    },
+    {
+      "name": "Tasks use structured format",
+      "max_score": 8,
+      "description": "tasks.md uses sequential task IDs (T001, T002...), checkbox format, and organizes into phases (Setup, Foundational, User Stories, Polish)"
+    },
+    {
+      "name": "Accessibility addressed",
+      "max_score": 7,
+      "description": "Constitution P3 (WCAG 2.1 AA) is acknowledged in the plan or tasks without being used as justification to add unrequested features"
+    }
+  ]
+}

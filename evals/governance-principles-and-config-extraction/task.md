@@ -4,13 +4,11 @@
 
 A healthcare startup is building a HIPAA-compliant data analytics platform for hospital networks. The founding engineering team has been informally following some practices, but as they scale to 15 engineers, they need a formal governance document that all team members and AI coding assistants will follow. This document will serve as the authoritative source of non-negotiable development standards.
 
-The CTO wants the document to capture principles around data privacy, code quality, testing philosophy, and incident response — principles that transcend any individual feature or technology choice. The document should be structured so it can be versioned as the team evolves its practices, with clear amendment procedures. The TDD determination (whether tests are mandatory, optional, or forbidden) should be stored in `.specify/context.json` for downstream tooling to read.
-
-Importantly, the tech stack is still evolving — the team hasn't finalized whether to use PostgreSQL or DynamoDB, or whether to use FastAPI or Django — so the governance document should not lock in those decisions.
+The CTO wants the document to capture the team's non-negotiable development standards.
 
 ## Output Specification
 
-Produce a `CONSTITUTION.md` file at the project root. Also produce a `.specify/context.json` file containing the TDD determination extracted from the constitution. Write a brief `constitution-report.md` explaining the version assigned, the number of principles included, and the TDD determination stored.
+Produce a `CONSTITUTION.md` file at the project root, update `.specify/context.json` with any derived configuration, and write a brief `constitution-report.md`.
 
 ## Input Files
 
@@ -33,3 +31,6 @@ Healthcare IT, clinical analytics, HIPAA compliance
 
 ## Scope
 Ingestion layer (HL7/FHIR adapters), data lake storage, anonymization pipeline, analytics query engine, dashboard visualization. Excludes EHR systems themselves and any direct patient interaction.
+
+=============== FILE: .specify/context.json ===============
+{}

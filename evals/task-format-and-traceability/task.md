@@ -2,9 +2,7 @@
 
 ## Problem/Feature Description
 
-A logistics company is building a REST API to manage warehouse inventory. The team has completed the feature spec and technical plan and now needs a detailed, dependency-ordered task list that developers can work from. The engineering manager wants the breakdown to clearly show which tasks can run in parallel (so the team can assign them to different engineers simultaneously), which belong to which user story, and how test scenarios map to implementation tasks.
-
-The team recently had problems with task lists that used vague prose to reference test ranges (like "tests 5 through 10") which broke their automated traceability tooling. They need explicit, individually listed test IDs.
+A logistics company is building a REST API to manage warehouse inventory. The team has completed the feature spec and technical plan and now needs a task list that developers can work from.
 
 ## Output Specification
 

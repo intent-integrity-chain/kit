@@ -1,0 +1,61 @@
+{
+  "context": "Tests whether the agent correctly applies the spec quality gate (detecting unresolved [NEEDS CLARIFICATION] items, checking FR-XXX count, and assessing measurable criteria) and produces a semantic diff when re-planning over an existing plan.md, showing what changed in a bordered box format with downstream impact.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "NEEDS CLARIFICATION flagged",
+      "max_score": 10,
+      "description": "planning-notes.md or agent output mentions that [NEEDS CLARIFICATION] items were found in spec.md (FR-001 max file size and FR-005 URL expiry)"
+    },
+    {
+      "name": "FR count assessed",
+      "max_score": 8,
+      "description": "planning-notes.md or agent output shows the FR-XXX pattern count was checked (spec has 6 FR items, which is ≥ 3 so should NOT trigger ERROR, but the check should be visible)"
+    },
+    {
+      "name": "Measurable criteria warning",
+      "max_score": 10,
+      "description": "planning-notes.md or agent output flags that success criteria SC-001 through SC-004 lack numeric/time/percentage measurements (e.g., a WARNING about no measurable criteria)"
+    },
+    {
+      "name": "Quality score reported",
+      "max_score": 8,
+      "description": "planning-notes.md includes a spec quality score (e.g., 'Score: X/10') or an equivalent quality assessment summary"
+    },
+    {
+      "name": "Semantic diff present",
+      "max_score": 10,
+      "description": "planning-notes.md contains a section comparing old vs new plan (semantic diff), identifying changes to tech stack, architecture, or dependencies"
+    },
+    {
+      "name": "Semantic diff format",
+      "max_score": 10,
+      "description": "The semantic diff uses a bordered box format with +--- borders and +Added / ~Changed / -Removed markers (or equivalent structured diff format from the skill's formatting guide)"
+    },
+    {
+      "name": "Downstream impact flagged",
+      "max_score": 8,
+      "description": "planning-notes.md or the semantic diff notes downstream impact — specifically that tasks.md or implementation work may need updates due to the changed architecture"
+    },
+    {
+      "name": "Updated plan has new dependencies",
+      "max_score": 10,
+      "description": "The updated plan.md adds dependencies related to virus scanning (e.g., ClamAV, a malware scanning library or service) that were absent in the original plan"
+    },
+    {
+      "name": "Updated architecture diagram",
+      "max_score": 8,
+      "description": "The updated plan.md includes a more detailed architecture section that reflects the new components (virus scanner, quota service, or similar) beyond the original simple three-box diagram"
+    },
+    {
+      "name": "No governance in plan",
+      "max_score": 8,
+      "description": "The updated plan.md does NOT contain project-wide principles, non-negotiable rules, or team process requirements — these belong in CONSTITUTION.md"
+    },
+    {
+      "name": "Clarification assumptions documented",
+      "max_score": 10,
+      "description": "The planning-notes.md or plan.md explicitly documents the assumptions made for the two [NEEDS CLARIFICATION] items (file size limit and URL expiry), rather than leaving them unresolved"
+    }
+  ]
+}

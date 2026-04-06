@@ -1,0 +1,66 @@
+{
+  "context": "Tests whether the agent creates a CONSTITUTION.md that follows governance best practices: technology-agnostic principles, structured versioning, TDD determination extracted to machine-readable config, and proper separation from feature-level concerns.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "No technology stack in constitution",
+      "max_score": 12,
+      "description": "CONSTITUTION.md does NOT contain specific technology choices such as database names (PostgreSQL, DynamoDB, MySQL), frameworks (FastAPI, Django, React), languages (Python, Node.js), or library/tool versions"
+    },
+    {
+      "name": "No implementation details",
+      "max_score": 8,
+      "description": "CONSTITUTION.md does NOT contain implementation specifics like file structures, API schemas, data models, architecture diagrams, or service configurations"
+    },
+    {
+      "name": "At least 3 principles",
+      "max_score": 8,
+      "description": "CONSTITUTION.md contains at least 3 distinct named principles (sections or subsections identifying governance rules)"
+    },
+    {
+      "name": "Principles are declarative",
+      "max_score": 8,
+      "description": "Constitution principles use declarative language (MUST, SHALL, REQUIRED, PROHIBITED) rather than vague aspirational language"
+    },
+    {
+      "name": "Semver version present",
+      "max_score": 7,
+      "description": "CONSTITUTION.md includes a version number in semver format (e.g., 1.0.0, 0.1.0) with a CONSTITUTION_VERSION or equivalent field"
+    },
+    {
+      "name": "Amendment procedure present",
+      "max_score": 7,
+      "description": "CONSTITUTION.md includes a section describing how the constitution can be amended (versioning, ratification, or change process)"
+    },
+    {
+      "name": ".specify/context.json created",
+      "max_score": 12,
+      "description": "A .specify/context.json file exists containing a tdd_determination field — the governance document's testing stance extracted to a machine-readable config file"
+    },
+    {
+      "name": "TDD determination value valid",
+      "max_score": 10,
+      "description": "The tdd_determination value in .specify/context.json is one of: 'mandatory', 'optional', or 'forbidden'"
+    },
+    {
+      "name": "Principles are domain-agnostic",
+      "max_score": 10,
+      "description": "Constitution principles are written as reusable governance rules, not project-specific requirements. They should apply regardless of which feature is being built — e.g., 'All PII MUST be encrypted at rest' not 'Patient HL7 messages must use TLS 1.3'"
+    },
+    {
+      "name": "Testing philosophy explicitly stated",
+      "max_score": 8,
+      "description": "CONSTITUTION.md explicitly addresses testing approach — whether TDD is required, optional, or forbidden — as a named principle or clear subsection, not just implied by other rules"
+    },
+    {
+      "name": "Dates in ISO format",
+      "max_score": 5,
+      "description": "Any dates in CONSTITUTION.md are in ISO 8601 format (YYYY-MM-DD)"
+    },
+    {
+      "name": "No feature-specific content",
+      "max_score": 5,
+      "description": "CONSTITUTION.md does not contain user stories, acceptance criteria, functional requirements, or other feature-level artifacts that belong in a spec"
+    }
+  ]
+}

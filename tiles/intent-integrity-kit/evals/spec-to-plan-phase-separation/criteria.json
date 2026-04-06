@@ -1,0 +1,61 @@
+{
+  "context": "Tests whether the agent maintains strict phase separation across the specify→plan boundary: spec.md must be technology-agnostic (WHAT not HOW) while plan.md must contain only technical decisions (no governance). Also validates that every functional requirement in the spec traces to a plan decision and no phantom requirements appear in the plan.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "No technology in spec.md",
+      "max_score": 15,
+      "description": "spec.md does NOT mention specific technologies, frameworks, databases, protocols, or languages (e.g., no Kafka, PostgreSQL, MQTT, TimescaleDB, Python, React, WebSocket, REST, GraphQL)"
+    },
+    {
+      "name": "No governance in plan.md",
+      "max_score": 12,
+      "description": "plan.md does NOT restate constitutional principles (no 'at-least-once delivery', 'degrade gracefully', 'auditability' rules). It may reference the constitution but must not duplicate governance content"
+    },
+    {
+      "name": "FR-XXX requirements in spec",
+      "max_score": 8,
+      "description": "spec.md contains at least 5 functional requirements using the FR-XXX pattern, covering: telemetry ingestion, health scoring, alerting, custom thresholds, and connection-lost detection"
+    },
+    {
+      "name": "SC-XXX success criteria in spec",
+      "max_score": 6,
+      "description": "spec.md contains at least 3 measurable success criteria using the SC-XXX pattern with quantifiable elements (numbers, percentages, time measurements)"
+    },
+    {
+      "name": "User stories in spec",
+      "max_score": 6,
+      "description": "spec.md contains at least 3 user stories covering dispatcher monitoring, maintenance coordinator investigation, and threshold configuration"
+    },
+    {
+      "name": "Given/When/Then scenarios in spec",
+      "max_score": 6,
+      "description": "spec.md contains at least 4 acceptance scenarios in Given/When/Then format covering the key use cases from the PM description"
+    },
+    {
+      "name": "Plan references spec FRs",
+      "max_score": 10,
+      "description": "plan.md or research.md references specific FR-XXX identifiers from spec.md when justifying technical decisions (e.g., choosing a time-series database to satisfy FR-XXX about telemetry storage)"
+    },
+    {
+      "name": "Every spec FR traceable to plan",
+      "max_score": 12,
+      "description": "Every FR-XXX in spec.md has a corresponding technical decision, data model entity, or API contract in the plan artifacts. No orphan requirements that the plan ignores"
+    },
+    {
+      "name": "No phantom requirements in plan",
+      "max_score": 12,
+      "description": "plan.md does not introduce features or capabilities not described in spec.md (e.g., no route optimization, driver scoring, fuel tracking, or other out-of-scope features that the PM did not request)"
+    },
+    {
+      "name": "data-model.md traces to spec entities",
+      "max_score": 8,
+      "description": "data-model.md defines entities that correspond to concepts in the spec (vehicles, telemetry readings, health scores, alerts, thresholds) — not entities invented by the plan without spec basis"
+    },
+    {
+      "name": "Connection-lost requirement survives to plan",
+      "max_score": 5,
+      "description": "The PM's specific requirement about 5-minute data absence showing 'connection lost' status appears in spec.md as a formal requirement AND is addressed in the plan's technical design"
+    }
+  ]
+}

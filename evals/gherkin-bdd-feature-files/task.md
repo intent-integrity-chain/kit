@@ -4,7 +4,7 @@
 
 A fintech startup is building a user notifications service that will alert customers about account events (new transactions, low balance, login from new device). The backend team has finished writing up the requirements in their specification format and now needs executable test scenarios before any implementation begins. They follow a test-first approach and need proper BDD-style test files that can be wired up to their testing framework.
 
-The product owner has provided a completed specification file (see below) and wants the QA engineer to translate it into Gherkin `.feature` files that the dev team can use as their implementation contract. The files must be organized sensibly and follow the project's tagging conventions so they can be traced back to individual requirements.
+The product owner has provided a completed specification file and technical plan (see below) and wants the QA engineer to translate the requirements into Gherkin `.feature` files.
 
 ## Output Specification
 
@@ -77,3 +77,66 @@ As a bank customer, I want to be notified immediately when a login occurs from a
 
 **Success Criteria:**
 - SC-005: Security alerts are delivered within 30 seconds of a new-device login event.
+
+=============== FILE: specs/001-notifications/plan.md ===============
+# Technical Plan: User Notifications
+
+## Technical Context
+
+- **Language/Version**: Python 3.12
+- **Primary Framework**: FastAPI 0.109
+- **Storage**: PostgreSQL 16 with SQLAlchemy 2.0
+- **Message Queue**: Redis Streams for async notification dispatch
+- **Testing**: pytest with pytest-asyncio
+- **Target Platform**: Linux/Docker
+
+## Project Structure
+
+```
+src/
+  models/notification.py       # Notification domain model
+  models/preference.py         # User notification preferences
+  models/device.py             # Registered device tracking
+  services/dispatcher.py       # Notification dispatch orchestrator
+  services/channels/email.py   # Email channel handler
+  services/channels/sms.py     # SMS channel handler
+  services/channels/inapp.py   # In-app channel handler
+  services/detector.py         # Transaction and device event detection
+  routes/notifications.py      # API endpoints
+  routes/preferences.py        # User preference management
+tests/
+  features/                    # BDD .feature files (to be generated)
+  integration/
+    test_dispatch.py
+    test_preferences.py
+```
+
+## Data Model Summary
+
+- **Notification**: id, userId, type (transaction|low_balance|security), channel (email|sms|inapp), status, sentAt, createdAt
+- **UserPreference**: id, userId, notificationsEnabled, emailAlertsEnabled, lowBalanceThreshold, customThresholdSet
+- **RegisteredDevice**: id, userId, deviceFingerprint, whitelisted, firstSeenAt
+
+=============== FILE: CONSTITUTION.md ===============
+# Project Constitution v1.0.0
+
+## Principles
+
+### P1: Test-Driven Development
+Test-first development MUST be used for all features. Test specifications MUST be written before implementation begins.
+
+### P2: Data Privacy
+User notification preferences and device data MUST be encrypted at rest.
+
+### P3: Reliability
+Notification delivery failures MUST be retried with exponential backoff. Failed deliveries MUST be logged.
+
+## Amendment Procedure
+
+Amendments require team lead approval and version increment.
+
+=============== FILE: .specify/context.json ===============
+{
+  "tdd_determination": "mandatory",
+  "active_feature": "001-notifications"
+}

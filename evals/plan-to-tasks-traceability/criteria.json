@@ -1,0 +1,61 @@
+{
+  "context": "Tests whether the agent generates tasks that are fully traceable to the plan and spec: file paths match the plan's project structure, user story tags match spec stories, TS-XXX references are comma-separated (not ranges), and no tasks reference technologies or files not defined in the plan.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "File paths match plan structure",
+      "max_score": 15,
+      "description": "Task descriptions reference file paths that exist in the plan's Project Structure section (e.g., src/services/event-service.ts, src/routes/events.ts, prisma/schema.prisma). No invented paths like src/controllers/ or src/utils/ that aren't in the plan"
+    },
+    {
+      "name": "Every user story has tagged tasks",
+      "max_score": 10,
+      "description": "All three user stories (US-1, US-2, US-3) have at least one task tagged with [US1], [US2], [US3] respectively"
+    },
+    {
+      "name": "Setup/Foundational tasks have no story tags",
+      "max_score": 8,
+      "description": "Tasks in Setup and Foundational phases do NOT have [USn] labels — these are shared infrastructure, not story-specific"
+    },
+    {
+      "name": "TS references are comma-separated",
+      "max_score": 12,
+      "description": "When tasks reference multiple test specs, they use comma-separated format like [TS-003, TS-004, TS-005] — NOT prose ranges like 'TS-003 through TS-005' or 'TS-003 to TS-005'"
+    },
+    {
+      "name": "TS references match provided .feature files",
+      "max_score": 10,
+      "description": "TS-XXX references in tasks correspond to actual @TS-XXX tags in the provided .feature files (TS-001 through TS-007). No references to TS-008 or higher that don't exist"
+    },
+    {
+      "name": "Priority ordering respected",
+      "max_score": 8,
+      "description": "P1 user story tasks (US-1 Create Event, US-2 Purchase Ticket) appear before P2 tasks (US-3 View Listings) in the phase structure"
+    },
+    {
+      "name": "Phase structure complete",
+      "max_score": 8,
+      "description": "tasks.md has all required phases: Setup (project init, schema), Foundational (shared models, database), User Story phases (by priority), and a Polish/Final phase"
+    },
+    {
+      "name": "[P] markers only on parallelizable tasks",
+      "max_score": 8,
+      "description": "[P] markers appear only on tasks that can genuinely run in parallel (different files, no mutual dependencies). Tasks that depend on each other (e.g., model before service) are NOT marked [P]"
+    },
+    {
+      "name": "No technologies beyond the plan",
+      "max_score": 10,
+      "description": "Tasks do not introduce frameworks, libraries, or tools not mentioned in the plan (e.g., no Redis, no GraphQL, no React — the plan specifies Express, Prisma, Vitest, Resend)"
+    },
+    {
+      "name": "Checkbox format used",
+      "max_score": 5,
+      "description": "All tasks use the markdown checkbox format: - [ ] TNNN description"
+    },
+    {
+      "name": "Sequential T-prefixed IDs",
+      "max_score": 6,
+      "description": "Tasks use sequential zero-padded IDs: T001, T002, T003, etc. with no gaps or duplicates"
+    }
+  ]
+}
