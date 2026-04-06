@@ -1,17 +1,27 @@
 {
   "name": "tessl-labs/intent-integrity-kit",
-  "version": "2.8.0",
+  "version": "2.8.1",
   "summary": "Closing the intent-to-code chasm - specification-driven development with BDD verification chain",
   "description": "Intent Integrity Kit (IIKit) preserves your intent from idea to implementation through specification-driven development with BDD verification chain. Compatible with Claude Code, Codex, Gemini, and OpenCode.\n\nWhat's new in v2.8.0: 14 eval scenarios testing cross-phase intent preservation (baseline 48% → with context 88%). Skill compliance fixes for constitution context.json creation, plan spec quality gate, and bugfix TDD fallback. Anti-bleeding eval design ensures scenarios test genuine skill behavior.",
   "entrypoint": "README.md",
   "private": false,
   "repository": "https://github.com/intent-integrity-chain/kit",
   "steering": {
-    "assertion-integrity": { "rules": "rules/assertion-integrity.md" },
-    "phase-discipline": { "rules": "rules/phase-discipline.md" },
-    "constitution": { "rules": "rules/constitution.md" },
-    "dashboard-refresh": { "rules": "rules/dashboard-refresh.md" },
-    "phase-separation": { "rules": "rules/phase-separation.md" }
+    "assertion-integrity": {
+      "rules": "rules/assertion-integrity.md"
+    },
+    "phase-discipline": {
+      "rules": "rules/phase-discipline.md"
+    },
+    "constitution": {
+      "rules": "rules/constitution.md"
+    },
+    "dashboard-refresh": {
+      "rules": "rules/dashboard-refresh.md"
+    },
+    "phase-separation": {
+      "rules": "rules/phase-separation.md"
+    }
   },
   "skills": {
     "iikit-core": {
@@ -51,5 +61,12 @@
       "path": "skills/iikit-bugfix/SKILL.md"
     }
   },
-  "keywords": ["intent-integrity", "tdd", "specification", "workflow", "ai-coding", "verification"]
+  "keywords": [
+    "intent-integrity",
+    "tdd",
+    "specification",
+    "workflow",
+    "ai-coding",
+    "verification"
+  ]
 }
