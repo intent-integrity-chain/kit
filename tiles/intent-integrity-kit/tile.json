@@ -1,6 +1,6 @@
 {
   "name": "tessl-labs/intent-integrity-kit",
-  "version": "2.8.1",
+  "version": "2.8.2",
   "summary": "Closing the intent-to-code chasm - specification-driven development with BDD verification chain",
   "description": "Intent Integrity Kit (IIKit) preserves your intent from idea to implementation through specification-driven development with BDD verification chain. Compatible with Claude Code, Codex, Gemini, and OpenCode.\n\nWhat's new in v2.8.0: 14 eval scenarios testing cross-phase intent preservation (baseline 48% → with context 88%). Skill compliance fixes for constitution context.json creation, plan spec quality gate, and bugfix TDD fallback. Anti-bleeding eval design ensures scenarios test genuine skill behavior.",
   "entrypoint": "README.md",
