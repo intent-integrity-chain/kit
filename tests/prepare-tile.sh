@@ -193,8 +193,19 @@ done
 echo "✓ Scripts distributed to skills"
 
 # Step 3: Clean up iikit-core — distributed files no longer needed in published tile
+# Keep references that iikit-core/SKILL.md itself uses (prd-seeding.md, help-reference.md)
+CORE_ONLY_REFS="prd-seeding.md help-reference.md"
+mkdir -p /tmp/iikit-core-refs-keep
+for ref in $CORE_ONLY_REFS; do
+    [[ -f "iikit-core/references/$ref" ]] && cp "iikit-core/references/$ref" /tmp/iikit-core-refs-keep/
+done
 rm -rf iikit-core/references
-echo "✓ Removed iikit-core/references/ (fully distributed)"
+mkdir -p iikit-core/references
+for ref in $CORE_ONLY_REFS; do
+    [[ -f "/tmp/iikit-core-refs-keep/$ref" ]] && cp "/tmp/iikit-core-refs-keep/$ref" iikit-core/references/
+done
+rm -rf /tmp/iikit-core-refs-keep
+echo "✓ Removed iikit-core/references/ (kept core-only: $CORE_ONLY_REFS)"
 
 # Remove templates only referenced from SKILL.md (now distributed as local copies)
 # Keep templates referenced by scripts: agent-file-template.md, spec-template.md, plan-template.md, premise-template.md
