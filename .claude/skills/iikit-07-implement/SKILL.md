@@ -201,29 +201,30 @@ All tasks `[x]`, features validated against spec, test execution enforcement (§
 
 Missing artifacts: STOP with run instructions. Constitution violations: STOP, explain, suggest alternative. Checklist incomplete: ask user. Task/parallel failure: report + halt (§6.5). Tests not run: STOP. Tests failing: fix code, re-run.
 
-## Next Steps
+## Dashboard & Next Steps
 
-Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/next-step.sh --phase 07 --json`
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/next-step.ps1 -Phase 07 -Json`
+After all tasks are complete (or on halt), run post-phase to refresh the dashboard and compute next step:
 
-Parse the JSON and present:
-1. If `clear_after` is true: suggest `/clear` before proceeding
-2. If `next_step` is `/iikit-07-implement` (feature incomplete): suggest resuming implementation
-3. If `next_step` is null (feature complete): congratulate and list alt_steps
-4. If `alt_steps` non-empty: list as alternatives (e.g., `/iikit-08-taskstoissues`)
-5. For `next_step` and each `alt_step`, include the `model_tier` from the JSON so the user knows which model is best for each option. Look up tiers in [model-recommendations.md](../iikit-core/references/model-recommendations.md) for agent-specific switch commands.
-6. Append dashboard link
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase 07
+```
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase 07`
 
-Push commits to remote if available: `git push`. If on a feature branch, offer to merge. Ask the user which approach they prefer:
+Note: implement handles its own commits per the chosen strategy (§6.6), so post-phase is called without `--commit-files`.
+
+Parse `next_step` from JSON:
+- If `next_step` is `/iikit-07-implement` (feature incomplete): suggest resuming
+- If `next_step` is null (feature complete): congratulate, list alt_steps
+- Include `model_tier` per [model-recommendations.md](../iikit-core/references/model-recommendations.md)
+
+Push commits to remote if available: `git push`. If on a feature branch, offer to merge:
 - **A) Merge locally**: `git checkout main && git merge <branch>`
-- **B) Create PR**: `gh pr create` if available, otherwise provide the GitHub URL to create one manually
+- **B) Create PR**: `gh pr create` if available, otherwise provide the GitHub URL
 - **C) Skip**: user will handle it
 
-Format:
 ```
 Implementation complete!
 Next: [/clear → ] <next_step or "All tasks done!">
 [- <alt_step> — <reason> (model: <tier>)]
-
-- Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
+- Dashboard: file://$(pwd)/.specify/dashboard.html
 ```
