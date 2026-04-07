@@ -74,8 +74,10 @@ jobs:
           pwsh -Command "Install-Module -Name Pester -Force -Scope CurrentUser -MinimumVersion 5.0"
           pwsh -Command "Invoke-Pester tests/powershell/ -Output Detailed -CI"
 
-      - name: Install tessl CLI
-        run: npm install -g @tessl/cli
+      - name: Setup Tessl CLI
+        uses: tesslio/setup-tessl@v2
+        with:
+          token: ${{ secrets.TESSL_TOKEN }}
 
       - name: E2E - Fresh install and hash integrity
         run: |
@@ -151,10 +153,8 @@ jobs:
       - name: Lint tile manifest
         run: tessl tile lint tiles/intent-integrity-kit
 
-      - name: Review all skills (threshold 80%)
-        env:
-          TESSL_API_TOKEN: ${{ secrets.TESSL_TOKEN }}
-        run: tests/run-skill-reviews.sh --threshold 80
+      - name: Review all skills (threshold 85%)
+        run: tests/run-skill-reviews.sh --threshold 85
 
   test-windows:
     name: Windows Pester Tests
@@ -253,15 +253,6 @@ jobs:
       - name: Publish tile v${{ steps.version.outputs.new }}
         if: steps.version.outputs.changed == 'true'
         run: tessl tile publish tiles/intent-integrity-kit
-
-      - uses: actions/setup-node@v4
-        if: steps.version.outputs.changed == 'true'
-        with:
-          node-version: '20'
-
-      - name: Install tessl CLI (for e2e verification)
-        if: steps.version.outputs.changed == 'true'
-        run: npm install -g @tessl/cli
 
       - name: Make scripts executable
         if: steps.version.outputs.changed == 'true'
