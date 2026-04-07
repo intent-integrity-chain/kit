@@ -203,14 +203,14 @@ Missing artifacts: STOP with run instructions. Constitution violations: STOP, ex
 
 ## Dashboard & Next Steps
 
-After all tasks are complete (or on halt), run post-phase to refresh the dashboard and compute next step:
+After all tasks are complete (or on halt), refresh the dashboard and compute the next step. The post-phase script handles both in a single call — it runs `generate-dashboard-safe.sh` to regenerate the HTML dashboard, then runs `next-step.sh --phase 07 --json` to determine the next workflow step based on feature completion state:
 
 ```bash
 bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase 07
 ```
 Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase 07`
 
-Note: implement handles its own commits per the chosen strategy (§6.6), so post-phase is called without `--commit-files`.
+Note: implement handles its own git commits per the chosen strategy (§6.6), so post-phase is called without `--commit-files`.
 
 Parse `next_step` from JSON:
 - If `next_step` is `/iikit-07-implement` (feature incomplete): suggest resuming
