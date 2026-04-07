@@ -109,23 +109,14 @@ If `tests/features/` already contains `.feature` files:
 
 ### 5. Store Assertion Integrity Hash
 
-**CRITICAL**: Store SHA256 hash of assertion content in both locations:
+**CRITICAL**: Store SHA256 hash in both context.json and git note in a single call:
 
 ```bash
-# Context.json (auto-derived from features directory path)
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh store-hash "FEATURE_DIR/tests/features"
-
-# Git note (tamper-resistant backup — uses first .feature file for note attachment)
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh store-git-note "FEATURE_DIR/tests/features"
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh store-all "FEATURE_DIR/tests/features"
 ```
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/testify-tdd.ps1 store-all "FEATURE_DIR/tests/features"`
 
-**Windows (PowerShell):**
-```powershell
-pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/testify-tdd.ps1 store-hash "FEATURE_DIR/tests/features"
-pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/testify-tdd.ps1 store-git-note "FEATURE_DIR/tests/features"
-```
-
-The implement skill verifies this hash before proceeding, blocking if `.feature` file assertions were tampered with.
+Returns JSON with `hash` and `git_note` status. The implement skill verifies this hash before proceeding.
 
 ### 6. Report
 

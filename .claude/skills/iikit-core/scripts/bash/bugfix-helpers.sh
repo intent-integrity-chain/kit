@@ -122,12 +122,54 @@ cmd_validate_feature() {
 }
 
 # =============================================================================
+# Full setup: list features, validate selected, get bug ID + task IDs in one call
+# Usage: cmd_full_setup <feature_dir> [task_count]
+cmd_full_setup() {
+    local feature_dir="$1"
+    local task_count="${2:-3}"
+
+    # List features
+    local features_json
+    features_json=$(list_features_json)
+
+    # Validate feature
+    local validate_json
+    validate_json=$(cmd_validate_feature "$feature_dir" 2>/dev/null)
+    local valid
+    valid=$(printf '%s' "$validate_json" | sed -n 's/.*"valid":\([a-z]*\).*/\1/p')
+
+    if [[ "$valid" != "true" ]]; then
+        printf '{"features":%s,"validation":%s}\n' "$features_json" "$validate_json"
+        return 1
+    fi
+
+    # Get bug ID and task IDs
+    local bug_id
+    bug_id=$(cmd_next_bug_id "$feature_dir")
+    local task_ids_json
+    task_ids_json=$(cmd_next_task_ids "$feature_dir" "$task_count")
+
+    # TDD determination
+    local tdd_det="optional"
+    local context_file
+    context_file=$(get_repo_root)/.specify/context.json
+    if [[ -f "$context_file" ]]; then
+        local det
+        det=$(sed -n 's/.*"tdd_determination"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$context_file")
+        [[ -n "$det" ]] && tdd_det="$det"
+    fi
+
+    printf '{"features":%s,"validation":%s,"bug_id":"%s","task_ids":%s,"tdd_determination":"%s"}\n' \
+        "$features_json" "$validate_json" "$bug_id" "$task_ids_json" "$tdd_det"
+}
+
+# =============================================================================
 # MAIN DISPATCHER
 # =============================================================================
 
 if [[ $# -lt 1 ]]; then
     echo "Usage: bugfix-helpers.sh <subcommand> [args...]" >&2
-    echo "Subcommands: --list-features, --next-bug-id, --next-task-ids, --validate-feature" >&2
+    echo "Subcommands: --list-features, --next-bug-id, --next-task-ids, --validate-feature, --full-setup" >&2
     exit 1
 fi
 
@@ -156,9 +198,16 @@ case "$1" in
         fi
         cmd_validate_feature "$2"
         ;;
+    --full-setup)
+        if [[ $# -lt 2 ]]; then
+            echo "Usage: bugfix-helpers.sh --full-setup <feature_dir> [task_count]" >&2
+            exit 1
+        fi
+        cmd_full_setup "$2" "${3:-3}"
+        ;;
     *)
         echo "Unknown subcommand: $1" >&2
-        echo "Available: --list-features, --next-bug-id, --next-task-ids, --validate-feature" >&2
+        echo "Available: --list-features, --next-bug-id, --next-task-ids, --validate-feature, --full-setup" >&2
         exit 1
         ;;
 esac

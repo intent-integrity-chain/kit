@@ -87,23 +87,17 @@ When `.feature` files exist, the full BDD verification chain applies to each imp
 
 **Step 1 — Write step definitions**: Write step definition code that binds Gherkin steps to application calls. Place in `tests/step_definitions/`.
 
-**Step 2 — Verify step coverage**: All `.feature` steps must have matching step definitions.
+**Step 2 — RED phase**: Run the BDD tests. They MUST fail (step definitions exist but production code does not yet implement the behavior). This confirms the tests are meaningful.
+
+**Step 3 — Write production code**: Implement the feature code that makes the tests pass.
+
+**Step 4 — GREEN phase**: Run the BDD tests again. They MUST pass. If they fail: fix the production code, not the tests or `.feature` files.
+
+**Step 5 — Verify BDD chain**: Run combined step coverage + quality check in one call:
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/verify-steps.sh --json "FEATURE_DIR/tests/features" "FEATURE_DIR/plan.md"
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/verify-bdd.sh --json "FEATURE_DIR/tests/features" "FEATURE_DIR/plan.md" "FEATURE_DIR/tests/step_definitions" "<language>"
 ```
-Must return `PASS` before continuing. If `BLOCKED`: fix missing step definitions. If `DEGRADED`: proceed with caution (no BDD framework available).
-
-**Step 3 — RED phase**: Run the BDD tests. They MUST fail (step definitions exist but production code does not yet implement the behavior). This confirms the tests are meaningful.
-
-**Step 4 — Write production code**: Implement the feature code that makes the tests pass.
-
-**Step 5 — GREEN phase**: Run the BDD tests again. They MUST pass. If they fail: fix the production code, not the tests or `.feature` files.
-
-**Step 6 — Verify step quality**: Ensure step definitions have meaningful assertions (not empty bodies or tautologies).
-```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/verify-step-quality.sh --json "FEATURE_DIR/tests/step_definitions" "<language>"
-```
-Must return `PASS` before marking the task complete. If `BLOCKED`: fix the flagged step definitions.
+Parse JSON for `steps.status` (coverage) and `quality.status` (assertions). Both must be `PASS` before marking task complete. If `BLOCKED`: fix the flagged step definitions.
 
 ### 2.2 Feature File Immutability
 

@@ -55,46 +55,26 @@ If input contains BOTH `#number` and text, prioritize the `#number` and warn tha
 1. Store the text as the bug description
 2. Continue to Step 3
 
-### 3. Select Target Feature
+### 3. Select Feature & Full Setup
 
-Run feature listing:
-
-**Unix/macOS/Linux:**
-```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/bugfix-helpers.sh --list-features
-```
-**Windows (PowerShell):**
-```powershell
-pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/bugfix-helpers.ps1 --list-features
-```
-
-Parse the JSON array. If empty: ERROR with "No features found. Run `/iikit-01-specify` first to create a feature."
-
-Present a numbered table of features:
-
-| # | Feature | Stage |
-|---|---------|-------|
-| 1 | 001-user-auth | implementing-50% |
-| 2 | 002-api-gateway | specified |
-
-Prompt user to select a feature by number.
-
-### 4. Validate Feature
-
-After selection, validate:
+Run full setup to list features, validate, get bug ID and task IDs in one call. First, present feature list to user. After selection:
 
 **Unix/macOS/Linux:**
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/bugfix-helpers.sh --validate-feature "<feature_dir>"
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/bugfix-helpers.sh --full-setup "<feature_dir>" <task_count>
 ```
 **Windows (PowerShell):**
 ```powershell
-pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/bugfix-helpers.ps1 --validate-feature "<feature_dir>"
+pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/bugfix-helpers.ps1 --full-setup "<feature_dir>" <task_count>
 ```
 
-If invalid: ERROR with the message from the JSON response.
+Use `task_count` = 2 if TDD mandatory (from `tdd_determination` in response), 3 otherwise.
 
-### 5. Gather Bug Details
+Parse JSON for: `features` (list for display), `validation` (check `valid`), `bug_id` (BUG-NNN), `task_ids` (T-BNNN array), `tdd_determination`.
+
+If `validation.valid` is false: ERROR with the message. If `features` is empty: ERROR with "No features found."
+
+### 4. Gather Bug Details
 
 **For text input (2b):**
 - Prompt user for **severity**: present options (critical, high, medium, low) with descriptions
@@ -103,17 +83,6 @@ If invalid: ERROR with the message from the JSON response.
 **For GitHub inbound (2a):**
 - Severity is pre-filled from labels (confirm with user if mapping is ambiguous)
 - Reproduction steps are pre-filled from issue body (confirm with user)
-
-### 6. Generate Bug ID
-
-**Unix/macOS/Linux:**
-```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/bugfix-helpers.sh --next-bug-id "<feature_dir>"
-```
-**Windows (PowerShell):**
-```powershell
-pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/bugfix-helpers.ps1 --next-bug-id "<feature_dir>"
-```
 
 ### 7. Write bugs.md
 
@@ -142,23 +111,9 @@ For text-input bugs only (NOT for GitHub inbound — issue already exists):
 2. Store returned issue number in the bugs.md GitHub Issue field
 3. If no GitHub remote configured: warn that GitHub issue creation was skipped, proceed with local workflow
 
-### 9. Assess TDD Requirements
+### 9. TDD & Task Generation
 
-Check TDD determination using this priority:
-
-1. **Read from `.specify/context.json`** — if it exists and contains `tdd_determination`, use that value directly.
-2. **Run the script** (if context.json doesn't have the field):
-   ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh assess-tdd "CONSTITUTION.md"
-   ```
-   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/testify-tdd.ps1 assess-tdd "CONSTITUTION.md"`
-3. **Determine from constitution text** (if script unavailable): scan CONSTITUTION.md for TDD indicators:
-   - MUST/REQUIRED + "TDD", "test-first", "red-green-refactor" → `mandatory`
-   - MUST + "test-driven", "tests before code" → `mandatory`
-   - Testing described as OPTIONAL → `optional`
-   - MUST + "test-after", "no unit tests" → `forbidden`
-
-The result is the `determination` value used in step 10 and 11.
+Use `tdd_determination` and `task_ids` from the full-setup response (Step 3). Use `bug_id` from Step 3.
 
 ### 10. BDD/TDD Flow (If Mandatory)
 
@@ -186,22 +141,7 @@ If TDD is mandatory (`determination` = `mandatory`):
 
 ### 11. Generate Bug Fix Tasks
 
-**Bug fix tasks use the `T-B` prefix** (e.g., T-B001, T-B002) to distinguish them from regular tasks (T001, T002). This is mandatory — the dashboard and parsers rely on the `T-B` prefix to identify bug fix tasks and calculate implementation progress correctly.
-
-**Select the task template based on TDD determination from Step 9:**
-- If `determination` = `mandatory`: use the **TDD task set** (count = 2)
-- Otherwise: use the **Non-TDD task set** (count = 3)
-
-Get next task IDs with the appropriate count:
-
-**Unix/macOS/Linux:**
-```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/bugfix-helpers.sh --next-task-ids "<feature_dir>" <count>
-```
-**Windows (PowerShell):**
-```powershell
-pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/bugfix-helpers.ps1 --next-task-ids "<feature_dir>" <count>
-```
+Use `task_ids` from the full-setup response (Step 3). Task IDs use `T-B` prefix — parsers and dashboard rely on this.
 
 **Non-TDD task set** (use when `determination` is NOT `mandatory`, count = 3):
 ```markdown

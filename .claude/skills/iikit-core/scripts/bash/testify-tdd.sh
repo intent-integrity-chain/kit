@@ -625,6 +625,15 @@ if [[ $# -gt 0 ]]; then
             fi
             store_git_note "$2"
             ;;
+        store-all)
+            if [[ $# -lt 2 ]]; then
+                echo "Usage: $0 store-all <features-dir>"
+                exit 1
+            fi
+            HASH=$(store_assertion_hash "$2")
+            NOTE=$(store_git_note "$2" 2>/dev/null || echo "SKIPPED")
+            printf '{"hash":"%s","git_note":"%s"}\n' "$HASH" "$NOTE"
+            ;;
         verify-git-note)
             if [[ $# -lt 2 ]]; then
                 echo "Usage: $0 verify-git-note <test-specs-file>"

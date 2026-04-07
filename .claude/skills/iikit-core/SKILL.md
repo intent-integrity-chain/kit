@@ -41,25 +41,28 @@ The `$ARGUMENTS` after `init` may include an optional path or URL to a PRD/SDD d
 
 > **Working directory**: All script paths below are relative to the project root. Before running any script, verify you are in the project root directory (`pwd` should show the directory containing `tessl.json` or `.tessl/`). If the script path doesn't resolve, find it: `find . -path "*/iikit-core/scripts/bash/git-setup.sh" 2>/dev/null || find ~/.tessl -path "*/iikit-core/scripts/bash/git-setup.sh" 2>/dev/null`
 
-#### Step 0 — Detect environment
+#### Step 0 — Detect environment, initialize hooks, check premise
+
+Run all detection and initialization in a single call:
 
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/git-setup.sh --json
-# Windows: pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/git-setup.ps1 -Json
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/init-full.sh --json
+# Windows: pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/init-full.ps1 -Json
 ```
 
-JSON fields: `git_available`, `is_git_repo`, `has_remote`, `remote_url`, `is_github_remote`, `gh_available`, `gh_authenticated`, `has_iikit_artifacts`.
+Parse JSON for `git` (environment), `init` (hooks), and `premise` (validation) sections.
 
-If `gh_available` is false, suggest: "GitHub CLI (`gh`) is not installed. Install it from https://cli.github.com/ for the best experience. Proceeding with `curl` fallback for GitHub operations."
+- `git.gh_available` false: suggest installing GitHub CLI
+- `init.git_user_configured` false: ask user for name/email, run `git config`
 
 #### Step 1 — Git/GitHub setup
 
-**Auto-skip**: If `is_git_repo` + `has_remote`, skip to Step 2.
+**Auto-skip**: If `git.is_git_repo` + `git.has_remote`, skip to Step 2.
 
 | Option | Requires | Action |
 |--------|----------|--------|
-| A) Init here | `git_available` | `git init`, then offer GitHub repo create (`gh` or API). Ask public/private. |
-| B) Clone | `git_available` | Ask for URL/`owner/name`. `gh repo clone` or `git clone`. |
+| A) Init here | `git.git_available` | `git init`, then offer GitHub repo create (`gh` or API). Ask public/private. |
+| B) Clone | `git.git_available` | Ask for URL/`owner/name`. `gh repo clone` or `git clone`. |
 | C) Skip | — | Proceed without git. Warn: no assertion integrity hooks. |
 
 Hide options whose prerequisites aren't met. If `git_available` is false, only C is available.
@@ -72,25 +75,9 @@ Hide options whose prerequisites aren't met. If `git_available` is false, only C
 
 `mkdir -p .specify specs`
 
-#### Step 4 — Initialize hooks
+#### Step 4 — Create PREMISE.md
 
-```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/init-project.sh --json
-# Windows: pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/init-project.ps1 -Json
-```
-
-Installs pre-commit (assertion validation) and post-commit (hash storage) hooks.
-
-If `git_user_configured` is `false`: ask the user for their name and email, then run:
-```bash
-git config user.name "<name>"
-git config user.email "<email>"
-```
-Do NOT guess from hostname or system username.
-
-#### Step 5 — Create PREMISE.md
-
-If `PREMISE.md` does not exist, create it from the user's input using [premise-template.md](templates/premise-template.md). Extract from the user's init description:
+If `premise.status` is `FAIL` or PREMISE.md doesn't exist: create from user's input using [premise-template.md](templates/premise-template.md). Extract:
 - **What**: project description (from the user's input text)
 - **Who**: target users (infer from context, or ask)
 - **Why**: problem being solved (infer from context, or ask)
@@ -101,7 +88,7 @@ Replace ALL bracket placeholders `[PLACEHOLDER]` with actual content. This is MA
 
 After writing PREMISE.md, validate:
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/validate-premise.sh --json "$PROJECT_PATH"
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/validate-premise.sh --json
 ```
 If validation fails (remaining placeholders or missing sections), fix and re-validate.
 
