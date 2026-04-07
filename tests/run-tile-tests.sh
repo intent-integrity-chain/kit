@@ -270,20 +270,20 @@ test_tdd_conditional_next_steps() {
     log_section "TDD Conditional Next Steps (via next-step.sh)"
     local base=".tessl/tiles/tessl-labs/intent-integrity-kit/skills"
 
-    # Plan skill delegates to next-step.sh which handles TDD routing
+    # Plan skill delegates to next-step.sh (directly or via post-phase.sh)
     ((TESTS_RUN++))
-    if grep -A10 "## Next Steps" "$base/iikit-02-plan/SKILL.md" | grep -q "next-step"; then
-        log_pass "plan delegates to next-step.sh (handles TDD routing)"
+    if grep -q "next-step\|post-phase" "$base/iikit-02-plan/SKILL.md"; then
+        log_pass "plan delegates to next-step.sh (directly or via post-phase.sh)"
     else
-        log_fail "plan missing next-step.sh in Next Steps"
+        log_fail "plan missing next-step delegation"
     fi
 
-    # Checklist skill delegates to next-step.sh
+    # Checklist skill delegates to next-step.sh (directly or via post-phase.sh)
     ((TESTS_RUN++))
-    if grep -A10 "## Next Steps" "$base/iikit-03-checklist/SKILL.md" | grep -q "next-step"; then
-        log_pass "checklist delegates to next-step.sh"
+    if grep -q "next-step\|post-phase" "$base/iikit-03-checklist/SKILL.md"; then
+        log_pass "checklist delegates to next-step.sh (directly or via post-phase.sh)"
     else
-        log_fail "checklist missing next-step.sh in Next Steps"
+        log_fail "checklist missing next-step delegation"
     fi
 
     # next-step.sh itself routes to testify when TDD mandatory
@@ -1229,9 +1229,9 @@ test_skill_numbering_consistency() {
         fi
     fi
 
-    # Tasks (06) delegates to next-step.sh which suggests analyze as alt_step
-    if grep -A10 "## Next Steps" "$base/iikit-05-tasks/SKILL.md" 2>/dev/null | grep -q "next-step"; then
-        : # Correct — delegates to next-step.sh
+    # Tasks (06) delegates to next-step.sh (directly or via post-phase.sh)
+    if grep -q "next-step\|post-phase" "$base/iikit-05-tasks/SKILL.md" 2>/dev/null; then
+        : # Correct — delegates to next-step.sh (directly or via post-phase.sh)
     else
         ((wrong_numbering++))
         log_info "tasks doesn't delegate to next-step.sh"
