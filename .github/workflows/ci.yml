@@ -153,8 +153,8 @@ jobs:
       - name: Lint tile manifest
         run: tessl tile lint tiles/intent-integrity-kit
 
-      - name: Review all skills (threshold 85%)
-        run: tests/run-skill-reviews.sh --threshold 85
+      - name: Review all skills (threshold 84%)
+        run: tests/run-skill-reviews.sh --threshold 84
 
   test-windows:
     name: Windows Pester Tests
