@@ -123,40 +123,19 @@ Output: path to tasks.md, total count, count per story, parallel opportunities, 
 
 If tasks.md exists: preserve `[x]` completion status, map old IDs to new by similarity, warn about changes to completed tasks. Ask confirmation before overwriting. Use format from [formatting-guide.md](../iikit-core/references/formatting-guide.md) (Semantic Diff section).
 
-## Commit
+## Commit, Dashboard & Next Steps
+
+Run post-phase to commit, refresh dashboard, and compute next step in a single call:
 
 ```bash
-git add specs/*/tasks.md
-git commit -m "tasks: <feature-short-name> task breakdown"
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase 05 --commit-files "specs/*/tasks.md" --commit-msg "tasks: <feature-short-name> task breakdown"
 ```
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase 05 -CommitFiles "specs/*/tasks.md" -CommitMsg "tasks: <feature-short-name> task breakdown"`
 
-## Dashboard Refresh
-
-Regenerate the dashboard so the pipeline reflects the new tasks:
-
-```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
-```
-
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
-
-## Next Steps
-
-Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/next-step.sh --phase 05 --json`
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/next-step.ps1 -Phase 05 -Json`
-
-Parse the JSON and present:
-1. If `clear_after` is true: suggest `/clear` before proceeding
-2. Present `next_step` as the primary recommendation
-3. If `alt_steps` non-empty: list as alternatives
-4. For `next_step` and each `alt_step`, include the `model_tier` from the JSON so the user knows which model is best for each option. Look up tiers in [model-recommendations.md](../iikit-core/references/model-recommendations.md) for agent-specific switch commands.
-5. Append dashboard link
-
-Format:
+Parse `next_step` from JSON. Present per [model-recommendations.md](../iikit-core/references/model-recommendations.md):
 ```
 Tasks generated!
 Next: [/clear → ] <next_step> (model: <tier>)
 [- <alt_step> — <reason> (model: <tier>)]
-
-- Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
+- Dashboard: file://$(pwd)/.specify/dashboard.html
 ```

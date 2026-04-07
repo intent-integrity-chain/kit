@@ -84,37 +84,23 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 9. **Git init** (if needed): `git init` to ensure project isolation
 
-10. **Commit**: `git add CONSTITUTION.md .specify/context.json && git commit -m "Add project constitution"`
-
-11. **Dashboard Refresh** (optional, never blocks):
-```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
-```
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
-
-12. **Report**: version, bump rationale, TDD determination, git status, suggested next steps
+10. **Report**: version, bump rationale, TDD determination, git status
 
 ## Formatting
 
 - Markdown headings per template, lines <100 chars, single blank line between sections, no trailing whitespace.
 
-## Next Steps
+## Commit, Dashboard & Next Steps
 
-Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/next-step.sh --phase 00 --json`
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/next-step.ps1 -Phase 00 -Json`
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase 00 --commit-files "CONSTITUTION.md,.specify/context.json" --commit-msg "Add project constitution"
+```
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase 00 -CommitFiles "CONSTITUTION.md,.specify/context.json" -CommitMsg "Add project constitution"`
 
-Parse the JSON and present:
-1. If `clear_after` is true: suggest `/clear` before proceeding
-2. Present `next_step` as the primary recommendation
-3. If `alt_steps` non-empty: list as alternatives
-4. For `next_step` and each `alt_step`, include the `model_tier` from the JSON so the user knows which model is best for each option. Look up tiers in [model-recommendations.md](../iikit-core/references/model-recommendations.md) for agent-specific switch commands.
-5. Append dashboard link
-
-Format:
+Parse `next_step` from JSON. Present per [model-recommendations.md](../iikit-core/references/model-recommendations.md):
 ```
 Constitution ready!
 Next: [/clear → ] <next_step> (model: <tier>)
 [- <alt_step> — <reason> (model: <tier>)]
-
-- Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
+- Dashboard: file://$(pwd)/.specify/dashboard.html
 ```

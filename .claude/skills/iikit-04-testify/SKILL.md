@@ -142,40 +142,19 @@ Output: TDD determination, scenario counts by source (acceptance/contract/valida
 | No acceptance scenarios | ERROR: Run /iikit-clarify |
 | .feature syntax error | FIX: Auto-correct and report |
 
-## Commit
+## Commit, Dashboard & Next Steps
+
+Run post-phase to commit, refresh dashboard, and compute next step in a single call:
 
 ```bash
-git add specs/*/tests/features/ specs/*/context.json .specify/context.json
-git commit -m "testify: <feature-short-name> BDD scenarios"
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase 04 --commit-files "specs/*/tests/features/,specs/*/context.json,.specify/context.json" --commit-msg "testify: <feature-short-name> BDD scenarios"
 ```
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase 04 -CommitFiles "specs/*/tests/features/,specs/*/context.json,.specify/context.json" -CommitMsg "testify: <feature-short-name> BDD scenarios"`
 
-## Dashboard Refresh
-
-Regenerate the dashboard so the pipeline reflects the new testify artifacts:
-
-```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
-```
-
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
-
-## Next Steps
-
-Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/next-step.sh --phase 04 --json`
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/next-step.ps1 -Phase 04 -Json`
-
-Parse the JSON and present:
-1. If `clear_after` is true: suggest `/clear` before proceeding
-2. Present `next_step` as the primary recommendation
-3. If `alt_steps` non-empty: list as alternatives
-4. For `next_step` and each `alt_step`, include the `model_tier` from the JSON so the user knows which model is best for each option. Look up tiers in [model-recommendations.md](../iikit-core/references/model-recommendations.md) for agent-specific switch commands.
-5. Append dashboard link
-
-Format:
+Parse `next_step` from JSON. Present per [model-recommendations.md](../iikit-core/references/model-recommendations.md):
 ```
 Feature files generated!
 Next: [/clear → ] <next_step> (model: <tier>)
 [- <alt_step> — <reason> (model: <tier>)]
-
-- Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
+- Dashboard: file://$(pwd)/.specify/dashboard.html
 ```

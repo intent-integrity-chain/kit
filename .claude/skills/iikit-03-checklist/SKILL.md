@@ -92,13 +92,6 @@ Continue until all items are `[x]` or explicitly deferred.
 
 Output: checklist path, item counts (total/checked/deferred), gap resolution summary, completion percentage.
 
-## Commit
-
-```bash
-git add specs/*/checklists/ .specify/context.json
-git commit -m "checklist: <feature-short-name> requirements review"
-```
-
 ## Record Phase Completion
 
 Write a timestamp to `.specify/context.json` so the dashboard knows the checklist phase was run (not just that requirements.md exists from specify):
@@ -109,35 +102,21 @@ CONTEXT_FILE=".specify/context.json"
 jq --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '.checklist_reviewed_at = $ts' "$CONTEXT_FILE" > "$CONTEXT_FILE.tmp" && mv "$CONTEXT_FILE.tmp" "$CONTEXT_FILE"
 ```
 
-## Dashboard Refresh
+## Commit, Dashboard & Next Steps
 
-Regenerate the dashboard so the pipeline reflects checklist completion:
+Run post-phase to commit, refresh dashboard, and compute next step in a single call:
 
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase 03 --commit-files "specs/*/checklists/,.specify/context.json" --commit-msg "checklist: <feature-short-name> requirements review"
 ```
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase 03 -CommitFiles "specs/*/checklists/,.specify/context.json" -CommitMsg "checklist: <feature-short-name> requirements review"`
 
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
-
-## Next Steps
-
-Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/next-step.sh --phase 03 --json`
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/next-step.ps1 -Phase 03 -Json`
-
-Parse the JSON and present:
-1. If `clear_after` is true: suggest `/clear` before proceeding
-2. Present `next_step` as the primary recommendation
-3. If `alt_steps` non-empty: list as alternatives
-4. For `next_step` and each `alt_step`, include the `model_tier` from the JSON so the user knows which model is best for each option. Look up tiers in [model-recommendations.md](../iikit-core/references/model-recommendations.md) for agent-specific switch commands.
-5. Append dashboard link
-
-If deferred items remain, warn that downstream skills will flag incomplete checklists.
-
-Format:
+Parse `next_step` from JSON. Present per [model-recommendations.md](../iikit-core/references/model-recommendations.md):
 ```
 Checklist complete!
 Next: [/clear → ] <next_step> (model: <tier>)
 [- <alt_step> — <reason> (model: <tier>)]
-
-- Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
+- Dashboard: file://$(pwd)/.specify/dashboard.html
 ```
+
+If deferred items remain, warn that downstream skills will flag incomplete checklists.

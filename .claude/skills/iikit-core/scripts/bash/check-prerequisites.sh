@@ -763,5 +763,5 @@ else
     fi
 fi
 
-# Launch dashboard (idempotent, never fails)
-bash "$SCRIPT_DIR/generate-dashboard-safe.sh"
+# Dashboard generation removed from prerequisites — handled by post-phase.sh
+# to avoid double-generation per phase invocation.

@@ -168,39 +168,19 @@ Output: branch name, plan path, generated artifacts (research.md, data-model.md,
 
 Flag breaking changes that would invalidate existing tasks or test specs.
 
-## Commit
+## Commit, Dashboard & Next Steps
+
+Run post-phase to commit, refresh dashboard, and compute next step in a single call:
 
 ```bash
-git add specs/*/plan.md specs/*/research.md specs/*/data-model.md specs/*/quickstart.md specs/*/contracts/ .specify/context.json
-git commit -m "plan: <feature-short-name> technical design"
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase 02 --commit-files "specs/*/plan.md,specs/*/research.md,specs/*/data-model.md,specs/*/quickstart.md,specs/*/contracts/,.specify/context.json" --commit-msg "plan: <feature-short-name> technical design"
 ```
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase 02 -CommitFiles "specs/*/plan.md,specs/*/research.md,specs/*/data-model.md,specs/*/quickstart.md,specs/*/contracts/,.specify/context.json" -CommitMsg "plan: <feature-short-name> technical design"`
 
-## Dashboard Refresh
-
-Regenerate the dashboard so the pipeline reflects the new plan:
-
-```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
-```
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
-
-## Next Steps
-
-Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/next-step.sh --phase 02 --json`
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/next-step.ps1 -Phase 02 -Json`
-
-Parse the JSON and present:
-1. If `clear_after` is true: suggest `/clear` before proceeding
-2. Present `next_step` as the primary recommendation
-3. If `alt_steps` non-empty: list as alternatives
-4. For `next_step` and each `alt_step`, include the `model_tier` from the JSON so the user knows which model is best for each option. Look up tiers in [model-recommendations.md](../iikit-core/references/model-recommendations.md) for agent-specific switch commands.
-5. Append dashboard link
-
-Format:
+Parse `next_step` from JSON. Present per [model-recommendations.md](../iikit-core/references/model-recommendations.md):
 ```
 Plan complete!
 Next: [/clear → ] <next_step> (model: <tier>)
 [- <alt_step> — <reason> (model: <tier>)]
-
-- Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
+- Dashboard: file://$(pwd)/.specify/dashboard.html
 ```

@@ -233,47 +233,21 @@ Append to existing `<feature_dir>/tasks.md`. If tasks.md does not exist, create 
 
 Do NOT modify existing entries or task IDs in tasks.md.
 
-### 12. Commit
+### 12. Commit, Dashboard & Next Steps
+
+Run post-phase to commit, refresh dashboard, and compute next step in a single call:
 
 ```bash
-git add specs/*/bugs.md specs/*/tasks.md specs/*/tests/features/
-git commit -m "bugfix: <BUG-ID> <short-description>"
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase bugfix --commit-files "specs/*/bugs.md,specs/*/tasks.md,specs/*/tests/features/" --commit-msg "bugfix: <BUG-ID> <short-description>"
 ```
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase bugfix -CommitFiles "specs/*/bugs.md,specs/*/tasks.md,specs/*/tests/features/" -CommitMsg "bugfix: <BUG-ID> <short-description>"`
 
-### 13. Dashboard Refresh (optional, never blocks)
-
-Regenerate the dashboard so the pipeline reflects the new bug and tasks:
-
-```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
+Parse `next_step` from JSON. Present per [model-recommendations.md](../iikit-core/references/model-recommendations.md):
 ```
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
-
-### 13. Report
-
-Output a summary:
-
-```
-Bug reported successfully!
-
-  Bug ID:      BUG-NNN
-  Feature:     <feature-name>
-  Severity:    <severity>
-  GitHub Issue: #number (or N/A)
-  Tasks:       T-BNNN through T-BNNN+N
-
-Files modified:
-  - <feature_dir>/bugs.md (created/appended)
-  - <feature_dir>/tasks.md (appended)
-  - <feature_dir>/tests/features/bugfix_BUG-NNN.feature (created, TDD only)
-
-Next step:
-  Run: bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/next-step.sh --phase bugfix --json
-  Parse `next_step` (will be /iikit-07-implement) and `model_tier`.
-  Include `model_tier` for next_step and any alt_steps so user knows best model per option.
-  - <next_step> — runs in bugfix mode (relaxed gates: no checklist or plan required, traces to bugs.md instead of spec)
-  
-  - Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
+Bug reported!
+Next: [/clear → ] <next_step> (model: <tier>)
+[- <alt_step> — <reason> (model: <tier>)]
+- Dashboard: file://$(pwd)/.specify/dashboard.html
 ```
 
 ## Error Handling

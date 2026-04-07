@@ -158,42 +158,19 @@ Ask: "Suggest concrete remediation edits for the top N issues?" Do NOT apply aut
 - Prioritize constitution violations, use specific examples over exhaustive rules
 - Report zero issues gracefully with coverage statistics
 
-## Commit
+## Commit, Dashboard & Next Steps
+
+Run post-phase to commit, refresh dashboard, and compute next step in a single call:
 
 ```bash
-git add specs/*/analysis.md .specify/score-history.json
-git commit -m "analyze: <feature-short-name> consistency report"
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase 06 --commit-files "specs/*/analysis.md,.specify/score-history.json" --commit-msg "analyze: <feature-short-name> consistency report"
 ```
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase 06 -CommitFiles "specs/*/analysis.md,.specify/score-history.json" -CommitMsg "analyze: <feature-short-name> consistency report"`
 
-## Dashboard Refresh
-
-Regenerate the dashboard so the pipeline reflects the analysis results:
-
-```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
-```
-
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
-
-## Next Steps
-
-Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/next-step.sh --phase 06 --json`
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/next-step.ps1 -Phase 06 -Json`
-
-Parse the JSON and present:
-1. If `clear_after` is true: suggest `/clear` before proceeding
-2. If CRITICAL issues were found: suggest resolving them, then re-run `/iikit-06-analyze`
-3. If no CRITICAL: present `next_step` as the primary recommendation
-4. If `alt_steps` non-empty: list as alternatives
-5. For `next_step` and each `alt_step`, include the `model_tier` from the JSON so the user knows which model is best for each option. Look up tiers in [model-recommendations.md](../iikit-core/references/model-recommendations.md) for agent-specific switch commands.
-6. Append dashboard link
-
-Format:
+Parse `next_step` from JSON. Present per [model-recommendations.md](../iikit-core/references/model-recommendations.md):
 ```
 Analysis complete!
-[- CRITICAL issues found: resolve, then re-run /iikit-06-analyze]
 Next: [/clear → ] <next_step> (model: <tier>)
 [- <alt_step> — <reason> (model: <tier>)]
-
-- Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
+- Dashboard: file://$(pwd)/.specify/dashboard.html
 ```

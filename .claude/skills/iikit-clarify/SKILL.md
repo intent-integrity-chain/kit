@@ -132,39 +132,21 @@ Output: questions asked/answered, target artifact and path, sections touched, tr
 - Respect early termination signals ("stop", "done", "proceed")
 - For non-spec artifacts, adapt reference format to the artifact's native ID scheme
 
-## Commit
+## Commit, Dashboard & Next Steps
 
-Commit the modified artifact(s):
-
-```bash
-git add -u
-git commit -m "clarify: <target-artifact> Q&A"
-```
-
-## Dashboard Refresh
+Run post-phase to commit, refresh dashboard, and compute next step in a single call:
 
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase clarify --commit-files "-u" --commit-msg "clarify: <target-artifact> Q&A"
 ```
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/generate-dashboard-safe.ps1`
+Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase clarify -CommitFiles "-u" -CommitMsg "clarify: <target-artifact> Q&A"`
 
-## Next Steps
-
-Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/next-step.sh --phase clarify --json`
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/next-step.ps1 -Phase clarify -Json`
-
-Parse the JSON and present:
-1. If `clear_after` is true: suggest `/clear` before proceeding (always true for clarify — Q&A sessions consume significant context)
-2. Present `next_step` as the primary recommendation
-3. If `alt_steps` non-empty: list as alternatives
-4. For `next_step` and each `alt_step`, include the `model_tier` from the JSON so the user knows which model is best for each option. Look up tiers in [model-recommendations.md](../iikit-core/references/model-recommendations.md) for agent-specific switch commands.
-5. Append dashboard link
-
-Format:
+Parse `next_step` from JSON. Present per [model-recommendations.md](../iikit-core/references/model-recommendations.md):
 ```
 Clarification complete!
-Next: /clear → <next_step>
+Next: [/clear → ] <next_step> (model: <tier>)
 [- <alt_step> — <reason> (model: <tier>)]
-
-- Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)
+- Dashboard: file://$(pwd)/.specify/dashboard.html
 ```
+
+Q&A sessions consume significant context — recommend `/clear` before proceeding.

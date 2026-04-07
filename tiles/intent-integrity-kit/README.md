@@ -6,7 +6,13 @@
 
 An AI coding assistant toolkit that preserves your intent from idea to implementation, with cryptographic verification at each step. Compatible with Claude Code, OpenAI Codex, Google Gemini, and OpenCode.
 
-## What's New in v2.8.0
+## What's New in v2.9.0
+
+- **Implementation commit strategy choice**: `/iikit-07-implement` now asks upfront — per-task commits (clean bisectable history) or batch commits (per-phase, ~47% faster). Batch mode cuts implementation turns in half by eliminating per-task git round-trips.
+- **Unified post-phase.sh**: Commit + dashboard refresh + next-step computation consolidated into a single script call. Reduces 3 tool call round-trips to 1 per phase, saving ~26% on implementation time.
+- **Dashboard deduplication**: Removed redundant dashboard generation from `check-prerequisites.sh` — was generating the dashboard twice per phase (once in prerequisites, once after artifact creation).
+
+### v2.8
 
 - **14 eval scenarios**: 9 new cross-phase and full-pipeline evals testing intent preservation across phase boundaries, plus 3 auto-generated and 2 reworked existing evals. Baseline 48% → with context 88%.
 - **Skill compliance fixes**: Constitution creates `.specify/context.json` with TDD determination in the same write step (was separate step, consistently skipped). Plan skill spec quality gate marked MANDATORY on every run including re-runs. Bugfix skill reads TDD from context.json with fallback when scripts unavailable.

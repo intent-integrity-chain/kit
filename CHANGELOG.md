@@ -1,5 +1,18 @@
 # Changelog
 
+## v2.9.0
+
+- **Commit strategy choice**: `/iikit-07-implement` asks users to choose between per-task commits (bisectable history, default) or batch commits (per-phase, ~47% faster). Batch mode cuts implementation from ~58 turns to ~31 turns.
+- **Unified post-phase.sh**: New script combines commit + dashboard refresh + next-step into a single tool call. All 9 artifact-producing skills updated. Eliminates 2 redundant tool call round-trips per phase.
+- **Dashboard deduplication**: `check-prerequisites.sh` no longer generates the dashboard — was causing double dashboard generation per phase.
+- **Performance profiling**: End-to-end pipeline profiled (init through implement). Implementation identified as 25% of total time, with 70-83% of each phase spent on ceremony vs productive work.
+
+## v2.8.0
+
+- **14 eval scenarios**: 9 new cross-phase and full-pipeline evals. Baseline 48% → with context 88%.
+- **Skill compliance fixes**: Constitution context.json creation, plan spec quality gate, bugfix TDD fallback.
+- **Eval anti-bleeding**: Task.md files stripped of narrator coaching.
+
 ## v2.7.13
 
 - **Premise card grid**: Constitution tab shows premise as a responsive card grid with click-to-expand.

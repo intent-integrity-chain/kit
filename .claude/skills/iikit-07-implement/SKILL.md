@@ -36,6 +36,18 @@ Load constitution per [constitution-loading.md](../iikit-core/references/constit
    ```
    Then re-run the prerequisites check from step 1.
 
+## Commit Strategy
+
+Before starting, ask the user to choose a commit strategy:
+
+**A) Per-task commits** (default, recommended for teams)
+Each completed task gets its own `git commit`. Produces a clean, bisectable history where every commit maps to a task ID. Tradeoff: adds ~1 extra tool call per task — for a 20-task feature, that's ~20 extra turns (~30% slower than batch).
+
+**B) Batch commits** (faster, recommended for solo devs)
+Code is written continuously. Commits happen per phase (Setup, Foundational, each User Story, Polish) — typically 4-6 commits for a full feature. Tradeoff: commits are larger and don't map 1:1 to task IDs, but implementation is significantly faster.
+
+Present the choice, default to A if user doesn't respond. Apply the chosen strategy throughout.
+
 ## Pre-Implementation Validation
 
 **Bugfix detection**: if every unchecked task has a `T-B` prefix, this is a **bugfix-only run** — relaxed gates below.
@@ -134,7 +146,7 @@ If tasks.md contains `[P]` markers, you **MUST** use the `Task` tool to dispatch
 1. Collect eligible tasks (dependencies satisfied)
 2. Build parallel batches from [P] tasks with no mutual dependencies
 3. Dispatch — parallel: launch one `Task` tool subagent per `[P]` task in the batch; sequential: one at a time
-4. Collect results, checkpoint `[x]` in tasks.md per batch, then commit per task (§6.6)
+4. Collect results, checkpoint `[x]` in tasks.md per batch, then commit per chosen strategy (§6.6)
 5. Repeat until phase complete
 
 Cross-story parallelism: independent stories can run as parallel workstreams after Phase 2 (verify no shared file modifications).
@@ -143,13 +155,20 @@ Cross-story parallelism: independent stories can run as parallel workstreams aft
 
 **6.5 Failure handling**: let in-flight siblings finish, mark successes, report failures, halt phase. Constitutional violations in workers: worker stops, reports to orchestrator, treated as task failure.
 
-**6.6 Task Commits**: After each task is marked `[x]`, stage its changed files (`git add` specific files, NOT `-A`) and commit:
+**6.6 Task Commits**: Apply the user's chosen commit strategy from the Commit Strategy section above.
 
-- `<feature-id>` = `FEATURE_DIR` with `specs/` prefix and trailing `/` stripped (e.g. `001-user-auth`)
+**Per-task** (strategy A): After each task is marked `[x]`, stage its changed files (`git add` specific files, NOT `-A`) and commit:
 - Subject: `feat(<feature-id>): <task-id> <task description>` (use `fix(…)` for `T-B` tasks)
 - Trailers: `iikit-feature: <feature-id>` and `iikit-task: <task-id>`
+- `<feature-id>` = `FEATURE_DIR` with `specs/` prefix and trailing `/` stripped (e.g. `001-user-auth`)
 - Skip if no files changed; for parallel batches commit each task individually after batch completes
-- After each commit, regenerate the dashboard so the board reflects the latest task state:
+
+**Batch** (strategy B): Write code continuously, mark tasks `[x]` as they complete, commit once per phase:
+- Subject: `feat(<feature-id>): <phase-name>` (e.g., `feat(001-user-auth): Phase 3 - User Story 1`)
+- Stage all changed files for the phase at once
+- Still mark each task `[x]` in tasks.md as it completes (for progress tracking)
+
+For both strategies, regenerate the dashboard after commits so the board reflects progress:
   ```bash
   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
   ```
