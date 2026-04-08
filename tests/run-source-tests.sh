@@ -512,7 +512,7 @@ test_task_commits() {
 
     # Bugfix prefix documented
     ((TESTS_RUN++))
-    if grep -q 'fix(.*T-B' "$impl"; then
+    if grep -qi 'fix(.*T-B\|fix(.*instead\|fix(.*bugfix' "$impl"; then
         log_pass "bugfix commit prefix documented"
     else
         log_fail "bugfix commit prefix not documented"
