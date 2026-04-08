@@ -1,8 +1,8 @@
 ---
 name: iikit-core
 description: >-
-  Initialize an IIKit project, check feature progress, select the active feature, and display the workflow command reference.
-  Use when starting a new project, running init, checking status, switching between features, or looking up available commands and phases.
+  Initialize an IIKit (Intent Integrity Kit) project, check IIKit feature progress, select the active IIKit feature, and display the IIKit workflow command reference.
+  Use when starting a new IIKit project, running IIKit init or setup, checking IIKit status, switching between IIKit features, looking up IIKit available commands and phases, or asking for help with the IIKit workflow.
 license: MIT
 metadata:
   version: "1.6.4"
@@ -39,11 +39,9 @@ The `$ARGUMENTS` after `init` may include an optional path or URL to a PRD/SDD d
 
 ### Execution Flow
 
-> **Working directory**: All script paths below are relative to the project root. Before running any script, verify you are in the project root directory (`pwd` should show the directory containing `tessl.json` or `.tessl/`). If the script path doesn't resolve, find it: `find . -path "*/iikit-core/scripts/bash/git-setup.sh" 2>/dev/null || find ~/.tessl -path "*/iikit-core/scripts/bash/git-setup.sh" 2>/dev/null`
+> **Working directory**: All script paths are relative to the project root (the directory containing `tessl.json` or `.tessl/`). If a script path doesn't resolve, search with: `find . -path "*/iikit-core/scripts/bash/<script>.sh" 2>/dev/null || find ~/.tessl -path "*/iikit-core/scripts/bash/<script>.sh" 2>/dev/null`
 
 #### Step 0 — Detect environment, initialize hooks, check premise
-
-Run all detection and initialization in a single call:
 
 ```bash
 bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/init-full.sh --json
@@ -52,20 +50,20 @@ bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash
 
 Parse JSON for `git` (environment), `init` (hooks), and `premise` (validation) sections.
 
-- `git.gh_available` false: suggest installing GitHub CLI
-- `init.git_user_configured` false: ask user for name/email, run `git config`
+- `git.gh_available` false → suggest installing GitHub CLI
+- `init.git_user_configured` false → ask user for name/email, run `git config`
 
 #### Step 1 — Git/GitHub setup
 
 **Auto-skip**: If `git.is_git_repo` + `git.has_remote`, skip to Step 2.
 
-| Option | Requires | Action |
-|--------|----------|--------|
-| A) Init here | `git.git_available` | `git init`, then offer GitHub repo create (`gh` or API). Ask public/private. |
-| B) Clone | `git.git_available` | Ask for URL/`owner/name`. `gh repo clone` or `git clone`. |
-| C) Skip | — | Proceed without git. Warn: no assertion integrity hooks. |
+Choose from available options (hide any whose prerequisites aren't met):
 
-Hide options whose prerequisites aren't met. If `git_available` is false, only C is available.
+- **A) Init here** — requires `git.git_available`: run `git init`, then offer GitHub repo creation (`gh` or API); ask public/private.
+- **B) Clone** — requires `git.git_available`: ask for URL or `owner/name`; run `gh repo clone` or `git clone`.
+- **C) Skip** — always available: proceed without git; warn that assertion integrity hooks won't be active.
+
+If `git_available` is false, only option C is available.
 
 #### Step 2 — Check if already initialized
 
@@ -92,11 +90,11 @@ bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash
 ```
 If validation fails (remaining placeholders or missing sections), fix and re-validate.
 
-#### Step 6 — Report
+#### Step 5 — Report
 
 Directories created, hook status, PREMISE.md status. Suggest `/iikit-00-constitution`.
 
-#### Step 7 — Seed backlog from PRD (optional)
+#### Step 6 — Seed backlog from PRD (optional)
 
 **Gate**: Requires `is_github_remote` AND user provided a PRD/SDD document. If not met, skip silently.
 

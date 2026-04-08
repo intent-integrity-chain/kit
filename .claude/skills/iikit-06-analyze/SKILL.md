@@ -31,14 +31,13 @@ Load constitution per [constitution-loading.md](../iikit-core/references/constit
 
 ## Prerequisites Check
 
-1. Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase 06 --json`
-   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/check-prerequisites.ps1 -Phase 06 -Json`
+1. Run:
+   - Bash: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase 06 --json`
+   - Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/check-prerequisites.ps1 -Phase 06 -Json`
 2. Derive paths: SPEC, PLAN, TASKS from FEATURE_DIR. ERROR if any missing.
 3. If JSON contains `needs_selection: true`: present the `features` array as a numbered table (name and stage columns). Follow the options presentation pattern in [conversation-guide.md](../iikit-core/references/conversation-guide.md). After user selects, run:
-   ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selection>
-   ```
-   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selection>`
+   - Bash: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selection>`
+   - Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selection>`
 
    Then re-run the prerequisites check from step 1.
 4. Checklist gate per [checklist-gate.md](../iikit-core/references/checklist-gate.md).
@@ -55,43 +54,32 @@ From tasks.md: task IDs, descriptions, phases, [P] markers, file paths.
 
 - Requirements inventory (functional + non-functional)
 - User story/action inventory with acceptance criteria
-- Task coverage mapping (task -> requirements/stories)
+- Task coverage mapping (task → requirements/stories)
 - Plan coverage mapping (requirement ID → plan.md sections where referenced)
 - Constitution rule set
 
 ### 3. Detection Passes (limit 50 findings)
 
-**A. Duplication**: near-duplicate requirements -> consolidate
-**B. Ambiguity**: vague terms (fast, scalable, secure) without measurable criteria; unresolved placeholders
-**C. Underspecification**: requirements missing objects/outcomes; stories without acceptance criteria; tasks referencing undefined components
-**D. Constitution Alignment**: conflicts with MUST principles; missing mandated sections. For each principle, report status using these exact values:
-- `ALIGNED` — principle satisfied across all artifacts
-- `VIOLATION` — principle violated (auto-CRITICAL severity)
-**E. Phase Separation Violations**: per [phase-separation-rules.md](../iikit-core/references/phase-separation-rules.md) — tech in constitution, implementation in spec, governance in plan
-**F. Coverage Gaps**: requirements with zero tasks; tasks with no mapped requirement; non-functional requirements not in tasks; requirements not referenced in plan.md
+| Pass | Category | What to detect |
+|------|----------|----------------|
+| **A** | Duplication | Near-duplicate requirements → consolidate |
+| **B** | Ambiguity | Vague terms (fast, scalable, secure) without measurable criteria; unresolved placeholders |
+| **C** | Underspecification | Requirements missing objects/outcomes; stories without acceptance criteria; tasks referencing undefined components |
+| **D** | Constitution Alignment | Conflicts with MUST principles; missing mandated sections. Per-principle status: `ALIGNED` or `VIOLATION` (auto-CRITICAL) |
+| **E** | Phase Separation | Per [phase-separation-rules.md](../iikit-core/references/phase-separation-rules.md) — tech in constitution, implementation in spec, governance in plan |
+| **F** | Coverage Gaps | Requirements with zero tasks; tasks with no mapped requirement; non-functional requirements absent from tasks; requirements unreferenced in plan.md. Scan plan.md for each FR-xxx/SC-xxx ID; collect contextual refs (KDD-x, section headers) where found |
+| **G** | Inconsistency | Terminology drift; entities in plan but not spec; conflicting requirements |
+| **G2** | Prose Ranges | Patterns like "TS-XXX through TS-XXX" in tasks.md → flag MEDIUM: "Prose range detected — intermediate IDs not traceable. Use explicit comma-separated list." |
+| **H** | Feature Traceability | When `FEATURE_DIR/tests/features/` exists — see H1–H3 below |
 
-> **Plan coverage detection**: Scan plan.md for each requirement ID (FR-xxx, SC-xxx). A requirement is "covered by plan" if its ID appears anywhere in plan.md. Collect contextual refs (KDD-x, section headers) where found.
+**H1. Untested requirements** (HIGH): For each FR-XXX/SC-XXX in spec.md, verify at least one `.feature` file carries a matching `@FR-XXX`/`@SC-XXX` tag. Flag unmatched IDs.
 
-**G. Inconsistency**: terminology drift; entities in plan but not spec; conflicting requirements
+**H2. Orphaned tags** (MEDIUM): For each `@FR-XXX`/`@SC-XXX` tag in `.feature` files, verify the ID exists in spec.md. Flag tags referencing non-existent IDs.
 
-**G2. Prose Range Detection**: Scan tasks.md for patterns like "TS-XXX through TS-XXX" or "TS-XXX to TS-XXX". Flag as MEDIUM finding: "Prose range detected — intermediate IDs not traceable. Use explicit comma-separated list."
+**H3. Step definition coverage** (optional): If `tests/step_definitions/` exists, run:
+- Bash: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/verify-steps.sh --json "FEATURE_DIR/tests/features" "FEATURE_DIR/plan.md"`
 
-**H. Feature File Traceability** (when `FEATURE_DIR/tests/features/` exists):
-Parse all `.feature` files in `tests/features/` and extract Gherkin tags:
-- `@FR-XXX` — functional requirement references
-- `@SC-XXX` — success criteria references
-- `@US-XXX` — user story references
-- `@TS-XXX` — test specification IDs
-
-**H1. Untested requirements**: For each FR-XXX and SC-XXX in spec.md, check if at least one `.feature` file has a corresponding `@FR-XXX` or `@SC-XXX` tag. Flag any FR-XXX or SC-XXX without a matching tag as "untested requirement" (severity: HIGH).
-
-**H2. Orphaned tags**: For each `@FR-XXX` or `@SC-XXX` tag found in `.feature` files, verify the referenced ID exists in spec.md. Flag tags referencing non-existent IDs as "orphaned traceability tag" (severity: MEDIUM).
-
-**H3. Step definition coverage** (optional): If `tests/step_definitions/` exists alongside `tests/features/`, run `verify-steps.sh` to check for undefined steps:
-```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/verify-steps.sh --json "FEATURE_DIR/tests/features" "FEATURE_DIR/plan.md"
-```
-If status is BLOCKED, report undefined steps as findings (severity: HIGH). If DEGRADED, note in report but do not flag as finding.
+`BLOCKED` → report undefined steps (HIGH). `DEGRADED` → note in report only.
 
 ### 4. Severity
 
@@ -128,19 +116,14 @@ Output to console AND write to `FEATURE_DIR/analysis.md`:
 
 After computing **Metrics** in step 5, persist the health score:
 
-1. **Compute health score**: `score = 100 - (critical*20 + high*5 + medium*2 + low*0.5)`, floored at 0, rounded to nearest integer.
-2. **Read** `.specify/score-history.json`. If the file does not exist, initialize with `{}`.
-3. **Append** a new entry for the current feature (keyed by feature directory name, e.g. `001-user-auth`):
-   ```json
-   { "timestamp": "<ISO-8601 UTC>", "score": <n>, "coverage_pct": <n>, "critical": <n>, "high": <n>, "medium": <n>, "low": <n>, "total_findings": <n> }
-   ```
-4. **Write** the updated object back to `.specify/score-history.json`.
-5. **Determine trend** by comparing the new score to the previous entry (if any):
-   - Score increased → `↑ improving`
-   - Score decreased → `↓ declining`
-   - Score unchanged or no previous entry → `→ stable`
-6. **Display** in console output: `Health Score: <score>/100 (<trend>)`
-7. **Include** the full `score_history` array for the current feature in `analysis.md` under the **Health Score** line and **Score History** table added in step 5.
+1. **Compute**: `score = max(0, round(100 - (critical×20 + high×5 + medium×2 + low×0.5)))`.
+2. **Read** `.specify/score-history.json` (initialize `{}` if missing).
+3. **Append** entry keyed by feature directory name (e.g. `001-user-auth`):
+   `{ "timestamp": "<ISO-8601 UTC>", "score": <n>, "coverage_pct": <n>, "critical": <n>, "high": <n>, "medium": <n>, "low": <n>, "total_findings": <n> }`
+4. **Write** updated object back to `.specify/score-history.json`.
+5. **Trend**: compare new score to previous entry — `↑ improving` / `↓ declining` / `→ stable` (or stable if no prior entry).
+6. **Display**: `Health Score: <score>/100 (<trend>)` in console and `analysis.md`.
+7. **Include** full `score_history` array for the current feature under the **Score History** table in `analysis.md`.
 
 ### 6. Next Actions
 
@@ -162,10 +145,8 @@ Ask: "Suggest concrete remediation edits for the top N issues?" Do NOT apply aut
 
 Run post-phase to commit, refresh dashboard, and compute next step in a single call:
 
-```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase 06 --commit-files "specs/*/analysis.md,.specify/score-history.json" --commit-msg "analyze: <feature-short-name> consistency report"
-```
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase 06 -CommitFiles "specs/*/analysis.md,.specify/score-history.json" -CommitMsg "analyze: <feature-short-name> consistency report"`
+- Bash: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase 06 --commit-files "specs/*/analysis.md,.specify/score-history.json" --commit-msg "analyze: <feature-short-name> consistency report"`
+- Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase 06 -CommitFiles "specs/*/analysis.md,.specify/score-history.json" -CommitMsg "analyze: <feature-short-name> consistency report"`
 
 Parse `next_step` from JSON. Present per [model-recommendations.md](../iikit-core/references/model-recommendations.md):
 ```

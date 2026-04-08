@@ -10,11 +10,7 @@ metadata:
 
 # Intent Integrity Kit Checklist
 
-Generate "Unit Tests for English" — checklists that validate REQUIREMENTS quality, not implementation.
-
-## Core Principle
-
-Every checklist item evaluates the **requirements themselves** for completeness, clarity, consistency, measurability, and coverage. Items MUST NOT test implementation behavior.
+Generate checklists that validate REQUIREMENTS quality, not implementation.
 
 ## User Input
 
@@ -63,8 +59,8 @@ Read from FEATURE_DIR: `spec.md` (required), `plan.md` (optional), `tasks.md` (o
 
 **Item structure**: question format about requirement quality, with quality dimension tag and spec reference.
 
-Correct: "Are visual hierarchy requirements defined with measurable criteria?" [Clarity, Spec SFR-1]
-Wrong: "Verify the button clicks correctly" (this tests implementation)
+- ✓ "Are visual hierarchy requirements defined with measurable criteria?" [Clarity, Spec SFR-1]
+- ✗ "Verify the button clicks correctly" — tests implementation, not requirements
 
 **Categories**: Requirement Completeness, Clarity, Consistency, Acceptance Criteria Quality, Scenario Coverage, SC-XXX Test Coverage, Edge Case Coverage, Non-Functional Requirements, Dependencies & Assumptions.
 

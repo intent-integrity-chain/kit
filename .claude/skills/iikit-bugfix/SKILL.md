@@ -41,14 +41,13 @@ If input contains BOTH `#number` and text, prioritize the `#number` and warn tha
 ### 2a. GitHub Inbound Flow
 
 1. Fetch issue: use `gh issue view <number> --json title,body,labels` if available, otherwise `curl` the GitHub API (`GET /repos/{owner}/{repo}/issues/{number}`)
-2. If fetch fails (issue not found, auth error, no GitHub remote): ERROR with clear message and suggest using text description instead.
-4. If fetch fails (issue not found, auth error): ERROR with clear message and remediation.
-5. Map fields:
+2. If fetch fails (issue not found, auth error, or no GitHub remote configured): ERROR with clear message and remediation; suggest using text description instead.
+3. Map fields:
    - `title` → bug description
    - `body` → reproduction steps
-   - `labels` → severity mapping: labels containing "critical" → critical, "high"/"priority" → high, "bug" → medium (default), otherwise → medium
-6. Store issue number for GitHub Issue field in bugs.md
-7. Continue to Step 3
+   - `labels` → severity: "critical" → critical, "high"/"priority" → high, "bug" → medium (default), otherwise → medium
+4. Store issue number for GitHub Issue field in bugs.md
+5. Continue to Step 3
 
 ### 2b. Text Description Flow
 
@@ -57,7 +56,7 @@ If input contains BOTH `#number` and text, prioritize the `#number` and warn tha
 
 ### 3. Select Feature & Full Setup
 
-Run full setup to list features, validate, get bug ID and task IDs in one call. First, present feature list to user. After selection:
+Run full setup to list features, validate, and get bug ID and task IDs. First, present feature list to user. After selection:
 
 **Unix/macOS/Linux:**
 ```bash
@@ -84,18 +83,18 @@ If `validation.valid` is false: ERROR with the message. If `features` is empty: 
 - Severity is pre-filled from labels (confirm with user if mapping is ambiguous)
 - Reproduction steps are pre-filled from issue body (confirm with user)
 
-### 7. Write bugs.md
+### 5. Write bugs.md
 
 Create or append to `<feature_dir>/bugs.md` using the template at [bugs-template.md](references/bugs-template.md).
 
 Fill in:
-- **BUG-ID**: from Step 6
+- **BUG-ID**: from Step 3
 - **Reported**: today's date (YYYY-MM-DD)
-- **Severity**: from Step 5
+- **Severity**: from Step 4
 - **Status**: `reported`
 - **GitHub Issue**: `#number` if from GitHub inbound, `_(none)_` otherwise
 - **Description**: bug description
-- **Reproduction Steps**: from Step 5
+- **Reproduction Steps**: from Step 4
 - **Root Cause**: `_(empty until investigation)_`
 - **Fix Reference**: `_(empty until implementation)_`
 
@@ -103,7 +102,7 @@ If `bugs.md` already exists, append with `---` separator before the new entry. D
 
 If `bugs.md` does not exist, create it with the header `# Bug Reports: <feature-name>` followed by the entry.
 
-### 8. Outbound GitHub Issue (Text Input Only)
+### 6. Outbound GitHub Issue (Text Input Only)
 
 For text-input bugs only (NOT for GitHub inbound — issue already exists):
 
@@ -111,11 +110,11 @@ For text-input bugs only (NOT for GitHub inbound — issue already exists):
 2. Store returned issue number in the bugs.md GitHub Issue field
 3. If no GitHub remote configured: warn that GitHub issue creation was skipped, proceed with local workflow
 
-### 9. TDD & Task Generation
+### 7. TDD & Task Generation
 
-Use `tdd_determination` and `task_ids` from the full-setup response (Step 3). Use `bug_id` from Step 3.
+Use `tdd_determination` and `task_ids` from Step 3. Use `bug_id` from Step 3.
 
-### 10. BDD/TDD Flow (If Mandatory)
+### 8. BDD/TDD Flow (If Mandatory)
 
 If TDD is mandatory (`determination` = `mandatory`):
 
@@ -137,13 +136,13 @@ If TDD is mandatory (`determination` = `mandatory`):
    ```bash
    bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh verify-hash "<feature_dir>/tests/features"
    ```
-5. Continue to Step 11 with TDD task variant
+5. Continue to Step 9 with TDD task variant
 
-### 11. Generate Bug Fix Tasks
+### 9. Generate Bug Fix Tasks
 
-Use `task_ids` from the full-setup response (Step 3). Task IDs use `T-B` prefix — parsers and dashboard rely on this.
+Use `task_ids` from Step 3. Task IDs use `T-B` prefix — parsers and dashboard rely on this.
 
-**Non-TDD task set** (use when `determination` is NOT `mandatory`, count = 3):
+**Non-TDD task set** (`determination` is NOT `mandatory`, count = 3):
 ```markdown
 ## Bug Fix Tasks
 
@@ -152,7 +151,7 @@ Use `task_ids` from the full-setup response (Step 3). Task IDs use `T-B` prefix 
 - [ ] T-BNNN+2 [BUG-NNN] Write regression test for BUG-NNN: <description>
 ```
 
-**TDD task set** (use when `determination` = `mandatory`, count = 2). The TS-NNN reference MUST point to the test spec created in Step 10:
+**TDD task set** (`determination` = `mandatory`, count = 2). The TS-NNN reference MUST point to the test spec created in Step 8:
 ```markdown
 ## Bug Fix Tasks
 
@@ -160,7 +159,7 @@ Use `task_ids` from the full-setup response (Step 3). Task IDs use `T-B` prefix 
 - [ ] T-BNNN+1 [BUG-NNN] Verify fix passes test TS-NNN for BUG-NNN: <description>
 ```
 
-If GitHub issue is linked, include reference in task descriptions (e.g., `(GitHub #42)`).
+If a GitHub issue is linked, include its reference in task descriptions (e.g., `(GitHub #42)`).
 
 Append to existing `<feature_dir>/tasks.md`. If tasks.md does not exist, create it with:
 ```markdown
@@ -173,14 +172,16 @@ Append to existing `<feature_dir>/tasks.md`. If tasks.md does not exist, create 
 
 Do NOT modify existing entries or task IDs in tasks.md.
 
-### 12. Commit, Dashboard & Next Steps
+### 10. Commit, Dashboard & Next Steps
 
-Run post-phase to commit, refresh dashboard, and compute next step in a single call:
-
+**Unix/macOS/Linux:**
 ```bash
 bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase bugfix --commit-files "specs/*/bugs.md,specs/*/tasks.md,specs/*/tests/features/" --commit-msg "bugfix: <BUG-ID> <short-description>"
 ```
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase bugfix -CommitFiles "specs/*/bugs.md,specs/*/tasks.md,specs/*/tests/features/" -CommitMsg "bugfix: <BUG-ID> <short-description>"`
+**Windows (PowerShell):**
+```powershell
+pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase bugfix -CommitFiles "specs/*/bugs.md,specs/*/tasks.md,specs/*/tests/features/" -CommitMsg "bugfix: <BUG-ID> <short-description>"
+```
 
 Parse `next_step` from JSON. Present per [model-recommendations.md](../iikit-core/references/model-recommendations.md):
 ```

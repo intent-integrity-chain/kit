@@ -96,17 +96,16 @@ For each NEEDS CLARIFICATION item and dependency: research, document findings in
 
 ### 5. Update context.json with Dashboard Data
 
-**MANDATORY** — you MUST update `.specify/context.json` after the plan is complete. This file drives the project dashboard. Use `jq` to merge into the existing file (create if missing). Do NOT overwrite existing fields.
+**MANDATORY** — you MUST update `.specify/context.json` after the plan is complete. Use `jq` to merge into the existing file (create if missing). Do NOT overwrite existing fields.
 
 ```bash
 CONTEXT_FILE=".specify/context.json"
 [[ -f "$CONTEXT_FILE" ]] || echo '{}' > "$CONTEXT_FILE"
 ```
 
-**Architecture Node Classifications:** If plan.md contains an architecture diagram, classify every named component in the diagram as one of `client`, `server`, `storage`, or `external` and write the map to `planview.nodeClassifications`:
+**Architecture Node Classifications:** If plan.md contains an architecture diagram, classify every named component as one of `client`, `server`, `storage`, or `external` and write the map to `planview.nodeClassifications`:
 
 ```bash
-# Replace example with actual component names from YOUR architecture diagram
 jq --argjson nodes '{
   "Browser SPA": "client",
   "API Gateway": "server",
@@ -115,7 +114,7 @@ jq --argjson nodes '{
 }' '.planview.nodeClassifications = $nodes' "$CONTEXT_FILE" > "$CONTEXT_FILE.tmp" && mv "$CONTEXT_FILE.tmp" "$CONTEXT_FILE"
 ```
 
-Classification rules: **client** = initiates requests (browsers, CLIs, mobile apps) | **server** = processes requests (APIs, workers, middleware) | **storage** = persists data (databases, caches, queues) | **external** = outside project boundary (third-party APIs, SaaS)
+Classification rules: **client** = initiates requests | **server** = processes requests | **storage** = persists data | **external** = outside project boundary
 
 **Tessl Eval Scores:** If Tessl tiles were installed in step 2, write eval scores to `planview.evalScores`:
 

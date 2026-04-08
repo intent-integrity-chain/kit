@@ -12,13 +12,9 @@ metadata:
 
 Generate executable Gherkin `.feature` files from requirement artifacts before implementation. Enables TDD by creating hash-locked BDD scenarios that serve as acceptance criteria.
 
-## User Input
+> **OS convention**: All commands are shown in bash. PowerShell equivalents exist at the same path with a `.ps1` extension (e.g., `scripts/powershell/check-prerequisites.ps1`) and accept the same flags in PascalCase (e.g., `-Phase 04 -Json`).
 
-```text
-$ARGUMENTS
-```
-
-This skill accepts **no user input parameters** — it reads artifacts automatically.
+> **Path alias**: `SCRIPTS=.tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash` — all `bash` commands below use this shorthand.
 
 ## Constitution Loading
 
@@ -35,15 +31,12 @@ Report per [formatting-guide.md](../iikit-core/references/formatting-guide.md) (
 
 ## Prerequisites Check
 
-1. Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase 04 --json`
-   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/check-prerequisites.ps1 -Phase 04 -Json`
+1. Run: `bash $SCRIPTS/check-prerequisites.sh --phase 04 --json`
 2. Parse for `FEATURE_DIR` and `AVAILABLE_DOCS`. Require **plan.md** and **spec.md** (ERROR if missing).
 3. If JSON contains `needs_selection: true`: present the `features` array as a numbered table (name and stage columns). Follow the options presentation pattern in [conversation-guide.md](../iikit-core/references/conversation-guide.md). After user selects, run:
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selection>
+   bash $SCRIPTS/set-active-feature.sh --json <selection>
    ```
-   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selection>`
-
    Then re-run the prerequisites check from step 1.
 4. Checklist gate per [checklist-gate.md](../iikit-core/references/checklist-gate.md).
 
@@ -76,7 +69,7 @@ Every scenario MUST include traceability tags:
 - `@P1` / `@P2` / `@P3` — priority level
 - `@acceptance` / `@contract` / `@validation` — test type
 
-**SC-XXX coverage rule**: For each SC-XXX in spec.md, ensure at least one scenario is tagged with the corresponding `@SC-XXX`. If an FR scenario already covers the success criterion, add the `@SC-XXX` tag to that scenario rather than creating a duplicate.
+**SC-XXX coverage rule**: For each SC-XXX in spec.md, ensure at least one scenario carries the corresponding `@SC-XXX` tag. If an existing FR scenario already covers the criterion, add the tag there rather than creating a duplicate.
 
 Feature-level tags for shared metadata:
 - `@US-XXX` on the Feature line for the parent user story
@@ -92,11 +85,7 @@ Use [testspec-template.md](../iikit-core/templates/testspec-template.md) as the 
 Add an HTML comment at the top of each `.feature` file:
 ```gherkin
 # DO NOT MODIFY SCENARIOS
-# These .feature files define expected behavior derived from requirements.
-# During implementation:
-#   - Write step definitions to match these scenarios
-#   - Fix code to pass tests, don't modify .feature files
-#   - If requirements change, re-run /iikit-04-testify
+# Derived from requirements. Fix code to pass tests; re-run /iikit-04-testify if requirements change.
 ```
 
 ### 4. Idempotency
@@ -112,9 +101,8 @@ If `tests/features/` already contains `.feature` files:
 **CRITICAL**: Store SHA256 hash in both context.json and git note in a single call:
 
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh store-all "FEATURE_DIR/tests/features"
+bash $SCRIPTS/testify-tdd.sh store-all "FEATURE_DIR/tests/features"
 ```
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/testify-tdd.ps1 store-all "FEATURE_DIR/tests/features"`
 
 Returns JSON with `hash` and `git_note` status. The implement skill verifies this hash before proceeding.
 
@@ -138,9 +126,8 @@ Output: TDD determination, scenario counts by source (acceptance/contract/valida
 Run post-phase to commit, refresh dashboard, and compute next step in a single call:
 
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase 04 --commit-files "specs/*/tests/features/,specs/*/context.json,.specify/context.json" --commit-msg "testify: <feature-short-name> BDD scenarios"
+bash $SCRIPTS/post-phase.sh --phase 04 --commit-files "specs/*/tests/features/,specs/*/context.json,.specify/context.json" --commit-msg "testify: <feature-short-name> BDD scenarios"
 ```
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase 04 -CommitFiles "specs/*/tests/features/,specs/*/context.json,.specify/context.json" -CommitMsg "testify: <feature-short-name> BDD scenarios"`
 
 Parse `next_step` from JSON. Present per [model-recommendations.md](../iikit-core/references/model-recommendations.md):
 ```

@@ -122,12 +122,11 @@ After each write and final pass:
 
 Output: questions asked/answered, target artifact and path, sections touched, traceability summary table (clarification -> referenced items), coverage summary (category -> status), suggested next command.
 
-**Next command logic**: run `check-prerequisites.sh --json status` and use its `next_step` field. This returns the actual next phase based on feature state (which artifacts exist), not what was just clarified. Clarify can run at any point — the next step depends on where the feature is, not where clarify was invoked.
+**Next command logic**: run `check-prerequisites.sh --json status` and use its `next_step` field to determine the actual next phase based on feature state.
 
 ## Behavior Rules
 
 - No meaningful ambiguities found: "No critical ambiguities detected." and suggest proceeding
-- Continue until all critical ambiguities are resolved
 - Avoid speculative tech stack questions unless absence blocks functional clarity
 - Respect early termination signals ("stop", "done", "proceed")
 - For non-spec artifacts, adapt reference format to the artifact's native ID scheme
@@ -149,4 +148,4 @@ Next: [/clear → ] <next_step> (model: <tier>)
 - Dashboard: file://$(pwd)/.specify/dashboard.html
 ```
 
-Q&A sessions consume significant context — recommend `/clear` before proceeding.
+Recommend `/clear` before proceeding to the next phase.

@@ -18,7 +18,7 @@ Convert existing tasks into dependency-ordered GitHub issues for project trackin
 $ARGUMENTS
 ```
 
-You **MUST** consider the user input before proceeding (if not empty).
+> **Platform note**: All `bash` commands have a PowerShell equivalent — replace `bash <script>.sh` with `pwsh <script>.ps1` and convert flags to `-PascalCase` form (e.g. `--phase 08 --json` → `-Phase 08 -Json`).
 
 ## Prerequisites Check
 
@@ -26,15 +26,12 @@ You **MUST** consider the user input before proceeding (if not empty).
    ```bash
    bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase 08 --json
    ```
-   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/check-prerequisites.ps1 -Phase 08 -Json`
 
 2. Parse JSON for `FEATURE_DIR` and `AVAILABLE_DOCS`. Extract path to **tasks.md**.
 3. If JSON contains `needs_selection: true`: present the `features` array as a numbered table (name and stage columns). Follow the options presentation pattern in [conversation-guide.md](../iikit-core/references/conversation-guide.md). After user selects, run:
    ```bash
    bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selection>
    ```
-   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selection>`
-
    Then re-run the prerequisites check from step 1.
 
 ## GitHub Remote Validation
@@ -51,7 +48,7 @@ git config --get remote.origin.url
 
 Extract: Task IDs, descriptions, phase groupings, parallel markers [P], user story labels [USn], dependencies.
 
-### 2. Create GitHub Issues
+### 2. Prepare Labels and Title Format
 
 **Title format**: `[FeatureID/TaskID] [Story] Description` — feature-id extracted from `FEATURE_DIR` (e.g. `001-user-auth`).
 
@@ -91,20 +88,17 @@ Output: issues created (count + numbers), failures (count + details), link to re
 
 ## Next Steps
 
-Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/next-step.sh --phase 08 --json`
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/next-step.ps1 -Phase 08 -Json`
+```bash
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/next-step.sh --phase 08 --json
+```
 
 Parse the JSON and present:
 1. `next_step` will be null (workflow complete)
 2. If `alt_steps` non-empty: list as alternatives
 3. Append dashboard link
 
-If on a feature branch, offer to merge:
-- **A) Merge locally**: `git checkout main && git merge <branch>`
-- **B) Create PR**: `gh pr create`
-- **C) Skip**: user will handle it
+If on a feature branch, offer to merge: **A)** `git checkout main && git merge <branch>`, **B)** `gh pr create`, or **C)** skip.
 
-Format:
 ```
 Issues exported! Review in GitHub, assign team members, add to project boards.
 - Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path)

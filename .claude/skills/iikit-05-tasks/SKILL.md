@@ -78,15 +78,15 @@ Extract tech stack from plan.md, user stories from spec.md, entities from data-m
 **Examples**:
 - `- [ ] T001 Create project structure per implementation plan` (setup, no story)
 - `- [ ] T005 [P] Implement authentication middleware in src/middleware/auth.py` (parallel, no story)
-- `- [ ] T012 [P] [US1] Create User model in src/models/user.py` (parallel, story)
-- `- [ ] T014 [US1] Implement UserService in src/services/user_service.py` (sequential, story)
+- `- [ ] T012 [P] [US1] Create User model in src/models/user.py` (parallel + story)
+- `- [ ] T014 [US1] Implement UserService in src/services/user_service.py` (sequential + story)
 
-**Wrong** — missing required elements:
-- `- [ ] Create User model` (no ID, no story label)
-- `T001 [US1] Create model` (no checkbox)
-- `- [ ] [US1] Create User model` (no task ID)
+**Wrong** — each example below is missing a required element:
+- No checkbox: `T001 [US1] Create model`
+- No task ID: `- [ ] [US1] Create User model`
+- No story label (on a story task): `- [ ] T014 Create UserService`
 
-**Traceability**: When referencing multiple test spec IDs, enumerate them explicitly as a comma-separated list. Do NOT use English prose ranges like "TS-005 through TS-010" — these break automated traceability checks.
+**Traceability**: Enumerate multiple test spec IDs explicitly as a comma-separated list — do NOT use prose ranges (e.g., "TS-005 through TS-010"), which break automated traceability checks.
 
 **Correct**: `[TS-005, TS-006, TS-007, TS-008, TS-009, TS-010]`
 **Wrong**: `TS-005 through TS-010`

@@ -2,7 +2,7 @@
 name: iikit-07-implement
 description: >-
   Execute the implementation plan by coding each task from tasks.md — writes source files, runs tests, verifies assertion integrity, and validates output against constitutional principles.
-  Use when ready to build the feature, start coding, develop from the task list, or resume a partially completed implementation.
+  Use when ready to build a feature from a tasks.md plan, start coding against an Intent Integrity Kit implementation plan, develop from the task list, resume a partially completed implementation, or run the implement phase of the iikit workflow.
 license: MIT
 metadata:
   version: "1.6.4"
@@ -38,15 +38,14 @@ Load constitution per [constitution-loading.md](../iikit-core/references/constit
 
 ## Commit Strategy
 
-Before starting, ask the user to choose a commit strategy:
+Ask the user to choose a commit strategy before starting:
 
-**A) Per-task commits** (default, recommended for teams)
-Each completed task gets its own `git commit`. Produces a clean, bisectable history where every commit maps to a task ID. Tradeoff: adds ~1 extra tool call per task — for a 20-task feature, that's ~20 extra turns (~30% slower than batch).
+| Strategy | Description |
+|----------|-------------|
+| **A) Per-task** (default) | One `git commit` per completed task. Clean, bisectable history mapping each commit to a task ID. |
+| **B) Batch** | Commits per phase (Setup, Foundational, each User Story, Polish) — typically 4–6 commits. Faster; commits don't map 1:1 to task IDs. |
 
-**B) Batch commits** (faster, recommended for solo devs)
-Code is written continuously. Commits happen per phase (Setup, Foundational, each User Story, Polish) — typically 4-6 commits for a full feature. Tradeoff: commits are larger and don't map 1:1 to task IDs, but implementation is significantly faster.
-
-Present the choice, default to A if user doesn't respond. Apply the chosen strategy throughout.
+Default to A if user doesn't respond. Apply the chosen strategy throughout.
 
 ## Pre-Implementation Validation
 
@@ -83,21 +82,17 @@ If TDD **mandatory** but `tests/features/` missing or empty: ERROR with `Run: /i
 
 ### 2.1 BDD Verification Chain Enforcement
 
-When `.feature` files exist, the full BDD verification chain applies to each implementation task:
+When `.feature` files exist, apply this chain to each implementation task:
 
-**Step 1 — Write step definitions**: Write step definition code that binds Gherkin steps to application calls. Place in `tests/step_definitions/`.
-
-**Step 2 — RED phase**: Run the BDD tests. They MUST fail (step definitions exist but production code does not yet implement the behavior). This confirms the tests are meaningful.
-
-**Step 3 — Write production code**: Implement the feature code that makes the tests pass.
-
-**Step 4 — GREEN phase**: Run the BDD tests again. They MUST pass. If they fail: fix the production code, not the tests or `.feature` files.
-
-**Step 5 — Verify BDD chain**: Run combined step coverage + quality check in one call:
-```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/verify-bdd.sh --json "FEATURE_DIR/tests/features" "FEATURE_DIR/plan.md" "FEATURE_DIR/tests/step_definitions" "<language>"
-```
-Parse JSON for `steps.status` (coverage) and `quality.status` (assertions). Both must be `PASS` before marking task complete. If `BLOCKED`: fix the flagged step definitions.
+1. **Write step definitions** in `tests/step_definitions/` binding Gherkin steps to application calls.
+2. **RED phase**: run BDD tests — they MUST fail. Confirms tests are meaningful.
+3. **Write production code** implementing the behavior.
+4. **GREEN phase**: run BDD tests — they MUST pass. Fix production code if they fail; never modify tests or `.feature` files.
+5. **Verify BDD chain**:
+   ```bash
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/verify-bdd.sh --json "FEATURE_DIR/tests/features" "FEATURE_DIR/plan.md" "FEATURE_DIR/tests/step_definitions" "<language>"
+   ```
+   Parse JSON for `steps.status` (coverage) and `quality.status` (assertions). Both must be `PASS` before marking task complete. If `BLOCKED`: fix the flagged step definitions.
 
 ### 2.2 Feature File Immutability
 
@@ -105,7 +100,7 @@ Parse JSON for `steps.status` (coverage) and `quality.status` (assertions). Both
 
 ### 2.3 Test Execution Enforcement
 
-Tests **MUST** be run, not just written. After writing a test: run it immediately (expect red). After implementing: run it (expect green). If tests fail: fix code, not tests. Never mark a test task `[x]` without execution output.
+Tests **MUST** be run, not just written. Run immediately after writing (expect red); run again after implementing (expect green). Fix code, not tests. Never mark a test task `[x]` without execution output.
 
 ```bash
 bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/verify-test-execution.sh verify "FEATURE_DIR/tests/features" "$(cat test-output.log)"
@@ -149,20 +144,33 @@ Cross-story parallelism: independent stories can run as parallel workstreams aft
 
 **6.5 Failure handling**: let in-flight siblings finish, mark successes, report failures, halt phase. Constitutional violations in workers: worker stops, reports to orchestrator, treated as task failure.
 
-**6.6 Task Commits**: Apply the user's chosen commit strategy from the Commit Strategy section above.
+**6.6 Task Commits**: Apply the user's chosen commit strategy.
 
 **Per-task** (strategy A): After each task is marked `[x]`, stage its changed files (`git add` specific files, NOT `-A`) and commit:
-- Subject: `feat(<feature-id>): <task-id> <task description>` (use `fix(…)` for `T-B` tasks)
-- Trailers: `iikit-feature: <feature-id>` and `iikit-task: <task-id>`
-- `<feature-id>` = `FEATURE_DIR` with `specs/` prefix and trailing `/` stripped (e.g. `001-user-auth`)
-- Skip if no files changed; for parallel batches commit each task individually after batch completes
+
+```
+# Subject + trailers template
+feat(<feature-id>): <task-id> <task description>
+iikit-feature: <feature-id>
+iikit-task: <task-id>
+
+# Bugfix tasks use fix(…) instead of feat(…)
+# <feature-id> = FEATURE_DIR with specs/ prefix and trailing / stripped (e.g. 001-user-auth)
+# Skip if no files changed; for parallel batches commit each task individually after batch completes
+```
 
 **Batch** (strategy B): Write code continuously, mark tasks `[x]` as they complete, commit once per phase:
-- Subject: `feat(<feature-id>): <phase-name>` (e.g., `feat(001-user-auth): Phase 3 - User Story 1`)
-- Stage all changed files for the phase at once
-- Still mark each task `[x]` in tasks.md as it completes (for progress tracking)
 
-For both strategies, regenerate the dashboard after commits so the board reflects progress:
+```
+# Subject template
+feat(<feature-id>): <phase-name>
+# e.g. feat(001-user-auth): Phase 3 - User Story 1
+
+# Stage all changed files for the phase at once
+# Still mark each task [x] in tasks.md as it completes (for progress tracking)
+```
+
+For both strategies, regenerate the dashboard after commits:
   ```bash
   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
   ```
@@ -183,7 +191,7 @@ After completing bug fix tasks (tasks with `T-B` prefix pattern):
 2. For each completed bug (all T-BNNN tasks for a BUG-NNN marked `[x]`):
    - Read the `GitHub Issue` field from the bug's entry in bugs.md
    - If a GitHub issue is linked (e.g., `#42`):
-     - **Close via commit**: include `Fixes #<number>` in the last task's commit message (§6.6) — GitHub auto-closes the issue when pushed/merged
+     - **Close via commit**: include `Fixes #<number>` in the last task's commit message (§6.6)
      - **Post a comment**: use `gh issue comment` if available, otherwise `curl` the GitHub API (`POST /repos/{owner}/{repo}/issues/{number}/comments`). Comment content: root cause from bugs.md, completed fix tasks, and fix reference
    - If no GitHub issue is linked: skip silently
 

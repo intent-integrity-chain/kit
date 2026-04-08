@@ -30,20 +30,16 @@ The text after `/iikit-01-specify` **is** the feature description.
 
 ### 0. Bug-Fix Intent Detection
 
-Before proceeding with feature specification, analyze the user description for bug-fix intent using **contextual analysis** (not keyword-only):
+Analyze the description using **contextual analysis** (not keyword-only) to determine primary intent: **fix existing broken behavior** vs. **add new capability**.
 
-**Bug-fix signals** (keywords in a fixing context): "fix", "crash", "broken", "bug", "doesn't work", "fails", "error" when used to describe existing broken behavior.
-
-**NOT bug-fix** (keywords in a new-feature context): "Add error handling", "Implement crash recovery", "Create bug tracking" — these describe new capabilities, not fixes to existing behavior.
-
-**Decision rule**: Is the primary intent to **fix existing broken behavior** or to **add new capability**? Keywords alone are insufficient — evaluate the full description.
+- **Bug-fix signals**: "fix", "crash", "broken", "bug", "doesn't work", "fails", "error" — when describing broken existing behavior.
+- **Not bug-fix**: "Add error handling", "Implement crash recovery" — these describe new capabilities, not fixes.
 
 If bug-fix intent is detected:
 1. Display: "This sounds like a bug fix. Consider using `/iikit-bugfix` instead."
 2. Show example: `/iikit-bugfix '<the user description>'`
-3. Ask the user to confirm: proceed with specification (it's genuinely a new feature) or switch to `/iikit-bugfix`
-4. If the user confirms it is a new feature: proceed to Step 1
-5. If the user wants bugfix: stop and suggest they run `/iikit-bugfix`
+3. Ask the user to confirm: proceed with specification (genuinely a new feature) or switch to `/iikit-bugfix`
+4. User confirms new feature → proceed to Step 1; user wants bugfix → stop.
 
 ### 1. Generate Branch Name
 
