@@ -76,8 +76,6 @@ jobs:
 
       - name: Setup Tessl CLI
         uses: tesslio/setup-tessl@v2
-        with:
-          token: ${{ secrets.TESSL_TOKEN }}
 
       - name: E2E - Fresh install and hash integrity
         run: |
@@ -154,6 +152,8 @@ jobs:
         run: tessl tile lint tiles/intent-integrity-kit
 
       - name: Review all skills (threshold 84%)
+        env:
+          TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
         run: tests/run-skill-reviews.sh --threshold 84
 
   test-windows:
