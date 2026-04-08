@@ -14,7 +14,6 @@ Generate executable Gherkin `.feature` files from requirement artifacts before i
 
 > **OS convention**: All commands are shown in bash. PowerShell equivalents exist at the same path with a `.ps1` extension (e.g., `scripts/powershell/check-prerequisites.ps1`) and accept the same flags in PascalCase (e.g., `-Phase 04 -Json`).
 
-> **Path alias**: `SCRIPTS=.tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash` — all `bash` commands below use this shorthand.
 
 ## Constitution Loading
 
@@ -31,11 +30,11 @@ Report per [formatting-guide.md](../iikit-core/references/formatting-guide.md) (
 
 ## Prerequisites Check
 
-1. Run: `bash $SCRIPTS/check-prerequisites.sh --phase 04 --json`
+1. Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase 04 --json`
 2. Parse for `FEATURE_DIR` and `AVAILABLE_DOCS`. Require **plan.md** and **spec.md** (ERROR if missing).
 3. If JSON contains `needs_selection: true`: present the `features` array as a numbered table (name and stage columns). Follow the options presentation pattern in [conversation-guide.md](../iikit-core/references/conversation-guide.md). After user selects, run:
    ```bash
-   bash $SCRIPTS/set-active-feature.sh --json <selection>
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selection>
    ```
    Then re-run the prerequisites check from step 1.
 4. Checklist gate per [checklist-gate.md](../iikit-core/references/checklist-gate.md).
@@ -101,7 +100,7 @@ If `tests/features/` already contains `.feature` files:
 **CRITICAL**: Store SHA256 hash in both context.json and git note in a single call:
 
 ```bash
-bash $SCRIPTS/testify-tdd.sh store-all "FEATURE_DIR/tests/features"
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh store-all "FEATURE_DIR/tests/features"
 ```
 
 Returns JSON with `hash` and `git_note` status. The implement skill verifies this hash before proceeding.
@@ -126,7 +125,7 @@ Output: TDD determination, scenario counts by source (acceptance/contract/valida
 Run post-phase to commit, refresh dashboard, and compute next step in a single call:
 
 ```bash
-bash $SCRIPTS/post-phase.sh --phase 04 --commit-files "specs/*/tests/features/,specs/*/context.json,.specify/context.json" --commit-msg "testify: <feature-short-name> BDD scenarios"
+bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase 04 --commit-files "specs/*/tests/features/,specs/*/context.json,.specify/context.json" --commit-msg "testify: <feature-short-name> BDD scenarios"
 ```
 
 Parse `next_step` from JSON. Present per [model-recommendations.md](../iikit-core/references/model-recommendations.md):
