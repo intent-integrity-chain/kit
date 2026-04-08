@@ -183,28 +183,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check if tile version changed
-        id: version
-        run: |
-          NEW=$(jq -r .version tiles/intent-integrity-kit/tile.json)
-          # Compare against latest release tag to handle multi-commit pushes
-          LATEST_TAG=$(git tag -l 'v*' --sort=-v:refname | head -1 | sed 's/^v//')
-          OLD=${LATEST_TAG:-""}
-          echo "old=$OLD" >> "$GITHUB_OUTPUT"
-          echo "new=$NEW" >> "$GITHUB_OUTPUT"
-          if [[ -z "$OLD" ]]; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "No previous tag found, publishing $NEW"
-          elif [[ "$NEW" != "$OLD" ]]; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "Version changed: $OLD → $NEW"
-          else
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "Version unchanged ($NEW), skipping publish"
-          fi
-
       - name: Resolve symlinks in tile directory
-        if: steps.version.outputs.changed == 'true'
         run: |
           # Replace symlinks with real copies so the archive contains real files
           cd tiles/intent-integrity-kit
@@ -230,13 +209,11 @@ jobs:
           done
 
       - name: Make skills self-contained
-        if: steps.version.outputs.changed == 'true'
         run: bash tests/prepare-tile.sh tiles/intent-integrity-kit/skills
 
       - name: Sync SKILL.md versions to tile version
-        if: steps.version.outputs.changed == 'true'
         run: |
-          VERSION=${{ steps.version.outputs.new }}
+          VERSION=$(jq -r .version tiles/intent-integrity-kit/tile.json)
           for skill in tiles/intent-integrity-kit/skills/*/SKILL.md; do
             if grep -q 'version:' "$skill"; then
               sed -i "s/version: \".*\"/version: \"$VERSION\"/" "$skill"
@@ -245,29 +222,30 @@ jobs:
           done
 
       - name: Setup Tessl CLI
-        if: steps.version.outputs.changed == 'true'
         uses: tesslio/setup-tessl@v2
         with:
           token: ${{ secrets.TESSL_TOKEN }}
 
-      - name: Publish tile v${{ steps.version.outputs.new }}
-        if: steps.version.outputs.changed == 'true'
-        run: tessl tile publish tiles/intent-integrity-kit
+      - name: Publish tile
+        id: publish
+        uses: jbaruch/tessl-smart-publish@v1
+        with:
+          path: tiles/intent-integrity-kit
 
       - name: Make scripts executable
-        if: steps.version.outputs.changed == 'true'
         run: |
           chmod +x tiles/intent-integrity-kit/skills/iikit-core/scripts/bash/*.sh
           chmod +x tests/*.sh
 
       - name: Verify tile (install from registry + e2e tests)
-        if: steps.version.outputs.changed == 'true'
         run: tests/run-tile-tests.sh --from-registry
 
       - name: Tag release
-        if: steps.version.outputs.changed == 'true'
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "v${{ steps.version.outputs.new }}"
-          git push --tags
+          VERSION="${{ steps.publish.outputs.version }}"
+          if ! git tag -l "v$VERSION" | grep -q .; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git tag "v$VERSION"
+            git push --tags
+          fi
