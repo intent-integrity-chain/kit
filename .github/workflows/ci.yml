@@ -228,7 +228,7 @@ jobs:
 
       - name: Publish tile
         id: publish
-        uses: jbaruch/tessl-smart-publish@v1
+        uses: tesslio/patch-version-publish@v1
         with:
           path: tiles/intent-integrity-kit
 
