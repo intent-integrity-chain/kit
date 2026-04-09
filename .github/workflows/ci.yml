@@ -240,22 +240,20 @@ jobs:
       - name: Verify tile (install from registry + e2e tests)
         run: tests/run-tile-tests.sh --from-registry
 
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          git_user_signingkey: true
+          git_tag_gpgsign: true
+
       - name: Tag release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION="${{ steps.publish.outputs.version }}"
-          if ! gh api repos/${{ github.repository }}/git/refs/tags/v${VERSION} >/dev/null 2>&1; then
-            TAG_SHA=$(gh api repos/${{ github.repository }}/git/tags \
-              -f tag="v${VERSION}" \
-              -f message="Release v${VERSION}" \
-              -f object="${{ github.sha }}" \
-              -f type="commit" \
-              --jq '.sha')
-            gh api repos/${{ github.repository }}/git/refs \
-              -f ref="refs/tags/v${VERSION}" \
-              -f sha="${TAG_SHA}"
-            echo "Tagged v${VERSION} as annotated tag via GitHub API (verified)"
+          if ! git tag -l "v${VERSION}" | grep -q .; then
+            git tag -s -m "Release v${VERSION}" "v${VERSION}" ${{ github.sha }}
+            git push --tags
+            echo "Tagged v${VERSION} (signed)"
           else
             echo "Tag v${VERSION} already exists, skipping"
           fi
