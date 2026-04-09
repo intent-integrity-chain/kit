@@ -1,6 +1,6 @@
 {
   "name": "tessl-labs/intent-integrity-kit",
-  "version": "2.9.6",
+  "version": "2.9.7",
   "summary": "Closing the intent-to-code chasm - specification-driven development with BDD verification chain",
   "description": "Intent Integrity Kit (IIKit) preserves your intent from idea to implementation through specification-driven development with BDD verification chain. Compatible with Claude Code, Codex, Gemini, and OpenCode.\n\nWhat's new in v2.9.0: Implementation commit strategy choice (per-task or batch) — batch commits cut implementation time by ~47%. Unified post-phase.sh reduces 3 tool calls to 1 per phase (commit + dashboard + next-step), saving ~26% on per-task runs. Removed redundant dashboard generation from check-prerequisites.sh.",
   "entrypoint": "README.md",
