@@ -246,10 +246,16 @@ jobs:
         run: |
           VERSION="${{ steps.publish.outputs.version }}"
           if ! gh api repos/${{ github.repository }}/git/refs/tags/v${VERSION} >/dev/null 2>&1; then
+            TAG_SHA=$(gh api repos/${{ github.repository }}/git/tags \
+              -f tag="v${VERSION}" \
+              -f message="Release v${VERSION}" \
+              -f object="${{ github.sha }}" \
+              -f type="commit" \
+              --jq '.sha')
             gh api repos/${{ github.repository }}/git/refs \
               -f ref="refs/tags/v${VERSION}" \
-              -f sha="${{ github.sha }}"
-            echo "Tagged v${VERSION} via GitHub API (verified)"
+              -f sha="${TAG_SHA}"
+            echo "Tagged v${VERSION} as annotated tag via GitHub API (verified)"
           else
             echo "Tag v${VERSION} already exists, skipping"
           fi
