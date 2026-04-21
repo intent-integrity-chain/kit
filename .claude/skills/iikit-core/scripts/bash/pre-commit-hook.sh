@@ -122,9 +122,9 @@ if [[ -n "$STAGED_CODE_FILES" ]]; then
             STEP_DEFS_FOUND=true
         fi
         if [[ "$STEP_DEFS_FOUND" == false ]]; then
-            # Check if step definition files are staged in the git index
+            # Check if step definition files are staged in the git index (exclude deletions)
             FEAT_REL_PATH="specs/$FEAT_NAME"
-            STAGED_STEP_DEFS=$(git diff --cached --name-only 2>/dev/null | grep "$FEAT_REL_PATH/tests/step_definitions/") || true
+            STAGED_STEP_DEFS=$(git diff --cached --name-only --diff-filter=ACMR 2>/dev/null | grep -F -- "$FEAT_REL_PATH/tests/step_definitions/") || true
             if [[ -n "$STAGED_STEP_DEFS" ]]; then
                 STEP_DEFS_FOUND=true
             fi
