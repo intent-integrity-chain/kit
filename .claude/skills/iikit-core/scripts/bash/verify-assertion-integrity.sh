@@ -20,7 +20,23 @@ set -euo pipefail
 # Extract function definitions from testify-tdd.sh without executing it.
 SCRIPT_DIR="$(CDPATH="" cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 eval "$(sed -n '/^extract_assertions()/,/^}/p' "$SCRIPT_DIR/testify-tdd.sh")"
-eval "$(sed -n '/^compute_assertion_hash()/,/^}/p' "$SCRIPT_DIR/testify-tdd.sh")"
+
+# compute_assertion_hash from testify-tdd.sh uses shasum -a 256.
+# Override to support sha256sum (Linux) when shasum is not available.
+compute_assertion_hash() {
+    local input_path="$1"
+    local assertions
+    assertions=$(extract_assertions "$input_path")
+    if [[ -z "$assertions" ]]; then
+        echo "NO_ASSERTIONS"
+        return
+    fi
+    if command -v shasum >/dev/null 2>&1; then
+        printf '%s' "$assertions" | shasum -a 256 | cut -d' ' -f1
+    else
+        printf '%s' "$assertions" | sha256sum | cut -d' ' -f1
+    fi
+}
 
 # =============================================================================
 # ARGUMENT PARSING
@@ -32,7 +48,11 @@ PROJECT_ROOT=""
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --json) JSON_MODE=true; shift ;;
-        --project-root) PROJECT_ROOT="$2"; shift 2 ;;
+        --project-root)
+            if [[ $# -lt 2 ]] || [[ "$2" == --* ]]; then
+                echo "ERROR: --project-root requires a path argument" >&2; exit 2
+            fi
+            PROJECT_ROOT="$2"; shift 2 ;;
         --help|-h)
             cat <<'EOF'
 Usage: verify-assertion-integrity.sh [--json] [--project-root PATH]

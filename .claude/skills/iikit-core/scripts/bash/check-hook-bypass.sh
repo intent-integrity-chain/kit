@@ -3,11 +3,16 @@
 # Exit 2 with stderr message = block the tool call.
 # Exit 0 = allow (no opinion).
 
-set -euo pipefail
+set -uo pipefail
+
+# If jq is not available, allow the call (don't block all Bash calls)
+if ! command -v jq >/dev/null 2>&1; then
+    exit 0
+fi
 
 INPUT=$(cat)
-TOOL=$(echo "$INPUT" | jq -r '.tool_name // empty')
-COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
+TOOL=$(echo "$INPUT" | jq -r '.tool_name // empty' 2>/dev/null) || exit 0
+COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty' 2>/dev/null) || exit 0
 
 if [[ "$TOOL" != "Bash" ]] || [[ -z "$COMMAND" ]]; then
     exit 0
