@@ -293,12 +293,12 @@ EOF
 # get_current_branch cascade priority tests
 # =============================================================================
 
-@test "get_current_branch: active-feature takes priority over SPECIFY_FEATURE" {
+@test "get_current_branch: SPECIFY_FEATURE takes priority over active-feature" {
     mkdir -p "$TEST_DIR/specs/002-sticky-feature"
     write_active_feature "002-sticky-feature"
     export SPECIFY_FEATURE="001-env-feature"
     result=$(get_current_branch)
-    [[ "$result" == "002-sticky-feature" ]]
+    [[ "$result" == "001-env-feature" ]]
     unset SPECIFY_FEATURE
 }
 
@@ -308,6 +308,54 @@ EOF
     result=$(get_current_branch)
     [[ "$result" == "003-env-override" ]]
     unset SPECIFY_FEATURE
+}
+
+@test "get_current_branch: git feature branch overrides stale active-feature" {
+    # Simulate switching from 001 to 002: sticky file still says 001
+    mkdir -p "$TEST_DIR/specs/001-old-feature"
+    mkdir -p "$TEST_DIR/specs/002-new-feature"
+    write_active_feature "001-old-feature"
+
+    # Mock git to return a feature branch
+    git() {
+        if [[ "$1" == "rev-parse" && "$2" == "--abbrev-ref" ]]; then
+            echo "002-new-feature"
+            return 0
+        elif [[ "$1" == "rev-parse" && "$2" == "--show-toplevel" ]]; then
+            echo "$TEST_DIR"
+            return 0
+        fi
+        command git "$@"
+    }
+    export -f git
+
+    result=$(get_current_branch)
+    [[ "$result" == "002-new-feature" ]]
+
+    unset -f git
+}
+
+@test "get_current_branch: non-feature branch falls back to active-feature" {
+    mkdir -p "$TEST_DIR/specs/001-my-feature"
+    write_active_feature "001-my-feature"
+
+    # Mock git to return main (non-feature branch)
+    git() {
+        if [[ "$1" == "rev-parse" && "$2" == "--abbrev-ref" ]]; then
+            echo "main"
+            return 0
+        elif [[ "$1" == "rev-parse" && "$2" == "--show-toplevel" ]]; then
+            echo "$TEST_DIR"
+            return 0
+        fi
+        command git "$@"
+    }
+    export -f git
+
+    result=$(get_current_branch)
+    [[ "$result" == "001-my-feature" ]]
+
+    unset -f git
 }
 
 # =============================================================================
