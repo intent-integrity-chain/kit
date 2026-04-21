@@ -154,7 +154,7 @@ get_repo_root() {
 }
 
 # Get current branch, with fallback for non-git repositories
-# Detection cascade: SPECIFY_FEATURE env > git feature branch (NNN-*) > active-feature file > git branch (non-feature) > scan specs dir > fallback
+# Detection cascade: SPECIFY_FEATURE env > git feature branch (NNN-*) > active-feature file > git branch (non-feature) > active-feature (non-git) > scan specs dir > fallback
 get_current_branch() {
     # 1. Check SPECIFY_FEATURE environment variable (explicit CI override)
     if [[ -n "${SPECIFY_FEATURE:-}" ]]; then
@@ -165,10 +165,8 @@ get_current_branch() {
     # 2. Check git branch — if it matches a feature pattern (NNN-*), use it
     #    This ensures switching branches always picks up the correct feature,
     #    even when a stale active-feature file points elsewhere.
-    if git rev-parse --abbrev-ref HEAD >/dev/null 2>&1; then
-        local git_branch
-        git_branch=$(git rev-parse --abbrev-ref HEAD)
-
+    local git_branch
+    git_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null) && [[ -n "$git_branch" ]] && {
         if [[ "$git_branch" =~ ^[0-9]{3}- ]]; then
             echo "$git_branch"
             return
@@ -184,9 +182,16 @@ get_current_branch() {
         # 4. Non-feature git branch, no sticky file — return branch as-is
         echo "$git_branch"
         return
-    fi
+    }
 
-    # 5. For non-git repos, try to find the latest feature directory
+    # 5. Non-git: check sticky active-feature file
+    local active
+    active=$(read_active_feature 2>/dev/null) && [[ -n "$active" ]] && {
+        echo "$active"
+        return
+    }
+
+    # 6. For non-git repos, try to find the latest feature directory
     local repo_root=$(get_repo_root)
     local specs_dir="$repo_root/specs"
 
@@ -214,7 +219,7 @@ get_current_branch() {
         fi
     fi
 
-    # 6. Final fallback
+    # 7. Final fallback
     echo "main"
 }
 
