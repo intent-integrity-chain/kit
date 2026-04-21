@@ -2891,7 +2891,7 @@
             <div class="pipeline-dot ${phase.status}">${PHASE_ICONS[phase.status] || ''}</div>
             <span class="pipeline-label${phase.name.includes('\n') ? ' pipeline-label-multiline' : ''}">${phase.name.includes('\n') ? phase.name.split('\n').map(l => `<span class="pipeline-label-line">${escapeHtml(l)}</span>`).join('') : escapeHtml(phase.name)}${phase.id === 'tasks' ? ' <span class="pipeline-redirect" title="Opens Implement board">&#x2197;</span>' : ''}</span>
             <span class="pipeline-progress">${phase.progress || ''}</span>
-            ${phase.clarifications > 0 ? '<span class="pipeline-clarify-badge" role="button" tabindex="0" title="View ' + phase.clarifications + ' clarification' + (phase.clarifications > 1 ? 's' : '') + '" aria-label="View ' + phase.clarifications + ' clarification' + (phase.clarifications > 1 ? 's' : '') + '">?' + phase.clarifications + '</span>' : ''}
+            ${phase.clarifications > 0 ? '<span class="pipeline-clarify-badge" title="View ' + phase.clarifications + ' clarification' + (phase.clarifications > 1 ? 's' : '') + '" aria-label="View ' + phase.clarifications + ' clarification' + (phase.clarifications > 1 ? 's' : '') + '">?' + phase.clarifications + '</span>' : ''}
           `;
 
           const clarifyBadge = node.querySelector('.pipeline-clarify-badge');
@@ -2899,13 +2899,6 @@
             clarifyBadge.addEventListener('click', (event) => {
               event.stopPropagation();
               switchTab('clarify');
-            });
-            clarifyBadge.addEventListener('keydown', (event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                event.stopPropagation();
-                switchTab('clarify');
-              }
             });
           }
 
