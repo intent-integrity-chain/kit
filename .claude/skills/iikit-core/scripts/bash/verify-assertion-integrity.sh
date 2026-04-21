@@ -19,7 +19,31 @@ set -euo pipefail
 
 # Extract function definitions from testify-tdd.sh without executing it.
 SCRIPT_DIR="$(CDPATH="" cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-eval "$(sed -n '/^extract_assertions()/,/^}/p' "$SCRIPT_DIR/testify-tdd.sh")"
+
+# Override extract_assertions with POSIX-compatible patterns (\s -> [[:space:]])
+# to ensure correct behavior on all grep implementations.
+extract_assertions() {
+    local input_path="$1"
+    if [[ -d "$input_path" ]]; then
+        local files
+        files=$(ls -1 "$input_path"/*.feature 2>/dev/null | LC_ALL=C sort)
+        [[ -z "$files" ]] && { echo ""; return 0; }
+        local f
+        for f in $files; do
+            { grep -E "^[[:space:]]*(Given|When|Then|And|But) " "$f" 2>/dev/null || true; }
+        done | sed 's/^[[:space:]]*//' | sed 's/[[:space:]][[:space:]]*/ /g' | sed 's/[[:space:]]*$//'
+    elif [[ -f "$input_path" ]]; then
+        if [[ "$input_path" == *.feature ]]; then
+            { grep -E "^[[:space:]]*(Given|When|Then|And|But) " "$input_path" 2>/dev/null || true; } \
+                | sed 's/^[[:space:]]*//' | sed 's/[[:space:]][[:space:]]*/ /g' | sed 's/[[:space:]]*$//'
+        else
+            { grep -E "^\*\*(Given|When|Then)\*\*:" "$input_path" 2>/dev/null || true; } \
+                | sed 's/[[:space:]]*$//' | LC_ALL=C sort
+        fi
+    else
+        echo ""; return 0
+    fi
+}
 
 # compute_assertion_hash from testify-tdd.sh uses shasum -a 256.
 # Override to support sha256sum (Linux) when shasum is not available.
