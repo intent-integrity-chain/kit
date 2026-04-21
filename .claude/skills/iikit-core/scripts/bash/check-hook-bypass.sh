@@ -1,7 +1,9 @@
-#!/bin/bash
-# PreToolUse hook: block git commit --no-verify and other hook bypass attempts.
-# Returns JSON with permissionDecision: "deny" when bypass is detected.
-# Exit 0 = decision provided; the harness evaluates the JSON.
+#!/usr/bin/env bash
+# PreToolUse hook: block git commit hook bypass attempts.
+# Exit 2 with stderr message = block the tool call.
+# Exit 0 = allow (no opinion).
+
+set -euo pipefail
 
 INPUT=$(cat)
 TOOL=$(echo "$INPUT" | jq -r '.tool_name // empty')
@@ -12,26 +14,25 @@ if [[ "$TOOL" != "Bash" ]] || [[ -z "$COMMAND" ]]; then
 fi
 
 # Check for --no-verify or -n flag on git commit
-# Strip quoted message content (-m "..." or heredoc) before checking flags
-# to avoid false positives when the commit message mentions --no-verify
-if echo "$COMMAND" | grep -qE '\bgit\s+commit\b'; then
-    # Extract just the git commit invocation line, strip -m message content
+# Extract first line only (avoids matching inside heredoc commit messages)
+# Strip -m "..." content to avoid false positives on message text
+if echo "$COMMAND" | grep -qE 'git[[:space:]]+commit'; then
     GIT_ARGS=$(echo "$COMMAND" | head -1 | sed 's/-m "[^"]*"//g' | sed "s/-m '[^']*'//g")
-    if echo "$GIT_ARGS" | grep -qE '(--no-verify|\s-[a-zA-Z]*n\b)'; then
-        echo '{"decision":"block","reason":"git commit --no-verify is prohibited. Fix the pre-commit hook failure instead of bypassing it. Re-run /iikit-04-testify if assertion hashes are stale."}'
+    if echo "$GIT_ARGS" | grep -qE '(--no-verify|[[:space:]]-[a-zA-Z]*n([[:space:]]|$))'; then
+        echo "git commit with hook bypass is prohibited. Fix the pre-commit hook failure instead. Re-run /iikit-04-testify if assertion hashes are stale." >&2
         exit 2
     fi
 fi
 
 # Check for hook file deletion/modification
-if echo "$COMMAND" | grep -qE '(rm|mv|chmod|truncate|>)\s+.*\.git/hooks/'; then
-    echo '{"decision":"block","reason":"Modifying .git/hooks/ is prohibited. Pre-commit hooks are an integrity gate."}'
+if echo "$COMMAND" | grep -qE '(rm|mv|chmod|truncate|>)[[:space:]].*\.git/hooks'; then
+    echo "Modifying .git/hooks is prohibited. Pre-commit hooks are an integrity gate." >&2
     exit 2
 fi
 
 # Check for git plumbing bypass
-if echo "$COMMAND" | grep -qE '\bgit\s+(commit-tree|mktree|hash-object\s+.*-w)\b'; then
-    echo '{"decision":"block","reason":"Git plumbing commands that bypass hooks are prohibited."}'
+if echo "$COMMAND" | grep -qE 'git[[:space:]]+(commit-tree|mktree|hash-object[[:space:]].*-w)'; then
+    echo "Git plumbing commands that bypass hooks are prohibited." >&2
     exit 2
 fi
 

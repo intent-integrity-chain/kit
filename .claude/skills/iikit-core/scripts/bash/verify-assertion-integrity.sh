@@ -3,26 +3,22 @@
 #
 # Verifies that .feature file assertion hashes match stored hashes in context.json.
 # Designed to run in any CI system (GitHub Actions, GitLab CI, Jenkins, etc.)
-# as a server-side enforcement layer that cannot be bypassed by --no-verify.
+# as a server-side enforcement layer that cannot be bypassed client-side.
 #
 # Usage:
 #   ./verify-assertion-integrity.sh [--json] [--project-root PATH]
 #
 # Exit codes:
 #   0 — All assertions verified (or no assertions found)
-#   1 — Assertion integrity check failed (hash mismatch)
-#   2 — Missing dependencies (jq, shasum)
+#   1 — Assertion integrity check failed (hash mismatch or missing hash)
+#   2 — Missing dependencies (jq, shasum/sha256sum)
 #
-# Requires: bash 3.2+, jq, shasum
+# Requires: bash 3.2+, jq, shasum or sha256sum
 
 set -euo pipefail
 
-# Source shared functions by calling testify-tdd.sh compute-hash to verify it works,
-# then define the functions we need by extracting them from the script.
+# Extract function definitions from testify-tdd.sh without executing it.
 SCRIPT_DIR="$(CDPATH="" cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-# extract_assertions and compute_assertion_hash are defined in testify-tdd.sh.
-# We source the function definitions by evaluating only the function blocks.
 eval "$(sed -n '/^extract_assertions()/,/^}/p' "$SCRIPT_DIR/testify-tdd.sh")"
 eval "$(sed -n '/^compute_assertion_hash()/,/^}/p' "$SCRIPT_DIR/testify-tdd.sh")"
 
@@ -42,7 +38,7 @@ while [[ $# -gt 0 ]]; do
 Usage: verify-assertion-integrity.sh [--json] [--project-root PATH]
 
 Verifies .feature file assertion hashes against stored hashes in context.json.
-Server-side enforcement that cannot be bypassed by --no-verify.
+Server-side enforcement that cannot be bypassed client-side.
 
 Options:
   --json              Output results in JSON format
@@ -64,12 +60,16 @@ done
 # DEPENDENCY CHECK
 # =============================================================================
 
-for cmd in jq shasum; do
-    if ! command -v "$cmd" >/dev/null 2>&1; then
-        echo "ERROR: Required command '$cmd' not found" >&2
-        exit 2
-    fi
-done
+if ! command -v jq >/dev/null 2>&1; then
+    echo "ERROR: Required command 'jq' not found" >&2
+    exit 2
+fi
+
+# Support both shasum (macOS) and sha256sum (Linux)
+if ! command -v shasum >/dev/null 2>&1 && ! command -v sha256sum >/dev/null 2>&1; then
+    echo "ERROR: Neither 'shasum' nor 'sha256sum' found" >&2
+    exit 2
+fi
 
 # =============================================================================
 # PROJECT ROOT DETECTION
@@ -130,22 +130,26 @@ for feat_dir in "$SPECS_DIR"/*/; do
     fi
 
     # Read stored hash from context.json
+    # Missing context.json with existing .feature files = integrity failure
+    # (prevents bypass via context.json deletion)
     if [[ ! -f "$CONTEXT_FILE" ]]; then
-        TOTAL_SKIPPED=$((TOTAL_SKIPPED + 1))
+        TOTAL_FAILED=$((TOTAL_FAILED + 1))
+        FAILURES+=("$feat_name: context.json missing (assertions exist but no stored hash)")
         continue
     fi
 
     CONTEXT_JSON=$(cat "$CONTEXT_FILE" 2>/dev/null)
     if ! echo "$CONTEXT_JSON" | jq empty 2>/dev/null; then
-        TOTAL_SKIPPED=$((TOTAL_SKIPPED + 1))
+        TOTAL_FAILED=$((TOTAL_FAILED + 1))
+        FAILURES+=("$feat_name: context.json is invalid JSON")
         continue
     fi
 
     STORED_HASH=$(echo "$CONTEXT_JSON" | jq -r '.testify.assertion_hash // ""' 2>/dev/null || echo "")
-    STORED_DIR=$(echo "$CONTEXT_JSON" | jq -r '.testify.features_dir // ""' 2>/dev/null || echo "")
 
-    if [[ -z "$STORED_HASH" ]] || [[ -z "$STORED_DIR" ]]; then
-        TOTAL_SKIPPED=$((TOTAL_SKIPPED + 1))
+    if [[ -z "$STORED_HASH" ]]; then
+        TOTAL_FAILED=$((TOTAL_FAILED + 1))
+        FAILURES+=("$feat_name: no assertion hash in context.json (run /iikit-04-testify)")
         continue
     fi
 
@@ -154,7 +158,7 @@ for feat_dir in "$SPECS_DIR"/*/; do
         TOTAL_PASSED=$((TOTAL_PASSED + 1))
     else
         TOTAL_FAILED=$((TOTAL_FAILED + 1))
-        FAILURES+=("$feat_name: expected=$STORED_HASH actual=$CURRENT_HASH")
+        FAILURES+=("$feat_name: hash mismatch (stored=$STORED_HASH actual=$CURRENT_HASH)")
     fi
 done
 
@@ -166,14 +170,21 @@ if $JSON_MODE; then
     STATUS="pass"
     [[ "$TOTAL_FAILED" -gt 0 ]] && STATUS="fail"
 
-    FAILURES_JSON="[]"
+    # Build failures array with proper JSON escaping
     if [[ ${#FAILURES[@]} -gt 0 ]]; then
-        FAILURES_JSON=$(printf '"%s",' "${FAILURES[@]}")
-        FAILURES_JSON="[${FAILURES_JSON%,}]"
+        FAILURES_JSON=$(printf '%s\n' "${FAILURES[@]}" | jq -R . | jq -s .)
+    else
+        FAILURES_JSON="[]"
     fi
 
-    printf '{"status":"%s","features_checked":%d,"passed":%d,"failed":%d,"skipped":%d,"failures":%s}\n' \
-        "$STATUS" "$TOTAL_CHECKED" "$TOTAL_PASSED" "$TOTAL_FAILED" "$TOTAL_SKIPPED" "$FAILURES_JSON"
+    jq -n \
+        --arg status "$STATUS" \
+        --argjson checked "$TOTAL_CHECKED" \
+        --argjson passed "$TOTAL_PASSED" \
+        --argjson failed "$TOTAL_FAILED" \
+        --argjson skipped "$TOTAL_SKIPPED" \
+        --argjson failures "$FAILURES_JSON" \
+        '{status:$status,features_checked:$checked,passed:$passed,failed:$failed,skipped:$skipped,failures:$failures}'
 else
     if [[ "$TOTAL_CHECKED" -eq 0 ]]; then
         echo "[iikit] No features with .feature files found — nothing to verify."
@@ -196,7 +207,7 @@ else
         done
         echo ""
         echo "  .feature assertions were modified without re-running /iikit-04-testify."
-        echo "  This may indicate a --no-verify bypass of the pre-commit hook."
+        echo "  This may indicate a hook bypass."
         echo ""
     fi
 fi
