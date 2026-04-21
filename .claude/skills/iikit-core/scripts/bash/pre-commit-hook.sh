@@ -179,7 +179,7 @@ if [[ -n "$STAGED_CODE_FILES" ]]; then
         done
         echo "" >&2
         echo "[iikit] .feature files exist — code commits require proper BDD wiring." >&2
-        echo "[iikit] To bypass (NOT recommended): git commit --no-verify" >&2
+        echo "[iikit] Fix the BDD setup before committing. Do NOT use --no-verify." >&2
         echo "" >&2
         exit 1
     fi
@@ -452,7 +452,7 @@ if [[ "$BLOCKED" == true ]]; then
     done
     echo "" >&2
     echo "[iikit] To fix: Re-run /iikit-04-testify to regenerate test specs with valid hashes." >&2
-    echo "[iikit] To bypass (NOT recommended): git commit --no-verify" >&2
+    echo "[iikit] Do NOT use --no-verify to bypass this check." >&2
     echo "" >&2
     exit 1
 fi
