@@ -10,7 +10,7 @@ An AI coding assistant toolkit that preserves your intent from idea to implement
 
 - **Assertion integrity enforcement**: Defense-in-depth against pre-commit hook bypass — CI verification script (`verify-assertion-integrity.sh`) for server-side enforcement, PreToolUse hook for Claude Code, constitution template with hook enforcement section.
 - **GitHub Copilot support**: Fifth agent — `.github/copilot-instructions.md` symlink, cross-directory setup scripts, `update-agent-context copilot` support.
-- **Bug fixes**: Dashboard `$`-pattern corruption (#49), branch detection cascade (#44/#45), pre-commit step definitions gate (#48), clarification panel navigation (#39).
+- **4 bug fixes**: Dashboard `$`-pattern corruption (#49), branch detection cascade (#44/#45), pre-commit step definitions gate (#48), clarification panel navigation (#39).
 
 ### v2.9
 
