@@ -9,6 +9,7 @@
     - .opencode/skills -> .claude/skills
     - CLAUDE.md -> AGENTS.md
     - GEMINI.md -> AGENTS.md
+    - .github/copilot-instructions.md -> AGENTS.md (GitHub Copilot)
 
     On Windows, symlinks require either:
     - Administrator privileges, OR
@@ -181,6 +182,12 @@ function New-FileLink {
         }
     }
 
+    # Ensure parent directory exists
+    $parentDir = Split-Path $LinkPath -Parent
+    if (-not (Test-Path $parentDir)) {
+        New-Item -ItemType Directory -Path $parentDir -Force | Out-Null
+    }
+
     if ($CanSymlink) {
         try {
             New-Item -ItemType SymbolicLink -Path $LinkPath -Target $TargetPath -ErrorAction Stop | Out-Null
@@ -246,7 +253,8 @@ Write-Host "Creating file links..." -ForegroundColor White
 
 $fileLinks = @(
     @{ Link = "CLAUDE.md"; Target = "AGENTS.md" },
-    @{ Link = "GEMINI.md"; Target = "AGENTS.md" }
+    @{ Link = "GEMINI.md"; Target = "AGENTS.md" },
+    @{ Link = ".github\copilot-instructions.md"; Target = "AGENTS.md" }
 )
 
 foreach ($link in $fileLinks) {
