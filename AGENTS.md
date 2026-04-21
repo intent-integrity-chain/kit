@@ -4,7 +4,7 @@
 
 ## Overview
 
-Intent Integrity Kit (IIKit) preserves your intent from idea to implementation through specification-driven development with cryptographic verification. Compatible with Claude Code, Codex, Gemini, and OpenCode.
+Intent Integrity Kit (IIKit) preserves your intent from idea to implementation through specification-driven development with cryptographic verification. Compatible with Claude Code, Codex, Gemini, OpenCode, and GitHub Copilot.
 
 ## Intent Integrity Kit Workflow
 
@@ -43,6 +43,7 @@ Read `FRAMEWORK-PRINCIPLES.md` for this framework's development principles.
 .codex/skills/               # Symlink -> .claude/skills
 .gemini/skills/              # Symlink -> .claude/skills
 .opencode/skills/            # Symlink -> .claude/skills
+.github/copilot-instructions.md  # Symlink -> AGENTS.md (GitHub Copilot)
 
 CONSTITUTION.md              # Project governance (content-agnostic, lives at root)
 PREMISE.md                   # App-wide context: what, who, why, domain, scope
@@ -155,7 +156,7 @@ Skills are stored in `.claude/skills/` with symlinks for other agents:
 - `.gemini/skills/` → `.claude/skills/`
 - `.opencode/skills/` → `.claude/skills/`
 
-Instruction files: `CLAUDE.md` and `GEMINI.md` are symlinks to this file (`AGENTS.md`).
+Instruction files: `CLAUDE.md`, `GEMINI.md`, and `.github/copilot-instructions.md` are symlinks to this file (`AGENTS.md`).
 
 <!-- IIKIT-TECH-START -->
 <!-- Tech stack will be inserted here by /iikit-02-plan -->

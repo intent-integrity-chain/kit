@@ -25,7 +25,7 @@ Relies on common helper functions in common.ps1
 #>
 param(
     [Parameter(Position=0)]
-    [ValidateSet('claude','gemini','codex','opencode')]
+    [ValidateSet('claude','gemini','copilot','codex','opencode')]
     [string]$AgentType
 )
 
@@ -292,9 +292,10 @@ function Update-SpecificAgent {
     switch ($Type) {
         'claude'   { Update-AgentFile -TargetFile $CLAUDE_FILE   -AgentName 'Claude Code' }
         'gemini'   { Update-AgentFile -TargetFile $GEMINI_FILE   -AgentName 'Gemini CLI' }
-        'opencode' { Update-AgentFile -TargetFile $AGENTS_FILE   -AgentName 'opencode' }
+        'copilot'  { Update-AgentFile -TargetFile $AGENTS_FILE   -AgentName 'GitHub Copilot' }
+        'opencode' { Update-AgentFile -TargetFile $AGENTS_FILE   -AgentName 'OpenCode' }
         'codex'    { Update-AgentFile -TargetFile $AGENTS_FILE   -AgentName 'Codex CLI' }
-        default { Write-Err "Unknown agent type '$Type'"; Write-Err 'Expected: claude|gemini|codex|opencode'; return $false }
+        default { Write-Err "Unknown agent type '$Type'"; Write-Err 'Expected: claude|gemini|copilot|codex|opencode'; return $false }
     }
 }
 

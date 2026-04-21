@@ -4,7 +4,7 @@
 
 **Closing the intent-to-code chasm**
 
-An AI coding assistant toolkit that preserves your intent from idea to implementation, with cryptographic verification at each step. Compatible with Claude Code, OpenAI Codex, Google Gemini, and OpenCode.
+An AI coding assistant toolkit that preserves your intent from idea to implementation, with cryptographic verification at each step. Compatible with Claude Code, OpenAI Codex, Google Gemini, OpenCode, and GitHub Copilot.
 
 ## What's New in v2.9.0
 
@@ -58,7 +58,7 @@ tessl install tessl-labs/intent-integrity-kit
 
 ```bash
 # 1. Launch your AI assistant
-claude          # or: codex, gemini, opencode
+claude          # or: codex, gemini, opencode, copilot
 
 # 2. Initialize the project
 /iikit-core init
@@ -255,6 +255,7 @@ your-project/
 | OpenAI Codex | `AGENTS.md` |
 | Google Gemini | `GEMINI.md` -> `AGENTS.md` |
 | OpenCode | `AGENTS.md` |
+| GitHub Copilot | `.github/copilot-instructions.md` -> `AGENTS.md` |
 
 ## Acknowledgments
 

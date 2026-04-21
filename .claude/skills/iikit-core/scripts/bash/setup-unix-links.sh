@@ -9,6 +9,7 @@
 #   - .opencode/skills -> .claude/skills
 #   - CLAUDE.md -> AGENTS.md
 #   - GEMINI.md -> AGENTS.md
+#   - .github/copilot-instructions.md -> AGENTS.md (GitHub Copilot)
 #
 # USAGE:
 #   ./setup-unix-links.sh           # Create symlinks with prompts
@@ -155,9 +156,21 @@ create_file_link() {
         fi
     fi
 
-    # Create symlink with relative path (files are in same directory)
-    if ln -s "$target_name" "$link_path" 2>/dev/null; then
-        echo -e "  ${GREEN}[OK] $link_name -> $target_name (symlink)${NC}"
+    # Ensure parent directory exists
+    local parent_dir
+    parent_dir=$(dirname "$link_path")
+    if [[ ! -d "$parent_dir" ]]; then
+        mkdir -p "$parent_dir"
+    fi
+
+    # Create symlink with relative path
+    local relative_target
+    relative_target=$(realpath --relative-to="$parent_dir" "$target_path" 2>/dev/null || \
+                      python3 -c "import os.path; print(os.path.relpath('$target_path', '$parent_dir'))" 2>/dev/null || \
+                      echo "$target_path")
+
+    if ln -s "$relative_target" "$link_path" 2>/dev/null; then
+        echo -e "  ${GREEN}[OK] $link_name -> $relative_target (symlink)${NC}"
         return 0
     else
         echo -e "  ${RED}[ERROR] Failed to create symlink: $link_name${NC}"
@@ -191,6 +204,7 @@ echo -e "${WHITE}Creating file links...${NC}"
 declare -a FILE_LINKS=(
     "CLAUDE.md:AGENTS.md"
     "GEMINI.md:AGENTS.md"
+    ".github/copilot-instructions.md:AGENTS.md"
 )
 
 for link_spec in "${FILE_LINKS[@]}"; do
