@@ -40,6 +40,20 @@
 [SECTION_3_CONTENT]
 <!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
 
+## Integrity
+
+### Pre-Commit Hook Enforcement (NON-NEGOTIABLE)
+
+Pre-commit hooks are a critical integrity gate. The following are prohibited:
+
+- **NEVER** use `git commit --no-verify` or `git commit -n` to bypass hooks
+- **NEVER** delete, modify, or disable files in `.git/hooks/`
+- **NEVER** use git plumbing commands (`git commit-tree`, `git mktree`) to circumvent hooks
+- If a pre-commit hook blocks your commit, **fix the root cause** — do not work around the hook
+- For assertion integrity failures: re-run `/iikit-04-testify` to regenerate hashes
+
+**CI enforcement recommended**: Add `verify-assertion-integrity.sh` to your CI pipeline for server-side verification that cannot be bypassed. See the CI integration reference for setup instructions.
+
 ## Governance
 <!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 

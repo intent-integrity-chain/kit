@@ -11,6 +11,18 @@
           }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/skills/iikit-core/scripts/bash/check-hook-bypass.sh",
+            "timeout": 5
+          }
+        ]
+      }
     ]
   }
 }
