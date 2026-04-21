@@ -734,10 +734,8 @@
       right: 2px;
       font-size: 9px;
       font-weight: 700;
-      font-family: inherit;
       color: #b8860b;
       background: rgba(245, 166, 35, 0.18);
-      border: none;
       border-radius: 8px;
       padding: 1px 5px;
       line-height: 14px;
@@ -2778,6 +2776,9 @@
         <span class="integrity-dot" aria-hidden="true"></span>
         <span class="integrity-text">Checking...</span>
       </div>
+      <button onclick="location.reload()" class="theme-toggle" aria-label="Refresh dashboard" title="Refresh (re-read data)" tabindex="0" style="margin-right:4px;">
+        <span>&#8635;</span>
+      </button>
       <button id="themeToggle" class="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle theme" tabindex="0">
         <span id="themeIcon">&#9790;</span>
       </button>
@@ -2818,7 +2819,7 @@
       let currentTestify = null;
       let currentAnalyze = null;
       let currentBugs = null;
-      let activeTab = null;
+      let activeTab = localStorage.getItem('iikit-active-tab') || null;
       let externalSankeyHighlight = null;
       // DASHBOARD_DATA mode: when data is inlined by the generator
       const staticMode = typeof window.DASHBOARD_DATA === 'object' && window.DASHBOARD_DATA !== null;
@@ -2890,7 +2891,7 @@
             <div class="pipeline-dot ${phase.status}">${PHASE_ICONS[phase.status] || ''}</div>
             <span class="pipeline-label${phase.name.includes('\n') ? ' pipeline-label-multiline' : ''}">${phase.name.includes('\n') ? phase.name.split('\n').map(l => `<span class="pipeline-label-line">${escapeHtml(l)}</span>`).join('') : escapeHtml(phase.name)}${phase.id === 'tasks' ? ' <span class="pipeline-redirect" title="Opens Implement board">&#x2197;</span>' : ''}</span>
             <span class="pipeline-progress">${phase.progress || ''}</span>
-            ${phase.clarifications > 0 ? '<button type="button" class="pipeline-clarify-badge" title="View ' + phase.clarifications + ' clarification' + (phase.clarifications > 1 ? 's' : '') + '" aria-label="View ' + phase.clarifications + ' clarification' + (phase.clarifications > 1 ? 's' : '') + '">?' + phase.clarifications + '</button>' : ''}
+            ${phase.clarifications > 0 ? '<span class="pipeline-clarify-badge" role="button" tabindex="0" title="View ' + phase.clarifications + ' clarification' + (phase.clarifications > 1 ? 's' : '') + '" aria-label="View ' + phase.clarifications + ' clarification' + (phase.clarifications > 1 ? 's' : '') + '">?' + phase.clarifications + '</span>' : ''}
           `;
 
           const clarifyBadge = node.querySelector('.pipeline-clarify-badge');
@@ -2898,6 +2899,13 @@
             clarifyBadge.addEventListener('click', (event) => {
               event.stopPropagation();
               switchTab('clarify');
+            });
+            clarifyBadge.addEventListener('keydown', (event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                event.stopPropagation();
+                switchTab('clarify');
+              }
             });
           }
 
@@ -2939,6 +2947,7 @@
         }
 
         activeTab = phaseId;
+        localStorage.setItem('iikit-active-tab', phaseId);
         // Re-render pipeline to update active state
         if (currentPipeline) renderPipeline(currentPipeline);
 
@@ -3721,12 +3730,14 @@
             const desc = n.text || n.title || n.description || '';
             const truncDesc = desc.length > 22 ? desc.substring(0, 22) + '...' : desc;
 
-            // Cross-link: requirements → spec, tasks → implement, gap nodes → checklist
+            // Cross-link: requirements → spec, tests → spec (trace to requirement), tasks → implement
             let crossAttr = '';
-            if (n.isGap) {
-              crossAttr = ` data-cross-target="checklist" data-cross-id="${escapeHtml(n.id)}"`;
-            } else if (n.col === 'left') {
+            if (n.col === 'left') {
               crossAttr = ` data-cross-target="spec" data-cross-id="${escapeHtml(n.id)}"`;
+            } else if (n.col === 'mid') {
+              // Test specs link to spec view (trace back to the requirement they verify)
+              const traceReq = Array.isArray(n.traceability) && n.traceability.length > 0 ? n.traceability[0] : n.id;
+              crossAttr = ` data-cross-target="spec" data-cross-id="${escapeHtml(traceReq)}"`;
             } else if (n.col === 'right') {
               crossAttr = ` data-cross-target="implement" data-cross-id="${escapeHtml(n.id)}"`;
             }
@@ -5360,7 +5371,7 @@
           case 'missing':
             textEl.textContent = 'Missing';
             badge.setAttribute('aria-label', 'Test integrity: no hash data available');
-            badge.title = 'No test specifications or context.json found';
+            badge.title = 'No test-specs.md or context.json found';
             break;
         }
       }
@@ -5772,6 +5783,9 @@
             if (fd.bugs && currentPipeline) renderPipeline(currentPipeline);
             switchTab(activeTab);
           }
+        } else {
+          // No features — show constitution directly (it's project-level, not per-feature)
+          renderConstitutionView();
         }
       } else {
         // Fetch mode (server-based)
