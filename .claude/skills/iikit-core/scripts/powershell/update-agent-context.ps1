@@ -293,7 +293,7 @@ function Update-SpecificAgent {
         'claude'   { Update-AgentFile -TargetFile $CLAUDE_FILE   -AgentName 'Claude Code' }
         'gemini'   { Update-AgentFile -TargetFile $GEMINI_FILE   -AgentName 'Gemini CLI' }
         'copilot'  { Update-AgentFile -TargetFile $AGENTS_FILE   -AgentName 'GitHub Copilot' }
-        'opencode' { Update-AgentFile -TargetFile $AGENTS_FILE   -AgentName 'opencode' }
+        'opencode' { Update-AgentFile -TargetFile $AGENTS_FILE   -AgentName 'OpenCode' }
         'codex'    { Update-AgentFile -TargetFile $AGENTS_FILE   -AgentName 'Codex CLI' }
         default { Write-Err "Unknown agent type '$Type'"; Write-Err 'Expected: claude|gemini|copilot|codex|opencode'; return $false }
     }
