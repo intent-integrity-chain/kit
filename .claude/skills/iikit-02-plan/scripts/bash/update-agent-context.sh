@@ -233,7 +233,8 @@ update_specific_agent() {
         claude) update_agent_file "$CLAUDE_FILE" "Claude Code" ;;
         gemini) update_agent_file "$GEMINI_FILE" "Gemini CLI" ;;
         copilot) update_agent_file "$AGENTS_FILE" "GitHub Copilot" ;;
-        codex|opencode) update_agent_file "$AGENTS_FILE" "Codex CLI" ;;
+        codex) update_agent_file "$AGENTS_FILE" "Codex CLI" ;;
+        opencode) update_agent_file "$AGENTS_FILE" "OpenCode" ;;
         *)
             log_error "Unknown agent type '$agent_type'"
             log_error "Expected: claude|gemini|copilot|codex|opencode"

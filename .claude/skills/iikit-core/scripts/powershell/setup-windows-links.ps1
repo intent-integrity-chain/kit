@@ -119,7 +119,7 @@ function New-DirectoryLink {
 
     # Ensure parent directory exists
     $parentDir = Split-Path $LinkPath -Parent
-    if (-not (Test-Path $parentDir)) {
+    if (-not [string]::IsNullOrWhiteSpace($parentDir) -and -not (Test-Path $parentDir)) {
         New-Item -ItemType Directory -Path $parentDir -Force | Out-Null
     }
 
@@ -184,7 +184,7 @@ function New-FileLink {
 
     # Ensure parent directory exists
     $parentDir = Split-Path $LinkPath -Parent
-    if (-not (Test-Path $parentDir)) {
+    if (-not [string]::IsNullOrWhiteSpace($parentDir) -and -not (Test-Path $parentDir)) {
         New-Item -ItemType Directory -Path $parentDir -Force | Out-Null
     }
 

@@ -167,7 +167,7 @@ create_file_link() {
     local relative_target
     relative_target=$(realpath --relative-to="$parent_dir" "$target_path" 2>/dev/null || \
                       python3 -c "import os.path; print(os.path.relpath('$target_path', '$parent_dir'))" 2>/dev/null || \
-                      echo "$target_name")
+                      echo "$target_path")
 
     if ln -s "$relative_target" "$link_path" 2>/dev/null; then
         echo -e "  ${GREEN}[OK] $link_name -> $relative_target (symlink)${NC}"
