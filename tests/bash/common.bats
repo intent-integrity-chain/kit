@@ -293,12 +293,12 @@ EOF
 # get_current_branch cascade priority tests
 # =============================================================================
 
-@test "get_current_branch: active-feature takes priority over SPECIFY_FEATURE" {
+@test "get_current_branch: SPECIFY_FEATURE takes priority over active-feature" {
     mkdir -p "$TEST_DIR/specs/002-sticky-feature"
     write_active_feature "002-sticky-feature"
     export SPECIFY_FEATURE="001-env-feature"
     result=$(get_current_branch)
-    [[ "$result" == "002-sticky-feature" ]]
+    [[ "$result" == "001-env-feature" ]]
     unset SPECIFY_FEATURE
 }
 
