@@ -739,7 +739,8 @@
       border-radius: 8px;
       padding: 1px 5px;
       line-height: 14px;
-      pointer-events: none;
+      pointer-events: auto;
+      cursor: pointer;
     }
 
     .pipeline-dot {
@@ -2890,7 +2891,7 @@
             <div class="pipeline-dot ${phase.status}">${PHASE_ICONS[phase.status] || ''}</div>
             <span class="pipeline-label${phase.name.includes('\n') ? ' pipeline-label-multiline' : ''}">${phase.name.includes('\n') ? phase.name.split('\n').map(l => `<span class="pipeline-label-line">${escapeHtml(l)}</span>`).join('') : escapeHtml(phase.name)}${phase.id === 'tasks' ? ' <span class="pipeline-redirect" title="Opens Implement board">&#x2197;</span>' : ''}</span>
             <span class="pipeline-progress">${phase.progress || ''}</span>
-            ${phase.clarifications > 0 ? '<span class="pipeline-clarify-badge" title="' + phase.clarifications + ' clarification session' + (phase.clarifications > 1 ? 's' : '') + '">?' + phase.clarifications + '</span>' : ''}
+            ${phase.clarifications > 0 ? '<span class="pipeline-clarify-badge" title="View clarifications" onclick="event.stopPropagation(); switchTab(\'clarify\');">?' + phase.clarifications + '</span>' : ''}
           `;
 
           node.addEventListener('click', () => switchTab(phase.id));
