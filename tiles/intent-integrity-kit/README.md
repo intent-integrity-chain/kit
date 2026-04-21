@@ -6,21 +6,23 @@
 
 An AI coding assistant toolkit that preserves your intent from idea to implementation, with cryptographic verification at each step. Compatible with Claude Code, OpenAI Codex, Google Gemini, OpenCode, and GitHub Copilot.
 
-## What's New in v2.9.0
+## What's New in v2.10.0
 
-- **Implementation commit strategy choice**: `/iikit-07-implement` now asks upfront — per-task commits (clean bisectable history) or batch commits (per-phase, ~47% faster). Batch mode cuts implementation turns in half by eliminating per-task git round-trips.
-- **Unified post-phase.sh**: Commit + dashboard refresh + next-step computation consolidated into a single script call. Reduces 3 tool call round-trips to 1 per phase, saving ~26% on implementation time.
-- **Dashboard deduplication**: Removed redundant dashboard generation from `check-prerequisites.sh` — was generating the dashboard twice per phase (once in prerequisites, once after artifact creation).
+- **Assertion integrity enforcement**: Defense-in-depth against pre-commit hook bypass — CI verification script (`verify-assertion-integrity.sh`) for server-side enforcement, PreToolUse hook for Claude Code, constitution template with hook enforcement section.
+- **GitHub Copilot support**: Fifth agent — `.github/copilot-instructions.md` symlink, cross-directory setup scripts, `update-agent-context copilot` support.
+- **4 bug fixes**: Dashboard `$`-pattern corruption (#49), branch detection cascade (#44/#45), pre-commit step definitions gate (#48), clarification panel navigation (#39).
+
+### v2.9
+
+Implementation commit strategy choice (per-task vs batch), unified post-phase.sh (3 tool calls → 1), dashboard deduplication.
 
 ### v2.8
 
-- **14 eval scenarios**: 9 new cross-phase and full-pipeline evals testing intent preservation across phase boundaries, plus 3 auto-generated and 2 reworked existing evals. Baseline 48% → with context 88%.
-- **Skill compliance fixes**: Constitution creates `.specify/context.json` with TDD determination in the same write step (was separate step, consistently skipped). Plan skill spec quality gate marked MANDATORY on every run including re-runs. Bugfix skill reads TDD from context.json with fallback when scripts unavailable.
-- **Eval anti-bleeding**: All task.md files stripped of narrator coaching that telegraphed criteria to the agent. Scenarios now test genuine skill behavior, not instruction following.
+14 eval scenarios (baseline 48% → 88%), skill compliance fixes, eval anti-bleeding.
 
 ### v2.7
 
-Dashboard overhaul (premise cards, architecture parser, tile review scores, bug cross-links), 27 bug fixes from E2E testing across 12 projects, externalized next-step state machine, generic clarify utility, Bash 3.2 macOS compatibility.
+Dashboard overhaul, 27 bug fixes from E2E testing across 12 projects, externalized next-step state machine, generic clarify utility, Bash 3.2 macOS compatibility.
 
 [Full changelog →](https://github.com/intent-integrity-chain/kit/blob/main/CHANGELOG.md)
 
