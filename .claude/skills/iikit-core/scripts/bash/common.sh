@@ -154,28 +154,39 @@ get_repo_root() {
 }
 
 # Get current branch, with fallback for non-git repositories
-# Detection cascade: active-feature file > SPECIFY_FEATURE env > git branch > single feature > fallback
+# Detection cascade: SPECIFY_FEATURE env > git feature branch (NNN-*) > active-feature file > git branch (non-feature) > scan specs dir > fallback
 get_current_branch() {
-    # 1. Check sticky active-feature file (survives restarts)
-    local active
-    active=$(read_active_feature 2>/dev/null) && [[ -n "$active" ]] && {
-        echo "$active"
-        return
-    }
-
-    # 2. Check SPECIFY_FEATURE environment variable (CI/scripts)
+    # 1. Check SPECIFY_FEATURE environment variable (explicit CI override)
     if [[ -n "${SPECIFY_FEATURE:-}" ]]; then
         echo "$SPECIFY_FEATURE"
         return
     fi
 
-    # 3. Check git branch if available
+    # 2. Check git branch — if it matches a feature pattern (NNN-*), use it
+    #    This ensures switching branches always picks up the correct feature,
+    #    even when a stale active-feature file points elsewhere.
     if git rev-parse --abbrev-ref HEAD >/dev/null 2>&1; then
-        git rev-parse --abbrev-ref HEAD
+        local git_branch
+        git_branch=$(git rev-parse --abbrev-ref HEAD)
+
+        if [[ "$git_branch" =~ ^[0-9]{3}- ]]; then
+            echo "$git_branch"
+            return
+        fi
+
+        # 3. On a non-feature branch (e.g. main): fall back to sticky active-feature file
+        local active
+        active=$(read_active_feature 2>/dev/null) && [[ -n "$active" ]] && {
+            echo "$active"
+            return
+        }
+
+        # 4. Non-feature git branch, no sticky file — return branch as-is
+        echo "$git_branch"
         return
     fi
 
-    # 4. For non-git repos, try to find the latest feature directory
+    # 5. For non-git repos, try to find the latest feature directory
     local repo_root=$(get_repo_root)
     local specs_dir="$repo_root/specs"
 
@@ -203,7 +214,8 @@ get_current_branch() {
         fi
     fi
 
-    echo "main"  # Final fallback
+    # 6. Final fallback
+    echo "main"
 }
 
 # Check if we have git available
