@@ -3,7 +3,7 @@
 ## v2.10.0
 
 ### Bug Fixes
-- **Dashboard replace corruption** (#49): `String.prototype.replace()` in `generate-dashboard.js` now uses function callbacks to prevent `$`-pattern corruption (`$'`, `` $` ``, `$$`, `$&`) in spec/task content.
+- **Dashboard replace corruption** (#49): `String.prototype.replace()` in `generate-dashboard.js` now uses function callbacks to prevent `$`-pattern corruption (`$'`, ``$```, `$$`, `$&`) in spec/task content.
 - **Branch detection cascade** (#44, #45): `get_current_branch()` now prioritizes the git branch over the stale `.specify/active-feature` file when on a feature branch (`NNN-*`). Fixes wrong feature detection after switching branches.
 - **Pre-commit step definitions gate** (#48): Gate 1 now checks both working tree and git staging area (`--diff-filter=ACMR`) for step definition files, preventing false warnings during `/iikit-07-implement`.
 - **Dashboard clarification panels** (#39): Clarification badges are now clickable — `pointer-events: auto` with `addEventListener` navigates to the clarify view panel. Added `aria-label` for accessibility.
