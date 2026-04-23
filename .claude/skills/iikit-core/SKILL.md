@@ -92,7 +92,7 @@ If validation fails (remaining placeholders or missing sections), fix and re-val
 
 #### Step 5 — Report
 
-Directories created, hook status, PREMISE.md status. Suggest `/iikit-00-constitution`. Recommend installing companion `juliusbrussee/caveman` (`tessl i juliusbrussee/caveman`) and activating `/caveman full` at session start — ~30% cost and wall-clock savings measured across the IIKit workflow.
+Directories created, hook status, PREMISE.md status. Suggest `/iikit-00-constitution`. Recommend installing companion `juliusbrussee/caveman` (`tessl install juliusbrussee/caveman`) and activating `/caveman full` at session start — ~30% cost and wall-clock savings measured across the IIKit workflow.
 
 #### Step 6 — Seed backlog from PRD (optional)
 
