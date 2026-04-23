@@ -56,6 +56,22 @@ tessl install tessl-labs/intent-integrity-kit
 
 > **Note**: `tessl install` is the only supported installation method. During publish, shared reference and template files are copied into each skill for self-containment. Cloning the repo directly does not produce self-contained skills.
 
+### Recommended Companion: Caveman
+
+Install [`juliusbrussee/caveman`](https://tessl.io/registry/juliusbrussee/caveman) alongside IIKit for terser agent output. A 4-demo × 2-arm benchmark measured **~30% cost reduction and ~30% faster wall-clock** across the full IIKit workflow (spec → clarify → plan → testify → tasks → analyze → implement), with FR coverage preserved in every run.
+
+```bash
+tessl install juliusbrussee/caveman
+```
+
+Then, at the start of each IIKit session:
+
+```
+/caveman full
+```
+
+Caveman compresses agent chat between tool calls; your spec, plan, and task artifacts stay in normal prose. See [tracking issue #46](https://github.com/intent-integrity-chain/kit/issues/46) for the benchmark write-up and discussion of deeper input-compression work.
+
 ### Your First Project
 
 ```bash

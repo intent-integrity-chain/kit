@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Documentation
+- **Caveman companion recommendation** (#46): README "Recommended Companion" section and `/iikit-core init` Step 5 now point users to [`juliusbrussee/caveman`](https://tessl.io/registry/juliusbrussee/caveman). A 4-demo × 2-arm benchmark measured ~30% cost and wall-clock reduction across the full IIKit workflow with FR coverage preserved. Issue #46 remains open for deeper input-compression work on IIKit's own SKILL.md files.
+
 ## v2.10.0
 
 ### Bug Fixes
