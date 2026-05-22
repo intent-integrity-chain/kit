@@ -26,7 +26,11 @@ if ($Help) {
     exit 0
 }
 
-$repoRoot = (Get-Location).Path
+# Resolve the actual git repo root so a sub-directory invocation still
+# operates on the top of the project (matches bash's get_repo_root behavior).
+$repoRoot = git rev-parse --show-toplevel 2>$null
+if (-not $repoRoot) { $repoRoot = (Get-Location).Path }
+$repoRoot = (Resolve-Path $repoRoot).Path
 $hooksDir = Join-Path $repoRoot ".git/hooks"
 
 $removed = New-Object System.Collections.Generic.List[string]
