@@ -74,7 +74,7 @@ if [[ "$TDD_DETERMINATION" == "mandatory" ]] && [[ -n "$STAGED_CODE_FILES" ]]; t
     for feat_dir in "$REPO_ROOT"/specs/[0-9][0-9][0-9]-*/; do
         [[ ! -d "$feat_dir" ]] && continue
         if [[ -d "$feat_dir/tests/features" ]]; then
-            FCOUNT=$(find "$feat_dir/tests/features" -maxdepth 1 -name "*.feature" -type f 2>/dev/null | wc -l | tr -d ' ')
+            FCOUNT=$(find -L "$feat_dir/tests/features" -maxdepth 1 -name "*.feature" -type f 2>/dev/null | wc -l | tr -d ' ')
             [[ "$FCOUNT" -gt 0 ]] && ANY_FEATURES=true && break
         fi
         # Also check legacy test-specs.md
@@ -107,7 +107,7 @@ if [[ -n "$STAGED_CODE_FILES" ]]; then
         [[ ! -d "$FEATURES_DIR" ]] && continue
 
         # Check that at least one .feature file exists
-        FEATURE_COUNT=$(find "$FEATURES_DIR" -maxdepth 1 -name "*.feature" -type f 2>/dev/null | wc -l | tr -d ' ')
+        FEATURE_COUNT=$(find -L "$FEATURES_DIR" -maxdepth 1 -name "*.feature" -type f 2>/dev/null | wc -l | tr -d ' ')
         [[ "$FEATURE_COUNT" -eq 0 ]] && continue
 
         FEAT_NAME=$(basename "$feat_dir")

@@ -818,3 +818,19 @@ TEMPLATE
     # Both scripts should use the same terminology for "no feature"
     [[ "$cp_stage" == "$ns_stage" ]]
 }
+
+@test "ISSUE-59: --phase 05 passes when tests/features is a symlink to a real directory" {
+    create_mock_feature "001-test-feature"
+
+    # Replace tests/features dir with a symlink to a canonical location
+    # (mirrors Maven layout: specs/NNN/tests/features -> src/test/resources/features)
+    feature_dir="$TEST_DIR/specs/001-test-feature"
+    canonical="$TEST_DIR/src/test/resources/features"
+    mkdir -p "$canonical"
+    mv "$feature_dir/tests/features/test.feature" "$canonical/test.feature"
+    rm -rf "$feature_dir/tests/features"
+    ln -s "$canonical" "$feature_dir/tests/features"
+
+    run "$CHECK_SCRIPT" --phase 05 --json
+    [[ "$status" -eq 0 ]]
+}

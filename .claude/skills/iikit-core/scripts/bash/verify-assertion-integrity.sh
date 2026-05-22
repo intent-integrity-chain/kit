@@ -158,7 +158,7 @@ for feat_dir in "$SPECS_DIR"/*/; do
         continue
     fi
 
-    FEATURE_COUNT=$(find "$FEATURES_DIR" -maxdepth 1 -name "*.feature" -type f 2>/dev/null | wc -l | tr -d ' ')
+    FEATURE_COUNT=$(find -L "$FEATURES_DIR" -maxdepth 1 -name "*.feature" -type f 2>/dev/null | wc -l | tr -d ' ')
     if [[ "$FEATURE_COUNT" -eq 0 ]]; then
         continue
     fi

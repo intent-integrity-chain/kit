@@ -655,7 +655,7 @@ if [[ "$PHASE" == "05" || "$PHASE" == "06" || "$PHASE" == "07" || "$PHASE" == "0
     if [[ "$TDD_DET" == "mandatory" ]]; then
         HAS_FEATURES=false
         if [[ -d "$FEATURE_DIR/tests/features" ]]; then
-            FCOUNT=$(find "$FEATURE_DIR/tests/features" -maxdepth 1 -name "*.feature" -type f 2>/dev/null | wc -l | tr -d ' ')
+            FCOUNT=$(find -L "$FEATURE_DIR/tests/features" -maxdepth 1 -name "*.feature" -type f 2>/dev/null | wc -l | tr -d ' ')
             [[ "$FCOUNT" -gt 0 ]] && HAS_FEATURES=true
         fi
 
