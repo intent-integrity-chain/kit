@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Bug Fixes
+- **Symlinked `tests/features/` not traversed by `find`** (#59): Every `find` over `.feature` files in `iikit-core` scripts (`check-prerequisites.sh`, `pre-commit-hook.sh`, `bugfix-helpers.sh`, `verify-assertion-integrity.sh`, `verify-steps.sh`) now passes `-L` so a symlinked `tests/features/` directory (e.g., Maven layout where it points to `src/test/resources/features/`) is followed. Previously the testify gate falsely reported `"features": false` and blocked phases 05–08 even when `.feature` files existed.
+
 ### Documentation
 - **Caveman companion recommendation** (#46): README "Recommended Companion" section and `/iikit-core init` Step 5 now point users to [`juliusbrussee/caveman`](https://tessl.io/registry/juliusbrussee/caveman). A 4-demo × 2-arm benchmark measured ~30% cost and wall-clock reduction across the full IIKit workflow with FR coverage preserved. Issue #46 remains open for deeper input-compression work on IIKit's own SKILL.md files.
 

@@ -289,7 +289,7 @@ if [[ ! -d "$FEATURES_DIR" ]]; then
 fi
 
 # Check for .feature files
-feature_count=$(find "$FEATURES_DIR" -maxdepth 1 -name "*.feature" -type f 2>/dev/null | wc -l | tr -d ' ')
+feature_count=$(find -L "$FEATURES_DIR" -maxdepth 1 -name "*.feature" -type f 2>/dev/null | wc -l | tr -d ' ')
 if [[ "$feature_count" -eq 0 ]]; then
     if [[ "$JSON_MODE" == "true" ]]; then
         printf '{"status":"DEGRADED","framework":null,"message":"No .feature files found in %s","total_steps":0,"matched_steps":0,"undefined_steps":0,"pending_steps":0,"details":[]}' "$FEATURES_DIR"

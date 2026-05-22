@@ -112,7 +112,7 @@ cmd_validate_feature() {
     [[ -f "$feature_dir/bugs.md" ]] && has_bugs="true"
     if [[ -d "$feature_dir/tests/features" ]]; then
         local fcount
-        fcount=$(find "$feature_dir/tests/features" -maxdepth 1 -name "*.feature" -type f 2>/dev/null | wc -l | tr -d ' ')
+        fcount=$(find -L "$feature_dir/tests/features" -maxdepth 1 -name "*.feature" -type f 2>/dev/null | wc -l | tr -d ' ')
         [[ "$fcount" -gt 0 ]] && has_tests="true"
     fi
 
