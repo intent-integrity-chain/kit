@@ -171,6 +171,10 @@ EOF
 }
 
 @test "uninit: --json with no scaffolding still emits a valid envelope" {
+    # setup_test_dir creates .specify/ and specs/ — clear them so the script
+    # has nothing to clean up or report.
+    rm -rf "$TEST_DIR/.specify" "$TEST_DIR/specs"
+
     result=$("$UNINIT_SCRIPT" --json)
 
     assert_contains "$result" '"removed":[]'
