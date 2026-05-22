@@ -64,7 +64,7 @@ function Strip-ChainCall([string]$hookName) {
     $hook = Join-Path $hooksDir $hookName
     if (-not (Test-Path $hook)) { return }
     $content = Get-Content $hook -Raw -ErrorAction SilentlyContinue
-    if ($content -notmatch "iikit-$hookName") { return }
+    if ($content -cnotmatch "iikit-$hookName") { return }
 
     $rel = To-Relative $hook
     if ($DryRun) {
@@ -92,7 +92,12 @@ function Strip-ChainCall([string]$hookName) {
 
 function Handle-Hook([string]$hookName, [string]$marker) {
     $hook = Join-Path $hooksDir $hookName
-    if ((Test-Path $hook) -and ((Get-Content $hook -Raw -ErrorAction SilentlyContinue) -match $marker)) {
+    # Case-sensitive match — the marker is an uppercase tag (`IIKIT-PRE-COMMIT`)
+    # the iikit hook installer writes into its own files. The chain-call line a
+    # non-iikit hook contains uses the lowercase script name (`iikit-pre-commit`)
+    # and must not be treated as marker presence, otherwise the user's hook gets
+    # deleted instead of having the chain-call stripped.
+    if ((Test-Path $hook) -and ((Get-Content $hook -Raw -ErrorAction SilentlyContinue) -cmatch $marker)) {
         Remove-Path $hook
     } else {
         Strip-ChainCall $hookName
