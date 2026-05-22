@@ -4,16 +4,16 @@ BeforeAll {
     Import-Module $PSScriptRoot/TestHelper.psm1 -Force
     $script:UninitScript = Join-Path (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)) "tiles/intent-integrity-kit/skills/iikit-core/scripts/powershell/uninit.ps1"
     $script:HooksSubdir = ".git/hooks"
-}
 
-function Install-MarkerHook {
-    param([string]$TestDir, [string]$Hook, [string]$Marker)
-    $hookPath = Join-Path $TestDir "$script:HooksSubdir/$Hook"
-    @(
-        "#!/usr/bin/env bash",
-        "# $Marker",
-        "echo iikit-$Hook"
-    ) | Set-Content $hookPath
+    function Install-MarkerHook {
+        param([string]$TestDir, [string]$Hook, [string]$Marker)
+        $hookPath = Join-Path $TestDir ".git/hooks/$Hook"
+        @(
+            "#!/usr/bin/env bash",
+            "# $Marker",
+            "echo iikit-$Hook"
+        ) | Set-Content $hookPath
+    }
 }
 
 Describe "uninit: tile-managed scaffolding" {
