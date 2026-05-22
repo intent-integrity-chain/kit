@@ -60,25 +60,47 @@ HOOKS_DIR="$REPO_ROOT/.git/hooks"
 
 REMOVED=()
 USER_CONTENT=()
+ERRORS=()
 
 # Track an action that would be taken; perform it unless --dry-run.
 record_remove() {
     REMOVED+=("$1")
 }
 
+record_error() {
+    ERRORS+=("$1")
+    printf '[uninit] ERROR: %s\n' "$1" >&2
+}
+
 remove_file() {
     local path="$1"
+    local rel="${path#"$REPO_ROOT/"}"
     if [[ -e "$path" || -L "$path" ]]; then
-        $DRY_RUN || rm -f "$path"
-        record_remove "${path#"$REPO_ROOT/"}"
+        if $DRY_RUN; then
+            record_remove "$rel"
+            return 0
+        fi
+        if rm -f "$path" 2>/dev/null && [[ ! -e "$path" && ! -L "$path" ]]; then
+            record_remove "$rel"
+        else
+            record_error "failed to remove $rel"
+        fi
     fi
 }
 
 remove_dir() {
     local path="$1"
+    local rel="${path#"$REPO_ROOT/"}"
     if [[ -d "$path" ]]; then
-        $DRY_RUN || rm -rf "$path"
-        record_remove "${path#"$REPO_ROOT/"}"
+        if $DRY_RUN; then
+            record_remove "$rel"
+            return 0
+        fi
+        if rm -rf "$path" 2>/dev/null && [[ ! -d "$path" ]]; then
+            record_remove "$rel"
+        else
+            record_error "failed to remove $rel"
+        fi
     fi
 }
 
@@ -171,10 +193,11 @@ join_json_array() {
 NEXT_STEP="tessl uninstall tessl-labs/intent-integrity-kit"
 
 if $JSON_MODE; then
-    printf '{"dry_run":%s,"removed":%s,"user_content":%s,"next_step":"%s"}\n' \
+    printf '{"dry_run":%s,"removed":%s,"user_content":%s,"errors":%s,"next_step":"%s"}\n' \
         "$DRY_RUN" \
         "$(join_json_array "${REMOVED[@]+"${REMOVED[@]}"}")" \
         "$(join_json_array "${USER_CONTENT[@]+"${USER_CONTENT[@]}"}")" \
+        "$(join_json_array "${ERRORS[@]+"${ERRORS[@]}"}")" \
         "$NEXT_STEP"
 else
     if $DRY_RUN; then
@@ -194,3 +217,6 @@ else
     echo ""
     echo "[uninit] Next: $NEXT_STEP"
 fi
+
+# Exit non-zero when any removal failed, so callers see a real failure signal.
+[[ ${#ERRORS[@]} -eq 0 ]] || exit 1

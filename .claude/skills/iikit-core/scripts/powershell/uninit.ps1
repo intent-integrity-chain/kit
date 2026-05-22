@@ -31,15 +31,32 @@ $hooksDir = Join-Path $repoRoot ".git/hooks"
 
 $removed = New-Object System.Collections.Generic.List[string]
 $userContent = New-Object System.Collections.Generic.List[string]
+$errors = New-Object System.Collections.Generic.List[string]
 
 function To-Relative([string]$abs) {
     return $abs.Substring($repoRoot.Length).TrimStart([char]'/', [char]'\')
 }
 
 function Remove-Path([string]$path) {
-    if (Test-Path $path) {
-        if (-not $DryRun) { Remove-Item $path -Recurse -Force -ErrorAction SilentlyContinue }
-        $removed.Add((To-Relative $path)) | Out-Null
+    if (-not (Test-Path $path)) { return }
+    $rel = To-Relative $path
+    if ($DryRun) {
+        $removed.Add($rel) | Out-Null
+        return
+    }
+    try {
+        Remove-Item $path -Recurse -Force -ErrorAction Stop
+        if (Test-Path $path) {
+            $msg = "failed to remove $rel"
+            $errors.Add($msg) | Out-Null
+            [Console]::Error.WriteLine("[uninit] ERROR: $msg")
+            return
+        }
+        $removed.Add($rel) | Out-Null
+    } catch {
+        $msg = "failed to remove ${rel}: $($_.Exception.Message)"
+        $errors.Add($msg) | Out-Null
+        [Console]::Error.WriteLine("[uninit] ERROR: $msg")
     }
 }
 
@@ -116,6 +133,7 @@ if ($Json) {
         dry_run      = [bool]$DryRun
         removed      = @($removed)
         user_content = @($userContent)
+        errors       = @($errors)
         next_step    = $nextStep
     }
     $result | ConvertTo-Json -Compress -Depth 3
@@ -135,3 +153,5 @@ if ($Json) {
     Write-Host ""
     Write-Host "[uninit] Next: $nextStep"
 }
+
+if ($errors.Count -gt 0) { exit 1 }
