@@ -51,18 +51,18 @@ function Remove-Path([string]$path) {
     try {
         Remove-Item $path -Recurse -Force -ErrorAction Stop
         if (Test-Path $path) {
-            $msg = "failed to remove $rel"
+            $msg = "failed to remove $rel — check that no process is holding files inside it, then delete '$rel' manually before running ``tessl uninstall``"
             $errors.Add($msg) | Out-Null
             [Console]::Error.WriteLine("[uninit] ERROR: $msg")
             return
         }
         $removed.Add($rel) | Out-Null
     } catch [System.UnauthorizedAccessException] {
-        $msg = "permission denied removing ${rel}: $($_.Exception.Message)"
+        $msg = "permission denied removing ${rel} ($($_.Exception.Message)) — re-run elevated (Run as Administrator) or grant write access on the parent directory, then re-run ``/iikit-core uninit``"
         $errors.Add($msg) | Out-Null
         [Console]::Error.WriteLine("[uninit] ERROR: $msg")
     } catch [System.IO.IOException] {
-        $msg = "I/O error removing ${rel}: $($_.Exception.Message)"
+        $msg = "I/O error removing ${rel} ($($_.Exception.Message)) — close any process or editor that has '$rel' open, then re-run ``/iikit-core uninit``"
         $errors.Add($msg) | Out-Null
         [Console]::Error.WriteLine("[uninit] ERROR: $msg")
     }
@@ -98,11 +98,11 @@ function Strip-ChainCall([string]$hookName) {
         Set-Content -Path $hook -Value $out -ErrorAction Stop
         $removed.Add("$rel (stripped iikit chain-call)") | Out-Null
     } catch [System.UnauthorizedAccessException] {
-        $msg = "permission denied rewriting ${rel}: $($_.Exception.Message)"
+        $msg = "permission denied rewriting ${rel} ($($_.Exception.Message)) — re-run elevated or grant write access on the .git/hooks directory, then re-run ``/iikit-core uninit``"
         $errors.Add($msg) | Out-Null
         [Console]::Error.WriteLine("[uninit] ERROR: $msg")
     } catch [System.IO.IOException] {
-        $msg = "I/O error rewriting ${rel}: $($_.Exception.Message)"
+        $msg = "I/O error rewriting ${rel} ($($_.Exception.Message)) — close any editor with '$rel' open and check disk space, then re-run ``/iikit-core uninit``"
         $errors.Add($msg) | Out-Null
         [Console]::Error.WriteLine("[uninit] ERROR: $msg")
     }

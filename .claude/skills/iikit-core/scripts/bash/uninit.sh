@@ -83,7 +83,7 @@ remove_file() {
         if rm -f "$path" 2>/dev/null && [[ ! -e "$path" && ! -L "$path" ]]; then
             record_remove "$rel"
         else
-            record_error "failed to remove $rel"
+            record_error "failed to remove $rel — check that you have write permission on the parent directory, then delete '$rel' manually before running \`tessl uninstall\`"
         fi
     fi
 }
@@ -99,7 +99,7 @@ remove_dir() {
         if rm -rf "$path" 2>/dev/null && [[ ! -d "$path" ]]; then
             record_remove "$rel"
         else
-            record_error "failed to remove $rel"
+            record_error "failed to remove $rel — close any process holding files inside it, check directory permissions, then delete '$rel' manually before running \`tessl uninstall\`"
         fi
     fi
 }
@@ -121,7 +121,7 @@ strip_chain_call() {
 
     local tmp
     if ! tmp="$(mktemp 2>/dev/null)"; then
-        record_error "failed to allocate temp file while rewriting $rel"
+        record_error "could not create temp file while rewriting $rel — check that \$TMPDIR (or /tmp) is writable and has free space, then re-run \`/iikit-core uninit\`"
         return 1
     fi
 
@@ -132,18 +132,18 @@ strip_chain_call() {
         { print }
     ' "$hook" > "$tmp" 2>/dev/null; then
         rm -f "$tmp"
-        record_error "failed to filter $rel"
+        record_error "awk failed while filtering $rel — strip the '# IIKit assertion integrity check' block and the following iikit-$hook_name call line by hand, then re-run \`/iikit-core uninit\`"
         return 1
     fi
 
     if ! mv "$tmp" "$hook" 2>/dev/null; then
         rm -f "$tmp"
-        record_error "failed to overwrite $rel"
+        record_error "could not overwrite $rel — check write permission on the .git/hooks directory, then re-run \`/iikit-core uninit\`"
         return 1
     fi
 
     if ! chmod +x "$hook" 2>/dev/null; then
-        record_error "failed to restore exec bit on $rel"
+        record_error "could not restore exec bit on $rel — run \`chmod +x $rel\` manually so the hook still fires on commit"
         return 1
     fi
 
