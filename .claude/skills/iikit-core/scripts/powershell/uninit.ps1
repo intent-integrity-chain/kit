@@ -76,22 +76,28 @@ function Strip-ChainCall([string]$hookName) {
         return
     }
 
-    $lines = Get-Content $hook
-    $out = New-Object System.Collections.Generic.List[string]
-    $skip = 0
-    foreach ($line in $lines) {
-        if ($skip -eq 0 -and $line -eq "# IIKit assertion integrity check") {
-            $skip = 2
-            continue
+    try {
+        $lines = Get-Content $hook -ErrorAction Stop
+        $out = New-Object System.Collections.Generic.List[string]
+        $skip = 0
+        foreach ($line in $lines) {
+            if ($skip -eq 0 -and $line -eq "# IIKit assertion integrity check") {
+                $skip = 2
+                continue
+            }
+            if ($skip -gt 0 -and ($line -match "iikit-$hookName" -or $line -eq "")) {
+                $skip--
+                continue
+            }
+            $out.Add($line) | Out-Null
         }
-        if ($skip -gt 0 -and ($line -match "iikit-$hookName" -or $line -eq "")) {
-            $skip--
-            continue
-        }
-        $out.Add($line) | Out-Null
+        Set-Content -Path $hook -Value $out -ErrorAction Stop
+        $removed.Add("$rel (stripped iikit chain-call)") | Out-Null
+    } catch {
+        $msg = "failed to rewrite ${rel}: $($_.Exception.Message)"
+        $errors.Add($msg) | Out-Null
+        [Console]::Error.WriteLine("[uninit] ERROR: $msg")
     }
-    Set-Content -Path $hook -Value $out
-    $removed.Add("$rel (stripped iikit chain-call)") | Out-Null
 }
 
 function Handle-Hook([string]$hookName, [string]$marker) {

@@ -110,25 +110,44 @@ remove_dir() {
 strip_chain_call() {
     local hook="$1"
     local hook_name="$2"
+    local rel="${hook#"$REPO_ROOT/"}"
     [[ -f "$hook" ]] || return 0
     grep -q "iikit-$hook_name" "$hook" 2>/dev/null || return 0
 
     if $DRY_RUN; then
-        record_remove "${hook#"$REPO_ROOT/"} (stripped iikit chain-call)"
+        record_remove "$rel (stripped iikit chain-call)"
         return 0
     fi
 
     local tmp
-    tmp="$(mktemp)"
-    awk -v name="iikit-$hook_name" '
+    if ! tmp="$(mktemp 2>/dev/null)"; then
+        record_error "failed to allocate temp file while rewriting $rel"
+        return 1
+    fi
+
+    if ! awk -v name="iikit-$hook_name" '
         /^# IIKit assertion integrity check$/ { skip = 2; next }
         skip > 0 && $0 ~ name { skip--; next }
         skip > 0 && /^$/      { skip--; next }
         { print }
-    ' "$hook" > "$tmp"
-    mv "$tmp" "$hook"
-    chmod +x "$hook"
-    record_remove "${hook#"$REPO_ROOT/"} (stripped iikit chain-call)"
+    ' "$hook" > "$tmp" 2>/dev/null; then
+        rm -f "$tmp"
+        record_error "failed to filter $rel"
+        return 1
+    fi
+
+    if ! mv "$tmp" "$hook" 2>/dev/null; then
+        rm -f "$tmp"
+        record_error "failed to overwrite $rel"
+        return 1
+    fi
+
+    if ! chmod +x "$hook" 2>/dev/null; then
+        record_error "failed to restore exec bit on $rel"
+        return 1
+    fi
+
+    record_remove "$rel (stripped iikit chain-call)"
 }
 
 # Hook handling: marker-owned hooks deleted outright; otherwise strip chain-call.
