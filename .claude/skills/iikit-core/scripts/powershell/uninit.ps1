@@ -57,8 +57,12 @@ function Remove-Path([string]$path) {
             return
         }
         $removed.Add($rel) | Out-Null
-    } catch {
-        $msg = "failed to remove ${rel}: $($_.Exception.Message)"
+    } catch [System.UnauthorizedAccessException] {
+        $msg = "permission denied removing ${rel}: $($_.Exception.Message)"
+        $errors.Add($msg) | Out-Null
+        [Console]::Error.WriteLine("[uninit] ERROR: $msg")
+    } catch [System.IO.IOException] {
+        $msg = "I/O error removing ${rel}: $($_.Exception.Message)"
         $errors.Add($msg) | Out-Null
         [Console]::Error.WriteLine("[uninit] ERROR: $msg")
     }
@@ -93,8 +97,12 @@ function Strip-ChainCall([string]$hookName) {
         }
         Set-Content -Path $hook -Value $out -ErrorAction Stop
         $removed.Add("$rel (stripped iikit chain-call)") | Out-Null
-    } catch {
-        $msg = "failed to rewrite ${rel}: $($_.Exception.Message)"
+    } catch [System.UnauthorizedAccessException] {
+        $msg = "permission denied rewriting ${rel}: $($_.Exception.Message)"
+        $errors.Add($msg) | Out-Null
+        [Console]::Error.WriteLine("[uninit] ERROR: $msg")
+    } catch [System.IO.IOException] {
+        $msg = "I/O error rewriting ${rel}: $($_.Exception.Message)"
         $errors.Add($msg) | Out-Null
         [Console]::Error.WriteLine("[uninit] ERROR: $msg")
     }
