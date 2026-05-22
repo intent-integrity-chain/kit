@@ -1,0 +1,137 @@
+#!/usr/bin/env pwsh
+# Remove intent-integrity-kit scaffolding from a project so `tessl uninstall`
+# does not leave broken hooks, orphaned `.specify/`, or stale tile artifacts behind.
+# Run BEFORE `tessl uninstall tessl-labs/intent-integrity-kit`.
+[CmdletBinding()]
+param(
+    [Alias('j')]
+    [switch]$Json,
+    [switch]$DryRun,
+    [switch]$RemoveUserContent,
+    [Alias('h')]
+    [switch]$Help
+)
+
+$ErrorActionPreference = 'Stop'
+
+if ($Help) {
+    Write-Host "Usage: ./uninit.ps1 [-Json] [-DryRun] [-RemoveUserContent]"
+    Write-Host ""
+    Write-Host "Remove iikit scaffolding before tessl uninstall."
+    Write-Host ""
+    Write-Host "Options:"
+    Write-Host "  -Json                 Output JSON"
+    Write-Host "  -DryRun               Report what would change without modifying anything"
+    Write-Host "  -RemoveUserContent    Also delete CONSTITUTION.md, PREMISE.md, specs/"
+    exit 0
+}
+
+$repoRoot = (Get-Location).Path
+$hooksDir = Join-Path $repoRoot ".git/hooks"
+
+$removed = New-Object System.Collections.Generic.List[string]
+$userContent = New-Object System.Collections.Generic.List[string]
+
+function To-Relative([string]$abs) {
+    return $abs.Substring($repoRoot.Length).TrimStart([char]'/', [char]'\')
+}
+
+function Remove-Path([string]$path) {
+    if (Test-Path $path) {
+        if (-not $DryRun) { Remove-Item $path -Recurse -Force -ErrorAction SilentlyContinue }
+        $removed.Add((To-Relative $path)) | Out-Null
+    }
+}
+
+function Strip-ChainCall([string]$hookName) {
+    $hook = Join-Path $hooksDir $hookName
+    if (-not (Test-Path $hook)) { return }
+    $content = Get-Content $hook -Raw -ErrorAction SilentlyContinue
+    if ($content -notmatch "iikit-$hookName") { return }
+
+    $rel = To-Relative $hook
+    if ($DryRun) {
+        $removed.Add("$rel (stripped iikit chain-call)") | Out-Null
+        return
+    }
+
+    $lines = Get-Content $hook
+    $out = New-Object System.Collections.Generic.List[string]
+    $skip = 0
+    foreach ($line in $lines) {
+        if ($skip -eq 0 -and $line -eq "# IIKit assertion integrity check") {
+            $skip = 2
+            continue
+        }
+        if ($skip -gt 0 -and ($line -match "iikit-$hookName" -or $line -eq "")) {
+            $skip--
+            continue
+        }
+        $out.Add($line) | Out-Null
+    }
+    Set-Content -Path $hook -Value $out
+    $removed.Add("$rel (stripped iikit chain-call)") | Out-Null
+}
+
+function Handle-Hook([string]$hookName, [string]$marker) {
+    $hook = Join-Path $hooksDir $hookName
+    if ((Test-Path $hook) -and ((Get-Content $hook -Raw -ErrorAction SilentlyContinue) -match $marker)) {
+        Remove-Path $hook
+    } else {
+        Strip-ChainCall $hookName
+    }
+    Remove-Path (Join-Path $hooksDir "iikit-$hookName")
+}
+
+if (Test-Path $hooksDir) {
+    Handle-Hook "pre-commit"  "IIKIT-PRE-COMMIT"
+    Handle-Hook "post-commit" "IIKIT-POST-COMMIT"
+}
+
+Remove-Path (Join-Path $repoRoot ".specify")
+
+$techMd = Join-Path $repoRoot "TECH.md"
+if ((Test-Path $techMd) -and ((Get-Content $techMd -Raw -ErrorAction SilentlyContinue) -match '/iikit-\d{2}-')) {
+    Remove-Path $techMd
+}
+
+function Check-UserContent([string]$path) {
+    if (Test-Path $path) {
+        if ($RemoveUserContent) {
+            Remove-Path $path
+        } else {
+            $userContent.Add((To-Relative $path)) | Out-Null
+        }
+    }
+}
+
+Check-UserContent (Join-Path $repoRoot "CONSTITUTION.md")
+Check-UserContent (Join-Path $repoRoot "PREMISE.md")
+Check-UserContent (Join-Path $repoRoot "specs")
+
+$nextStep = "tessl uninstall tessl-labs/intent-integrity-kit"
+
+if ($Json) {
+    $result = [ordered]@{
+        dry_run      = [bool]$DryRun
+        removed      = @($removed)
+        user_content = @($userContent)
+        next_step    = $nextStep
+    }
+    $result | ConvertTo-Json -Compress -Depth 3
+} else {
+    if ($DryRun) { Write-Host "[uninit] DRY RUN — no files changed" }
+    if ($removed.Count -gt 0) {
+        Write-Host "[uninit] Removed:"
+        foreach ($p in $removed) { Write-Host "  - $p" }
+    } else {
+        Write-Host "[uninit] No tile-managed scaffolding found."
+    }
+    if ($userContent.Count -gt 0) {
+        Write-Host ""
+        Write-Host "[uninit] User-authored content kept (re-run with -RemoveUserContent to delete):"
+        foreach ($p in $userContent) { Write-Host "  - $p" }
+    }
+    Write-Host ""
+    Write-Host "[uninit] Next: $nextStep"
+}

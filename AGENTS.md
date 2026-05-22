@@ -10,7 +10,7 @@ Intent Integrity Kit (IIKit) preserves your intent from idea to implementation t
 
 This project uses specification-driven development. The phases are:
 
-**Utility:** `/iikit-core` - Initialize project (git/GitHub setup, PRD seeding), check status, select active feature, show help (run `init` before starting)
+**Utility:** `/iikit-core` - Initialize project (git/GitHub setup, PRD seeding), uninit before `tessl uninstall`, check status, select active feature, show help (run `init` before starting)
 **Utility:** `/iikit-clarify` - Resolve ambiguities in any artifact (spec, plan, checklist, testify, tasks, constitution) — runnable after any phase
 **Utility:** `/iikit-bugfix` - Report and fix bugs without full specification workflow
 
@@ -92,7 +92,7 @@ chmod +x .claude/skills/iikit-core/scripts/bash/*.sh
 
 | Skill | Command | Description |
 |-------|---------|-------------|
-| Core | `/iikit-core` | Initialize project (git/GitHub setup, PRD seeding), check status, select feature, show help |
+| Core | `/iikit-core` | Initialize project, uninit before `tessl uninstall`, check status, select feature, show help |
 | Clarify | `/iikit-clarify` | Resolve ambiguities in any artifact (utility, runnable after any phase) |
 | Bugfix | `/iikit-bugfix` | Report and fix bugs without full specification workflow |
 | Constitution | `/iikit-00-constitution` | Create project governance principles |

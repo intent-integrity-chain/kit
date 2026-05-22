@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Features
+- **`/iikit-core uninit` subcommand** (#62): New action that removes iikit-managed scaffolding (`.git/hooks/pre-commit`/`post-commit` IIKit blocks, alongside `iikit-*` hooks, chain-call lines in user hooks, `.specify/`, `TECH.md` when it carries an iikit phase reference) and reports user-authored content (`CONSTITUTION.md`, `PREMISE.md`, `specs/`) so the user decides. Run it BEFORE `tessl uninstall tessl-labs/intent-integrity-kit` to avoid orphaned hooks and stale tile artifacts. Supports `--dry-run` and `--remove-user-content`. BATS + Pester coverage.
+
 ### Bug Fixes
 - **Symlinked `tests/features/` not traversed by `find`** (#59): Every `find` over `.feature` files in `iikit-core` scripts (`check-prerequisites.sh`, `pre-commit-hook.sh`, `bugfix-helpers.sh`, `verify-assertion-integrity.sh`, `verify-steps.sh`) now passes `-L` so a symlinked `tests/features/` directory (e.g., Maven layout where it points to `src/test/resources/features/`) is followed. Previously the testify gate falsely reported `"features": false` and blocked phases 05–08 even when `.feature` files existed.
 
