@@ -72,6 +72,10 @@ function Strip-ChainCall([string]$hookName) {
     $hook = Join-Path $hooksDir $hookName
     if (-not (Test-Path $hook)) { return }
     $content = Get-Content $hook -Raw -ErrorAction SilentlyContinue
+    # Require BOTH the marker comment and the chain-call line — a hook that
+    # merely mentions `iikit-pre-commit` in a comment must not be treated
+    # as iikit-managed and rewritten.
+    if ($content -cnotmatch '# IIKit assertion integrity check') { return }
     if ($content -cnotmatch "iikit-$hookName") { return }
 
     $rel = To-Relative $hook

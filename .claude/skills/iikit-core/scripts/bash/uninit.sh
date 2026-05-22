@@ -112,6 +112,11 @@ strip_chain_call() {
     local hook_name="$2"
     local rel="${hook#"$REPO_ROOT/"}"
     [[ -f "$hook" ]] || return 0
+    # Require BOTH the marker comment line and the chain-call invocation.
+    # Gating on the call line alone would flag a user hook that merely
+    # mentions `iikit-pre-commit` in a comment, leading to a misleading
+    # `(stripped iikit chain-call)` report on a file the script did not change.
+    grep -qF '# IIKit assertion integrity check' "$hook" 2>/dev/null || return 0
     grep -q "iikit-$hook_name" "$hook" 2>/dev/null || return 0
 
     if $DRY_RUN; then
