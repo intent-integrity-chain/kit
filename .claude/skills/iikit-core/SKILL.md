@@ -1,8 +1,8 @@
 ---
 name: iikit-core
 description: >-
-  Initialize an IIKit (Intent Integrity Kit) project, check IIKit feature progress, select the active IIKit feature, and display the IIKit workflow command reference.
-  Use when starting a new IIKit project, running IIKit init or setup, checking IIKit status, switching between IIKit features, looking up IIKit available commands and phases, or asking for help with the IIKit workflow.
+  Initialize an IIKit (Intent Integrity Kit) project, uninit (remove IIKit scaffolding before `tessl uninstall`), check IIKit feature progress, select the active IIKit feature, and display the IIKit workflow command reference.
+  Use when starting a new IIKit project, running IIKit init or setup, uninstalling/removing/uninit-ing IIKit before running `tessl uninstall`, checking IIKit status, switching between IIKit features, looking up IIKit available commands and phases, or asking for help with the IIKit workflow.
 license: MIT
 metadata:
   version: "1.6.4"
@@ -25,7 +25,8 @@ Parse the user input to determine which subcommand to execute.
 1. **init** - Initialize intent-integrity-kit in a new or existing project
 2. **status** - Show current project and feature status
 3. **use** - Select the active feature for multi-feature projects
-4. **help** - Display workflow phases and command reference
+4. **uninit** - Remove iikit scaffolding before `tessl uninstall`
+5. **help** - Display workflow phases and command reference
 
 If no subcommand is provided, show help.
 
@@ -138,6 +139,29 @@ The `$ARGUMENTS` after `use` is the feature selector: a number (`1`, `001`), par
 2. **Report** active feature, stage, and suggest next command: `specified` → `/iikit-clarify` or `/iikit-02-plan` | `planned` → `/iikit-03-checklist` or `/iikit-05-tasks` | `testified` → `/iikit-05-tasks` | `tasks-ready` → `/iikit-07-implement` | `implementing-NN%` → `/iikit-07-implement` (resume) | `complete` → done. Suggest `/clear` before next skill when appropriate.
 
 If no selector, no match, or ambiguous match: show available features with stages and ask user to pick.
+
+## Subcommand: uninit
+
+Remove iikit-managed scaffolding from the project so `tessl uninstall tessl-labs/intent-integrity-kit` does not leave broken hooks or orphaned tile artifacts behind. Run this BEFORE `tessl uninstall` — once the tile is gone, the skill (and this script) are no longer reachable.
+
+### Execution Flow
+
+1. Run the dry-run preview:
+   ```bash
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/uninit.sh --dry-run --json
+   # Windows: pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/uninit.ps1 -DryRun -Json
+   ```
+   Parse JSON for `removed` (tile-managed scaffolding the script will delete or strip — `.git/hooks/pre-commit`/`post-commit` IIKit blocks, `.specify/`, `TECH.md` when it carries an iikit phase reference) and `user_content` (paths the caller decides on — `CONSTITUTION.md`, `PREMISE.md`, `specs/`).
+
+2. **Present results and confirm.** Show the `removed` and `user_content` lists. Ask whether to also delete the user-authored content. Default is to keep it — these files often outlive the tile (constitutions and feature specs encode real project decisions).
+
+3. Run the uninstaller. Pass `--remove-user-content` only if the user opted to delete the user-authored files at step 2.
+   ```bash
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/uninit.sh --json [--remove-user-content]
+   # Windows: pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/uninit.ps1 -Json [-RemoveUserContent]
+   ```
+
+4. **Report next command.** Show the literal `next_step` from the JSON output: `tessl uninstall tessl-labs/intent-integrity-kit`. The script does not invoke `tessl uninstall` itself — that's a separate tool the user runs after this skill finishes.
 
 ## Subcommand: help (also default when no subcommand)
 

@@ -106,7 +106,7 @@ Each phase builds on the previous. Never skip phases.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│  /iikit-core               →  Initialize project, status, help             │
+│  /iikit-core               →  Initialize/uninit project, status, help      │
 │  /iikit-clarify            →  Resolve ambiguities (any artifact, any time) │
 │  /iikit-bugfix             →  Report and fix bugs                          │
 ├────────────────────────────────────────────────────────────────────────────┤
