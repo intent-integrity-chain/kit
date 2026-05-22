@@ -146,31 +146,22 @@ Remove iikit-managed scaffolding from the project so `tessl uninstall tessl-labs
 
 ### Execution Flow
 
-#### Step 1 — Preview what would be removed
+1. Run the dry-run preview:
+   ```bash
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/uninit.sh --dry-run --json
+   # Windows: pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/uninit.ps1 -DryRun -Json
+   ```
+   Parse JSON for `removed` (tile-managed scaffolding the script will delete or strip — `.git/hooks/pre-commit`/`post-commit` IIKit blocks, `.specify/`, `TECH.md` when it carries an iikit phase reference) and `user_content` (paths the caller decides on — `CONSTITUTION.md`, `PREMISE.md`, `specs/`).
 
-```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/uninit.sh --dry-run --json
-# Windows: pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/uninit.ps1 -DryRun -Json
-```
+2. **Present results and confirm.** Show the `removed` and `user_content` lists. Ask whether to also delete the user-authored content. Default is to keep it — these files often outlive the tile (constitutions and feature specs encode real project decisions).
 
-Parse JSON for `removed` (tile-managed scaffolding the script will delete or strip — `.git/hooks/pre-commit`/`post-commit` IIKit blocks, `.specify/`, `TECH.md` when it carries an iikit phase reference) and `user_content` (paths the caller decides on — `CONSTITUTION.md`, `PREMISE.md`, `specs/`).
+3. Run the uninstaller. Pass `--remove-user-content` only if the user opted to delete the user-authored files at step 2.
+   ```bash
+   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/uninit.sh --json [--remove-user-content]
+   # Windows: pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/uninit.ps1 -Json [-RemoveUserContent]
+   ```
 
-#### Step 2 — Confirm with the user
-
-Present the `removed` and `user_content` lists. Ask whether to also delete the user-authored content. Default is to keep it — these files often outlive the tile (constitutions and feature specs encode real project decisions).
-
-#### Step 3 — Run the uninstaller
-
-```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/uninit.sh --json [--remove-user-content]
-# Windows: pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/uninit.ps1 -Json [-RemoveUserContent]
-```
-
-Pass `--remove-user-content` only when the user opted to delete the user-authored files in Step 2.
-
-#### Step 4 — Tell the user the next command
-
-Show the literal `next_step` from the JSON output: `tessl uninstall tessl-labs/intent-integrity-kit`. The script does not invoke `tessl uninstall` itself — that's a separate tool the user runs after this skill finishes.
+4. **Report next command.** Show the literal `next_step` from the JSON output: `tessl uninstall tessl-labs/intent-integrity-kit`. The script does not invoke `tessl uninstall` itself — that's a separate tool the user runs after this skill finishes.
 
 ## Subcommand: help (also default when no subcommand)
 
