@@ -2,7 +2,7 @@
 
 IIKit's pre-commit hook enforces assertion integrity. By default it lives at `.git/hooks/pre-commit`; if you had an existing pre-commit hook at install time, IIKit installs to `.git/hooks/iikit-pre-commit` and your hook chain-calls it. To layer additional checks (formatters, linters, secret scanners) without disturbing that enforcement, use the `.git/hooks/pre-commit.d/` extension point.
 
-> **Linked worktrees / submodules**: `/iikit-core init` and `/iikit-core uninit` run against the main checkout (where `.git` is a directory). Commits from a linked worktree fire the main repo's pre-commit hook, which resolves `pre-commit.d/` via `git rev-parse --git-path hooks` and works correctly from any worktree. See issue #67 for full worktree support across install/uninit.
+> **Linked worktrees / submodules**: `/iikit-core init` and `/iikit-core uninit` resolve the hooks dir via `git rev-parse --git-path hooks`, so running them from a worktree installs to (and removes from) the gitdir's `hooks/` — the main repo's `.git/hooks/` for worktrees, `.git/modules/<name>/hooks/` for submodules. All worktrees of a given repo share the same hooks dir by design; install once from any of them.
 
 ## How It Works
 

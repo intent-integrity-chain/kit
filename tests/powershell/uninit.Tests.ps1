@@ -248,3 +248,53 @@ Describe "uninit: pre-commit.d handling" {
         (Test-Path $script:PreCommitD) | Should -BeTrue
     }
 }
+
+Describe "uninit: linked-worktree support" {
+    BeforeEach {
+        $script:TestDir = New-TestDirectory
+        Remove-Item (Join-Path $script:TestDir "CONSTITUTION.md") -Force -ErrorAction SilentlyContinue
+    }
+
+    AfterEach {
+        Remove-TestDirectory -TestDir $script:TestDir
+    }
+
+    It "removes hooks from the main repo's hooks dir when run from a worktree" {
+        # Set up main + worktree
+        $mainDir = Join-Path $script:TestDir "main"
+        $wtDir = Join-Path $script:TestDir "wt"
+        New-Item -ItemType Directory -Path $mainDir -Force | Out-Null
+
+        Push-Location $mainDir
+        git init -q . 2>&1 | Out-Null
+        git config user.email "test@test.com"
+        git config user.name "Test"
+        git commit -q --allow-empty -m "init" 2>&1 | Out-Null
+        git worktree add -q $wtDir -b feature 2>&1 | Out-Null
+        Pop-Location
+
+        # Install an IIKit-marker pre-commit hook directly into the main repo's hooks dir
+        $mainHooks = Join-Path $mainDir ".git/hooks"
+        $preCommit = Join-Path $mainHooks "pre-commit"
+        @(
+            "#!/usr/bin/env bash"
+            "# IIKIT-PRE-COMMIT"
+            "echo iikit-pre-commit"
+        ) | Set-Content $preCommit
+
+        # Provision pre-commit.d/ with the IIKit-marker README
+        $preCommitD = Join-Path $mainHooks "pre-commit.d"
+        New-Item -ItemType Directory -Path $preCommitD -Force | Out-Null
+        "# IIKit pre-commit extension point — IIKIT-PRE-COMMIT-D" |
+            Set-Content (Join-Path $preCommitD "README")
+
+        # Run uninit from inside the worktree
+        Push-Location $wtDir
+        $result = & $script:UninitScript -Json | Out-String
+        Pop-Location
+
+        # Hooks gone from main repo's hooks dir
+        (Test-Path $preCommit) | Should -Be $false
+        (Test-Path (Join-Path $preCommitD "README")) | Should -Be $false
+    }
+}

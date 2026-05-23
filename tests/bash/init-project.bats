@@ -194,3 +194,56 @@ teardown() {
     [[ "$status" -eq 0 ]]
     [[ -x ".git/hooks/pre-commit.d/prettier" ]]
 }
+
+# =============================================================================
+# Linked-worktree support
+# =============================================================================
+
+@test "init-project: installs hooks at the main repo's hooks dir when run from a linked worktree" {
+    # Build a main repo + add a linked worktree
+    git init -q "$TEST_DIR/main"
+    git -C "$TEST_DIR/main" config user.email "test@test.com"
+    git -C "$TEST_DIR/main" config user.name "Test"
+    git -C "$TEST_DIR/main" commit -q --allow-empty -m "init"
+    git -C "$TEST_DIR/main" worktree add -q "$TEST_DIR/wt" -b feature
+
+    cd "$TEST_DIR/wt"
+    mkdir -p .specify
+
+    run "$INIT_SCRIPT" --json
+    [[ "$status" -eq 0 ]]
+
+    # Hooks land in the main repo's hooks dir, not the worktree's `.git` (which is a file)
+    [[ -f "$TEST_DIR/main/.git/hooks/pre-commit" ]]
+    [[ -f "$TEST_DIR/main/.git/hooks/pre-commit.d/README" ]]
+    grep -q "IIKIT-PRE-COMMIT" "$TEST_DIR/main/.git/hooks/pre-commit"
+
+    # JSON reports the install succeeded (no silent skip)
+    assert_contains "$output" '"hook_installed":true'
+    assert_contains "$output" '"pre_commit_d_provisioned":true'
+
+    # Worktree's `.git` file is untouched
+    [[ -f "$TEST_DIR/wt/.git" ]]
+}
+
+@test "uninit: removes hooks from the main repo's hooks dir when run from a linked worktree" {
+    git init -q "$TEST_DIR/main"
+    git -C "$TEST_DIR/main" config user.email "test@test.com"
+    git -C "$TEST_DIR/main" config user.name "Test"
+    git -C "$TEST_DIR/main" commit -q --allow-empty -m "init"
+    git -C "$TEST_DIR/main" worktree add -q "$TEST_DIR/wt" -b feature
+
+    cd "$TEST_DIR/wt"
+    mkdir -p .specify
+    "$INIT_SCRIPT" >/dev/null
+
+    # Sanity: hooks went to main
+    [[ -f "$TEST_DIR/main/.git/hooks/pre-commit" ]]
+
+    UNINIT_SCRIPT="$SCRIPTS_DIR/uninit.sh"
+    run "$UNINIT_SCRIPT" --json
+    [[ "$status" -eq 0 ]]
+
+    [[ ! -f "$TEST_DIR/main/.git/hooks/pre-commit" ]]
+    [[ ! -d "$TEST_DIR/main/.git/hooks/pre-commit.d" ]]
+}

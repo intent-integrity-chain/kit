@@ -31,14 +31,34 @@ if ($Help) {
 $repoRoot = git rev-parse --show-toplevel 2>$null
 if (-not $repoRoot) { $repoRoot = (Get-Location).Path }
 $repoRoot = (Resolve-Path $repoRoot).Path
-$hooksDir = Join-Path $repoRoot ".git/hooks"
+
+# Resolve hooks directory via `git rev-parse --git-path hooks` so linked
+# worktrees and submodules (where `.git` is a file pointing at the gitdir)
+# find the real hooks dir — typically the main repo's `.git/hooks/` or
+# `.git/modules/<name>/hooks/` for submodules.
+$hooksRel = git -C $repoRoot rev-parse --git-path hooks 2>$null
+if ($hooksRel) {
+    if ([System.IO.Path]::IsPathRooted($hooksRel)) {
+        $hooksDir = $hooksRel
+    } else {
+        $hooksDir = Join-Path $repoRoot $hooksRel
+    }
+} else {
+    $hooksDir = Join-Path $repoRoot ".git/hooks"
+}
 
 $removed = New-Object System.Collections.Generic.List[string]
 $userContent = New-Object System.Collections.Generic.List[string]
 $errors = New-Object System.Collections.Generic.List[string]
 
 function To-Relative([string]$abs) {
-    return $abs.Substring($repoRoot.Length).TrimStart([char]'/', [char]'\')
+    # Strip the repoRoot prefix only when it actually matches; in worktrees /
+    # submodules the hooks dir resolves outside the working tree, so keep the
+    # absolute path rather than slicing arbitrary bytes off the front.
+    if ($abs.StartsWith($repoRoot, [System.StringComparison]::Ordinal)) {
+        return $abs.Substring($repoRoot.Length).TrimStart([char]'/', [char]'\')
+    }
+    return $abs
 }
 
 function Remove-Path([string]$path) {

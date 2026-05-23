@@ -56,7 +56,17 @@ for arg in "$@"; do
 done
 
 REPO_ROOT="$(get_repo_root)"
-HOOKS_DIR="$REPO_ROOT/.git/hooks"
+
+# Resolve hooks directory via `git rev-parse --git-path hooks` so linked
+# worktrees and submodules (where `.git` is a file pointing at the gitdir)
+# find the real hooks dir — typically the main repo's `.git/hooks/` or
+# `.git/modules/<name>/hooks/` for submodules.
+HOOKS_REL="$(git -C "$REPO_ROOT" rev-parse --git-path hooks 2>/dev/null)"
+case "$HOOKS_REL" in
+    /*) HOOKS_DIR="$HOOKS_REL" ;;
+    "") HOOKS_DIR="$REPO_ROOT/.git/hooks" ;;
+    *)  HOOKS_DIR="$REPO_ROOT/$HOOKS_REL" ;;
+esac
 
 REMOVED=()
 USER_CONTENT=()
@@ -177,8 +187,8 @@ fi
 # pre-commit.d/: remove our IIKIT-PRE-COMMIT-D README; report everything else as
 # user content; drop the dir only when truly empty. `find` includes dotfiles so
 # stray `.keep` / editor scratch files don't get silently rm -rf'd. Uses the
-# same `$HOOKS_DIR` as the hook removal above to stay in lockstep — see #67
-# for cross-script worktree handling.
+# same `$HOOKS_DIR` as the hook removal above — both are git-resolved so they
+# stay in lockstep across main checkouts, linked worktrees, and submodules.
 PRECOMMIT_D="$HOOKS_DIR/pre-commit.d"
 if [[ -d "$PRECOMMIT_D" ]]; then
     PRECOMMIT_D_README="$PRECOMMIT_D/README"
@@ -202,7 +212,13 @@ if [[ -d "$PRECOMMIT_D" ]]; then
         if [[ "$PRECOMMIT_D_README_HANDLED" == true && "$entry" == "$PRECOMMIT_D_README" ]]; then
             continue
         fi
-        rel="${entry#"$REPO_ROOT/"}"
+        # Strip REPO_ROOT prefix when applicable; otherwise keep the absolute
+        # path (worktrees/submodules: hooks dir lives outside the working tree).
+        if [[ "$entry" == "$REPO_ROOT"/* ]]; then
+            rel="${entry#"$REPO_ROOT/"}"
+        else
+            rel="$entry"
+        fi
         USER_CONTENT+=("$rel")
         remaining=$((remaining + 1))
     done < <(find "$PRECOMMIT_D" -mindepth 1 -maxdepth 1 -print 2>/dev/null)
