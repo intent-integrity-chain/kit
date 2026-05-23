@@ -132,6 +132,27 @@ if (Test-Path $hooksDir) {
     Handle-Hook "post-commit" "IIKIT-POST-COMMIT"
 }
 
+# pre-commit.d/: remove our IIKIT-PRE-COMMIT-D README; report user scripts; drop dir if empty.
+$preCommitD = Join-Path $hooksDir "pre-commit.d"
+if (Test-Path $preCommitD) {
+    $preCommitDReadme = Join-Path $preCommitD "README"
+    if (Test-Path $preCommitDReadme) {
+        $readmeContent = Get-Content $preCommitDReadme -Raw -ErrorAction SilentlyContinue
+        if ($readmeContent -match 'IIKIT-PRE-COMMIT-D') {
+            Remove-Path $preCommitDReadme
+        }
+    }
+    # Report user scripts remaining in the dir
+    $remainingEntries = @(Get-ChildItem -Path $preCommitD -Force -ErrorAction SilentlyContinue)
+    foreach ($entry in $remainingEntries) {
+        $userContent.Add((To-Relative $entry.FullName)) | Out-Null
+    }
+    # Drop the dir only if no user scripts remain
+    if ($remainingEntries.Count -eq 0) {
+        Remove-Path $preCommitD
+    }
+}
+
 Remove-Path (Join-Path $repoRoot ".specify")
 
 $techMd = Join-Path $repoRoot "TECH.md"

@@ -172,6 +172,7 @@ Display the workflow reference from [help-reference.md](references/help-referenc
 - [spec-template.md](templates/spec-template.md), [plan-template.md](templates/plan-template.md), [agent-file-template.md](templates/agent-file-template.md) — feature scaffolding
 - [prd-issue-template.md](templates/prd-issue-template.md) — PRD backlog seeding
 - [help-reference.md](references/help-reference.md) — workflow command reference
+- [hook-chaining.md](references/hook-chaining.md) — how to layer pre-commit checks via `.git/hooks/pre-commit.d/`
 
 ## Error Handling
 

@@ -174,6 +174,29 @@ if [[ -d "$HOOKS_DIR" ]]; then
     handle_hook "post-commit" "IIKIT-POST-COMMIT"
 fi
 
+# pre-commit.d/: remove our IIKIT-PRE-COMMIT-D README; report user scripts; drop dir if empty.
+PRECOMMIT_D="$HOOKS_DIR/pre-commit.d"
+if [[ -d "$PRECOMMIT_D" ]]; then
+    PRECOMMIT_D_README="$PRECOMMIT_D/README"
+    if [[ -f "$PRECOMMIT_D_README" ]] && grep -q 'IIKIT-PRE-COMMIT-D' "$PRECOMMIT_D_README" 2>/dev/null; then
+        remove_file "$PRECOMMIT_D_README"
+    fi
+    # Report user scripts (anything left in the dir, excluding dotfiles)
+    for entry in "$PRECOMMIT_D"/*; do
+        [[ -e "$entry" ]] || continue
+        rel="${entry#"$REPO_ROOT/"}"
+        USER_CONTENT+=("$rel")
+    done
+    # Drop the dir only if no user scripts remain
+    remaining=0
+    for entry in "$PRECOMMIT_D"/*; do
+        [[ -e "$entry" ]] && remaining=$((remaining + 1))
+    done
+    if [[ "$remaining" -eq 0 ]]; then
+        remove_dir "$PRECOMMIT_D"
+    fi
+fi
+
 remove_dir "$REPO_ROOT/.specify"
 
 # TECH.md: only remove when it carries an iikit phase reference.

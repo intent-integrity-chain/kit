@@ -185,3 +185,47 @@ Describe "uninit: JSON shape" {
         $result | Should -Match "tessl uninstall tessl-labs/intent-integrity-kit"
     }
 }
+
+Describe "uninit: pre-commit.d handling" {
+    BeforeEach {
+        $script:TestDir = New-TestDirectory
+        Push-Location $script:TestDir
+        Remove-Item "CONSTITUTION.md" -Force -ErrorAction SilentlyContinue
+        $script:PreCommitD = Join-Path $script:TestDir "$script:HooksSubdir/pre-commit.d"
+        New-Item -ItemType Directory -Path $script:PreCommitD -Force | Out-Null
+    }
+
+    AfterEach {
+        Pop-Location
+        Remove-TestDirectory -TestDir $script:TestDir
+    }
+
+    It "removes IIKit-managed README and empty pre-commit.d" {
+        "# IIKit pre-commit extension point — IIKIT-PRE-COMMIT-D" | Set-Content (Join-Path $script:PreCommitD "README")
+
+        $result = & $script:UninitScript -Json | Out-String
+
+        (Test-Path $script:PreCommitD) | Should -BeFalse
+        $result | Should -Match "pre-commit.d"
+    }
+
+    It "preserves user scripts and reports them" {
+        "# IIKit pre-commit extension point — IIKIT-PRE-COMMIT-D" | Set-Content (Join-Path $script:PreCommitD "README")
+        "#!/bin/sh" | Set-Content (Join-Path $script:PreCommitD "prettier")
+
+        $result = & $script:UninitScript -Json | Out-String
+
+        (Test-Path (Join-Path $script:PreCommitD "README")) | Should -BeFalse
+        (Test-Path (Join-Path $script:PreCommitD "prettier")) | Should -BeTrue
+        (Test-Path $script:PreCommitD) | Should -BeTrue
+        $result | Should -Match "prettier"
+    }
+
+    It "leaves a non-iikit README untouched" {
+        "# Team docs — not iikit-managed" | Set-Content (Join-Path $script:PreCommitD "README")
+
+        & $script:UninitScript -Json | Out-Null
+
+        (Test-Path (Join-Path $script:PreCommitD "README")) | Should -BeTrue
+    }
+}

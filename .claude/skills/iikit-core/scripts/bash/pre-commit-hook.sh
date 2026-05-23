@@ -19,6 +19,34 @@ if [[ -z "$REPO_ROOT" ]]; then
     exit 0
 fi
 
+# ============================================================================
+# EXTENSION HOOKS — run every executable in .git/hooks/pre-commit.d/
+# Fires on every successful IIKit exit (pass or no-op).
+# Skipped when IIKit blocks — extensions never see a partial pass.
+# ============================================================================
+
+run_pre_commit_d() {
+    local d_dir="$REPO_ROOT/.git/hooks/pre-commit.d"
+    [[ -d "$d_dir" ]] || return 0
+
+    local failed=0 ran=0
+    for ext in "$d_dir"/*; do
+        [[ -e "$ext" ]] || continue
+        # Skip our own README and any non-executable file
+        [[ -x "$ext" ]] || continue
+        # Skip dotfiles (keepfiles, editor scratch)
+        case "$(basename "$ext")" in .*) continue ;; esac
+
+        ran=$((ran + 1))
+        if ! "$ext"; then
+            echo "[iikit] Extension hook failed: ${ext#"$REPO_ROOT"/}" >&2
+            failed=1
+        fi
+    done
+
+    return $failed
+}
+
 SCRIPTS_DIR=""
 CANDIDATE_PATHS=(
     "$REPO_ROOT/.claude/skills/iikit-core/scripts/bash"
@@ -35,7 +63,8 @@ done
 
 if [[ -z "$SCRIPTS_DIR" ]]; then
     echo "[iikit] Warning: IIKit scripts not found — skipping assertion integrity check" >&2
-    exit 0
+    run_pre_commit_d
+    exit $?
 fi
 
 # ============================================================================
@@ -47,7 +76,8 @@ STAGED_TEST_SPECS=$(git diff --cached --name-only 2>/dev/null | grep 'test-specs
 STAGED_CODE_FILES=$(git diff --cached --name-only 2>/dev/null | grep -E '\.(py|js|ts|jsx|tsx|go|java|rs|cs|rb|kt)$' | grep -vE '^(\.tessl/|\.claude/|\.codex/|\.gemini/|\.opencode/|node_modules/)') || true
 
 if [[ -z "$STAGED_FEATURE_FILES" ]] && [[ -z "$STAGED_TEST_SPECS" ]] && [[ -z "$STAGED_CODE_FILES" ]]; then
-    exit 0
+    run_pre_commit_d
+    exit $?
 fi
 
 # ============================================================================
@@ -457,4 +487,5 @@ if [[ "$BLOCKED" == true ]]; then
     exit 1
 fi
 
-exit 0
+run_pre_commit_d
+exit $?

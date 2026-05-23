@@ -117,6 +117,43 @@ $postHookResult = Install-IIKitHook -HookType "post-commit" -SourceFile "post-co
 $postHookInstalled = $postHookResult.installed
 $postHookStatus = $postHookResult.status
 
+# Provision pre-commit.d/ extension point (user-supplied formatters, linters, etc.)
+$preCommitDProvisioned = $false
+if (Test-Path $gitDir) {
+    $preCommitDDir = Join-Path $gitDir "hooks/pre-commit.d"
+    if (-not (Test-Path $preCommitDDir)) {
+        New-Item -ItemType Directory -Path $preCommitDDir -Force | Out-Null
+    }
+    $preCommitDReadme = Join-Path $preCommitDDir "README"
+    if (-not (Test-Path $preCommitDReadme)) {
+        $readmeContent = @'
+# IIKit pre-commit extension point — IIKIT-PRE-COMMIT-D
+#
+# Drop executable scripts in this directory to extend the pre-commit chain
+# without modifying .git/hooks/pre-commit (which IIKit owns).
+#
+# Each executable in this dir runs AFTER IIKit's assertion-integrity checks
+# pass. Files are executed in lexical order. Non-executable files are
+# ignored. Dotfiles are ignored. This README is ignored (no exec bit).
+#
+# Examples:
+#   prettier-write   - bunx prettier --write on staged JS/TS files
+#   eslint-fix       - eslint --fix on staged sources
+#   secret-scan      - gitleaks protect --staged
+#
+# Each script receives no arguments. Use `git diff --cached --name-only` to
+# find staged files. Exit non-zero to block the commit.
+#
+# Note: this directory is per-clone (not tracked in git). To share extensions
+# across the team, commit your scripts under a tracked path (e.g.
+# scripts/git-hooks/) and symlink each into .git/hooks/pre-commit.d/
+# during onboarding.
+'@
+        Set-Content -Path $preCommitDReadme -Value $readmeContent -NoNewline
+        $preCommitDProvisioned = $true
+    }
+}
+
 # Commit constitution if requested and it exists
 $constitutionCommitted = $false
 $constitutionPath = Join-Path $projectRoot 'CONSTITUTION.md'
@@ -158,6 +195,7 @@ if ($Json) {
         hook_status = $hookStatus
         post_hook_installed = $postHookInstalled
         post_hook_status = $postHookStatus
+        pre_commit_d_provisioned = $preCommitDProvisioned
         project_root = $projectRoot.ToString()
     }
     $result | ConvertTo-Json -Compress
@@ -172,4 +210,7 @@ if ($Json) {
     }
     Report-HookStatus "Pre-commit" $hookStatus
     Report-HookStatus "Post-commit" $postHookStatus
+    if ($preCommitDProvisioned) {
+        Write-Output "[specify] Extension point created at .git/hooks/pre-commit.d/ (drop user-supplied hooks here)"
+    }
 }

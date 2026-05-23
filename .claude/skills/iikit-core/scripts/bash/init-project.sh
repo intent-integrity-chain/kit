@@ -134,6 +134,40 @@ install_hook "post-commit" "post-commit-hook.sh" "IIKIT-POST-COMMIT"
 POST_HOOK_INSTALLED="$RESULT_installed"
 POST_HOOK_STATUS="$RESULT_status"
 
+# Provision pre-commit.d/ extension point (user-supplied formatters, linters, etc.)
+PRECOMMIT_D_PROVISIONED=false
+if [ -d "$PROJECT_ROOT/.git" ]; then
+    PRECOMMIT_D_DIR="$PROJECT_ROOT/.git/hooks/pre-commit.d"
+    mkdir -p "$PRECOMMIT_D_DIR"
+    PRECOMMIT_D_README="$PRECOMMIT_D_DIR/README"
+    if [ ! -f "$PRECOMMIT_D_README" ]; then
+        cat > "$PRECOMMIT_D_README" <<'README_EOF'
+# IIKit pre-commit extension point — IIKIT-PRE-COMMIT-D
+#
+# Drop executable scripts in this directory to extend the pre-commit chain
+# without modifying .git/hooks/pre-commit (which IIKit owns).
+#
+# Each executable in this dir runs AFTER IIKit's assertion-integrity checks
+# pass. Files are executed in lexical order. Non-executable files are
+# ignored. Dotfiles are ignored. This README is ignored (no exec bit).
+#
+# Examples:
+#   prettier-write   - bunx prettier --write on staged JS/TS files
+#   eslint-fix       - eslint --fix on staged sources
+#   secret-scan      - gitleaks protect --staged
+#
+# Each script receives no arguments. Use `git diff --cached --name-only` to
+# find staged files. Exit non-zero to block the commit.
+#
+# Note: this directory is per-clone (not tracked in git). To share extensions
+# across the team, commit your scripts under a tracked path (e.g.
+# scripts/git-hooks/) and symlink each into .git/hooks/pre-commit.d/
+# during onboarding.
+README_EOF
+        PRECOMMIT_D_PROVISIONED=true
+    fi
+fi
+
 # Commit constitution if requested and it exists
 CONSTITUTION_COMMITTED=false
 if [ "$COMMIT_CONSTITUTION" = true ] && [ -f "$PROJECT_ROOT/CONSTITUTION.md" ]; then
@@ -173,8 +207,8 @@ report_hook_status() {
 }
 
 if $JSON_MODE; then
-    printf '{"success":true,"git_initialized":%s,"git_status":"%s","git_user_configured":%s,"constitution_committed":%s,"hook_installed":%s,"hook_status":"%s","post_hook_installed":%s,"post_hook_status":"%s","project_root":"%s"}\n' \
-        "$GIT_INITIALIZED" "$GIT_STATUS" "$GIT_USER_CONFIGURED" "$CONSTITUTION_COMMITTED" "$HOOK_INSTALLED" "$HOOK_STATUS" "$POST_HOOK_INSTALLED" "$POST_HOOK_STATUS" "$PROJECT_ROOT"
+    printf '{"success":true,"git_initialized":%s,"git_status":"%s","git_user_configured":%s,"constitution_committed":%s,"hook_installed":%s,"hook_status":"%s","post_hook_installed":%s,"post_hook_status":"%s","pre_commit_d_provisioned":%s,"project_root":"%s"}\n' \
+        "$GIT_INITIALIZED" "$GIT_STATUS" "$GIT_USER_CONFIGURED" "$CONSTITUTION_COMMITTED" "$HOOK_INSTALLED" "$HOOK_STATUS" "$POST_HOOK_INSTALLED" "$POST_HOOK_STATUS" "$PRECOMMIT_D_PROVISIONED" "$PROJECT_ROOT"
 else
     if [ "$GIT_INITIALIZED" = true ]; then
         echo "[specify] Git repository initialized at $PROJECT_ROOT"
@@ -186,4 +220,7 @@ else
     fi
     report_hook_status "Pre-commit" "$HOOK_STATUS"
     report_hook_status "Post-commit" "$POST_HOOK_STATUS"
+    if [ "$PRECOMMIT_D_PROVISIONED" = true ]; then
+        echo "[specify] Extension point created at .git/hooks/pre-commit.d/ (drop user-supplied hooks here)"
+    fi
 fi
