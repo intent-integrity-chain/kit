@@ -1,6 +1,6 @@
 {
   "name": "tessl-labs/intent-integrity-kit",
-  "version": "2.10.4",
+  "version": "2.10.5",
   "summary": "Closing the intent-to-code chasm - specification-driven development with BDD verification chain",
   "description": "Intent Integrity Kit (IIKit) preserves your intent from idea to implementation through specification-driven development with BDD verification chain. Compatible with Claude Code, Codex, Gemini, OpenCode, and GitHub Copilot.\n\nWhat's new in v2.10.0: Assertion integrity enforcement (CI verification script, PreToolUse hook, constitution template). GitHub Copilot support (fifth agent). 4 bug fixes: dashboard corruption, branch detection, pre-commit gate, clarification panels.",
   "entrypoint": "README.md",
