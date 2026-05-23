@@ -38,14 +38,7 @@ $userContent = New-Object System.Collections.Generic.List[string]
 $errors = New-Object System.Collections.Generic.List[string]
 
 function To-Relative([string]$abs) {
-    # Only strip the repoRoot prefix when $abs actually starts with it;
-    # in worktrees the hooks dir can resolve outside the working tree,
-    # in which case keep the absolute path rather than slicing arbitrary
-    # bytes off the front.
-    if ($abs.StartsWith($repoRoot, [System.StringComparison]::Ordinal)) {
-        return $abs.Substring($repoRoot.Length).TrimStart([char]'/', [char]'\')
-    }
-    return $abs
+    return $abs.Substring($repoRoot.Length).TrimStart([char]'/', [char]'\')
 }
 
 function Remove-Path([string]$path) {
@@ -141,19 +134,9 @@ if (Test-Path $hooksDir) {
 
 # pre-commit.d/: remove our IIKIT-PRE-COMMIT-D README; report every remaining
 # entry (scripts, dotfiles, subdirs, non-iikit READMEs) as user content; drop
-# the dir only when no entries remain.
-# Resolve hooks dir via `git rev-parse` (worktrees/submodules safe).
-$preCommitDHooksRel = git -C $repoRoot rev-parse --git-path hooks 2>$null
-if ($preCommitDHooksRel) {
-    if ([System.IO.Path]::IsPathRooted($preCommitDHooksRel)) {
-        $preCommitDHooksAbs = $preCommitDHooksRel
-    } else {
-        $preCommitDHooksAbs = Join-Path $repoRoot $preCommitDHooksRel
-    }
-} else {
-    $preCommitDHooksAbs = $hooksDir
-}
-$preCommitD = Join-Path $preCommitDHooksAbs "pre-commit.d"
+# the dir only when no entries remain. Uses the same `$hooksDir` as the hook
+# removal above to stay in lockstep — see #67 for cross-script worktree handling.
+$preCommitD = Join-Path $hooksDir "pre-commit.d"
 if (Test-Path $preCommitD) {
     $preCommitDReadme = Join-Path $preCommitD "README"
     $preCommitDReadmeHandled = $false

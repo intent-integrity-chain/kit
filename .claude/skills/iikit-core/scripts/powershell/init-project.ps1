@@ -118,17 +118,13 @@ $postHookInstalled = $postHookResult.installed
 $postHookStatus = $postHookResult.status
 
 # Provision pre-commit.d/ extension point (user-supplied formatters, linters, etc.)
-# Resolve hooks dir via `git rev-parse` so worktrees / submodules (where `.git`
-# is a file pointing at the real gitdir) work correctly.
+# Uses the same `$gitDir/hooks` path as Install-IIKitHook above so the extension
+# point and the hook itself stay in lockstep — if `.git` is a file (linked
+# worktree, submodule), Install-IIKitHook's `Test-Path` gate already failed
+# and we skip provisioning here too rather than producing an orphan dir.
 $preCommitDProvisioned = $false
-$hooksRel = git -C $projectRoot rev-parse --git-path hooks 2>$null
-if ($hooksRel) {
-    if ([System.IO.Path]::IsPathRooted($hooksRel)) {
-        $hooksAbs = $hooksRel
-    } else {
-        $hooksAbs = Join-Path $projectRoot $hooksRel
-    }
-    $preCommitDDir = Join-Path $hooksAbs "pre-commit.d"
+if ((Test-Path $gitDir) -and (Test-Path $gitDir -PathType Container)) {
+    $preCommitDDir = Join-Path $gitDir "hooks/pre-commit.d"
     if (-not (Test-Path $preCommitDDir)) {
         New-Item -ItemType Directory -Path $preCommitDDir -Force | Out-Null
     }
@@ -226,14 +222,6 @@ if ($Json) {
     Report-HookStatus "Pre-commit" $hookStatus
     Report-HookStatus "Post-commit" $postHookStatus
     if ($preCommitDProvisioned) {
-        # Report the resolved location — in worktrees this can differ from
-        # `.git/hooks/pre-commit.d/` because the hooks dir lives in the main repo.
-        $projectRootStr = $projectRoot.ToString()
-        if ($preCommitDDir.StartsWith($projectRootStr, [System.StringComparison]::Ordinal)) {
-            $displayPath = $preCommitDDir.Substring($projectRootStr.Length).TrimStart([char]'/', [char]'\')
-        } else {
-            $displayPath = $preCommitDDir
-        }
-        Write-Output "[specify] Extension point created at $displayPath (drop user-supplied hooks here)"
+        Write-Output "[specify] Extension point created at .git/hooks/pre-commit.d/ (drop user-supplied hooks here)"
     }
 }

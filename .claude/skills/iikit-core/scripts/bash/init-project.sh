@@ -135,14 +135,13 @@ POST_HOOK_INSTALLED="$RESULT_installed"
 POST_HOOK_STATUS="$RESULT_status"
 
 # Provision pre-commit.d/ extension point (user-supplied formatters, linters, etc.)
+# Uses the same `$PROJECT_ROOT/.git/hooks` path as `install_hook` above so the
+# extension point and the hook itself stay in lockstep — if `.git` is a file
+# (linked worktree, submodule), the install_hook gate skipped already and we
+# skip here too rather than provisioning an orphan dir.
 PRECOMMIT_D_PROVISIONED=false
-HOOKS_REL="$(git -C "$PROJECT_ROOT" rev-parse --git-path hooks 2>/dev/null)"
-if [ -n "$HOOKS_REL" ]; then
-    case "$HOOKS_REL" in
-        /*) HOOKS_ABS="$HOOKS_REL" ;;
-        *)  HOOKS_ABS="$PROJECT_ROOT/$HOOKS_REL" ;;
-    esac
-    PRECOMMIT_D_DIR="$HOOKS_ABS/pre-commit.d"
+if [ -d "$PROJECT_ROOT/.git" ]; then
+    PRECOMMIT_D_DIR="$PROJECT_ROOT/.git/hooks/pre-commit.d"
     mkdir -p "$PRECOMMIT_D_DIR"
     PRECOMMIT_D_README="$PRECOMMIT_D_DIR/README"
     if [ ! -f "$PRECOMMIT_D_README" ]; then
@@ -233,9 +232,6 @@ else
     report_hook_status "Pre-commit" "$HOOK_STATUS"
     report_hook_status "Post-commit" "$POST_HOOK_STATUS"
     if [ "$PRECOMMIT_D_PROVISIONED" = true ]; then
-        # Report the resolved location — in worktrees this can differ from
-        # `.git/hooks/pre-commit.d/` because the hooks dir lives in the main repo.
-        DISPLAY_PATH="${PRECOMMIT_D_DIR#"$PROJECT_ROOT/"}"
-        echo "[specify] Extension point created at $DISPLAY_PATH (drop user-supplied hooks here)"
+        echo "[specify] Extension point created at .git/hooks/pre-commit.d/ (drop user-supplied hooks here)"
     fi
 fi

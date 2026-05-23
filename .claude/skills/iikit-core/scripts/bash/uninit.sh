@@ -176,15 +176,10 @@ fi
 
 # pre-commit.d/: remove our IIKIT-PRE-COMMIT-D README; report everything else as
 # user content; drop the dir only when truly empty. `find` includes dotfiles so
-# stray `.keep` / editor scratch files don't get silently rm -rf'd.
-# Resolve hooks dir via `git rev-parse` (worktrees/submodules safe).
-PRECOMMIT_D_HOOKS_REL="$(git -C "$REPO_ROOT" rev-parse --git-path hooks 2>/dev/null)"
-case "$PRECOMMIT_D_HOOKS_REL" in
-    /*) PRECOMMIT_D_HOOKS_ABS="$PRECOMMIT_D_HOOKS_REL" ;;
-    "") PRECOMMIT_D_HOOKS_ABS="$HOOKS_DIR" ;;
-    *)  PRECOMMIT_D_HOOKS_ABS="$REPO_ROOT/$PRECOMMIT_D_HOOKS_REL" ;;
-esac
-PRECOMMIT_D="$PRECOMMIT_D_HOOKS_ABS/pre-commit.d"
+# stray `.keep` / editor scratch files don't get silently rm -rf'd. Uses the
+# same `$HOOKS_DIR` as the hook removal above to stay in lockstep — see #67
+# for cross-script worktree handling.
+PRECOMMIT_D="$HOOKS_DIR/pre-commit.d"
 if [[ -d "$PRECOMMIT_D" ]]; then
     PRECOMMIT_D_README="$PRECOMMIT_D/README"
     PRECOMMIT_D_README_HANDLED=false
@@ -207,14 +202,7 @@ if [[ -d "$PRECOMMIT_D" ]]; then
         if [[ "$PRECOMMIT_D_README_HANDLED" == true && "$entry" == "$PRECOMMIT_D_README" ]]; then
             continue
         fi
-        # Strip REPO_ROOT prefix when applicable; otherwise keep the absolute
-        # path so worktree hooks (where the hooks dir lives outside the
-        # worktree top) don't get an arbitrary substring sliced off.
-        if [[ "$entry" == "$REPO_ROOT"/* ]]; then
-            rel="${entry#"$REPO_ROOT/"}"
-        else
-            rel="$entry"
-        fi
+        rel="${entry#"$REPO_ROOT/"}"
         USER_CONTENT+=("$rel")
         remaining=$((remaining + 1))
     done < <(find "$PRECOMMIT_D" -mindepth 1 -maxdepth 1 -print 2>/dev/null)
