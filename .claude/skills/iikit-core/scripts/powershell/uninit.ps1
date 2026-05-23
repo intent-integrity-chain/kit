@@ -135,7 +135,18 @@ if (Test-Path $hooksDir) {
 # pre-commit.d/: remove our IIKIT-PRE-COMMIT-D README; report every remaining
 # entry (scripts, dotfiles, subdirs, non-iikit READMEs) as user content; drop
 # the dir only when no entries remain.
-$preCommitD = Join-Path $hooksDir "pre-commit.d"
+# Resolve hooks dir via `git rev-parse` (worktrees/submodules safe).
+$preCommitDHooksRel = git -C $repoRoot rev-parse --git-path hooks 2>$null
+if ($preCommitDHooksRel) {
+    if ([System.IO.Path]::IsPathRooted($preCommitDHooksRel)) {
+        $preCommitDHooksAbs = $preCommitDHooksRel
+    } else {
+        $preCommitDHooksAbs = Join-Path $repoRoot $preCommitDHooksRel
+    }
+} else {
+    $preCommitDHooksAbs = $hooksDir
+}
+$preCommitD = Join-Path $preCommitDHooksAbs "pre-commit.d"
 if (Test-Path $preCommitD) {
     $preCommitDReadme = Join-Path $preCommitD "README"
     $preCommitDReadmeHandled = $false

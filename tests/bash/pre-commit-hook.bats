@@ -665,7 +665,7 @@ EOF
     assert_contains "$output" "Extension hook failed"
 }
 
-@test "pre-commit.d/: extensions skipped when IIKit blocks" {
+@test "pre-commit.d/: IIKit blocks AFTER extensions run (extensions are not the final gate)" {
     # Set up a tampered .feature commit that blocks IIKit
     mkdir -p "$TEST_DIR/specs/001-feature/tests/features"
     cat > "$TEST_DIR/specs/001-feature/tests/features/login.feature" << 'EOF'
@@ -688,7 +688,7 @@ Feature: Test
 EOF
     git -C "$TEST_DIR" add specs/001-feature/tests/features/login.feature
 
-    # Install an extension that would side-effect if it ran
+    # Extension runs first and succeeds; IIKit then catches the tampered hash
     mkdir -p "$TEST_DIR/.git/hooks/pre-commit.d"
     cat > "$TEST_DIR/.git/hooks/pre-commit.d/marker" << 'EOF'
 #!/usr/bin/env bash
@@ -700,7 +700,49 @@ EOF
     cd "$TEST_DIR"
     run bash .git/hooks/pre-commit
     [ "$status" -eq 1 ]
-    [ ! -f "$TEST_DIR/EXT-RAN" ]
+    # Extension ran before IIKit's gate fired
+    [ -f "$TEST_DIR/EXT-RAN" ]
+    assert_contains "$output" "ASSERTION INTEGRITY CHECK FAILED"
+}
+
+@test "pre-commit.d/: extension that tampers with .feature is caught by IIKit (final-gate property)" {
+    # Establish a valid hash for a known .feature content
+    mkdir -p "$TEST_DIR/specs/001-feature/tests/features"
+    cat > "$TEST_DIR/specs/001-feature/tests/features/login.feature" << 'EOF'
+Feature: Test
+  Scenario: Test scenario
+    Given a test precondition
+    When a test action occurs
+    Then a test result is observed
+EOF
+    "$TESTIFY_SCRIPT" store-hash "$TEST_DIR/specs/001-feature/tests/features" > /dev/null
+    git -C "$TEST_DIR" add -A >/dev/null 2>&1
+    git -C "$TEST_DIR" commit -m "establish hash" >/dev/null 2>&1
+
+    # Stage the same valid file — hash check would pass on its own
+    git -C "$TEST_DIR" add specs/001-feature/tests/features/login.feature
+
+    # Hostile extension: re-stage a tampered version after IIKit would normally check
+    mkdir -p "$TEST_DIR/.git/hooks/pre-commit.d"
+    cat > "$TEST_DIR/.git/hooks/pre-commit.d/tamper" << 'EOF'
+#!/usr/bin/env bash
+root="$(git rev-parse --show-toplevel)"
+cat > "$root/specs/001-feature/tests/features/login.feature" <<'F'
+Feature: Test
+  Scenario: Test scenario
+    Given a test precondition
+    When a test action occurs
+    Then a TAMPERED result is observed
+F
+git -C "$root" add specs/001-feature/tests/features/login.feature
+exit 0
+EOF
+    chmod +x "$TEST_DIR/.git/hooks/pre-commit.d/tamper"
+
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    [ "$status" -eq 1 ]
+    assert_contains "$output" "ASSERTION INTEGRITY CHECK FAILED"
 }
 
 @test "pre-commit.d/: non-executable files are ignored" {

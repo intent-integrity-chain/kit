@@ -13,7 +13,7 @@ IIKit's pre-commit hook executes every file in `.git/hooks/pre-commit.d/` that:
 
 Files run in deterministic byte-collation order (`LC_ALL=C` sort). Each runs with no arguments — use `git diff --cached --name-only` to discover staged files. Exit non-zero to block the commit.
 
-Extensions fire on every IIKit success or no-op path: the assertion check passing, nothing relevant staged (fast-path), and the degraded "IIKit scripts not found" warning path. They are skipped only when IIKit explicitly blocks the commit, so extensions never see a partial pass.
+Extensions run **before** IIKit's assertion-integrity check. IIKit is the final gate — if an extension mutates a `.feature` file, `test-specs.md`, or `context.json` (whether a formatter accidentally reflows assertions or a hostile extension tampers deliberately), IIKit verifies the post-extension staged state and blocks the commit. Extensions are skipped only when no git repo is detected. A failing extension blocks the commit and the IIKit check does not run.
 
 ## Why Not a Hook Manager
 
@@ -23,16 +23,20 @@ Hook managers (lefthook, husky, pre-commit) install their own `.git/hooks/pre-co
 
 Place these as executable files in `.git/hooks/pre-commit.d/` (no extension required).
 
+The examples use NUL-delimited pipelines (`--name-only -z` + `xargs -0`) so paths containing spaces, tabs, or newlines are handled correctly.
+
 ### Prettier on staged JS/TS
 
 ```bash
 #!/usr/bin/env bash
 # .git/hooks/pre-commit.d/prettier-write
 set -euo pipefail
-staged=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(ts|tsx|js|jsx|json|md|yml|yaml|html|css)$' || true)
-[ -z "$staged" ] && exit 0
-echo "$staged" | xargs bunx prettier --write
-echo "$staged" | xargs git add
+git diff --cached --name-only --diff-filter=ACMR -z \
+    | grep -zE '\.(ts|tsx|js|jsx|json|md|yml|yaml|html|css)$' \
+    | { xargs -0 -r bunx prettier --write && \
+        git diff --cached --name-only --diff-filter=ACMR -z \
+        | grep -zE '\.(ts|tsx|js|jsx|json|md|yml|yaml|html|css)$' \
+        | xargs -0 -r git add; }
 ```
 
 ### ESLint --fix on staged sources
@@ -41,10 +45,12 @@ echo "$staged" | xargs git add
 #!/usr/bin/env bash
 # .git/hooks/pre-commit.d/eslint-fix
 set -euo pipefail
-staged=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(ts|tsx|js|jsx)$' || true)
-[ -z "$staged" ] && exit 0
-echo "$staged" | xargs npx eslint --fix
-echo "$staged" | xargs git add
+git diff --cached --name-only --diff-filter=ACMR -z \
+    | grep -zE '\.(ts|tsx|js|jsx)$' \
+    | { xargs -0 -r npx eslint --fix && \
+        git diff --cached --name-only --diff-filter=ACMR -z \
+        | grep -zE '\.(ts|tsx|js|jsx)$' \
+        | xargs -0 -r git add; }
 ```
 
 ### Gitleaks secret scan
@@ -61,10 +67,10 @@ exec gitleaks protect --staged --redact
 #!/usr/bin/env bash
 # .git/hooks/pre-commit.d/spotless
 set -euo pipefail
-staged=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.java$' || true)
-[ -z "$staged" ] && exit 0
 ./mvnw -q spotless:apply
-echo "$staged" | xargs git add
+git diff --cached --name-only --diff-filter=ACMR -z \
+    | grep -zE '\.java$' \
+    | xargs -0 -r git add
 ```
 
 ## Sharing Extensions Across the Team
@@ -72,15 +78,16 @@ echo "$staged" | xargs git add
 `.git/hooks/` is per-clone and not tracked. To share extensions:
 
 1. Commit your scripts to a tracked path like `scripts/git-hooks/`.
-2. Add a one-line onboarding step that symlinks each into `.git/hooks/pre-commit.d/`:
+2. Add an onboarding step that symlinks each regular file into `.git/hooks/pre-commit.d/`:
 
 ```bash
-for hook in scripts/git-hooks/*; do
-    ln -sf "../../../$hook" ".git/hooks/pre-commit.d/$(basename "$hook")"
-done
+find scripts/git-hooks -maxdepth 1 -type f -print0 \
+    | while IFS= read -r -d '' hook; do
+        ln -sf "../../../$hook" ".git/hooks/pre-commit.d/$(basename "$hook")"
+    done
 ```
 
-Run this once per fresh clone (or as part of a project bootstrap script).
+Run this once per fresh clone (or as part of a project bootstrap script). `-type f` skips subdirectories; NUL-delimited iteration handles filenames with any valid characters.
 
 ## Troubleshooting
 

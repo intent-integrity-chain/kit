@@ -177,7 +177,14 @@ fi
 # pre-commit.d/: remove our IIKIT-PRE-COMMIT-D README; report everything else as
 # user content; drop the dir only when truly empty. `find` includes dotfiles so
 # stray `.keep` / editor scratch files don't get silently rm -rf'd.
-PRECOMMIT_D="$HOOKS_DIR/pre-commit.d"
+# Resolve hooks dir via `git rev-parse` (worktrees/submodules safe).
+PRECOMMIT_D_HOOKS_REL="$(git -C "$REPO_ROOT" rev-parse --git-path hooks 2>/dev/null)"
+case "$PRECOMMIT_D_HOOKS_REL" in
+    /*) PRECOMMIT_D_HOOKS_ABS="$PRECOMMIT_D_HOOKS_REL" ;;
+    "") PRECOMMIT_D_HOOKS_ABS="$HOOKS_DIR" ;;
+    *)  PRECOMMIT_D_HOOKS_ABS="$REPO_ROOT/$PRECOMMIT_D_HOOKS_REL" ;;
+esac
+PRECOMMIT_D="$PRECOMMIT_D_HOOKS_ABS/pre-commit.d"
 if [[ -d "$PRECOMMIT_D" ]]; then
     PRECOMMIT_D_README="$PRECOMMIT_D/README"
     PRECOMMIT_D_README_HANDLED=false

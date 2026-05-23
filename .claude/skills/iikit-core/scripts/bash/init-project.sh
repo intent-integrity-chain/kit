@@ -154,10 +154,13 @@ if [ -n "$HOOKS_REL" ]; then
 # at .git/hooks/pre-commit by default, or .git/hooks/iikit-pre-commit when
 # IIKit was installed alongside an existing user hook).
 #
-# Each executable in this dir runs on every IIKit success or no-op path,
-# and is skipped when IIKit blocks the commit. Files are executed in
-# deterministic byte-collation order (LC_ALL=C sort). Subdirectories,
-# non-executable files, dotfiles, and this README are ignored.
+# Each executable in this dir runs BEFORE IIKit's assertion-integrity check,
+# so IIKit remains the final gate — mutating a .feature file / test-specs.md
+# / context.json from an extension will be caught by the subsequent IIKit
+# check against the post-extension staged state. A failing extension blocks
+# the commit immediately. Files are executed in deterministic byte-collation
+# order (LC_ALL=C sort). Subdirectories, non-executable files, dotfiles,
+# and this README are ignored.
 #
 # Examples:
 #   prettier-write   - bunx prettier --write on staged JS/TS files

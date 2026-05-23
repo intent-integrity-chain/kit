@@ -21,8 +21,11 @@ fi
 
 # ============================================================================
 # EXTENSION HOOKS — run every executable in .git/hooks/pre-commit.d/
-# Fires on every successful IIKit exit (pass or no-op).
-# Skipped when IIKit blocks — extensions never see a partial pass.
+# Runs FIRST so IIKit's assertion-integrity check is the final gate. If an
+# extension mutates a `.feature` file / `test-specs.md` / hash state (whether
+# intentionally — formatters — or maliciously), the subsequent IIKit check
+# sees the post-extension staged content and will block the commit.
+# Skipped only when no git repo is detected.
 # ============================================================================
 
 run_pre_commit_d() {
@@ -60,6 +63,13 @@ run_pre_commit_d() {
     return $failed
 }
 
+# Run extensions FIRST — IIKit's checks below run against the post-extension
+# staged state, so IIKit remains the final gate even if an extension mutates
+# protected files.
+if ! run_pre_commit_d; then
+    exit 1
+fi
+
 SCRIPTS_DIR=""
 CANDIDATE_PATHS=(
     "$REPO_ROOT/.claude/skills/iikit-core/scripts/bash"
@@ -76,8 +86,7 @@ done
 
 if [[ -z "$SCRIPTS_DIR" ]]; then
     echo "[iikit] Warning: IIKit scripts not found — skipping assertion integrity check" >&2
-    run_pre_commit_d
-    exit $?
+    exit 0
 fi
 
 # ============================================================================
@@ -89,8 +98,7 @@ STAGED_TEST_SPECS=$(git diff --cached --name-only 2>/dev/null | grep 'test-specs
 STAGED_CODE_FILES=$(git diff --cached --name-only 2>/dev/null | grep -E '\.(py|js|ts|jsx|tsx|go|java|rs|cs|rb|kt)$' | grep -vE '^(\.tessl/|\.claude/|\.codex/|\.gemini/|\.opencode/|node_modules/)') || true
 
 if [[ -z "$STAGED_FEATURE_FILES" ]] && [[ -z "$STAGED_TEST_SPECS" ]] && [[ -z "$STAGED_CODE_FILES" ]]; then
-    run_pre_commit_d
-    exit $?
+    exit 0
 fi
 
 # ============================================================================
@@ -500,5 +508,4 @@ if [[ "$BLOCKED" == true ]]; then
     exit 1
 fi
 
-run_pre_commit_d
-exit $?
+exit 0
