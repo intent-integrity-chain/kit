@@ -239,8 +239,9 @@ Describe "uninit: pre-commit.d handling" {
 
         $result = & $script:UninitScript -Json -DryRun | Out-String
 
-        # README must appear in removed (as planned) but NOT in user_content
-        $result | Should -Match "pre-commit.d/README"
+        # README must appear in removed (as planned) but NOT in user_content.
+        # Allow forward-slash or backslash separator since Pester runs on Windows.
+        $result | Should -Match 'pre-commit\.d[/\\]+README'
         $result | Should -Match '"user_content":\s*\[\s*\]'
         # Disk state unchanged in dry-run
         (Test-Path (Join-Path $script:PreCommitD "README")) | Should -BeTrue
