@@ -193,8 +193,8 @@ done
 echo "✓ Scripts distributed to skills"
 
 # Step 3: Clean up iikit-core — distributed files no longer needed in published tile
-# Keep references that iikit-core/SKILL.md itself uses (prd-seeding.md, help-reference.md)
-CORE_ONLY_REFS="prd-seeding.md help-reference.md"
+# Keep references that iikit-core/SKILL.md itself uses
+CORE_ONLY_REFS="prd-seeding.md help-reference.md hook-chaining.md"
 mkdir -p /tmp/iikit-core-refs-keep
 for ref in $CORE_ONLY_REFS; do
     [[ -f "iikit-core/references/$ref" ]] && cp "iikit-core/references/$ref" /tmp/iikit-core-refs-keep/
