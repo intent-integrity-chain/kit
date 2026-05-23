@@ -132,7 +132,9 @@ if (Test-Path $hooksDir) {
     Handle-Hook "post-commit" "IIKIT-POST-COMMIT"
 }
 
-# pre-commit.d/: remove our IIKIT-PRE-COMMIT-D README; report user scripts; drop dir if empty.
+# pre-commit.d/: remove our IIKIT-PRE-COMMIT-D README; report every remaining
+# entry (scripts, dotfiles, subdirs, non-iikit READMEs) as user content; drop
+# the dir only when no entries remain.
 $preCommitD = Join-Path $hooksDir "pre-commit.d"
 if (Test-Path $preCommitD) {
     $preCommitDReadme = Join-Path $preCommitD "README"
@@ -148,7 +150,7 @@ if (Test-Path $preCommitD) {
     foreach ($entry in $remainingEntries) {
         $userContent.Add((To-Relative $entry.FullName)) | Out-Null
     }
-    # Drop the dir only if no user scripts remain
+    # Drop the dir only when it is empty after the README removal above
     if ($remainingEntries.Count -eq 0) {
         Remove-Path $preCommitD
     }
