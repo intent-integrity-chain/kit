@@ -25,20 +25,21 @@ Hook managers (lefthook, husky, pre-commit) install their own `.git/hooks/pre-co
 
 Place these as executable files in `.git/hooks/pre-commit.d/` (no extension required).
 
-The examples use NUL-delimited pipelines (`--name-only -z` + `xargs -0`) so paths containing spaces, tabs, or newlines are handled correctly.
+The examples use NUL-delimited pipelines (`--name-only -z` + `xargs -0 -r`) so paths containing spaces, tabs, or newlines are handled correctly. They use `set -eu` rather than `set -euo pipefail` and wrap `grep` in `{ ... || true; }` so a successful no-op commit (no files match the regex) does not abort the script.
 
 ### Prettier on staged JS/TS
 
 ```bash
 #!/usr/bin/env bash
 # .git/hooks/pre-commit.d/prettier-write
-set -euo pipefail
+set -eu
+PATTERN='\.(ts|tsx|js|jsx|json|md|yml|yaml|html|css)$'
 git diff --cached --name-only --diff-filter=ACMR -z \
-    | grep -zE '\.(ts|tsx|js|jsx|json|md|yml|yaml|html|css)$' \
-    | { xargs -0 -r bunx prettier --write && \
-        git diff --cached --name-only --diff-filter=ACMR -z \
-        | grep -zE '\.(ts|tsx|js|jsx|json|md|yml|yaml|html|css)$' \
-        | xargs -0 -r git add; }
+    | { grep -zE "$PATTERN" || true; } \
+    | xargs -0 -r bunx prettier --write
+git diff --cached --name-only --diff-filter=ACMR -z \
+    | { grep -zE "$PATTERN" || true; } \
+    | xargs -0 -r git add
 ```
 
 ### ESLint --fix on staged sources
@@ -46,13 +47,14 @@ git diff --cached --name-only --diff-filter=ACMR -z \
 ```bash
 #!/usr/bin/env bash
 # .git/hooks/pre-commit.d/eslint-fix
-set -euo pipefail
+set -eu
+PATTERN='\.(ts|tsx|js|jsx)$'
 git diff --cached --name-only --diff-filter=ACMR -z \
-    | grep -zE '\.(ts|tsx|js|jsx)$' \
-    | { xargs -0 -r npx eslint --fix && \
-        git diff --cached --name-only --diff-filter=ACMR -z \
-        | grep -zE '\.(ts|tsx|js|jsx)$' \
-        | xargs -0 -r git add; }
+    | { grep -zE "$PATTERN" || true; } \
+    | xargs -0 -r npx eslint --fix
+git diff --cached --name-only --diff-filter=ACMR -z \
+    | { grep -zE "$PATTERN" || true; } \
+    | xargs -0 -r git add
 ```
 
 ### Gitleaks secret scan
@@ -68,10 +70,10 @@ exec gitleaks protect --staged --redact
 ```bash
 #!/usr/bin/env bash
 # .git/hooks/pre-commit.d/spotless
-set -euo pipefail
+set -eu
 ./mvnw -q spotless:apply
 git diff --cached --name-only --diff-filter=ACMR -z \
-    | grep -zE '\.java$' \
+    | { grep -zE '\.java$' || true; } \
     | xargs -0 -r git add
 ```
 
