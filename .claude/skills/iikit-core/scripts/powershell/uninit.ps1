@@ -161,7 +161,13 @@ if (Test-Path $preCommitD) {
         $readmeContent = Get-Content $preCommitDReadme -Raw -ErrorAction SilentlyContinue
         if ($readmeContent -match 'IIKIT-PRE-COMMIT-D') {
             Remove-Path $preCommitDReadme
-            $preCommitDReadmeHandled = $true
+            # Only treat the README as handled when it's actually gone (or in
+            # -DryRun, where it stays on disk but is logically removed). A
+            # failed Remove-Path leaves the file in place and subsequent
+            # emptiness detection should still see it.
+            if ($DryRun -or -not (Test-Path $preCommitDReadme)) {
+                $preCommitDReadmeHandled = $true
+            }
         }
     }
     # Report every remaining entry (scripts, dotfiles, subdirs, non-iikit READMEs).

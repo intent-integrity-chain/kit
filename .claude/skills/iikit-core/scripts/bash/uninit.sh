@@ -190,7 +190,13 @@ if [[ -d "$PRECOMMIT_D" ]]; then
     PRECOMMIT_D_README_HANDLED=false
     if [[ -f "$PRECOMMIT_D_README" ]] && grep -q 'IIKIT-PRE-COMMIT-D' "$PRECOMMIT_D_README" 2>/dev/null; then
         remove_file "$PRECOMMIT_D_README"
-        PRECOMMIT_D_README_HANDLED=true
+        # Only treat the README as handled when it's actually gone (or in
+        # --dry-run, where it stays on disk but is logically removed). A failed
+        # remove_file leaves the file in place and we want subsequent emptiness
+        # detection to see it.
+        if $DRY_RUN || [[ ! -f "$PRECOMMIT_D_README" ]]; then
+            PRECOMMIT_D_README_HANDLED=true
+        fi
     fi
     remaining=0
     while IFS= read -r entry; do
