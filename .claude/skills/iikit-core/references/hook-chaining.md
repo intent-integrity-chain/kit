@@ -93,4 +93,4 @@ Run this once per fresh clone (or as part of a project bootstrap script). `-type
 
 - **Script doesn't run** — check `ls -la .git/hooks/pre-commit.d/` for the exec bit. Files without `chmod +x` are skipped silently.
 - **Script ran but commit didn't pick up its fixes** — formatters that rewrite files in place must `git add` the modified files; otherwise the commit captures the unfixed staged version.
-- **Want to run extensions even when IIKit blocks** — by design, no. Extensions only run when IIKit's check passes or has no work to do. If IIKit blocks, fix the assertion-integrity issue first.
+- **My extension modified a `.feature` file and now the commit is blocked** — IIKit verifies the post-extension staged state, so any extension-side mutation of `.feature` / `test-specs.md` / `context.json` re-triggers the hash check. Re-run `/iikit-04-testify` to regenerate hashes against the new content, or stop the extension from touching those paths.
