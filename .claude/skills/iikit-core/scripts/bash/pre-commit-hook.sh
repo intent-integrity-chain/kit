@@ -19,6 +19,58 @@ if [[ -z "$REPO_ROOT" ]]; then
     exit 0
 fi
 
+# ============================================================================
+# EXTENSION HOOKS — run every executable in .git/hooks/pre-commit.d/
+# Runs FIRST so IIKit's assertion-integrity check is the final gate. If an
+# extension mutates a `.feature` file / `test-specs.md` / hash state (whether
+# intentionally — formatters — or maliciously), the subsequent IIKit check
+# sees the post-extension staged content and will block the commit.
+# Skipped only when no git repo is detected.
+# ============================================================================
+
+run_pre_commit_d() {
+    # Resolve hooks dir via `git rev-parse` so worktrees and submodules
+    # (where `.git` is a file pointing at the real gitdir) work correctly.
+    local hooks_dir
+    hooks_dir="$(git -C "$REPO_ROOT" rev-parse --git-path hooks 2>/dev/null)"
+    [[ -n "$hooks_dir" ]] || return 0
+    # `--git-path` returns a path relative to $REPO_ROOT in non-worktree
+    # checkouts; resolve to absolute for safety.
+    [[ "$hooks_dir" = /* ]] || hooks_dir="$REPO_ROOT/$hooks_dir"
+    local d_dir="$hooks_dir/pre-commit.d"
+    [[ -d "$d_dir" ]] || return 0
+
+    local failed=0 ext
+    # Enumerate with `find` (bash 3.2 safe) and sort under LC_ALL=C so
+    # extension order is deterministic byte-collation, not locale-dependent.
+    while IFS= read -r ext; do
+        [[ -n "$ext" ]] || continue
+        # Require a regular file (or symlink to one). Skips dirs, FIFOs,
+        # sockets, devices, and broken symlinks — exec'ing those would
+        # hang or fail and block the commit.
+        [[ -f "$ext" ]] || continue
+        # Skip non-executable files (README, etc.)
+        [[ -x "$ext" ]] || continue
+        # Skip dotfiles (keepfiles, editor scratch)
+        case "$(basename "$ext")" in .*) continue ;; esac
+
+        if ! "$ext"; then
+            echo "[iikit] Extension hook failed: ${ext#"$REPO_ROOT"/}" >&2
+            echo "[iikit]   Fix the script's error above, or temporarily move it out of .git/hooks/pre-commit.d/, then retry the commit." >&2
+            failed=1
+        fi
+    done < <(find "$d_dir" -mindepth 1 -maxdepth 1 -print 2>/dev/null | LC_ALL=C sort)
+
+    return $failed
+}
+
+# Run extensions FIRST — IIKit's checks below run against the post-extension
+# staged state, so IIKit remains the final gate even if an extension mutates
+# protected files.
+if ! run_pre_commit_d; then
+    exit 1
+fi
+
 SCRIPTS_DIR=""
 CANDIDATE_PATHS=(
     "$REPO_ROOT/.claude/skills/iikit-core/scripts/bash"

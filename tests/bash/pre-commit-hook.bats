@@ -629,3 +629,190 @@ EOF
     run bash .git/hooks/pre-commit
     [[ "$status" -eq 0 ]]
 }
+
+# =============================================================================
+# pre-commit.d/ extension point
+# =============================================================================
+
+@test "pre-commit.d/: executes extension hook on no-op fast path" {
+    mkdir -p "$TEST_DIR/.git/hooks/pre-commit.d"
+    cat > "$TEST_DIR/.git/hooks/pre-commit.d/marker" << 'EOF'
+#!/usr/bin/env bash
+touch "$(git rev-parse --show-toplevel)/EXT-RAN"
+exit 0
+EOF
+    chmod +x "$TEST_DIR/.git/hooks/pre-commit.d/marker"
+
+    # Nothing relevant staged — IIKit fast-paths to exit 0, extension should still run
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    [ "$status" -eq 0 ]
+    [ -f "$TEST_DIR/EXT-RAN" ]
+}
+
+@test "pre-commit.d/: failing extension hook blocks the commit" {
+    mkdir -p "$TEST_DIR/.git/hooks/pre-commit.d"
+    cat > "$TEST_DIR/.git/hooks/pre-commit.d/fail" << 'EOF'
+#!/usr/bin/env bash
+echo "extension says no" >&2
+exit 7
+EOF
+    chmod +x "$TEST_DIR/.git/hooks/pre-commit.d/fail"
+
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    [ "$status" -ne 0 ]
+    assert_contains "$output" "Extension hook failed"
+}
+
+@test "pre-commit.d/: IIKit blocks AFTER extensions run (extensions are not the final gate)" {
+    # Set up a tampered .feature commit that blocks IIKit
+    mkdir -p "$TEST_DIR/specs/001-feature/tests/features"
+    cat > "$TEST_DIR/specs/001-feature/tests/features/login.feature" << 'EOF'
+Feature: Test
+  Scenario: Test scenario
+    Given a test precondition
+    When a test action occurs
+    Then a test result is observed
+EOF
+    "$TESTIFY_SCRIPT" store-hash "$TEST_DIR/specs/001-feature/tests/features" > /dev/null
+    git -C "$TEST_DIR" add -A >/dev/null 2>&1
+    git -C "$TEST_DIR" commit -m "add feature with hash" >/dev/null 2>&1
+
+    cat > "$TEST_DIR/specs/001-feature/tests/features/login.feature" << 'EOF'
+Feature: Test
+  Scenario: Test scenario
+    Given a test precondition
+    When a test action occurs
+    Then a DIFFERENT result is observed
+EOF
+    git -C "$TEST_DIR" add specs/001-feature/tests/features/login.feature
+
+    # Extension runs first and succeeds; IIKit then catches the tampered hash
+    mkdir -p "$TEST_DIR/.git/hooks/pre-commit.d"
+    cat > "$TEST_DIR/.git/hooks/pre-commit.d/marker" << 'EOF'
+#!/usr/bin/env bash
+touch "$(git rev-parse --show-toplevel)/EXT-RAN"
+exit 0
+EOF
+    chmod +x "$TEST_DIR/.git/hooks/pre-commit.d/marker"
+
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    [ "$status" -eq 1 ]
+    # Extension ran before IIKit's gate fired
+    [ -f "$TEST_DIR/EXT-RAN" ]
+    assert_contains "$output" "ASSERTION INTEGRITY CHECK FAILED"
+}
+
+@test "pre-commit.d/: extension that tampers with .feature is caught by IIKit (final-gate property)" {
+    # Establish a valid hash for a known .feature content
+    mkdir -p "$TEST_DIR/specs/001-feature/tests/features"
+    cat > "$TEST_DIR/specs/001-feature/tests/features/login.feature" << 'EOF'
+Feature: Test
+  Scenario: Test scenario
+    Given a test precondition
+    When a test action occurs
+    Then a test result is observed
+EOF
+    "$TESTIFY_SCRIPT" store-hash "$TEST_DIR/specs/001-feature/tests/features" > /dev/null
+    git -C "$TEST_DIR" add -A >/dev/null 2>&1
+    git -C "$TEST_DIR" commit -m "establish hash" >/dev/null 2>&1
+
+    # Stage the same valid file — hash check would pass on its own
+    git -C "$TEST_DIR" add specs/001-feature/tests/features/login.feature
+
+    # Hostile extension: re-stage a tampered version after IIKit would normally check
+    mkdir -p "$TEST_DIR/.git/hooks/pre-commit.d"
+    cat > "$TEST_DIR/.git/hooks/pre-commit.d/tamper" << 'EOF'
+#!/usr/bin/env bash
+root="$(git rev-parse --show-toplevel)"
+cat > "$root/specs/001-feature/tests/features/login.feature" <<'F'
+Feature: Test
+  Scenario: Test scenario
+    Given a test precondition
+    When a test action occurs
+    Then a TAMPERED result is observed
+F
+git -C "$root" add specs/001-feature/tests/features/login.feature
+exit 0
+EOF
+    chmod +x "$TEST_DIR/.git/hooks/pre-commit.d/tamper"
+
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    [ "$status" -eq 1 ]
+    assert_contains "$output" "ASSERTION INTEGRITY CHECK FAILED"
+}
+
+@test "pre-commit.d/: non-executable files are ignored" {
+    mkdir -p "$TEST_DIR/.git/hooks/pre-commit.d"
+    # README (no exec bit) — must not be invoked even if its content would fail
+    cat > "$TEST_DIR/.git/hooks/pre-commit.d/README" << 'EOF'
+this would not parse as a shell script and would error if executed
+EOF
+
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    [ "$status" -eq 0 ]
+}
+
+@test "pre-commit.d/: dotfiles are ignored" {
+    mkdir -p "$TEST_DIR/.git/hooks/pre-commit.d"
+    cat > "$TEST_DIR/.git/hooks/pre-commit.d/.swp" << 'EOF'
+#!/usr/bin/env bash
+exit 1
+EOF
+    chmod +x "$TEST_DIR/.git/hooks/pre-commit.d/.swp"
+
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    [ "$status" -eq 0 ]
+}
+
+@test "pre-commit.d/: extensions run in lexical order" {
+    mkdir -p "$TEST_DIR/.git/hooks/pre-commit.d"
+    cat > "$TEST_DIR/.git/hooks/pre-commit.d/01-first" << 'EOF'
+#!/usr/bin/env bash
+echo "first" >> "$(git rev-parse --show-toplevel)/EXT-ORDER"
+EOF
+    cat > "$TEST_DIR/.git/hooks/pre-commit.d/02-second" << 'EOF'
+#!/usr/bin/env bash
+echo "second" >> "$(git rev-parse --show-toplevel)/EXT-ORDER"
+EOF
+    chmod +x "$TEST_DIR/.git/hooks/pre-commit.d/01-first" "$TEST_DIR/.git/hooks/pre-commit.d/02-second"
+
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    [ "$status" -eq 0 ]
+    [ "$(cat "$TEST_DIR/EXT-ORDER")" = "first
+second" ]
+}
+
+@test "pre-commit.d/: subdirectories are ignored (not exec'd)" {
+    mkdir -p "$TEST_DIR/.git/hooks/pre-commit.d/subdir"
+    chmod +x "$TEST_DIR/.git/hooks/pre-commit.d/subdir"
+
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    [ "$status" -eq 0 ]
+}
+
+@test "pre-commit.d/: all extensions run even when one fails" {
+    mkdir -p "$TEST_DIR/.git/hooks/pre-commit.d"
+    cat > "$TEST_DIR/.git/hooks/pre-commit.d/01-fail" << 'EOF'
+#!/usr/bin/env bash
+exit 1
+EOF
+    cat > "$TEST_DIR/.git/hooks/pre-commit.d/02-after" << 'EOF'
+#!/usr/bin/env bash
+touch "$(git rev-parse --show-toplevel)/SECOND-RAN"
+exit 0
+EOF
+    chmod +x "$TEST_DIR/.git/hooks/pre-commit.d/01-fail" "$TEST_DIR/.git/hooks/pre-commit.d/02-after"
+
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    [ "$status" -ne 0 ]
+    [ -f "$TEST_DIR/SECOND-RAN" ]
+}

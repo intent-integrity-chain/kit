@@ -117,6 +117,54 @@ $postHookResult = Install-IIKitHook -HookType "post-commit" -SourceFile "post-co
 $postHookInstalled = $postHookResult.installed
 $postHookStatus = $postHookResult.status
 
+# Provision pre-commit.d/ extension point (user-supplied formatters, linters, etc.)
+# Uses the same `$gitDir/hooks` path as Install-IIKitHook above so the extension
+# point and the hook itself stay in lockstep — if `.git` is a file (linked
+# worktree, submodule), Install-IIKitHook's `Test-Path` gate already failed
+# and we skip provisioning here too rather than producing an orphan dir.
+$preCommitDProvisioned = $false
+if ((Test-Path $gitDir) -and (Test-Path $gitDir -PathType Container)) {
+    $preCommitDDir = Join-Path $gitDir "hooks/pre-commit.d"
+    if (-not (Test-Path $preCommitDDir)) {
+        New-Item -ItemType Directory -Path $preCommitDDir -Force | Out-Null
+    }
+    $preCommitDReadme = Join-Path $preCommitDDir "README"
+    if (-not (Test-Path $preCommitDReadme)) {
+        $readmeContent = @'
+# IIKit pre-commit extension point — IIKIT-PRE-COMMIT-D
+#
+# Drop executable scripts in this directory to extend the pre-commit chain
+# without removing or disabling IIKit's pre-commit enforcement (which lives
+# at .git/hooks/pre-commit by default, or .git/hooks/iikit-pre-commit when
+# IIKit was installed alongside an existing user hook).
+#
+# Each executable in this dir runs BEFORE IIKit's assertion-integrity check,
+# so IIKit remains the final gate — mutating a .feature file / test-specs.md
+# / context.json from an extension will be caught by the subsequent IIKit
+# check against the post-extension staged state. Files are executed in
+# deterministic byte-collation order (LC_ALL=C sort); if one fails the rest
+# in this dir still run, but the hook exits non-zero after the loop and
+# IIKit does not run. Subdirectories, non-executable files, dotfiles,
+# and this README are ignored.
+#
+# Examples:
+#   prettier-write   - bunx prettier --write on staged JS/TS files
+#   eslint-fix       - eslint --fix on staged sources
+#   secret-scan      - gitleaks protect --staged
+#
+# Each script receives no arguments. Use `git diff --cached --name-only` to
+# find staged files. Exit non-zero to block the commit.
+#
+# Note: this directory is per-clone (not tracked in git). To share extensions
+# across the team, commit your scripts under a tracked path (e.g.
+# scripts/git-hooks/) and symlink each into .git/hooks/pre-commit.d/
+# during onboarding.
+'@
+        Set-Content -Path $preCommitDReadme -Value $readmeContent -NoNewline
+        $preCommitDProvisioned = $true
+    }
+}
+
 # Commit constitution if requested and it exists
 $constitutionCommitted = $false
 $constitutionPath = Join-Path $projectRoot 'CONSTITUTION.md'
@@ -158,6 +206,7 @@ if ($Json) {
         hook_status = $hookStatus
         post_hook_installed = $postHookInstalled
         post_hook_status = $postHookStatus
+        pre_commit_d_provisioned = $preCommitDProvisioned
         project_root = $projectRoot.ToString()
     }
     $result | ConvertTo-Json -Compress
@@ -172,4 +221,7 @@ if ($Json) {
     }
     Report-HookStatus "Pre-commit" $hookStatus
     Report-HookStatus "Post-commit" $postHookStatus
+    if ($preCommitDProvisioned) {
+        Write-Output "[specify] Extension point created at .git/hooks/pre-commit.d/ (drop user-supplied hooks here)"
+    }
 }

@@ -150,3 +150,47 @@ teardown() {
     [[ "$status" -eq 1 ]]
     assert_contains "$output" "Unknown option"
 }
+
+# =============================================================================
+# pre-commit.d/ extension point provisioning
+# =============================================================================
+
+@test "init-project: creates pre-commit.d/ extension point with README" {
+    mkdir -p .specify
+
+    run "$INIT_SCRIPT"
+    [[ "$status" -eq 0 ]]
+    [[ -d ".git/hooks/pre-commit.d" ]]
+    [[ -f ".git/hooks/pre-commit.d/README" ]]
+    grep -q "IIKIT-PRE-COMMIT-D" .git/hooks/pre-commit.d/README
+}
+
+@test "init-project: JSON reports pre_commit_d_provisioned true on fresh init" {
+    mkdir -p .specify
+
+    run "$INIT_SCRIPT" --json
+    [[ "$status" -eq 0 ]]
+    assert_contains "$output" '"pre_commit_d_provisioned":true'
+}
+
+@test "init-project: preserves existing pre-commit.d/README on re-run" {
+    mkdir -p .specify
+    "$INIT_SCRIPT" >/dev/null
+    echo "user customization" >> .git/hooks/pre-commit.d/README
+
+    run "$INIT_SCRIPT" --json
+    [[ "$status" -eq 0 ]]
+    grep -q "user customization" .git/hooks/pre-commit.d/README
+    assert_contains "$output" '"pre_commit_d_provisioned":false'
+}
+
+@test "init-project: preserves user scripts in pre-commit.d/ on re-run" {
+    mkdir -p .specify
+    "$INIT_SCRIPT" >/dev/null
+    echo '#!/bin/sh' > .git/hooks/pre-commit.d/prettier
+    chmod +x .git/hooks/pre-commit.d/prettier
+
+    run "$INIT_SCRIPT"
+    [[ "$status" -eq 0 ]]
+    [[ -x ".git/hooks/pre-commit.d/prettier" ]]
+}

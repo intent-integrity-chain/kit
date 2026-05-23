@@ -132,6 +132,42 @@ if (Test-Path $hooksDir) {
     Handle-Hook "post-commit" "IIKIT-POST-COMMIT"
 }
 
+# pre-commit.d/: remove our IIKIT-PRE-COMMIT-D README; report every remaining
+# entry (scripts, dotfiles, subdirs, non-iikit READMEs) as user content; drop
+# the dir only when no entries remain. Uses the same `$hooksDir` as the hook
+# removal above to stay in lockstep — see #67 for cross-script worktree handling.
+$preCommitD = Join-Path $hooksDir "pre-commit.d"
+if (Test-Path $preCommitD) {
+    $preCommitDReadme = Join-Path $preCommitD "README"
+    $preCommitDReadmeHandled = $false
+    if (Test-Path $preCommitDReadme) {
+        $readmeContent = Get-Content $preCommitDReadme -Raw -ErrorAction SilentlyContinue
+        if ($readmeContent -match 'IIKIT-PRE-COMMIT-D') {
+            Remove-Path $preCommitDReadme
+            # Only treat the README as handled when it's actually gone (or in
+            # -DryRun, where it stays on disk but is logically removed). A
+            # failed Remove-Path leaves the file in place and subsequent
+            # emptiness detection should still see it.
+            if ($DryRun -or -not (Test-Path $preCommitDReadme)) {
+                $preCommitDReadmeHandled = $true
+            }
+        }
+    }
+    # Report every remaining entry (scripts, dotfiles, subdirs, non-iikit READMEs).
+    # Skip the iikit-managed README we already recorded for removal — `-DryRun`
+    # leaves it on disk, so Get-ChildItem would otherwise double-count it as
+    # user content AND keep the dir from being reported as droppable.
+    $remainingEntries = @(Get-ChildItem -Path $preCommitD -Force -ErrorAction SilentlyContinue |
+        Where-Object { -not ($preCommitDReadmeHandled -and $_.FullName -eq $preCommitDReadme) })
+    foreach ($entry in $remainingEntries) {
+        $userContent.Add((To-Relative $entry.FullName)) | Out-Null
+    }
+    # Drop the dir only when it is empty after the README removal above
+    if ($remainingEntries.Count -eq 0) {
+        Remove-Path $preCommitD
+    }
+}
+
 Remove-Path (Join-Path $repoRoot ".specify")
 
 $techMd = Join-Path $repoRoot "TECH.md"

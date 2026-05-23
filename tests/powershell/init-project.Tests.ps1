@@ -89,4 +89,37 @@ Describe "init-project" {
             $result | Should -Match '"constitution_committed":\s*true'
         }
     }
+
+    Context "pre-commit.d extension point" {
+        BeforeEach {
+            New-Item -ItemType Directory -Path ".specify" -Force | Out-Null
+        }
+
+        It "creates pre-commit.d directory with marker README" {
+            & $script:InitScript | Out-Null
+            Test-Path ".git/hooks/pre-commit.d" | Should -Be $true
+            Test-Path ".git/hooks/pre-commit.d/README" | Should -Be $true
+            (Get-Content ".git/hooks/pre-commit.d/README" -Raw) | Should -Match 'IIKIT-PRE-COMMIT-D'
+        }
+
+        It "JSON reports pre_commit_d_provisioned true on fresh init" {
+            $result = & $script:InitScript -Json | Out-String
+            $result | Should -Match '"pre_commit_d_provisioned":\s*true'
+        }
+
+        It "preserves an existing README on re-run and reports provisioned false" {
+            & $script:InitScript | Out-Null
+            Add-Content -Path ".git/hooks/pre-commit.d/README" -Value "user customization"
+            $result = & $script:InitScript -Json | Out-String
+            (Get-Content ".git/hooks/pre-commit.d/README" -Raw) | Should -Match 'user customization'
+            $result | Should -Match '"pre_commit_d_provisioned":\s*false'
+        }
+
+        It "preserves user scripts in pre-commit.d on re-run" {
+            & $script:InitScript | Out-Null
+            "#!/bin/sh" | Set-Content ".git/hooks/pre-commit.d/prettier"
+            & $script:InitScript | Out-Null
+            Test-Path ".git/hooks/pre-commit.d/prettier" | Should -Be $true
+        }
+    }
 }

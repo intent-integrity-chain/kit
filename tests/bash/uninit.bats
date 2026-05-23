@@ -181,3 +181,85 @@ EOF
     assert_contains "$result" '"removed":[]'
     assert_contains "$result" '"user_content":[]'
 }
+
+# =============================================================================
+# pre-commit.d/ handling
+# =============================================================================
+
+@test "uninit: removes IIKit-managed pre-commit.d README and empty dir" {
+    mkdir -p "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d"
+    cat > "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d/README" <<'EOF'
+# IIKit pre-commit extension point — IIKIT-PRE-COMMIT-D
+EOF
+
+    result=$("$UNINIT_SCRIPT" --json)
+
+    [[ ! -d "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d" ]]
+    assert_contains "$result" "pre-commit.d"
+}
+
+@test "uninit: preserves user scripts in pre-commit.d and reports them" {
+    mkdir -p "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d"
+    cat > "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d/README" <<'EOF'
+# IIKit pre-commit extension point — IIKIT-PRE-COMMIT-D
+EOF
+    cat > "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d/prettier" <<'EOF'
+#!/bin/sh
+EOF
+    chmod +x "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d/prettier"
+
+    result=$("$UNINIT_SCRIPT" --json)
+
+    # Our README is gone but the user script and dir remain
+    [[ ! -f "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d/README" ]]
+    [[ -x "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d/prettier" ]]
+    [[ -d "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d" ]]
+    assert_contains "$result" "pre-commit.d/prettier"
+}
+
+@test "uninit: reports dotfiles in pre-commit.d/ as user content (not silently removed)" {
+    mkdir -p "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d"
+    cat > "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d/README" <<'EOF'
+# IIKit pre-commit extension point — IIKIT-PRE-COMMIT-D
+EOF
+    : > "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d/.keep"
+
+    result=$("$UNINIT_SCRIPT" --json)
+
+    # Dotfile must survive AND be reported as user content; dir is preserved
+    [[ -f "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d/.keep" ]]
+    [[ -d "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d" ]]
+    assert_contains "$result" ".keep"
+}
+
+@test "uninit: --dry-run on pre-commit.d/ does not double-count managed README" {
+    # Clear default user-content setup so user_content reflects only this test's intent
+    rm -rf "$TEST_DIR/.specify" "$TEST_DIR/specs"
+    rm -f "$TEST_DIR/CONSTITUTION.md"
+
+    mkdir -p "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d"
+    cat > "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d/README" <<'EOF'
+# IIKit pre-commit extension point — IIKIT-PRE-COMMIT-D
+EOF
+
+    result=$("$UNINIT_SCRIPT" --json --dry-run)
+
+    # README must appear in `removed` (as planned deletion) but NOT in `user_content`,
+    # and the dir itself must show as droppable.
+    assert_contains "$result" "pre-commit.d/README"
+    assert_contains "$result" '"user_content":[]'
+    # Disk state is unchanged in dry-run
+    [[ -f "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d/README" ]]
+    [[ -d "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d" ]]
+}
+
+@test "uninit: leaves non-iikit README in pre-commit.d/ alone" {
+    mkdir -p "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d"
+    cat > "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d/README" <<'EOF'
+# Custom team docs — not iikit-managed
+EOF
+
+    "$UNINIT_SCRIPT" --json
+
+    [[ -f "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d/README" ]]
+}

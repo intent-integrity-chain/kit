@@ -174,6 +174,43 @@ if [[ -d "$HOOKS_DIR" ]]; then
     handle_hook "post-commit" "IIKIT-POST-COMMIT"
 fi
 
+# pre-commit.d/: remove our IIKIT-PRE-COMMIT-D README; report everything else as
+# user content; drop the dir only when truly empty. `find` includes dotfiles so
+# stray `.keep` / editor scratch files don't get silently rm -rf'd. Uses the
+# same `$HOOKS_DIR` as the hook removal above to stay in lockstep — see #67
+# for cross-script worktree handling.
+PRECOMMIT_D="$HOOKS_DIR/pre-commit.d"
+if [[ -d "$PRECOMMIT_D" ]]; then
+    PRECOMMIT_D_README="$PRECOMMIT_D/README"
+    PRECOMMIT_D_README_HANDLED=false
+    if [[ -f "$PRECOMMIT_D_README" ]] && grep -q 'IIKIT-PRE-COMMIT-D' "$PRECOMMIT_D_README" 2>/dev/null; then
+        remove_file "$PRECOMMIT_D_README"
+        # Only treat the README as handled when it's actually gone (or in
+        # --dry-run, where it stays on disk but is logically removed). A failed
+        # remove_file leaves the file in place and we want subsequent emptiness
+        # detection to see it.
+        if $DRY_RUN || [[ ! -f "$PRECOMMIT_D_README" ]]; then
+            PRECOMMIT_D_README_HANDLED=true
+        fi
+    fi
+    remaining=0
+    while IFS= read -r entry; do
+        [[ -n "$entry" ]] || continue
+        # Skip the iikit-managed README we already recorded for removal.
+        # `--dry-run` leaves it on disk so `find` would otherwise double-count
+        # it as user content AND keep `remaining` > 0.
+        if [[ "$PRECOMMIT_D_README_HANDLED" == true && "$entry" == "$PRECOMMIT_D_README" ]]; then
+            continue
+        fi
+        rel="${entry#"$REPO_ROOT/"}"
+        USER_CONTENT+=("$rel")
+        remaining=$((remaining + 1))
+    done < <(find "$PRECOMMIT_D" -mindepth 1 -maxdepth 1 -print 2>/dev/null)
+    if [[ "$remaining" -eq 0 ]]; then
+        remove_dir "$PRECOMMIT_D"
+    fi
+fi
+
 remove_dir "$REPO_ROOT/.specify"
 
 # TECH.md: only remove when it carries an iikit phase reference.
