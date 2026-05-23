@@ -747,6 +747,15 @@ EOF
 second" ]
 }
 
+@test "pre-commit.d/: subdirectories are ignored (not exec'd)" {
+    mkdir -p "$TEST_DIR/.git/hooks/pre-commit.d/subdir"
+    chmod +x "$TEST_DIR/.git/hooks/pre-commit.d/subdir"
+
+    cd "$TEST_DIR"
+    run bash .git/hooks/pre-commit
+    [ "$status" -eq 0 ]
+}
+
 @test "pre-commit.d/: all extensions run even when one fails" {
     mkdir -p "$TEST_DIR/.git/hooks/pre-commit.d"
     cat > "$TEST_DIR/.git/hooks/pre-commit.d/01-fail" << 'EOF'

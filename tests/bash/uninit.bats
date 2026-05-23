@@ -217,6 +217,21 @@ EOF
     assert_contains "$result" "pre-commit.d/prettier"
 }
 
+@test "uninit: reports dotfiles in pre-commit.d/ as user content (not silently removed)" {
+    mkdir -p "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d"
+    cat > "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d/README" <<'EOF'
+# IIKit pre-commit extension point — IIKIT-PRE-COMMIT-D
+EOF
+    : > "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d/.keep"
+
+    result=$("$UNINIT_SCRIPT" --json)
+
+    # Dotfile must survive AND be reported as user content; dir is preserved
+    [[ -f "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d/.keep" ]]
+    [[ -d "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d" ]]
+    assert_contains "$result" ".keep"
+}
+
 @test "uninit: leaves non-iikit README in pre-commit.d/ alone" {
     mkdir -p "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d"
     cat > "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d/README" <<'EOF'

@@ -132,9 +132,10 @@ if (Test-Path $gitDir) {
 # Drop executable scripts in this directory to extend the pre-commit chain
 # without modifying .git/hooks/pre-commit (which IIKit owns).
 #
-# Each executable in this dir runs AFTER IIKit's assertion-integrity checks
-# pass. Files are executed in lexical order. Non-executable files are
-# ignored. Dotfiles are ignored. This README is ignored (no exec bit).
+# Each executable in this dir runs on every IIKit success or no-op path,
+# and is skipped when IIKit blocks the commit. Files are executed in
+# deterministic byte-collation order (LC_ALL=C sort). Subdirectories,
+# non-executable files, dotfiles, and this README are ignored.
 #
 # Examples:
 #   prettier-write   - bunx prettier --write on staged JS/TS files

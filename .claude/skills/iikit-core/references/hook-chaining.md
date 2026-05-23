@@ -4,13 +4,16 @@ IIKit owns `.git/hooks/pre-commit` and uses it to enforce assertion integrity. T
 
 ## How It Works
 
-IIKit's pre-commit hook, after its own checks pass, executes every file in `.git/hooks/pre-commit.d/` that:
+IIKit's pre-commit hook executes every file in `.git/hooks/pre-commit.d/` that:
 
+- Is a regular file or symlink (not a subdirectory)
 - Is executable (`chmod +x`)
 - Is not a dotfile
 - Is not the IIKit-provisioned `README` (no exec bit)
 
-Files run in lexical order. Each runs with no arguments — use `git diff --cached --name-only` to discover staged files. Exit non-zero to block the commit. If IIKit's own assertion check fails, extensions are skipped entirely so they never see a partial pass.
+Files run in deterministic byte-collation order (`LC_ALL=C` sort). Each runs with no arguments — use `git diff --cached --name-only` to discover staged files. Exit non-zero to block the commit.
+
+Extensions fire on every IIKit success or no-op path: the assertion check passing, nothing relevant staged (fast-path), and the degraded "IIKit scripts not found" warning path. They are skipped only when IIKit explicitly blocks the commit, so extensions never see a partial pass.
 
 ## Why Not a Hook Manager
 
