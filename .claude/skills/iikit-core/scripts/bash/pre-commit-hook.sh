@@ -29,20 +29,20 @@ run_pre_commit_d() {
     local d_dir="$REPO_ROOT/.git/hooks/pre-commit.d"
     [[ -d "$d_dir" ]] || return 0
 
-    local failed=0 ran=0 ext
+    local failed=0 ext
     # Enumerate with `find` (bash 3.2 safe) and sort under LC_ALL=C so
     # extension order is deterministic byte-collation, not locale-dependent.
     while IFS= read -r ext; do
         [[ -n "$ext" ]] || continue
-        [[ -e "$ext" ]] || continue
-        # Skip subdirectories — `-x` is true for traversable dirs, exec would fail
-        [[ -d "$ext" ]] && continue
+        # Require a regular file (or symlink to one). Skips dirs, FIFOs,
+        # sockets, devices, and broken symlinks — exec'ing those would
+        # hang or fail and block the commit.
+        [[ -f "$ext" ]] || continue
         # Skip non-executable files (README, etc.)
         [[ -x "$ext" ]] || continue
         # Skip dotfiles (keepfiles, editor scratch)
         case "$(basename "$ext")" in .*) continue ;; esac
 
-        ran=$((ran + 1))
         if ! "$ext"; then
             echo "[iikit] Extension hook failed: ${ext#"$REPO_ROOT"/}" >&2
             failed=1

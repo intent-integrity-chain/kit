@@ -142,7 +142,8 @@ if (Test-Path $preCommitD) {
             Remove-Path $preCommitDReadme
         }
     }
-    # Report user scripts remaining in the dir
+    # Report every remaining entry (scripts, dotfiles, subdirs, non-iikit READMEs)
+    # so nothing in this dir gets silently rm -rf'd when we drop the empty parent.
     $remainingEntries = @(Get-ChildItem -Path $preCommitD -Force -ErrorAction SilentlyContinue)
     foreach ($entry in $remainingEntries) {
         $userContent.Add((To-Relative $entry.FullName)) | Out-Null
