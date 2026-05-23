@@ -228,4 +228,22 @@ Describe "uninit: pre-commit.d handling" {
 
         (Test-Path (Join-Path $script:PreCommitD "README")) | Should -BeTrue
     }
+
+    It "-DryRun does not double-count the managed README" {
+        # Clear default user-content setup so user_content reflects only this test's intent
+        Remove-Item (Join-Path $script:TestDir ".specify") -Recurse -Force -ErrorAction SilentlyContinue
+        Remove-Item (Join-Path $script:TestDir "specs") -Recurse -Force -ErrorAction SilentlyContinue
+        Remove-Item (Join-Path $script:TestDir "CONSTITUTION.md") -Force -ErrorAction SilentlyContinue
+
+        "# IIKit pre-commit extension point — IIKIT-PRE-COMMIT-D" | Set-Content (Join-Path $script:PreCommitD "README")
+
+        $result = & $script:UninitScript -Json -DryRun | Out-String
+
+        # README must appear in removed (as planned) but NOT in user_content
+        $result | Should -Match "pre-commit.d/README"
+        $result | Should -Match '"user_content":\s*\[\s*\]'
+        # Disk state unchanged in dry-run
+        (Test-Path (Join-Path $script:PreCommitD "README")) | Should -BeTrue
+        (Test-Path $script:PreCommitD) | Should -BeTrue
+    }
 }

@@ -56,6 +56,7 @@ run_pre_commit_d() {
 
         if ! "$ext"; then
             echo "[iikit] Extension hook failed: ${ext#"$REPO_ROOT"/}" >&2
+            echo "[iikit]   Fix the script's error above, or temporarily move it out of .git/hooks/pre-commit.d/, then retry the commit." >&2
             failed=1
         fi
     done < <(find "$d_dir" -mindepth 1 -maxdepth 1 -print 2>/dev/null | LC_ALL=C sort)
