@@ -49,8 +49,10 @@ if [ ! -d "$PROJECT_ROOT/.specify" ]; then
     exit 1
 fi
 
-# Check if already a git repo
-if [ -d "$PROJECT_ROOT/.git" ]; then
+# Check if already a git repo. `--is-inside-work-tree` is true for linked
+# worktrees and submodules (where `.git` is a file pointing at the real
+# gitdir), so it covers all the layouts `-d .git` misses.
+if git -C "$PROJECT_ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     GIT_INITIALIZED=false
     GIT_STATUS="already_initialized"
 else
@@ -59,6 +61,18 @@ else
     GIT_INITIALIZED=true
     GIT_STATUS="initialized"
 fi
+
+# Resolve hooks directory via `git rev-parse --git-path hooks` once and reuse
+# everywhere. In a linked worktree or submodule this resolves to the gitdir's
+# hooks/ (typically the main repo's `.git/hooks/`), so install_hook and
+# pre-commit.d/ provisioning land in the same place git actually runs hooks
+# from.
+HOOKS_REL="$(git -C "$PROJECT_ROOT" rev-parse --git-path hooks 2>/dev/null)"
+case "$HOOKS_REL" in
+    /*) HOOKS_ABS="$HOOKS_REL" ;;
+    "") HOOKS_ABS="" ;;
+    *)  HOOKS_ABS="$PROJECT_ROOT/$HOOKS_REL" ;;
+esac
 
 # Check if git user identity is configured (required for commits)
 GIT_USER_CONFIGURED=true
@@ -80,7 +94,7 @@ install_hook() {
     RESULT_installed=false
     RESULT_status="skipped"
 
-    if [ ! -d "$PROJECT_ROOT/.git" ]; then
+    if [ -z "$HOOKS_ABS" ]; then
         return
     fi
 
@@ -92,7 +106,7 @@ install_hook() {
         return
     fi
 
-    local hooks_dir="$PROJECT_ROOT/.git/hooks"
+    local hooks_dir="$HOOKS_ABS"
     mkdir -p "$hooks_dir"
     local existing_hook="$hooks_dir/$hook_type"
 
@@ -135,13 +149,13 @@ POST_HOOK_INSTALLED="$RESULT_installed"
 POST_HOOK_STATUS="$RESULT_status"
 
 # Provision pre-commit.d/ extension point (user-supplied formatters, linters, etc.)
-# Uses the same `$PROJECT_ROOT/.git/hooks` path as `install_hook` above so the
-# extension point and the hook itself stay in lockstep — if `.git` is a file
-# (linked worktree, submodule), the install_hook gate skipped already and we
-# skip here too rather than provisioning an orphan dir.
+# Uses the same resolved `$HOOKS_ABS` as `install_hook` above so the extension
+# point and the hook itself land in the same git-managed hooks directory —
+# `git rev-parse --git-path hooks` resolves correctly for linked worktrees
+# and submodules where `.git` is a file rather than a directory.
 PRECOMMIT_D_PROVISIONED=false
-if [ -d "$PROJECT_ROOT/.git" ]; then
-    PRECOMMIT_D_DIR="$PROJECT_ROOT/.git/hooks/pre-commit.d"
+if [ -n "$HOOKS_ABS" ]; then
+    PRECOMMIT_D_DIR="$HOOKS_ABS/pre-commit.d"
     mkdir -p "$PRECOMMIT_D_DIR"
     PRECOMMIT_D_README="$PRECOMMIT_D_DIR/README"
     if [ ! -f "$PRECOMMIT_D_README" ]; then
@@ -232,6 +246,10 @@ else
     report_hook_status "Pre-commit" "$HOOK_STATUS"
     report_hook_status "Post-commit" "$POST_HOOK_STATUS"
     if [ "$PRECOMMIT_D_PROVISIONED" = true ]; then
-        echo "[specify] Extension point created at .git/hooks/pre-commit.d/ (drop user-supplied hooks here)"
+        # Report the resolved path — in worktrees/submodules this differs from
+        # `.git/hooks/pre-commit.d/` (the hooks dir lives in the main repo /
+        # `.git/modules/<name>/hooks/`).
+        DISPLAY_PATH="${PRECOMMIT_D_DIR#"$PROJECT_ROOT/"}"
+        echo "[specify] Extension point created at $DISPLAY_PATH (drop user-supplied hooks here)"
     fi
 fi

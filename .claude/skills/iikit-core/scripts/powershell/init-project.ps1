@@ -42,9 +42,11 @@ if (-not (Test-Path (Join-Path $projectRoot '.specify'))) {
     exit 1
 }
 
-# Check if already a git repo
-$gitDir = Join-Path $projectRoot '.git'
-if (Test-Path $gitDir) {
+# Check if already a git repo. `--is-inside-work-tree` is true for linked
+# worktrees and submodules (where `.git` is a file pointing at the real
+# gitdir), so it covers all the layouts `Test-Path .git` misses.
+git -C $projectRoot rev-parse --is-inside-work-tree 2>$null | Out-Null
+if ($LASTEXITCODE -eq 0) {
     $gitInitialized = $false
     $gitStatus = "already_initialized"
 } else {
@@ -52,6 +54,22 @@ if (Test-Path $gitDir) {
     git init $projectRoot 2>&1 | Out-Null
     $gitInitialized = $true
     $gitStatus = "initialized"
+}
+
+# Resolve hooks directory via `git rev-parse --git-path hooks` once and reuse
+# everywhere. In a linked worktree or submodule this resolves to the gitdir's
+# hooks/ (typically the main repo's `.git/hooks/`), so Install-IIKitHook and
+# pre-commit.d/ provisioning land in the same place git actually runs hooks
+# from.
+$hooksRel = git -C $projectRoot rev-parse --git-path hooks 2>$null
+if ($hooksRel) {
+    if ([System.IO.Path]::IsPathRooted($hooksRel)) {
+        $hooksAbs = $hooksRel
+    } else {
+        $hooksAbs = Join-Path $projectRoot $hooksRel
+    }
+} else {
+    $hooksAbs = ""
 }
 
 # Install git hooks for assertion integrity enforcement
@@ -65,8 +83,7 @@ function Install-IIKitHook {
 
     $result = @{ installed = $false; status = "skipped" }
 
-    $gitDirPath = Join-Path $projectRoot '.git'
-    if (-not (Test-Path $gitDirPath)) { return $result }
+    if (-not $hooksAbs) { return $result }
 
     $bashScriptDir = Join-Path (Split-Path $PSScriptRoot -Parent) "bash"
     $hookSource = Join-Path $bashScriptDir $SourceFile
@@ -76,7 +93,7 @@ function Install-IIKitHook {
         return $result
     }
 
-    $hooksDir = Join-Path $gitDirPath "hooks"
+    $hooksDir = $hooksAbs
     if (-not (Test-Path $hooksDir)) {
         New-Item -ItemType Directory -Path $hooksDir -Force | Out-Null
     }
@@ -118,13 +135,13 @@ $postHookInstalled = $postHookResult.installed
 $postHookStatus = $postHookResult.status
 
 # Provision pre-commit.d/ extension point (user-supplied formatters, linters, etc.)
-# Uses the same `$gitDir/hooks` path as Install-IIKitHook above so the extension
-# point and the hook itself stay in lockstep — if `.git` is a file (linked
-# worktree, submodule), Install-IIKitHook's `Test-Path` gate already failed
-# and we skip provisioning here too rather than producing an orphan dir.
+# Uses the same resolved `$hooksAbs` as Install-IIKitHook above so the extension
+# point and the hook itself land in the same git-managed hooks directory —
+# `git rev-parse --git-path hooks` resolves correctly for linked worktrees and
+# submodules where `.git` is a file rather than a directory.
 $preCommitDProvisioned = $false
-if ((Test-Path $gitDir) -and (Test-Path $gitDir -PathType Container)) {
-    $preCommitDDir = Join-Path $gitDir "hooks/pre-commit.d"
+if ($hooksAbs) {
+    $preCommitDDir = Join-Path $hooksAbs "pre-commit.d"
     if (-not (Test-Path $preCommitDDir)) {
         New-Item -ItemType Directory -Path $preCommitDDir -Force | Out-Null
     }
@@ -222,6 +239,15 @@ if ($Json) {
     Report-HookStatus "Pre-commit" $hookStatus
     Report-HookStatus "Post-commit" $postHookStatus
     if ($preCommitDProvisioned) {
-        Write-Output "[specify] Extension point created at .git/hooks/pre-commit.d/ (drop user-supplied hooks here)"
+        # Report the resolved path — in worktrees/submodules this differs from
+        # `.git/hooks/pre-commit.d/` (the hooks dir lives in the main repo /
+        # `.git/modules/<name>/hooks/`).
+        $projectRootStr = $projectRoot.ToString()
+        if ($preCommitDDir.StartsWith($projectRootStr, [System.StringComparison]::Ordinal)) {
+            $displayPath = $preCommitDDir.Substring($projectRootStr.Length).TrimStart([char]'/', [char]'\')
+        } else {
+            $displayPath = $preCommitDDir
+        }
+        Write-Output "[specify] Extension point created at $displayPath (drop user-supplied hooks here)"
     }
 }

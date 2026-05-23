@@ -122,4 +122,38 @@ Describe "init-project" {
             Test-Path ".git/hooks/pre-commit.d/prettier" | Should -Be $true
         }
     }
+
+    Context "Linked-worktree support" {
+        It "installs hooks at the main repo's hooks dir when run from a worktree" {
+            Pop-Location
+
+            $mainDir = Join-Path $script:TestDir "main"
+            $wtDir = Join-Path $script:TestDir "wt"
+            New-Item -ItemType Directory -Path $mainDir -Force | Out-Null
+
+            Push-Location $mainDir
+            git init -q . 2>&1 | Out-Null
+            git config user.email "test@test.com"
+            git config user.name "Test"
+            git commit -q --allow-empty -m "init" 2>&1 | Out-Null
+            git worktree add -q $wtDir -b feature 2>&1 | Out-Null
+            Pop-Location
+
+            Push-Location $wtDir
+            New-Item -ItemType Directory -Path ".specify" -Force | Out-Null
+
+            $result = & $script:InitScript -Json | Out-String
+
+            # Hooks land in the main repo's hooks dir, not the worktree's `.git` (a file)
+            (Test-Path (Join-Path $mainDir ".git/hooks/pre-commit")) | Should -Be $true
+            (Test-Path (Join-Path $mainDir ".git/hooks/pre-commit.d/README")) | Should -Be $true
+            (Get-Content (Join-Path $mainDir ".git/hooks/pre-commit") -Raw) | Should -Match 'IIKIT-PRE-COMMIT'
+
+            $result | Should -Match '"hook_installed":\s*true'
+            $result | Should -Match '"pre_commit_d_provisioned":\s*true'
+
+            # Worktree's `.git` file is untouched (it's a file, not a directory)
+            (Test-Path (Join-Path $wtDir ".git")) | Should -Be $true
+        }
+    }
 }
