@@ -157,9 +157,10 @@ if [ -n "$HOOKS_REL" ]; then
 # Each executable in this dir runs BEFORE IIKit's assertion-integrity check,
 # so IIKit remains the final gate — mutating a .feature file / test-specs.md
 # / context.json from an extension will be caught by the subsequent IIKit
-# check against the post-extension staged state. A failing extension blocks
-# the commit immediately. Files are executed in deterministic byte-collation
-# order (LC_ALL=C sort). Subdirectories, non-executable files, dotfiles,
+# check against the post-extension staged state. Files are executed in
+# deterministic byte-collation order (LC_ALL=C sort); if one fails the rest
+# in this dir still run, but the hook exits non-zero after the loop and
+# IIKit does not run. Subdirectories, non-executable files, dotfiles,
 # and this README are ignored.
 #
 # Examples:
@@ -232,6 +233,9 @@ else
     report_hook_status "Pre-commit" "$HOOK_STATUS"
     report_hook_status "Post-commit" "$POST_HOOK_STATUS"
     if [ "$PRECOMMIT_D_PROVISIONED" = true ]; then
-        echo "[specify] Extension point created at .git/hooks/pre-commit.d/ (drop user-supplied hooks here)"
+        # Report the resolved location — in worktrees this can differ from
+        # `.git/hooks/pre-commit.d/` because the hooks dir lives in the main repo.
+        DISPLAY_PATH="${PRECOMMIT_D_DIR#"$PROJECT_ROOT/"}"
+        echo "[specify] Extension point created at $DISPLAY_PATH (drop user-supplied hooks here)"
     fi
 fi

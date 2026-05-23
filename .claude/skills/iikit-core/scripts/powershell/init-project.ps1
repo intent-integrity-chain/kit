@@ -145,9 +145,10 @@ if ($hooksRel) {
 # Each executable in this dir runs BEFORE IIKit's assertion-integrity check,
 # so IIKit remains the final gate — mutating a .feature file / test-specs.md
 # / context.json from an extension will be caught by the subsequent IIKit
-# check against the post-extension staged state. A failing extension blocks
-# the commit immediately. Files are executed in deterministic byte-collation
-# order (LC_ALL=C sort). Subdirectories, non-executable files, dotfiles,
+# check against the post-extension staged state. Files are executed in
+# deterministic byte-collation order (LC_ALL=C sort); if one fails the rest
+# in this dir still run, but the hook exits non-zero after the loop and
+# IIKit does not run. Subdirectories, non-executable files, dotfiles,
 # and this README are ignored.
 #
 # Examples:
@@ -225,6 +226,14 @@ if ($Json) {
     Report-HookStatus "Pre-commit" $hookStatus
     Report-HookStatus "Post-commit" $postHookStatus
     if ($preCommitDProvisioned) {
-        Write-Output "[specify] Extension point created at .git/hooks/pre-commit.d/ (drop user-supplied hooks here)"
+        # Report the resolved location — in worktrees this can differ from
+        # `.git/hooks/pre-commit.d/` because the hooks dir lives in the main repo.
+        $projectRootStr = $projectRoot.ToString()
+        if ($preCommitDDir.StartsWith($projectRootStr, [System.StringComparison]::Ordinal)) {
+            $displayPath = $preCommitDDir.Substring($projectRootStr.Length).TrimStart([char]'/', [char]'\')
+        } else {
+            $displayPath = $preCommitDDir
+        }
+        Write-Output "[specify] Extension point created at $displayPath (drop user-supplied hooks here)"
     }
 }

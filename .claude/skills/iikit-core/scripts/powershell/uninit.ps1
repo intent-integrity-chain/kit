@@ -38,7 +38,14 @@ $userContent = New-Object System.Collections.Generic.List[string]
 $errors = New-Object System.Collections.Generic.List[string]
 
 function To-Relative([string]$abs) {
-    return $abs.Substring($repoRoot.Length).TrimStart([char]'/', [char]'\')
+    # Only strip the repoRoot prefix when $abs actually starts with it;
+    # in worktrees the hooks dir can resolve outside the working tree,
+    # in which case keep the absolute path rather than slicing arbitrary
+    # bytes off the front.
+    if ($abs.StartsWith($repoRoot, [System.StringComparison]::Ordinal)) {
+        return $abs.Substring($repoRoot.Length).TrimStart([char]'/', [char]'\')
+    }
+    return $abs
 }
 
 function Remove-Path([string]$path) {

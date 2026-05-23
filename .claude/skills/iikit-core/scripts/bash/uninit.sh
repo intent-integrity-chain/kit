@@ -201,7 +201,14 @@ if [[ -d "$PRECOMMIT_D" ]]; then
         if [[ "$PRECOMMIT_D_README_HANDLED" == true && "$entry" == "$PRECOMMIT_D_README" ]]; then
             continue
         fi
-        rel="${entry#"$REPO_ROOT/"}"
+        # Strip REPO_ROOT prefix when applicable; otherwise keep the absolute
+        # path so worktree hooks (where the hooks dir lives outside the
+        # worktree top) don't get an arbitrary substring sliced off.
+        if [[ "$entry" == "$REPO_ROOT"/* ]]; then
+            rel="${entry#"$REPO_ROOT/"}"
+        else
+            rel="$entry"
+        fi
         USER_CONTENT+=("$rel")
         remaining=$((remaining + 1))
     done < <(find "$PRECOMMIT_D" -mindepth 1 -maxdepth 1 -print 2>/dev/null)
