@@ -1,6 +1,6 @@
 # Pre-Commit Hook Chaining
 
-IIKit owns `.git/hooks/pre-commit` and uses it to enforce assertion integrity. To layer additional checks (formatters, linters, secret scanners) without modifying that file, use the `.git/hooks/pre-commit.d/` extension point.
+IIKit's pre-commit hook enforces assertion integrity. By default it lives at `.git/hooks/pre-commit`; if you had an existing pre-commit hook at install time, IIKit installs to `.git/hooks/iikit-pre-commit` and your hook chain-calls it. To layer additional checks (formatters, linters, secret scanners) without disturbing that enforcement, use the `.git/hooks/pre-commit.d/` extension point.
 
 ## How It Works
 
@@ -17,7 +17,7 @@ Extensions fire on every IIKit success or no-op path: the assertion check passin
 
 ## Why Not a Hook Manager
 
-Hook managers (lefthook, husky, pre-commit) install their own `.git/hooks/pre-commit` and either overwrite the IIKit hook or rename it to `pre-commit.old`. Either path violates the assertion-integrity rule — IIKit must own that file so the check cannot be silently disabled. Use `pre-commit.d/` instead; a single executable script there can shell out to whatever tool you prefer.
+Hook managers (lefthook, husky, pre-commit) install their own `.git/hooks/pre-commit` and either overwrite the IIKit hook or rename it to `pre-commit.old`. Either path violates the assertion-integrity rule — the IIKit enforcement must not be removed or silently disabled. Use `pre-commit.d/` instead; a single executable script there can shell out to whatever tool you prefer.
 
 ## Examples
 

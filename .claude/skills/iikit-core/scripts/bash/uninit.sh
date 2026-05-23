@@ -180,12 +180,20 @@ fi
 PRECOMMIT_D="$HOOKS_DIR/pre-commit.d"
 if [[ -d "$PRECOMMIT_D" ]]; then
     PRECOMMIT_D_README="$PRECOMMIT_D/README"
+    PRECOMMIT_D_README_HANDLED=false
     if [[ -f "$PRECOMMIT_D_README" ]] && grep -q 'IIKIT-PRE-COMMIT-D' "$PRECOMMIT_D_README" 2>/dev/null; then
         remove_file "$PRECOMMIT_D_README"
+        PRECOMMIT_D_README_HANDLED=true
     fi
     remaining=0
     while IFS= read -r entry; do
         [[ -n "$entry" ]] || continue
+        # Skip the iikit-managed README we already recorded for removal.
+        # `--dry-run` leaves it on disk so `find` would otherwise double-count
+        # it as user content AND keep `remaining` > 0.
+        if [[ "$PRECOMMIT_D_README_HANDLED" == true && "$entry" == "$PRECOMMIT_D_README" ]]; then
+            continue
+        fi
         rel="${entry#"$REPO_ROOT/"}"
         USER_CONTENT+=("$rel")
         remaining=$((remaining + 1))

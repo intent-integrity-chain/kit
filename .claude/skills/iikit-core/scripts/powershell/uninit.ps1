@@ -138,15 +138,20 @@ if (Test-Path $hooksDir) {
 $preCommitD = Join-Path $hooksDir "pre-commit.d"
 if (Test-Path $preCommitD) {
     $preCommitDReadme = Join-Path $preCommitD "README"
+    $preCommitDReadmeHandled = $false
     if (Test-Path $preCommitDReadme) {
         $readmeContent = Get-Content $preCommitDReadme -Raw -ErrorAction SilentlyContinue
         if ($readmeContent -match 'IIKIT-PRE-COMMIT-D') {
             Remove-Path $preCommitDReadme
+            $preCommitDReadmeHandled = $true
         }
     }
-    # Report every remaining entry (scripts, dotfiles, subdirs, non-iikit READMEs)
-    # so nothing in this dir gets silently rm -rf'd when we drop the empty parent.
-    $remainingEntries = @(Get-ChildItem -Path $preCommitD -Force -ErrorAction SilentlyContinue)
+    # Report every remaining entry (scripts, dotfiles, subdirs, non-iikit READMEs).
+    # Skip the iikit-managed README we already recorded for removal — `-DryRun`
+    # leaves it on disk, so Get-ChildItem would otherwise double-count it as
+    # user content AND keep the dir from being reported as droppable.
+    $remainingEntries = @(Get-ChildItem -Path $preCommitD -Force -ErrorAction SilentlyContinue |
+        Where-Object { -not ($preCommitDReadmeHandled -and $_.FullName -eq $preCommitDReadme) })
     foreach ($entry in $remainingEntries) {
         $userContent.Add((To-Relative $entry.FullName)) | Out-Null
     }

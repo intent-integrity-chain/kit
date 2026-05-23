@@ -232,6 +232,27 @@ EOF
     assert_contains "$result" ".keep"
 }
 
+@test "uninit: --dry-run on pre-commit.d/ does not double-count managed README" {
+    # Clear default user-content setup so user_content reflects only this test's intent
+    rm -rf "$TEST_DIR/.specify" "$TEST_DIR/specs"
+    rm -f "$TEST_DIR/CONSTITUTION.md"
+
+    mkdir -p "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d"
+    cat > "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d/README" <<'EOF'
+# IIKit pre-commit extension point — IIKIT-PRE-COMMIT-D
+EOF
+
+    result=$("$UNINIT_SCRIPT" --json --dry-run)
+
+    # README must appear in `removed` (as planned deletion) but NOT in `user_content`,
+    # and the dir itself must show as droppable.
+    assert_contains "$result" "pre-commit.d/README"
+    assert_contains "$result" '"user_content":[]'
+    # Disk state is unchanged in dry-run
+    [[ -f "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d/README" ]]
+    [[ -d "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d" ]]
+}
+
 @test "uninit: leaves non-iikit README in pre-commit.d/ alone" {
     mkdir -p "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d"
     cat > "$TEST_DIR/$HOOKS_SUBDIR/pre-commit.d/README" <<'EOF'

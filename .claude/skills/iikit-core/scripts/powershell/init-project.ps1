@@ -118,9 +118,17 @@ $postHookInstalled = $postHookResult.installed
 $postHookStatus = $postHookResult.status
 
 # Provision pre-commit.d/ extension point (user-supplied formatters, linters, etc.)
+# Resolve hooks dir via `git rev-parse` so worktrees / submodules (where `.git`
+# is a file pointing at the real gitdir) work correctly.
 $preCommitDProvisioned = $false
-if (Test-Path $gitDir) {
-    $preCommitDDir = Join-Path $gitDir "hooks/pre-commit.d"
+$hooksRel = git -C $projectRoot rev-parse --git-path hooks 2>$null
+if ($hooksRel) {
+    if ([System.IO.Path]::IsPathRooted($hooksRel)) {
+        $hooksAbs = $hooksRel
+    } else {
+        $hooksAbs = Join-Path $projectRoot $hooksRel
+    }
+    $preCommitDDir = Join-Path $hooksAbs "pre-commit.d"
     if (-not (Test-Path $preCommitDDir)) {
         New-Item -ItemType Directory -Path $preCommitDDir -Force | Out-Null
     }
@@ -130,7 +138,9 @@ if (Test-Path $gitDir) {
 # IIKit pre-commit extension point — IIKIT-PRE-COMMIT-D
 #
 # Drop executable scripts in this directory to extend the pre-commit chain
-# without modifying .git/hooks/pre-commit (which IIKit owns).
+# without removing or disabling IIKit's pre-commit enforcement (which lives
+# at .git/hooks/pre-commit by default, or .git/hooks/iikit-pre-commit when
+# IIKit was installed alongside an existing user hook).
 #
 # Each executable in this dir runs on every IIKit success or no-op path,
 # and is skipped when IIKit blocks the commit. Files are executed in

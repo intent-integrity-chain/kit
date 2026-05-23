@@ -136,8 +136,13 @@ POST_HOOK_STATUS="$RESULT_status"
 
 # Provision pre-commit.d/ extension point (user-supplied formatters, linters, etc.)
 PRECOMMIT_D_PROVISIONED=false
-if [ -d "$PROJECT_ROOT/.git" ]; then
-    PRECOMMIT_D_DIR="$PROJECT_ROOT/.git/hooks/pre-commit.d"
+HOOKS_REL="$(git -C "$PROJECT_ROOT" rev-parse --git-path hooks 2>/dev/null)"
+if [ -n "$HOOKS_REL" ]; then
+    case "$HOOKS_REL" in
+        /*) HOOKS_ABS="$HOOKS_REL" ;;
+        *)  HOOKS_ABS="$PROJECT_ROOT/$HOOKS_REL" ;;
+    esac
+    PRECOMMIT_D_DIR="$HOOKS_ABS/pre-commit.d"
     mkdir -p "$PRECOMMIT_D_DIR"
     PRECOMMIT_D_README="$PRECOMMIT_D_DIR/README"
     if [ ! -f "$PRECOMMIT_D_README" ]; then
@@ -145,7 +150,9 @@ if [ -d "$PROJECT_ROOT/.git" ]; then
 # IIKit pre-commit extension point — IIKIT-PRE-COMMIT-D
 #
 # Drop executable scripts in this directory to extend the pre-commit chain
-# without modifying .git/hooks/pre-commit (which IIKit owns).
+# without removing or disabling IIKit's pre-commit enforcement (which lives
+# at .git/hooks/pre-commit by default, or .git/hooks/iikit-pre-commit when
+# IIKit was installed alongside an existing user hook).
 #
 # Each executable in this dir runs on every IIKit success or no-op path,
 # and is skipped when IIKit blocks the commit. Files are executed in

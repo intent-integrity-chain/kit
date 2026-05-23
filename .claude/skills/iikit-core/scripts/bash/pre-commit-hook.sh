@@ -26,7 +26,15 @@ fi
 # ============================================================================
 
 run_pre_commit_d() {
-    local d_dir="$REPO_ROOT/.git/hooks/pre-commit.d"
+    # Resolve hooks dir via `git rev-parse` so worktrees and submodules
+    # (where `.git` is a file pointing at the real gitdir) work correctly.
+    local hooks_dir
+    hooks_dir="$(git -C "$REPO_ROOT" rev-parse --git-path hooks 2>/dev/null)"
+    [[ -n "$hooks_dir" ]] || return 0
+    # `--git-path` returns a path relative to $REPO_ROOT in non-worktree
+    # checkouts; resolve to absolute for safety.
+    [[ "$hooks_dir" = /* ]] || hooks_dir="$REPO_ROOT/$hooks_dir"
+    local d_dir="$hooks_dir/pre-commit.d"
     [[ -d "$d_dir" ]] || return 0
 
     local failed=0 ext
