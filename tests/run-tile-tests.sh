@@ -81,10 +81,11 @@ setup() {
         # Tessl 0.81+ 403s `tessl install` while moderation is `Pending` for a
         # just-published version. Moderation usually clears within minutes
         # (manually via tessl-admin or automatically). Retry with exponential
-        # backoff: 30s, 60s, 120s, 240s, 300s, 300s — total budget ~17 min.
+        # backoff between attempts: 30s, 60s, 120s, 240s, 300s, 300s — 7 total
+        # attempts (6 sleeps), budget ~17.5 min.
         local installed=""
         local attempt=0
-        local max_attempts=6
+        local max_attempts=7
         local sleep_s=30
         local max_sleep=300
         local installed_dir=".tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core"
@@ -106,7 +107,7 @@ setup() {
             fi
         done
         if [[ -z "$installed" ]]; then
-            log_fail "tessl install never succeeded after ${max_attempts} attempts (~17 min total). Run 'tessl tile info tessl-labs/intent-integrity-kit' to inspect — if moderationStatus is still 'pending' or 'failed', clear it via tessl-admin (echo '{\"status\": \"pass\"}' | tessl api admin/tiles/tessl-labs/intent-integrity-kit/versions/<version> -X PATCH --input -) and re-run."
+            log_fail "tessl install never succeeded after ${max_attempts} attempts (~17.5 min total). Run 'tessl tile info tessl-labs/intent-integrity-kit' to inspect — if moderationStatus is still 'pending' or 'failed', clear it via tessl-admin (echo '{\"status\": \"pass\"}' | tessl api admin/tiles/tessl-labs/intent-integrity-kit/versions/<version> -X PATCH --input -) and re-run."
             exit 1
         fi
     fi
