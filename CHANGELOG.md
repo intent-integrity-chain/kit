@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Bug Fixes
+- **`Verify tile` step retries through moderation gate**: Tessl 0.81+ returns 403 Forbidden on `tessl install` while a just-published version's `moderationStatus` is `pending`. The publish job's verify step ran the install immediately after publish, hit the 403, fell through to a dead `@0.7.0`/`@0.6.5` fallback, and cascaded 73 "skill directory missing" failures. `tests/run-tile-tests.sh` now retries the registry install with exponential backoff between attempts (30 → 60 → 120 → 240 → 300 → 300 seconds, 7 attempts total, ~17.5 min budget) and fails cleanly with admin-override remediation guidance if it never clears. Dead version-fallback removed.
 - **Tessl install path moved from `.tessl/tiles/` to `.tessl/plugins/`** (#80): Tessl CLI 0.81+ installs tiles to `.tessl/plugins/<workspace>/<tile>/` instead of `.tessl/tiles/<workspace>/<tile>/`. Every hardcoded reference in the repo (CI workflows, gh-aw policy-reviewer prompts, every `iikit-*/SKILL.md` invoking a script, pre/post-commit hooks, dev-time symlink, source/tile test paths) was updated to the new path. Without this fix, CI's E2E install test fails on every PR, the OpenAI gh-aw reviewer posts `Policy load failed` `CHANGES_REQUESTED` on every PR, and end-users on Tessl 0.81+ get "No such file or directory" when invoking any iikit skill. Mechanical rename only — no behavior change.
 
 ### Features
