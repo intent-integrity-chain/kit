@@ -78,12 +78,36 @@ setup() {
         rm -rf "$tile_copy"
     else
         log_info "Installing from registry (latest)..."
-        # Note: May need to specify version if recently published
-        tessl install tessl-labs/intent-integrity-kit 2>&1 | grep -v "^-"
-        if [[ ! -d ".tessl/plugins/tessl-labs/intent-integrity-kit" ]]; then
-            log_info "Retrying with explicit version..."
-            tessl install tessl-labs/intent-integrity-kit@0.7.0 2>&1 | grep -v "^-" || \
-            tessl install tessl-labs/intent-integrity-kit@0.6.5 2>&1 | grep -v "^-"
+        # Tessl 0.81+ 403s `tessl install` while moderation is `Pending` for a
+        # just-published version. Moderation usually clears within minutes
+        # (manually via tessl-admin or automatically). Retry with exponential
+        # backoff: 30s, 60s, 120s, 240s, 300s, 300s — total budget ~17 min.
+        local installed=""
+        local attempt=0
+        local max_attempts=6
+        local sleep_s=30
+        local max_sleep=300
+        local installed_dir=".tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core"
+        while (( attempt < max_attempts )); do
+            tessl install tessl-labs/intent-integrity-kit 2>&1 | grep -v "^-" || true
+            if [[ -d "$installed_dir" ]]; then
+                installed="yes"
+                if (( attempt > 0 )); then
+                    log_info "install succeeded on attempt $((attempt + 1))"
+                fi
+                break
+            fi
+            (( attempt++ ))
+            if (( attempt < max_attempts )); then
+                log_info "install blocked (likely moderation Pending); retrying in ${sleep_s}s (attempt ${attempt}/${max_attempts})"
+                sleep "$sleep_s"
+                sleep_s=$(( sleep_s * 2 ))
+                (( sleep_s > max_sleep )) && sleep_s=$max_sleep
+            fi
+        done
+        if [[ -z "$installed" ]]; then
+            log_fail "tessl install never succeeded after ${max_attempts} attempts (~17 min total). Run 'tessl tile info tessl-labs/intent-integrity-kit' to inspect — if moderationStatus is still 'pending' or 'failed', clear it via tessl-admin (echo '{\"status\": \"pass\"}' | tessl api admin/tiles/tessl-labs/intent-integrity-kit/versions/<version> -X PATCH --input -) and re-run."
+            exit 1
         fi
     fi
 }
