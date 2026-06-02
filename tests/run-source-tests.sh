@@ -518,12 +518,12 @@ test_task_commits() {
         log_fail "bugfix commit prefix not documented"
     fi
 
-    # parallel-execution.md references §6.6
+    # parallel-execution.md references §5.6
     ((TESTS_RUN++))
-    if grep -q '§6.6' "$ref"; then
-        log_pass "parallel-execution.md references §6.6"
+    if grep -q '§5.6' "$ref"; then
+        log_pass "parallel-execution.md references §5.6"
     else
-        log_fail "parallel-execution.md does not reference §6.6"
+        log_fail "parallel-execution.md does not reference §5.6"
     fi
 
     # Next Steps says "Push commits" not "Commit and push"
