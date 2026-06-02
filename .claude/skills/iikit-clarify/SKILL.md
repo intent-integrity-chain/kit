@@ -128,7 +128,7 @@ Append a **Checklist re-validation** entry under the active session in `spec.md`
 - Unchanged: K
 ```
 
-Skip this step when the target was not `spec.md` (plan, tasks, testify, checklist, constitution) — non-spec clarifications do not drive checklist quality items. Skip when no checklist files exist.
+Skip this step when the target was not `spec.md` (plan, tasks, testify, checklist, constitution). Skip when no checklist files exist.
 
 ### 6. Validation
 
