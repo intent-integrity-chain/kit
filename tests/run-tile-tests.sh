@@ -100,7 +100,7 @@ setup() {
             fi
             (( attempt++ ))
             if (( attempt < max_attempts )); then
-                log_info "install blocked (likely moderation Pending); retrying in ${sleep_s}s (attempt ${attempt}/${max_attempts})"
+                log_info "install blocked (likely moderation Pending); retrying in ${sleep_s}s (next: attempt $((attempt + 1))/${max_attempts})"
                 sleep "$sleep_s"
                 sleep_s=$(( sleep_s * 2 ))
                 (( sleep_s > max_sleep )) && sleep_s=$max_sleep
