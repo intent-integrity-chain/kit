@@ -47,7 +47,7 @@ Sub-procedure (perform in order):
    - **B) Clone** — requires `git.git_available`: ask for URL or `owner/name`; run `gh repo clone` or `git clone`.
    - **C) Skip** — always available: proceed without git; warn that assertion integrity hooks won't be active.
 
-   If `git_available` is false, only option C is available.
+   If `git.git_available` is false, only option C is available.
 
 3. **Check if already initialized**: `test -f "CONSTITUTION.md"`. If true, show constitution status, feature count, and suggest `/iikit-core status`; finish here.
 

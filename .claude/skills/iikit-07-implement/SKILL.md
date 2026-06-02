@@ -135,7 +135,7 @@ If tasks.md contains `[P]` markers, you **MUST** use the `Task` tool to dispatch
 
 Cross-story parallelism: independent stories can run as parallel workstreams after Phase 2 (verify no shared file modifications).
 
-**5.4 Rules**: install dependencies (Step 4) and Tessl tiles (Step 4) before writing code, query tiles before library code, tests before code if TDD, run tests after writing them, only orchestrator updates tasks.md.
+**5.4 Rules**: complete Step 4 (dependencies and Tessl tiles) before writing code, query tiles before library code, tests before code if TDD, run tests after writing them, only orchestrator updates tasks.md.
 
 **5.5 Failure handling**: let in-flight siblings finish, mark successes, report failures, halt phase. Constitutional violations in workers: worker stops, reports to orchestrator, treated as task failure.
 
