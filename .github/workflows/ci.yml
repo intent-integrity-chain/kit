@@ -149,6 +149,27 @@ jobs:
           fi
           rm -rf "$TESTDIR"
 
+      - name: Resolve symlinks in tile directory (for lint)
+        run: |
+          cd tiles/intent-integrity-kit
+          git ls-files -s . | grep '^120000' | awk '{print $4}' | while read link; do
+            target=$(readlink -f "$link" 2>/dev/null)
+            if [ -z "$target" ] || [ ! -e "$target" ]; then
+              target=$(cat "$link")
+              target=$(cd "$(dirname "$link")" && readlink -f "$target")
+            fi
+            if [ -d "$target" ]; then
+              rm "$link"
+              cp -R "$target" "$link"
+            elif [ -f "$target" ]; then
+              rm "$link"
+              cp "$target" "$link"
+            fi
+          done
+
+      - name: Make skills self-contained (for lint)
+        run: bash tests/prepare-tile.sh tiles/intent-integrity-kit/skills
+
       - name: Lint tile manifest
         run: tessl tile lint tiles/intent-integrity-kit
 
