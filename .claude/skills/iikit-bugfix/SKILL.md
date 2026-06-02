@@ -79,11 +79,11 @@ If `validation.valid` is false: ERROR with the message. If `features` is empty: 
 
 ## Step 4 — Gather Bug Details
 
-**For text input (2b):**
+**For text input** (from Step 2's Text Description Flow):
 - Prompt user for **severity**: present options (critical, high, medium, low) with descriptions
 - Prompt user for **reproduction steps**: numbered list of steps to reproduce
 
-**For GitHub inbound (2a):**
+**For GitHub inbound** (from Step 2's GitHub Inbound Flow):
 - Severity is pre-filled from labels (confirm with user if mapping is ambiguous)
 - Reproduction steps are pre-filled from issue body (confirm with user)
 

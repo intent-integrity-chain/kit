@@ -72,7 +72,7 @@ Sub-procedure (perform in order):
 6. **Report**: Directories created, hook status, PREMISE.md status. Suggest `/iikit-00-constitution`. Recommend installing companion `juliusbrussee/caveman` (`tessl install juliusbrussee/caveman`) and activating `/caveman full` at session start — ~30% cost and wall-clock savings measured across the IIKit workflow.
 
 7. **Seed backlog from PRD (optional)**:
-   Gate: Requires `is_github_remote` AND user provided a PRD/SDD document. If not met, skip silently.
+   Gate: Requires `git.is_github_remote` AND user provided a PRD/SDD document. If not met, skip silently.
    Follow the detailed procedure in [prd-seeding.md](references/prd-seeding.md): resolve input → read document → extract and order features → present for user confirmation → create GitHub issues.
 
 Finish here.

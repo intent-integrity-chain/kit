@@ -121,25 +121,25 @@ Before writing source code:
 
 ## Step 5 — Execute Tasks
 
-**5.1 Task extraction**: parse tasks.md for phase, completion status (`[x]` = skip), dependencies, [P] markers, [USn] labels. Build in-memory task graph.
+**Task extraction**: parse tasks.md for phase, completion status (`[x]` = skip), dependencies, [P] markers, [USn] labels. Build in-memory task graph.
 
-**5.2 Execution strategy — read [parallel-execution.md](references/parallel-execution.md) BEFORE proceeding**:
+**Execution strategy** (read [parallel-execution.md](references/parallel-execution.md) BEFORE proceeding):
 If tasks.md contains `[P]` markers, you **MUST** use the `Task` tool to dispatch parallel batches as concurrent subagents (one worker per task). Only fall back to sequential execution if the runtime has no subagent dispatch mechanism. Report mode per [formatting-guide.md](../iikit-core/references/formatting-guide.md) (Execution Mode Header).
 
-**5.3 Phase-by-phase**:
+**Phase-by-phase**:
 1. Collect eligible tasks (dependencies satisfied)
 2. Build parallel batches from [P] tasks with no mutual dependencies
 3. Dispatch — parallel: launch one `Task` tool subagent per `[P]` task in the batch; sequential: one at a time
-4. Collect results, checkpoint `[x]` in tasks.md per batch, then commit per chosen strategy (§5.6)
+4. Collect results, checkpoint `[x]` in tasks.md per batch, then commit per Task Commits below
 5. Repeat until phase complete
 
 Cross-story parallelism: independent stories can run as parallel workstreams after Phase 2 (verify no shared file modifications).
 
-**5.4 Rules**: complete Step 4 (dependencies and Tessl tiles) before writing code, query tiles before library code, tests before code if TDD, run tests after writing them, only orchestrator updates tasks.md.
+**Rules**: complete Step 4 (dependencies and Tessl tiles) before writing code, query tiles before library code, tests before code if TDD, run tests after writing them, only orchestrator updates tasks.md.
 
-**5.5 Failure handling**: let in-flight siblings finish, mark successes, report failures, halt phase. Constitutional violations in workers: worker stops, reports to orchestrator, treated as task failure.
+**Failure handling**: let in-flight siblings finish, mark successes, report failures, halt phase. Constitutional violations in workers: worker stops, reports to orchestrator, treated as task failure.
 
-**5.6 Task Commits**: Apply the user's chosen commit strategy.
+**Task Commits**: Apply the user's chosen commit strategy.
 
 **Per-task** (strategy A): After each task is marked `[x]`, stage its changed files (`git add` specific files, NOT `-A`) and commit:
 
@@ -186,7 +186,7 @@ After completing bug fix tasks (tasks with `T-B` prefix pattern):
 2. For each completed bug (all T-BNNN tasks for a BUG-NNN marked `[x]`):
    - Read the `GitHub Issue` field from the bug's entry in bugs.md
    - If a GitHub issue is linked (e.g., `#42`):
-     - **Close via commit**: include `Fixes #<number>` in the last task's commit message (§5.6)
+     - **Close via commit**: include `Fixes #<number>` in the last task's commit message (per Task Commits in Step 5)
      - **Post a comment**: use `gh issue comment` if available, otherwise `curl` the GitHub API (`POST /repos/{owner}/{repo}/issues/{number}/comments`). Comment content: root cause from bugs.md, completed fix tasks, and fix reference
    - If no GitHub issue is linked: skip silently
 
@@ -196,7 +196,7 @@ All tasks `[x]`, features validated against spec, test execution enforcement (St
 
 ## Error Handling
 
-Missing artifacts: STOP with run instructions. Constitution violations: STOP, explain, suggest alternative. Checklist incomplete: ask user. Task/parallel failure: report + halt (§5.5). Tests not run: STOP. Tests failing: fix code, re-run.
+Missing artifacts: STOP with run instructions. Constitution violations: STOP, explain, suggest alternative. Checklist incomplete: ask user. Task/parallel failure: report + halt (per Failure handling in Step 5). Tests not run: STOP. Tests failing: fix code, re-run.
 
 ## Dashboard & Next Steps
 
@@ -207,7 +207,7 @@ bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/ba
 ```
 Windows: `pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase 07`
 
-Note: implement handles its own git commits per the chosen strategy (§5.6), so post-phase is called without `--commit-files`.
+Note: implement handles its own git commits per the chosen strategy (Task Commits in Step 5), so post-phase is called without `--commit-files`.
 
 Parse `next_step` from JSON:
 - If `next_step` is `/iikit-07-implement` (feature incomplete): suggest resuming
