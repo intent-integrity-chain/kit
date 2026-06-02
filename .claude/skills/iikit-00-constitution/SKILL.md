@@ -31,7 +31,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 1. **Check PREMISE.md exists**: `test -f PREMISE.md`. If missing: ERROR — "PREMISE.md not found. Run `/iikit-core init` first to create it." Do NOT proceed without PREMISE.md.
 2. **Validate PREMISE.md**:
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/validate-premise.sh --json
+   bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/validate-premise.sh --json
    ```
    If FAIL (missing sections or placeholders): ERROR — show details, suggest re-running init.
 3. Check if constitution exists: `cat CONSTITUTION.md 2>/dev/null || echo "NO_CONSTITUTION"`
@@ -93,9 +93,9 @@ You **MUST** consider the user input before proceeding (if not empty).
 ## Commit, Dashboard & Next Steps
 
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase 00 --commit-files "CONSTITUTION.md,.specify/context.json" --commit-msg "Add project constitution"
+bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase 00 --commit-files "CONSTITUTION.md,.specify/context.json" --commit-msg "Add project constitution"
 ```
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase 00 -CommitFiles "CONSTITUTION.md,.specify/context.json" -CommitMsg "Add project constitution"`
+Windows: `pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase 00 -CommitFiles "CONSTITUTION.md,.specify/context.json" -CommitMsg "Add project constitution"`
 
 Parse `next_step` from JSON. Present per [model-recommendations.md](../iikit-core/references/model-recommendations.md):
 ```

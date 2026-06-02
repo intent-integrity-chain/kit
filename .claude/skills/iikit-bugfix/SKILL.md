@@ -60,11 +60,11 @@ Run full setup to list features, validate, and get bug ID and task IDs. First, p
 
 **Unix/macOS/Linux:**
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/bugfix-helpers.sh --full-setup "<feature_dir>" <task_count>
+bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/bugfix-helpers.sh --full-setup "<feature_dir>" <task_count>
 ```
 **Windows (PowerShell):**
 ```powershell
-pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/bugfix-helpers.ps1 --full-setup "<feature_dir>" <task_count>
+pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/bugfix-helpers.ps1 --full-setup "<feature_dir>" <task_count>
 ```
 
 Use `task_count` = 2 if TDD mandatory (from `tdd_determination` in response), 3 otherwise.
@@ -130,11 +130,11 @@ If TDD is mandatory (`determination` = `mandatory`):
    ```
 3. Re-hash the features directory:
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh rehash "<feature_dir>/tests/features"
+   bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh rehash "<feature_dir>/tests/features"
    ```
 4. **Verify hash was stored** — if result is NOT `valid`, STOP and report error:
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh verify-hash "<feature_dir>/tests/features"
+   bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh verify-hash "<feature_dir>/tests/features"
    ```
 5. Continue to Step 9 with TDD task variant
 
@@ -176,11 +176,11 @@ Do NOT modify existing entries or task IDs in tasks.md.
 
 **Unix/macOS/Linux:**
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase bugfix --commit-files "specs/*/bugs.md,specs/*/tasks.md,specs/*/tests/features/" --commit-msg "bugfix: <BUG-ID> <short-description>"
+bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase bugfix --commit-files "specs/*/bugs.md,specs/*/tasks.md,specs/*/tests/features/" --commit-msg "bugfix: <BUG-ID> <short-description>"
 ```
 **Windows (PowerShell):**
 ```powershell
-pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase bugfix -CommitFiles "specs/*/bugs.md,specs/*/tasks.md,specs/*/tests/features/" -CommitMsg "bugfix: <BUG-ID> <short-description>"
+pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase bugfix -CommitFiles "specs/*/bugs.md,specs/*/tasks.md,specs/*/tests/features/" -CommitMsg "bugfix: <BUG-ID> <short-description>"
 ```
 
 Parse `next_step` from JSON. Present per [model-recommendations.md](../iikit-core/references/model-recommendations.md):

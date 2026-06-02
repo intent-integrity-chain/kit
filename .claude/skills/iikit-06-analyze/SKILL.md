@@ -32,12 +32,12 @@ Load constitution per [constitution-loading.md](../iikit-core/references/constit
 ## Prerequisites Check
 
 1. Run:
-   - Bash: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase 06 --json`
-   - Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/check-prerequisites.ps1 -Phase 06 -Json`
+   - Bash: `bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase 06 --json`
+   - Windows: `pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/check-prerequisites.ps1 -Phase 06 -Json`
 2. Derive paths: SPEC, PLAN, TASKS from FEATURE_DIR. ERROR if any missing.
 3. If JSON contains `needs_selection: true`: present the `features` array as a numbered table (name and stage columns). Follow the options presentation pattern in [conversation-guide.md](../iikit-core/references/conversation-guide.md). After user selects, run:
-   - Bash: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selection>`
-   - Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selection>`
+   - Bash: `bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selection>`
+   - Windows: `pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selection>`
 
    Then re-run the prerequisites check from step 1.
 4. Checklist gate per [checklist-gate.md](../iikit-core/references/checklist-gate.md).
@@ -77,7 +77,7 @@ From tasks.md: task IDs, descriptions, phases, [P] markers, file paths.
 **H2. Orphaned tags** (MEDIUM): For each `@FR-XXX`/`@SC-XXX` tag in `.feature` files, verify the ID exists in spec.md. Flag tags referencing non-existent IDs.
 
 **H3. Step definition coverage** (optional): If `tests/step_definitions/` exists, run:
-- Bash: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/verify-steps.sh --json "FEATURE_DIR/tests/features" "FEATURE_DIR/plan.md"`
+- Bash: `bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/verify-steps.sh --json "FEATURE_DIR/tests/features" "FEATURE_DIR/plan.md"`
 
 `BLOCKED` → report undefined steps (HIGH). `DEGRADED` → note in report only.
 
@@ -145,8 +145,8 @@ Ask: "Suggest concrete remediation edits for the top N issues?" Do NOT apply aut
 
 Run post-phase to commit, refresh dashboard, and compute next step in a single call:
 
-- Bash: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase 06 --commit-files "specs/*/analysis.md,.specify/score-history.json" --commit-msg "analyze: <feature-short-name> consistency report"`
-- Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase 06 -CommitFiles "specs/*/analysis.md,.specify/score-history.json" -CommitMsg "analyze: <feature-short-name> consistency report"`
+- Bash: `bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase 06 --commit-files "specs/*/analysis.md,.specify/score-history.json" --commit-msg "analyze: <feature-short-name> consistency report"`
+- Windows: `pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase 06 -CommitFiles "specs/*/analysis.md,.specify/score-history.json" -CommitMsg "analyze: <feature-short-name> consistency report"`
 
 Parse `next_step` from JSON. Present per [model-recommendations.md](../iikit-core/references/model-recommendations.md):
 ```

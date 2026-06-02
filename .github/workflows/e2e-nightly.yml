@@ -32,13 +32,13 @@ jobs:
           tessl install tessl-labs/intent-integrity-kit
 
           # Verify tile installed correctly
-          test -f .tessl/tiles/tessl-labs/intent-integrity-kit/tile.json
-          test -f .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh
-          test -f .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/dashboard/src/generate-dashboard.js
-          test -f .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/dashboard/template.js
+          test -f .tessl/plugins/tessl-labs/intent-integrity-kit/tile.json
+          test -f .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh
+          test -f .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/dashboard/src/generate-dashboard.js
+          test -f .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/dashboard/template.js
 
           # Verify scripts are executable and work
-          bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/git-setup.sh --json | jq .git_available
+          bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/git-setup.sh --json | jq .git_available
 
           echo "PASS: Fresh install"
           rm -rf "$TESTDIR"
@@ -51,7 +51,7 @@ jobs:
           git init && git config user.email "test@test.com" && git config user.name "Test"
           tessl init && tessl install tessl-labs/intent-integrity-kit
 
-          SCRIPTS=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
+          SCRIPTS=".tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
 
           # Create feature files
           mkdir -p specs/001-test/tests/features
@@ -87,8 +87,8 @@ jobs:
           git init && git config user.email "test@test.com" && git config user.name "Test"
           tessl init && tessl install tessl-labs/intent-integrity-kit
 
-          SCRIPTS=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
-          DASHBOARD_DIR=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/dashboard"
+          SCRIPTS=".tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
+          DASHBOARD_DIR=".tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/dashboard"
 
           cat > CONSTITUTION.md << 'EOF'
           # Constitution
@@ -135,7 +135,7 @@ jobs:
           git init && git config user.email "test@test.com" && git config user.name "Test"
           tessl init && tessl install tessl-labs/intent-integrity-kit
 
-          SCRIPTS=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
+          SCRIPTS=".tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
 
           mkdir -p specs/001-test/tests/features
           cat > specs/001-test/tests/features/test.feature << 'FEAT'
@@ -177,7 +177,7 @@ jobs:
           git init && git config user.email "test@test.com" && git config user.name "Test"
           tessl init && tessl install tessl-labs/intent-integrity-kit
 
-          SCRIPTS=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
+          SCRIPTS=".tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
 
           # Install hook
           cp "$SCRIPTS/pre-commit-hook.sh" .git/hooks/pre-commit
@@ -218,7 +218,7 @@ jobs:
           cd "$TESTDIR"
           tessl init && tessl install tessl-labs/intent-integrity-kit
 
-          SCRIPTS=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
+          SCRIPTS=".tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
 
           # Missing premise should fail
           RESULT=$(bash "$SCRIPTS/validate-premise.sh" --json "$TESTDIR" 2>&1) || true
