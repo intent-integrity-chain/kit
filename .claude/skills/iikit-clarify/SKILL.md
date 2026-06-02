@@ -113,7 +113,7 @@ See [clarification-format.md](references/clarification-format.md) for format det
 
 ### 5. Re-validate Affected Checklists
 
-If the clarified target was `spec.md` AND `{FEATURE_DIR}/checklists/*.md` exists, re-evaluate each checklist file against the updated spec:
+If the clarified target was `spec.md` AND one or more `{FEATURE_DIR}/checklists/*.md` files are present, re-evaluate each checklist file against the updated spec:
 
 1. For each `[x]` item: confirm the spec change has not invalidated it. If the clarification removed or contradicted the requirement the item references, change `[x]` to `[ ]` and tag with `[Stale]` plus a one-line note (e.g., `[Stale: SC-003 acceptance threshold revised from 95% to 99%]`).
 2. For each `[ ]` or `[Gap]` item: check whether the clarification resolves it. If so, change to `[x]` and add a one-line justification referencing the clarification (e.g., `[Resolved by clarification on FR-007]`).
@@ -133,7 +133,7 @@ Skip this step when the target was not `spec.md` (plan, tasks, testify, checklis
 ### 6. Validation
 
 After each write and final pass:
-- One bullet per accepted answer, each ending with `[refs]`
+- Every Q&A bullet ends with `[refs]` (the optional Checklist re-validation entry from step 5 is exempt)
 - All referenced IDs exist in the artifact
 - No vague placeholders or contradictions remain
 
