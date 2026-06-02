@@ -7,7 +7,7 @@ description: >-
   task dependencies seem off, or constitution principles are vague.
 license: MIT
 metadata:
-  version: "2.5.0"
+  version: "2.6.0"
 ---
 
 # Intent Integrity Kit Clarify (Generic Utility)
@@ -111,16 +111,35 @@ Present ONE question at a time.
 
 See [clarification-format.md](references/clarification-format.md) for format details.
 
-### 5. Validation
+### 5. Re-validate Affected Checklists
+
+If the clarified target was `spec.md` AND `{FEATURE_DIR}/checklists/*.md` exists, re-evaluate each checklist file against the updated spec:
+
+1. For each `[x]` item: confirm the spec change has not invalidated it. If the clarification removed or contradicted the requirement the item references, change `[x]` to `[ ]` and tag with `[Stale]` plus a one-line note (e.g., `[Stale: SC-003 acceptance threshold revised from 95% to 99%]`).
+2. For each `[ ]` or `[Gap]` item: check whether the clarification resolves it. If so, change to `[x]` and add a one-line justification referencing the clarification (e.g., `[Resolved by clarification on FR-007]`).
+3. Other items: leave unchanged.
+
+Append a **Checklist re-validation** entry under the active session in `spec.md`'s `## Clarifications` section:
+
+```
+**Checklist re-validation**
+- Regressions: N items [x] -> [ ] ([Stale: ...])
+- Resolved: M items [ ]/[Gap] -> [x]
+- Unchanged: K
+```
+
+Skip this step when the target was not `spec.md` (plan, tasks, testify, checklist, constitution) — non-spec clarifications do not drive checklist quality items. Skip when no checklist files exist.
+
+### 6. Validation
 
 After each write and final pass:
 - One bullet per accepted answer, each ending with `[refs]`
 - All referenced IDs exist in the artifact
 - No vague placeholders or contradictions remain
 
-### 6. Report
+### 7. Report
 
-Output: questions asked/answered, target artifact and path, sections touched, traceability summary table (clarification -> referenced items), coverage summary (category -> status), suggested next command.
+Output: questions asked/answered, target artifact and path, sections touched, traceability summary table (clarification -> referenced items), coverage summary (category -> status), checklist re-validation diff (when step 5 ran), suggested next command.
 
 **Next command logic**: run `check-prerequisites.sh --json status` and use its `next_step` field to determine the actual next phase based on feature state.
 
