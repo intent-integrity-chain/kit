@@ -84,7 +84,7 @@ jobs:
           git init && git config user.email "test@test.com" && git config user.name "Test"
           tessl init
           tessl install tessl-labs/intent-integrity-kit
-          SCRIPTS=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
+          SCRIPTS=".tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
           test -f "$SCRIPTS/testify-tdd.sh"
           test -f "$SCRIPTS/../dashboard/template.js"
           mkdir -p specs/001-test/tests/features .specify
@@ -104,8 +104,8 @@ jobs:
           cd "$TESTDIR"
           git init && git config user.email "test@test.com" && git config user.name "Test"
           tessl init && tessl install tessl-labs/intent-integrity-kit
-          SCRIPTS=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
-          DASHBOARD=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/dashboard"
+          SCRIPTS=".tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
+          DASHBOARD=".tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/dashboard"
           cat > CONSTITUTION.md << 'CONST'
           # Constitution
           ## Core Principles
@@ -135,7 +135,7 @@ jobs:
           cd "$TESTDIR"
           git init && git config user.email "test@test.com" && git config user.name "Test"
           tessl init && tessl install tessl-labs/intent-integrity-kit
-          SCRIPTS=".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
+          SCRIPTS=".tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
           cp "$SCRIPTS/pre-commit-hook.sh" .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
           mkdir -p specs/001-test/tests/features
           printf 'Feature: Test\n  Scenario: Basic\n    Given a precondition\n    Then a result\n' > specs/001-test/tests/features/test.feature

@@ -65,12 +65,12 @@ test_symlink_structure() {
         log_fail "tiles/intent-integrity-kit/skills is not a symlink"
     fi
 
-    # .tessl/tiles/tessl-labs/intent-integrity-kit must be a symlink to the tile
+    # .tessl/plugins/tessl-labs/intent-integrity-kit must be a symlink to the tile
     ((TESTS_RUN++))
-    if [[ -L ".tessl/tiles/tessl-labs/intent-integrity-kit" ]]; then
-        log_pass ".tessl/tiles/tessl-labs/intent-integrity-kit is a symlink"
+    if [[ -L ".tessl/plugins/tessl-labs/intent-integrity-kit" ]]; then
+        log_pass ".tessl/plugins/tessl-labs/intent-integrity-kit is a symlink"
     else
-        log_fail ".tessl/tiles/tessl-labs/intent-integrity-kit is not a symlink"
+        log_fail ".tessl/plugins/tessl-labs/intent-integrity-kit is not a symlink"
     fi
 
     # .codex/skills, .gemini/skills, .opencode/skills should chain through .claude/skills
@@ -85,7 +85,7 @@ test_symlink_structure() {
 
     # .tessl path should resolve to the tile scripts
     ((TESTS_RUN++))
-    if [[ -f ".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh" ]]; then
+    if [[ -f ".tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh" ]]; then
         log_pass ".tessl path resolves to tile scripts"
     else
         log_fail ".tessl path does not resolve to tile scripts"
@@ -124,17 +124,17 @@ test_skill_completeness() {
 # ─── Script Path Consistency ─────────────────────────────────────────────────
 
 test_script_paths() {
-    log_section "Script Paths in SKILL.md (must use .tessl/tiles/...)"
+    log_section "Script Paths in SKILL.md (must use .tessl/plugins/...)"
 
-    # All bash command paths must use .tessl/tiles/tessl-labs/intent-integrity-kit/skills/
+    # All bash command paths must use .tessl/plugins/tessl-labs/intent-integrity-kit/skills/
     ((TESTS_RUN++))
     local correct_bash
-    correct_bash=$(grep -rh "bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/" "$SKILLS_DIR"/iikit-*/SKILL.md 2>/dev/null | wc -l)
+    correct_bash=$(grep -rh "bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/" "$SKILLS_DIR"/iikit-*/SKILL.md 2>/dev/null | wc -l)
     correct_bash="${correct_bash//[^0-9]/}"
     if [[ "$correct_bash" -gt 0 ]]; then
-        log_pass "bash commands use .tessl/tiles/... path ($correct_bash refs)"
+        log_pass "bash commands use .tessl/plugins/... path ($correct_bash refs)"
     else
-        log_fail "no bash commands use .tessl/tiles/... path"
+        log_fail "no bash commands use .tessl/plugins/... path"
     fi
 
     # No .claude/skills/ paths should remain in SKILL.md files
@@ -148,13 +148,13 @@ test_script_paths() {
         grep -rn "\.claude/skills/" "$SKILLS_DIR"/iikit-*/SKILL.md 2>/dev/null | head -5
     fi
 
-    # PowerShell commands should use .tessl/tiles/ path
+    # PowerShell commands should use .tessl/plugins/ path
     ((TESTS_RUN++))
     local correct_pwsh
-    correct_pwsh=$(grep -rh "pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/" "$SKILLS_DIR"/iikit-*/SKILL.md 2>/dev/null | wc -l)
+    correct_pwsh=$(grep -rh "pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/" "$SKILLS_DIR"/iikit-*/SKILL.md 2>/dev/null | wc -l)
     correct_pwsh="${correct_pwsh//[^0-9]/}"
     if [[ "$correct_pwsh" -gt 0 ]]; then
-        log_pass "pwsh commands use .tessl/tiles/... path ($correct_pwsh refs)"
+        log_pass "pwsh commands use .tessl/plugins/... path ($correct_pwsh refs)"
     else
         log_warn "no pwsh commands found (may be OK)"
     fi

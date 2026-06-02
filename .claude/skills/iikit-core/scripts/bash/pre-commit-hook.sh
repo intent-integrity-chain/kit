@@ -74,7 +74,7 @@ fi
 SCRIPTS_DIR=""
 CANDIDATE_PATHS=(
     "$REPO_ROOT/.claude/skills/iikit-core/scripts/bash"
-    "$REPO_ROOT/.tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
+    "$REPO_ROOT/.tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
     "$REPO_ROOT/.codex/skills/iikit-core/scripts/bash"
 )
 

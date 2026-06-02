@@ -53,9 +53,9 @@ Incorporate findings into research.md.
 For each installed tile, fetch eval scores:
 
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/fetch-tile-evals.sh --json <workspace/tile-name>
+bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/fetch-tile-evals.sh --json <workspace/tile-name>
 ```
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/fetch-tile-evals.ps1 -Json <workspace/tile-name>`
+Windows: `pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/fetch-tile-evals.ps1 -Json <workspace/tile-name>`
 
 - Include eval scores in the research.md Tessl Tiles table (add Eval column)
 - If a technology has multiple tile options: prefer the one with higher eval score

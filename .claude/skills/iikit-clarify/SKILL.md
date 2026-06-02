@@ -30,13 +30,13 @@ Load constitution per [constitution-loading.md](../iikit-core/references/constit
 
 ## Prerequisites Check
 
-1. Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase clarify --json`
-   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/check-prerequisites.ps1 -Phase clarify -Json`
+1. Run: `bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase clarify --json`
+   Windows: `pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/check-prerequisites.ps1 -Phase clarify -Json`
 2. Parse JSON. If `needs_selection: true`: present the `features` array as a numbered table (name and stage columns). Follow the options presentation pattern in [conversation-guide.md](../iikit-core/references/conversation-guide.md). After user selects, run:
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selection>
+   bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selection>
    ```
-   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selection>`
+   Windows: `pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selection>`
 
    Then re-run the prerequisites check from step 1.
 3. Determine the target artifact (see "Target Detection" below).
@@ -136,9 +136,9 @@ Output: questions asked/answered, target artifact and path, sections touched, tr
 Run post-phase to commit, refresh dashboard, and compute next step in a single call:
 
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase clarify --commit-files "-u" --commit-msg "clarify: <target-artifact> Q&A"
+bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase clarify --commit-files "-u" --commit-msg "clarify: <target-artifact> Q&A"
 ```
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase clarify -CommitFiles "-u" -CommitMsg "clarify: <target-artifact> Q&A"`
+Windows: `pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase clarify -CommitFiles "-u" -CommitMsg "clarify: <target-artifact> Q&A"`
 
 Parse `next_step` from JSON. Present per [model-recommendations.md](../iikit-core/references/model-recommendations.md):
 ```

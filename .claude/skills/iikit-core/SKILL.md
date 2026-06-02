@@ -45,8 +45,8 @@ The `$ARGUMENTS` after `init` may include an optional path or URL to a PRD/SDD d
 #### Step 0 — Detect environment, initialize hooks, check premise
 
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/init-full.sh --json
-# Windows: pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/init-full.ps1 -Json
+bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/init-full.sh --json
+# Windows: pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/init-full.ps1 -Json
 ```
 
 Parse JSON for `git` (environment), `init` (hooks), and `premise` (validation) sections.
@@ -87,7 +87,7 @@ Replace ALL bracket placeholders `[PLACEHOLDER]` with actual content. This is MA
 
 After writing PREMISE.md, validate:
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/validate-premise.sh --json
+bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/validate-premise.sh --json
 ```
 If validation fails (remaining placeholders or missing sections), fix and re-validate.
 
@@ -111,8 +111,8 @@ Show constitution status, feature count, and suggest `/iikit-core status`.
 
 1. Run:
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase status --json
-   # Windows: pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/check-prerequisites.ps1 -Phase status -Json
+   bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase status --json
+   # Windows: pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/check-prerequisites.ps1 -Phase status -Json
    ```
 
 2. **Present results** (all logic is in script output — just display):
@@ -131,8 +131,8 @@ The `$ARGUMENTS` after `use` is the feature selector: a number (`1`, `001`), par
 
 1. Run:
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selector>
-   # Windows: pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selector>
+   bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selector>
+   # Windows: pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selector>
    ```
    Parse JSON for `active_feature` and `stage`.
 
@@ -148,8 +148,8 @@ Remove iikit-managed scaffolding from the project so `tessl uninstall tessl-labs
 
 1. Run the dry-run preview:
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/uninit.sh --dry-run --json
-   # Windows: pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/uninit.ps1 -DryRun -Json
+   bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/uninit.sh --dry-run --json
+   # Windows: pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/uninit.ps1 -DryRun -Json
    ```
    Parse JSON for `removed` (tile-managed scaffolding the script will delete or strip — `.git/hooks/pre-commit`/`post-commit` IIKit blocks, `.specify/`, `TECH.md` when it carries an iikit phase reference) and `user_content` (paths the caller decides on — `CONSTITUTION.md`, `PREMISE.md`, `specs/`).
 
@@ -157,8 +157,8 @@ Remove iikit-managed scaffolding from the project so `tessl uninstall tessl-labs
 
 3. Run the uninstaller. Pass `--remove-user-content` only if the user opted to delete the user-authored files at step 2.
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/uninit.sh --json [--remove-user-content]
-   # Windows: pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/uninit.ps1 -Json [-RemoveUserContent]
+   bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/uninit.sh --json [--remove-user-content]
+   # Windows: pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/uninit.ps1 -Json [-RemoveUserContent]
    ```
 
 4. **Report next command.** Show the literal `next_step` from the JSON output: `tessl uninstall tessl-labs/intent-integrity-kit`. The script does not invoke `tessl uninstall` itself — that's a separate tool the user runs after this skill finishes.

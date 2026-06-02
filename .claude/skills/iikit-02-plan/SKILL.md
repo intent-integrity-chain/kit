@@ -28,16 +28,16 @@ Load constitution per [constitution-loading.md](../iikit-core/references/constit
 
 1. Run prerequisites check:
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase 02 --json
+   bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase 02 --json
    ```
-   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/check-prerequisites.ps1 -Phase 02 -Json`
+   Windows: `pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/check-prerequisites.ps1 -Phase 02 -Json`
 
 2. Parse JSON for `FEATURE_SPEC`, `IMPL_PLAN`, `FEATURE_DIR`, `BRANCH`. If missing spec.md: ERROR.
 3. If JSON contains `needs_selection: true`: present the `features` array as a numbered table (name and stage columns). Follow the options presentation pattern in [conversation-guide.md](../iikit-core/references/conversation-guide.md). After user selects, run:
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selection>
+   bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selection>
    ```
-   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selection>`
+   Windows: `pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selection>`
 
    Then re-run the prerequisites check from step 1.
 
@@ -90,9 +90,9 @@ For each NEEDS CLARIFICATION item and dependency: research, document findings in
 3. Create `quickstart.md` with test scenarios
 4. Update agent context:
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/update-agent-context.sh claude
+   bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/update-agent-context.sh claude
    ```
-   Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/update-agent-context.ps1 -AgentType claude`
+   Windows: `pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/update-agent-context.ps1 -AgentType claude`
 
 ### 5. Update context.json with Dashboard Data
 
@@ -172,9 +172,9 @@ Flag breaking changes that would invalidate existing tasks or test specs.
 Run post-phase to commit, refresh dashboard, and compute next step in a single call:
 
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase 02 --commit-files "specs/*/plan.md,specs/*/research.md,specs/*/data-model.md,specs/*/quickstart.md,specs/*/contracts/,.specify/context.json" --commit-msg "plan: <feature-short-name> technical design"
+bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase 02 --commit-files "specs/*/plan.md,specs/*/research.md,specs/*/data-model.md,specs/*/quickstart.md,specs/*/contracts/,.specify/context.json" --commit-msg "plan: <feature-short-name> technical design"
 ```
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase 02 -CommitFiles "specs/*/plan.md,specs/*/research.md,specs/*/data-model.md,specs/*/quickstart.md,specs/*/contracts/,.specify/context.json" -CommitMsg "plan: <feature-short-name> technical design"`
+Windows: `pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase 02 -CommitFiles "specs/*/plan.md,specs/*/research.md,specs/*/data-model.md,specs/*/quickstart.md,specs/*/contracts/,.specify/context.json" -CommitMsg "plan: <feature-short-name> technical design"`
 
 Parse `next_step` from JSON. Present per [model-recommendations.md](../iikit-core/references/model-recommendations.md):
 ```

@@ -53,12 +53,12 @@ Check current branch. If on main/master/develop, suggest creating feature branch
 
 **Unix/macOS/Linux:**
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/create-new-feature.sh --json "$ARGUMENTS" --short-name "your-short-name"
+bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/create-new-feature.sh --json "$ARGUMENTS" --short-name "your-short-name"
 # Add --skip-branch if user declined branch creation
 ```
 **Windows (PowerShell):**
 ```powershell
-pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/create-new-feature.ps1 -Json "$ARGUMENTS" -ShortName "your-short-name"
+pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/create-new-feature.ps1 -Json "$ARGUMENTS" -ShortName "your-short-name"
 # Add -SkipBranch if user declined
 ```
 
@@ -107,9 +107,9 @@ If spec.md already exists: extract semantic elements (stories, requirements, cri
 Run post-phase to commit, refresh dashboard, and compute next step in a single call:
 
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase 01 --commit-files "specs/*/spec.md,specs/*/checklists/requirements.md,.specify/active-feature" --commit-msg "spec: <feature-short-name> specification"
+bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase 01 --commit-files "specs/*/spec.md,specs/*/checklists/requirements.md,.specify/active-feature" --commit-msg "spec: <feature-short-name> specification"
 ```
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase 01 -CommitFiles "specs/*/spec.md,specs/*/checklists/requirements.md,.specify/active-feature" -CommitMsg "spec: <feature-short-name> specification"`
+Windows: `pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase 01 -CommitFiles "specs/*/spec.md,specs/*/checklists/requirements.md,.specify/active-feature" -CommitMsg "spec: <feature-short-name> specification"`
 
 Parse `next_step` from JSON. Present per [model-recommendations.md](../iikit-core/references/model-recommendations.md):
 ```

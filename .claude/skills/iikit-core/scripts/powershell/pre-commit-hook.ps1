@@ -26,7 +26,7 @@ try {
 $scriptsDir = $null
 $candidatePaths = @(
     (Join-Path $repoRoot ".claude/skills/iikit-core/scripts/powershell"),
-    (Join-Path $repoRoot ".tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell"),
+    (Join-Path $repoRoot ".tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell"),
     (Join-Path $repoRoot ".codex/skills/iikit-core/scripts/powershell")
 )
 

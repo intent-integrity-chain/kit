@@ -28,11 +28,11 @@ Load constitution per [constitution-loading.md](../iikit-core/references/constit
 
 ## Prerequisites Check
 
-1. Run: `bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase 07 --json`
+1. Run: `bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh --phase 07 --json`
 2. Parse for `FEATURE_DIR` and `AVAILABLE_DOCS`. If missing tasks.md: ERROR.
 3. If JSON contains `needs_selection: true`: present the `features` array as a numbered table (name and stage columns). Follow the options presentation pattern in [conversation-guide.md](../iikit-core/references/conversation-guide.md). After user selects, run:
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selection>
+   bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selection>
    ```
    Then re-run the prerequisites check from step 1.
 
@@ -73,7 +73,7 @@ Read `tasks.md` + `plan.md` (standard) or `tasks.md` + `bugs.md` (bugfix). Optio
 If `tests/features/` directory exists (contains `.feature` files), verify assertion integrity:
 
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh comprehensive-check "FEATURE_DIR/tests/features" "CONSTITUTION.md"
+bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/testify-tdd.sh comprehensive-check "FEATURE_DIR/tests/features" "CONSTITUTION.md"
 ```
 
 Parse JSON response: `PASS` (proceed), `BLOCKED` (halt, show remediation), `WARN` (proceed with caution).
@@ -90,7 +90,7 @@ When `.feature` files exist, apply this chain to each implementation task:
 4. **GREEN phase**: run BDD tests — they MUST pass. Fix production code if they fail; never modify tests or `.feature` files.
 5. **Verify BDD chain**:
    ```bash
-   bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/verify-bdd.sh --json "FEATURE_DIR/tests/features" "FEATURE_DIR/plan.md" "FEATURE_DIR/tests/step_definitions" "<language>"
+   bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/verify-bdd.sh --json "FEATURE_DIR/tests/features" "FEATURE_DIR/plan.md" "FEATURE_DIR/tests/step_definitions" "<language>"
    ```
    Parse JSON for `steps.status` (coverage) and `quality.status` (assertions). Both must be `PASS` before marking task complete. If `BLOCKED`: fix the flagged step definitions.
 
@@ -103,7 +103,7 @@ When `.feature` files exist, apply this chain to each implementation task:
 Tests **MUST** be run, not just written. Run immediately after writing (expect red); run again after implementing (expect green). Fix code, not tests. Never mark a test task `[x]` without execution output.
 
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/verify-test-execution.sh verify "FEATURE_DIR/tests/features" "$(cat test-output.log)"
+bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/verify-test-execution.sh verify "FEATURE_DIR/tests/features" "$(cat test-output.log)"
 ```
 
 Block on any status other than `PASS`.
@@ -172,7 +172,7 @@ feat(<feature-id>): <phase-name>
 
 For both strategies, regenerate the dashboard after commits:
   ```bash
-  bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
+  bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
   ```
 
 ### 7. Output Validation
@@ -208,9 +208,9 @@ Missing artifacts: STOP with run instructions. Constitution violations: STOP, ex
 After all tasks are complete (or on halt), refresh the dashboard and compute the next step. The post-phase script handles both in a single call — it runs `generate-dashboard-safe.sh` to regenerate the HTML dashboard, then runs `next-step.sh --phase 07 --json` to determine the next workflow step based on feature completion state:
 
 ```bash
-bash .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase 07
+bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/post-phase.sh --phase 07
 ```
-Windows: `pwsh .tessl/tiles/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase 07`
+Windows: `pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/post-phase.ps1 -Phase 07`
 
 Note: implement handles its own git commits per the chosen strategy (§6.6), so post-phase is called without `--commit-files`.
 
