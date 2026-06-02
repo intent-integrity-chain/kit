@@ -265,8 +265,8 @@ test_parallel_execution() {
         log_fail "implement SKILL.md does not reference parallel-execution.md"
     fi
 
-    # Section 6 has subsections 6.1-6.5 (bold-formatted in SKILL.md)
-    local subsections=("6.1 Task extraction" "6.2 Execution strategy" "6.3 Phase-by-phase" "6.4 Rules" "6.5 Failure handling")
+    # Step 5 has subsections 5.1-5.5 (bold-formatted in SKILL.md)
+    local subsections=("5.1 Task extraction" "5.2 Execution strategy" "5.3 Phase-by-phase" "5.4 Rules" "5.5 Failure handling")
     for sub in "${subsections[@]}"; do
         ((TESTS_RUN++))
         if grep -q "$sub" "$impl"; then
@@ -490,16 +490,16 @@ test_premise_support() {
 # ─── Task Commits ────────────────────────────────────────────────────────────
 
 test_task_commits() {
-    log_section "Task Commits (§6.6)"
+    log_section "Task Commits (§5.6)"
     local impl="$SKILLS_DIR/iikit-07-implement/SKILL.md"
     local ref="$SKILLS_DIR/iikit-07-implement/references/parallel-execution.md"
 
-    # Section 6.6 exists in implement skill
+    # Section 5.6 exists in implement skill
     ((TESTS_RUN++))
-    if grep -q '6.6 Task Commits' "$impl"; then
-        log_pass "section 6.6 Task Commits present"
+    if grep -q '5.6 Task Commits' "$impl"; then
+        log_pass "section 5.6 Task Commits present"
     else
-        log_fail "section 6.6 Task Commits missing"
+        log_fail "section 5.6 Task Commits missing"
     fi
 
     # Commit message format specified

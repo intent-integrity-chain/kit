@@ -10,6 +10,8 @@ metadata:
 
 # Intent Integrity Kit Bugfix
 
+Process steps in order. Do not skip ahead.
+
 Report a bug against an existing feature, create a structured `bugs.md` record, and generate fix tasks in `tasks.md`.
 
 ## User Input
@@ -24,21 +26,23 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 Load constitution per [constitution-loading.md](../iikit-core/references/constitution-loading.md) (soft mode — warn if missing, proceed without).
 
-## Execution Flow
-
 The text after `/iikit-bugfix` is either a `#number` (GitHub issue) or a text bug description.
 
-### 1. Parse Input
+## Step 1 — Parse Input
 
 Determine the input type:
 
-- **`#number` pattern** (e.g., `#42`): GitHub inbound flow (Step 2a)
-- **Text description**: Text description flow (Step 2b)
+- **`#number` pattern** (e.g., `#42`): GitHub inbound flow
+- **Text description**: Text description flow
 - **Empty**: ERROR with usage example: `/iikit-bugfix 'Login fails when email contains plus sign'` or `/iikit-bugfix #42`
 
 If input contains BOTH `#number` and text, prioritize the `#number` and warn that text is ignored.
 
-### 2a. GitHub Inbound Flow
+## Step 2 — Resolve Bug Source
+
+Take exactly one branch based on the input type from Step 1.
+
+**GitHub Inbound Flow** (when input matches `#number`):
 
 1. Fetch issue: use `gh issue view <number> --json title,body,labels` if available, otherwise `curl` the GitHub API (`GET /repos/{owner}/{repo}/issues/{number}`)
 2. If fetch fails (issue not found, auth error, or no GitHub remote configured): ERROR with clear message and remediation; suggest using text description instead.
@@ -47,14 +51,14 @@ If input contains BOTH `#number` and text, prioritize the `#number` and warn tha
    - `body` → reproduction steps
    - `labels` → severity: "critical" → critical, "high"/"priority" → high, "bug" → medium (default), otherwise → medium
 4. Store issue number for GitHub Issue field in bugs.md
-5. Continue to Step 3
 
-### 2b. Text Description Flow
+**Text Description Flow** (when input is free-form text):
 
 1. Store the text as the bug description
-2. Continue to Step 3
 
-### 3. Select Feature & Full Setup
+Both flows converge at Step 3.
+
+## Step 3 — Select Feature & Full Setup
 
 Run full setup to list features, validate, and get bug ID and task IDs. First, present feature list to user. After selection:
 
@@ -73,7 +77,7 @@ Parse JSON for: `features` (list for display), `validation` (check `valid`), `bu
 
 If `validation.valid` is false: ERROR with the message. If `features` is empty: ERROR with "No features found."
 
-### 4. Gather Bug Details
+## Step 4 — Gather Bug Details
 
 **For text input (2b):**
 - Prompt user for **severity**: present options (critical, high, medium, low) with descriptions
@@ -83,7 +87,7 @@ If `validation.valid` is false: ERROR with the message. If `features` is empty: 
 - Severity is pre-filled from labels (confirm with user if mapping is ambiguous)
 - Reproduction steps are pre-filled from issue body (confirm with user)
 
-### 5. Write bugs.md
+## Step 5 — Write bugs.md
 
 Create or append to `<feature_dir>/bugs.md` using the template at [bugs-template.md](references/bugs-template.md).
 
@@ -102,7 +106,7 @@ If `bugs.md` already exists, append with `---` separator before the new entry. D
 
 If `bugs.md` does not exist, create it with the header `# Bug Reports: <feature-name>` followed by the entry.
 
-### 6. Outbound GitHub Issue (Text Input Only)
+## Step 6 — Outbound GitHub Issue (Text Input Only)
 
 For text-input bugs only (NOT for GitHub inbound — issue already exists):
 
@@ -110,11 +114,11 @@ For text-input bugs only (NOT for GitHub inbound — issue already exists):
 2. Store returned issue number in the bugs.md GitHub Issue field
 3. If no GitHub remote configured: warn that GitHub issue creation was skipped, proceed with local workflow
 
-### 7. TDD & Task Generation
+## Step 7 — TDD & Task Generation
 
 Use `tdd_determination` and `task_ids` from Step 3. Use `bug_id` from Step 3.
 
-### 8. BDD/TDD Flow (If Mandatory)
+## Step 8 — BDD/TDD Flow (If Mandatory)
 
 If TDD is mandatory (`determination` = `mandatory`):
 
@@ -138,7 +142,7 @@ If TDD is mandatory (`determination` = `mandatory`):
    ```
 5. Continue to Step 9 with TDD task variant
 
-### 9. Generate Bug Fix Tasks
+## Step 9 — Generate Bug Fix Tasks
 
 Use `task_ids` from Step 3. Task IDs use `T-B` prefix — parsers and dashboard rely on this.
 
@@ -172,7 +176,7 @@ Append to existing `<feature_dir>/tasks.md`. If tasks.md does not exist, create 
 
 Do NOT modify existing entries or task IDs in tasks.md.
 
-### 10. Commit, Dashboard & Next Steps
+## Step 10 — Commit, Dashboard & Next Steps
 
 **Unix/macOS/Linux:**
 ```bash

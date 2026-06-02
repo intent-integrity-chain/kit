@@ -10,6 +10,8 @@ metadata:
 
 # Intent Integrity Kit Checklist
 
+Process steps in order. Do not skip ahead.
+
 Generate checklists that validate REQUIREMENTS quality, not implementation.
 
 ## User Input
@@ -37,9 +39,7 @@ Load constitution per [constitution-loading.md](../iikit-core/references/constit
 
    Then re-run the prerequisites check from step 1.
 
-## Execution Steps
-
-### 1. Clarify Intent
+## Step 1 — Clarify Intent
 
 Derive up to THREE contextual questions (skip if unambiguous from `$ARGUMENTS`):
 - Scope: include integration touchpoints?
@@ -47,11 +47,11 @@ Derive up to THREE contextual questions (skip if unambiguous from `$ARGUMENTS`):
 - Depth: lightweight sanity list or formal release gate?
 - Audience: author-only or peer PR review?
 
-### 2. Load Feature Context
+## Step 2 — Load Feature Context
 
 Read from FEATURE_DIR: `spec.md` (required), `plan.md` (optional), `tasks.md` (optional).
 
-### 3. Generate Checklist
+## Step 3 — Generate Checklist
 
 **Starting point**: `FEATURE_DIR/checklists/requirements.md` already exists (created by `/iikit-01-specify`). Review it, extend it with additional items, and resolve gaps. Do NOT create a duplicate — work with the existing file.
 
@@ -70,11 +70,11 @@ See [checklist-examples.md](references/checklist-examples.md) for correct/wrong 
 
 Use [checklist-template.md](../iikit-core/templates/checklist-template.md) for format structure.
 
-### 4. Gap Resolution (Interactive)
+## Step 4 — Gap Resolution (Interactive)
 
 For each `[Gap]` item: follow the gap resolution pattern in [conversation-guide.md](../iikit-core/references/conversation-guide.md). Present missing requirement, explain risk, offer options. On resolution: update spec.md and check item off. Skip if `--no-interactive` or no gaps.
 
-### 5. Remaining Item Validation
+## Step 5 — Remaining Item Validation
 
 After gap resolution, validate ALL unchecked `[ ]` items against spec/plan/constitution:
 - If covered: check off with justification
@@ -84,7 +84,7 @@ Continue until all items are `[x]` or explicitly deferred.
 
 **IMPORTANT**: Checklists are optional — not creating one is fine. But once created, they MUST reach 100% before the skill reports success.
 
-### 6. Report
+## Step 6 — Report
 
 Output: checklist path, item counts (total/checked/deferred), gap resolution summary, completion percentage.
 

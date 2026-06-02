@@ -12,6 +12,8 @@ metadata:
 
 # Intent Integrity Kit Clarify (Generic Utility)
 
+Process steps in order. Do not skip ahead.
+
 Ask targeted clarification questions to reduce ambiguity in the detected (or user-specified) artifact, then encode answers back into it.
 
 ## User Input
@@ -65,13 +67,11 @@ If no argument, auto-detect by checking artifacts in reverse phase order. Pick t
 
 If no clarifiable artifact exists: ERROR with `No artifacts to clarify. Run /iikit-01-specify first or /iikit-00-constitution.`
 
-## Execution Steps
-
-### 1. Scan for Ambiguities
+## Step 1 — Scan for Ambiguities
 
 Load the target artifact and perform a structured scan using the taxonomy for that artifact type from [ambiguity-taxonomies.md](../iikit-core/references/ambiguity-taxonomies.md). Mark each area: Clear / Partial / Missing.
 
-### 2. Generate Question Queue
+## Step 2 — Generate Question Queue
 
 **Constraints**:
 - Each answerable with multiple-choice (2-5 options) OR short phrase (<=5 words)
@@ -85,7 +85,7 @@ Load the target artifact and perform a structured scan using the taxonomy for th
 - Only include questions that materially impact downstream phases
 - Balance category coverage, exclude already-answered, favor downstream rework reduction
 
-### 3. Sequential Questioning
+## Step 3 — Sequential Questioning
 
 Present ONE question at a time.
 
@@ -95,7 +95,7 @@ Present ONE question at a time.
 
 **Stop when**: all critical ambiguities resolved or user signals done.
 
-### 4. Integration After Each Answer
+## Step 4 — Integration After Each Answer
 
 1. Ensure `## Clarifications` section exists in the target artifact with `### Session YYYY-MM-DD` subheading
 2. Append: `- Q: <question> -> A: <answer> [<refs>]`
@@ -111,7 +111,7 @@ Present ONE question at a time.
 
 See [clarification-format.md](references/clarification-format.md) for format details.
 
-### 5. Re-validate Affected Checklists
+## Step 5 — Re-validate Affected Checklists
 
 If the clarified target was `spec.md` AND one or more `{FEATURE_DIR}/checklists/*.md` files are present, re-evaluate each checklist file against the updated spec:
 
@@ -130,14 +130,14 @@ Append a **Checklist re-validation** entry under the active session in `spec.md`
 
 Skip this step when the target was not `spec.md` (plan, tasks, testify, checklist, constitution). Skip when no checklist files exist.
 
-### 6. Validation
+## Step 6 — Validation
 
 After each write and final pass:
 - Every Q&A bullet ends with `[refs]` (the optional Checklist re-validation entry from step 5 is exempt)
 - All referenced IDs exist in the artifact
 - No vague placeholders or contradictions remain
 
-### 7. Report
+## Step 7 — Report
 
 Output: questions asked/answered, target artifact and path, sections touched, traceability summary table (clarification -> referenced items), coverage summary (category -> status), checklist re-validation diff (when step 5 ran), suggested next command.
 

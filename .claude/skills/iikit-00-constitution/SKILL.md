@@ -10,6 +10,8 @@ metadata:
 
 # Intent Integrity Kit Constitution
 
+Process steps in order. Do not skip ahead.
+
 Create or update the project constitution at `CONSTITUTION.md` — the governing principles for specification-driven development.
 
 ## Scope
@@ -37,54 +39,76 @@ You **MUST** consider the user input before proceeding (if not empty).
 3. Check if constitution exists: `cat CONSTITUTION.md 2>/dev/null || echo "NO_CONSTITUTION"`
 4. If missing, copy from [constitution-template.md](../iikit-core/templates/constitution-template.md)
 
-## Execution Flow
+## Step 1 — Load Existing Constitution
 
-1. **Load existing constitution** — identify placeholder tokens `[ALL_CAPS_IDENTIFIER]`. Adapt to user's needs (more or fewer principles than template).
+Identify placeholder tokens `[ALL_CAPS_IDENTIFIER]`. Adapt to user's needs (more or fewer principles than template).
 
-2. **Collect values for placeholders**:
-   - From user input, or infer from repo context
-   - `RATIFICATION_DATE`: original adoption date
-   - `LAST_AMENDED_DATE`: today if changes made
-   - `CONSTITUTION_VERSION`: semver (MAJOR: principle removal/redefinition, MINOR: new principle, PATCH: clarifications)
+## Step 2 — Collect Placeholder Values
 
-3. **Draft content**: replace all placeholders, preserve heading hierarchy, ensure each principle has name + rules + rationale, governance section covers amendment/versioning/compliance.
+- From user input, or infer from repo context
+- `RATIFICATION_DATE`: original adoption date
+- `LAST_AMENDED_DATE`: today if changes made
+- `CONSTITUTION_VERSION`: semver (MAJOR: principle removal/redefinition, MINOR: new principle, PATCH: clarifications)
 
-4. **Consistency check**: validate against [plan-template.md](../iikit-core/templates/plan-template.md), [spec-template.md](../iikit-core/templates/spec-template.md), [tasks-template.md](../iikit-core/templates/tasks-template.md).
+## Step 3 — Draft Content
 
-5. **Sync Impact Report** (HTML comment at top): version change, modified principles, added/removed sections, follow-up TODOs.
+Replace all placeholders, preserve heading hierarchy, ensure each principle has name + rules + rationale, governance section covers amendment/versioning/compliance.
 
-6. **Validate**: no remaining bracket tokens, version matches report, dates in ISO format, principles are declarative and testable. Constitution MUST have at least 3 principles — if fewer, add more based on the project context.
+## Step 4 — Consistency Check
 
-7. **Phase separation validation**: scan for technology-specific content per [phase-separation-rules.md](../iikit-core/references/phase-separation-rules.md). Auto-fix violations, re-validate until clean.
+Validate against [plan-template.md](../iikit-core/templates/plan-template.md), [spec-template.md](../iikit-core/templates/spec-template.md), [tasks-template.md](../iikit-core/templates/tasks-template.md).
 
-8. **Write TWO files** — both are required outputs of this skill:
+## Step 5 — Sync Impact Report
 
-   **a) Write `CONSTITUTION.md`** with the finalized constitution content.
+HTML comment at top: version change, modified principles, added/removed sections, follow-up TODOs.
 
-   **b) Write `.specify/context.json`** with the TDD determination extracted from the constitution you just wrote. All downstream skills (testify, bugfix, implement) read TDD policy from this file. Determine the value from the constitution text:
-   - Constitution contains MUST/REQUIRED + "TDD", "test-first", or "red-green-refactor" → `mandatory`
-   - Constitution contains MUST + "test-driven" or "tests before code" → `mandatory`
-   - Constitution contains MUST + "test-after" or "no unit tests" → `forbidden`
-   - Testing is described as OPTIONAL or SHOULD → `optional`
-   - No testing policy stated → `optional`
+## Step 6 — Validate
 
-   Create the file:
-   ```bash
-   mkdir -p .specify
-   ```
-   Write `.specify/context.json` containing at minimum:
-   ```json
-   {
-     "tdd_determination": "<mandatory|optional|forbidden>"
-   }
-   ```
-   If `.specify/context.json` already exists, merge (don't overwrite other fields). You can use `jq` if available, or write the file directly.
+No remaining bracket tokens, version matches report, dates in ISO format, principles are declarative and testable. Constitution MUST have at least 3 principles — if fewer, add more based on the project context.
 
-   **Verify**: confirm `.specify/context.json` exists and contains `tdd_determination`.
+## Step 7 — Phase Separation Validation
 
-9. **Git init** (if needed): `git init` to ensure project isolation
+Scan for technology-specific content per [phase-separation-rules.md](../iikit-core/references/phase-separation-rules.md). Auto-fix violations, re-validate until clean.
 
-10. **Report**: version, bump rationale, TDD determination, git status
+## Step 8 — Write Outputs
+
+Both files are required outputs of this skill:
+
+**Write `CONSTITUTION.md`** with the finalized constitution content.
+
+**Write `.specify/context.json`** with the TDD determination extracted from the constitution you just wrote. All downstream skills (testify, bugfix, implement) read TDD policy from this file. Determine the value from the constitution text:
+
+- Constitution contains MUST/REQUIRED + "TDD", "test-first", or "red-green-refactor" → `mandatory`
+- Constitution contains MUST + "test-driven" or "tests before code" → `mandatory`
+- Constitution contains MUST + "test-after" or "no unit tests" → `forbidden`
+- Testing is described as OPTIONAL or SHOULD → `optional`
+- No testing policy stated → `optional`
+
+Create the file:
+
+```bash
+mkdir -p .specify
+```
+
+Write `.specify/context.json` containing at minimum:
+
+```json
+{
+  "tdd_determination": "<mandatory|optional|forbidden>"
+}
+```
+
+If `.specify/context.json` already exists, merge (don't overwrite other fields). You can use `jq` if available, or write the file directly.
+
+**Verify**: confirm `.specify/context.json` exists and contains `tdd_determination`.
+
+## Step 9 — Git Init
+
+If needed, run `git init` to ensure project isolation.
+
+## Step 10 — Report
+
+Report version, bump rationale, TDD determination, git status.
 
 ## Formatting
 

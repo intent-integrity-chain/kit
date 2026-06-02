@@ -10,6 +10,8 @@ metadata:
 
 # Intent Integrity Kit Testify
 
+Process steps in order. Do not skip ahead.
+
 Generate executable Gherkin `.feature` files from requirement artifacts before implementation. Enables TDD by creating hash-locked BDD scenarios that serve as acceptance criteria.
 
 > **OS convention**: All commands are shown in bash. PowerShell equivalents exist at the same path with a `.ps1` extension (e.g., `scripts/powershell/check-prerequisites.ps1`) and accept the same flags in PascalCase (e.g., `-Phase 04 -Json`).
@@ -49,14 +51,12 @@ Report per [formatting-guide.md](../iikit-core/references/formatting-guide.md) (
 
 Search spec.md for Given/When/Then patterns. If none found: ERROR with `Run: /iikit-clarify`.
 
-## Execution Flow
-
-### 1. Load Artifacts
+## Step 1 — Load Artifacts
 
 - **Required**: `spec.md` (acceptance scenarios), `plan.md` (API contracts, tech stack)
 - **Optional**: `data-model.md` (validation rules)
 
-### 2. Generate Gherkin Feature Files
+## Step 2 — Generate Gherkin Feature Files
 
 Create `.feature` files in `FEATURE_DIR/tests/features/`:
 
@@ -64,7 +64,7 @@ Create `.feature` files in `FEATURE_DIR/tests/features/`:
 
 **File organization**: Generate one `.feature` file per user story or logical grouping. Use descriptive filenames (e.g., `login.feature`, `user-management.feature`).
 
-#### 2.1 Gherkin Tag Conventions
+**Gherkin Tag Conventions**
 
 Every scenario MUST include traceability tags:
 - `@TS-XXX` — test spec ID (sequential, unique across all .feature files)
@@ -79,13 +79,13 @@ Every scenario MUST include traceability tags:
 Feature-level tags for shared metadata:
 - `@US-XXX` on the Feature line for the parent user story
 
-#### 2.2 Transformation Rules
+**Transformation Rules**
 
 **From spec.md — Acceptance Tests**: For each Given/When/Then scenario, generate a Gherkin scenario.
 
 Use [testspec-template.md](../iikit-core/templates/testspec-template.md) as the Gherkin file template. For transformation examples, advanced constructs (Background, Scenario Outline, Rule), and syntax validation rules, see [gherkin-reference.md](references/gherkin-reference.md).
 
-### 3. Add DO NOT MODIFY Markers
+## Step 3 — Add DO NOT MODIFY Markers
 
 Add an HTML comment at the top of each `.feature` file:
 ```gherkin
@@ -93,7 +93,7 @@ Add an HTML comment at the top of each `.feature` file:
 # Derived from requirements. Fix code to pass tests; re-run /iikit-04-testify if requirements change.
 ```
 
-### 4. Idempotency
+## Step 4 — Idempotency
 
 If `tests/features/` already contains `.feature` files:
 - Preserve existing scenario tags (TS-XXX) where the source scenario is unchanged
@@ -101,7 +101,7 @@ If `tests/features/` already contains `.feature` files:
 - Mark removed scenarios as deprecated (comment out with `# DEPRECATED:`)
 - Show diff summary of changes
 
-### 5. Store Assertion Integrity Hash
+## Step 5 — Store Assertion Integrity Hash
 
 **CRITICAL**: Store SHA256 hash in both context.json and git note in a single call:
 
@@ -111,7 +111,7 @@ bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/ba
 
 Returns JSON with `hash` and `git_note` status. The implement skill verifies this hash before proceeding.
 
-### 6. Report
+## Step 6 — Report
 
 Output: TDD determination, scenario counts by source (acceptance/contract/validation), output directory path, number of `.feature` files generated, hash status (LOCKED).
 

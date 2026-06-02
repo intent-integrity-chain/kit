@@ -10,6 +10,8 @@ metadata:
 
 # Intent Integrity Kit Plan
 
+Process steps in order. Do not skip ahead.
+
 Generate design artifacts from the feature specification using the plan template.
 
 ## User Input
@@ -65,23 +67,21 @@ Spec Quality: X/10
 
 If score < 6: recommend `/iikit-clarify` first.
 
-## Execution Flow
-
-### 1. Fill Technical Context
+## Step 1 — Fill Technical Context
 
 Using the plan template, define: Language/Version, Primary Dependencies, Storage, Testing, Target Platform, Project Type, Performance Goals, Constraints, Scale/Scope. Mark unknowns as "NEEDS CLARIFICATION".
 
 When Tessl eval results are available for candidate technologies, include eval scores in the decision rationale in research.md. Higher eval scores indicate better-validated tiles and should factor into technology selection when choosing between alternatives.
 
-### 2. Tessl Tile Discovery
+## Step 2 — Tessl Tile Discovery
 
 If Tessl is installed, discover and install tiles for all technologies. See [tessl-tile-discovery.md](references/tessl-tile-discovery.md) for the full procedure.
 
-### 3. Research & Resolve Unknowns
+## Step 3 — Research & Resolve Unknowns
 
 For each NEEDS CLARIFICATION item and dependency: research, document findings in `research.md` with decision, rationale, and alternatives considered. Include Tessl Tiles section if applicable.
 
-### 4. Design & Contracts
+## Step 4 — Design & Contracts
 
 **Prerequisites**: research.md complete
 
@@ -94,7 +94,7 @@ For each NEEDS CLARIFICATION item and dependency: research, document findings in
    ```
    Windows: `pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/update-agent-context.ps1 -AgentType claude`
 
-### 5. Update context.json with Dashboard Data
+## Step 5 — Update context.json with Dashboard Data
 
 **MANDATORY** — you MUST update `.specify/context.json` after the plan is complete. Use `jq` to merge into the existing file (create if missing). Do NOT overwrite existing fields.
 
@@ -124,11 +124,11 @@ jq --argjson evals '{
 }' '.planview.evalScores = $evals' "$CONTEXT_FILE" > "$CONTEXT_FILE.tmp" && mv "$CONTEXT_FILE.tmp" "$CONTEXT_FILE"
 ```
 
-### 6. Constitution Check (Post-Design)
+## Step 6 — Constitution Check (Post-Design)
 
 Re-validate all technical decisions against constitutional principles. On violation: STOP, state violation, suggest compliant alternative.
 
-### 7. Phase Separation Validation
+## Step 7 — Phase Separation Validation
 
 Scan plan for governance content per [phase-separation-rules.md](../iikit-core/references/phase-separation-rules.md) (Plan section). Auto-fix by replacing with constitution references, re-validate.
 
