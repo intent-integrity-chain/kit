@@ -28,7 +28,7 @@ Load constitution per [constitution-loading.md](../iikit-core/references/constit
 
 The text after `/iikit-01-specify` **is** the feature description.
 
-## Step 0 — Bug-Fix Intent Detection
+## Step 1 — Bug-Fix Intent Detection
 
 Analyze the description using **contextual analysis** (not keyword-only) to determine primary intent: **fix existing broken behavior** vs. **add new capability**.
 
@@ -39,15 +39,15 @@ If bug-fix intent is detected:
 1. Display: "This sounds like a bug fix. Consider using `/iikit-bugfix` instead."
 2. Show example: `/iikit-bugfix '<the user description>'`
 3. Ask the user to confirm: proceed with specification (genuinely a new feature) or switch to `/iikit-bugfix`
-4. User confirms new feature → proceed to Step 1; user wants bugfix → stop.
+4. User confirms new feature → proceed to Step 2; user wants bugfix → stop.
 
-## Step 1 — Generate Branch Name
+## Step 2 — Generate Branch Name
 
 Create 2-4 word action-noun name from description:
 - "I want to add user authentication" -> "user-auth"
 - "Implement OAuth2 integration for the API" -> "oauth2-api-integration"
 
-## Step 2 — Create Feature Branch and Directory
+## Step 3 — Create Feature Branch and Directory
 
 Check current branch. If on main/master/develop, suggest creating feature branch (default). If already on feature branch, suggest skipping.
 
@@ -64,7 +64,7 @@ pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/po
 
 Parse JSON for `BRANCH_NAME`, `SPEC_FILE`, `FEATURE_NUM`. Only run ONCE per feature.
 
-## Step 3 — Generate Specification
+## Step 4 — Generate Specification
 
 1. Parse user description — if empty: ERROR with usage example
 2. Extract key concepts: actors, actions, data, constraints
@@ -76,19 +76,19 @@ Parse JSON for `BRANCH_NAME`, `SPEC_FILE`, `FEATURE_NUM`. Only run ONCE per feat
 
 Write to `SPEC_FILE` using [spec-template.md](../iikit-core/templates/spec-template.md) structure.
 
-## Step 4 — Phase Separation Validation
+## Step 5 — Phase Separation Validation
 
 Scan for implementation details per [phase-separation-rules.md](../iikit-core/references/phase-separation-rules.md) (Specification section). Auto-fix violations, re-validate until clean.
 
-## Step 5 — Create Spec Quality Checklist
+## Step 6 — Create Spec Quality Checklist
 
 Generate `FEATURE_DIR/checklists/requirements.md` covering: content quality (no implementation details), requirement completeness, feature readiness.
 
-## Step 6 — Handle Clarifications
+## Step 7 — Handle Clarifications
 
 If `[NEEDS CLARIFICATION]` markers remain, present each as a question with options table and wait for user response.
 
-## Step 7 — Report
+## Step 8 — Report
 
 Output: branch name, spec file path, checklist results, readiness for next phase.
 

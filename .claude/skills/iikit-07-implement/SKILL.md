@@ -119,7 +119,7 @@ Before writing source code:
 2. **Install Tessl tiles** for each major dependency: `tessl search <pkg>` then `tessl install <tile>`. Query tile docs before writing library code. See [tessl-integration.md](references/tessl-integration.md).
 3. **Scaffold project** if needed. For existing directories, use force/overwrite flags. See [ignore-patterns.md](references/ignore-patterns.md) for gitignore patterns.
 
-## Step 5 — Parse and Execute Tasks
+## Step 5 — Execute Tasks
 
 **5.1 Task extraction**: parse tasks.md for phase, completion status (`[x]` = skip), dependencies, [P] markers, [USn] labels. Build in-memory task graph.
 

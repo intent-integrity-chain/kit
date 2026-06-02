@@ -77,7 +77,7 @@ When Tessl eval results are available for candidate technologies, include eval s
 
 If Tessl is installed, discover and install tiles for all technologies. See [tessl-tile-discovery.md](references/tessl-tile-discovery.md) for the full procedure.
 
-## Step 3 — Research & Resolve Unknowns
+## Step 3 — Resolve Unknowns
 
 For each NEEDS CLARIFICATION item and dependency: research, document findings in `research.md` with decision, rationale, and alternatives considered. Include Tessl Tiles section if applicable.
 
