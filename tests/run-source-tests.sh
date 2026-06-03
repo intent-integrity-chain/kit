@@ -65,14 +65,6 @@ test_symlink_structure() {
         log_fail "tiles/intent-integrity-kit/skills is not a symlink"
     fi
 
-    # .tessl/plugins/tessl-labs/intent-integrity-kit must be a symlink to the tile
-    ((TESTS_RUN++))
-    if [[ -L ".tessl/plugins/tessl-labs/intent-integrity-kit" ]]; then
-        log_pass ".tessl/plugins/tessl-labs/intent-integrity-kit is a symlink"
-    else
-        log_fail ".tessl/plugins/tessl-labs/intent-integrity-kit is not a symlink"
-    fi
-
     # .codex/skills, .gemini/skills, .opencode/skills should chain through .claude/skills
     for agent in .codex .gemini .opencode; do
         ((TESTS_RUN++))
@@ -83,13 +75,11 @@ test_symlink_structure() {
         fi
     done
 
-    # .tessl path should resolve to the tile scripts
-    ((TESTS_RUN++))
-    if [[ -f ".tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/check-prerequisites.sh" ]]; then
-        log_pass ".tessl path resolves to tile scripts"
-    else
-        log_fail ".tessl path does not resolve to tile scripts"
-    fi
+    # Note: end-user resolution at .tessl/plugins/tessl-labs/intent-integrity-kit/
+    # is tested in tests/run-tile-tests.sh after `tessl install`. The source tree
+    # no longer ships a dev-time symlink at that path — local development uses
+    # `tessl install file:./tiles/intent-integrity-kit [--watch-local]` per
+    # CONTRIBUTING.md (#82).
 }
 
 # ─── Skill Completeness ─────────────────────────────────────────────────────
