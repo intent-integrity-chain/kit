@@ -170,6 +170,41 @@ teardown() {
 }
 
 # =============================================================================
+# Dry-run tests
+# =============================================================================
+
+@test "create-new-feature: --dry-run does not create directory" {
+    original_branch=$(git branch --show-current)
+    "$CREATE_SCRIPT" --json --dry-run "Preview only feature" >/dev/null
+
+    # No specs/ children should exist
+    [[ -z "$(ls -A specs 2>/dev/null)" ]]
+}
+
+@test "create-new-feature: --dry-run does not create git branch" {
+    original_branch=$(git branch --show-current)
+    "$CREATE_SCRIPT" --json --dry-run "Preview only feature" >/dev/null
+
+    current_branch=$(git branch --show-current)
+    [[ "$current_branch" == "$original_branch" ]]
+}
+
+@test "create-new-feature: --dry-run emits dry_run=true in JSON" {
+    result=$("$CREATE_SCRIPT" --json --dry-run "Preview only feature")
+
+    assert_contains "$result" '"dry_run":true'
+    assert_contains "$result" '"BRANCH_NAME"'
+    assert_contains "$result" '"FEATURE_NUM"'
+}
+
+@test "create-new-feature: --dry-run respects --short-name and --number" {
+    result=$("$CREATE_SCRIPT" --json --dry-run --short-name "user-auth" --number 7 "ignored desc")
+
+    assert_contains "$result" '"FEATURE_NUM":"007"'
+    assert_contains "$result" "user-auth"
+}
+
+# =============================================================================
 # Bug regression tests (from e2e test findings)
 # =============================================================================
 

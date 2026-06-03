@@ -119,7 +119,9 @@ if ($ProjectRoot) {
 }
 $hasGit = Test-HasGit
 $currentBranch = Get-CurrentBranch
-$statusNoFeature = $false
+$noFeatureBranch = $false
+# paths_only and status_mode tolerate non-feature branches.
+$softBranchMode = ($cfg.Extras -match 'status_mode') -or ($cfg.Extras -match 'paths_only')
 $branchResult = Test-FeatureBranch -Branch $currentBranch -HasGit $hasGit
 if ($branchResult -eq "NEEDS_SELECTION") {
     $featuresJson = Get-FeaturesJson
@@ -131,8 +133,8 @@ if ($branchResult -eq "NEEDS_SELECTION") {
     }
     exit 2
 } elseif ($branchResult -eq "ERROR") {
-    if ($cfg.Extras -match 'status_mode') {
-        $statusNoFeature = $true
+    if ($softBranchMode) {
+        $noFeatureBranch = $true
         $paths = [PSCustomObject]@{
             REPO_ROOT      = $repoRoot
             CURRENT_BRANCH = $currentBranch
@@ -151,8 +153,8 @@ if ($branchResult -eq "NEEDS_SELECTION") {
     }
 }
 
-# Get all feature paths (skip if status mode with no feature)
-if (-not $statusNoFeature) {
+# Get all feature paths (skip if soft branch mode with no feature)
+if (-not $noFeatureBranch) {
     $paths = Get-FeaturePathsEnv
 
     # Override paths if -ProjectRoot was specified
@@ -269,7 +271,7 @@ if ($cfg.Extras -match 'status_mode') {
     if ($paths.FEATURE_DIR -and (Test-Path $paths.FEATURE_DIR -PathType Container -ErrorAction SilentlyContinue)) {
         $localFeature = Split-Path $paths.FEATURE_DIR -Leaf
         $featureStage = Get-FeatureStage -RepoRoot $repoRoot -Feature $localFeature
-    } elseif ($statusNoFeature) {
+    } elseif ($noFeatureBranch) {
         $featureStage = 'no-feature'
     }
 
@@ -290,7 +292,7 @@ if ($cfg.Extras -match 'status_mode') {
     if (-not $aConstitution) {
         $nextStep = '/iikit-00-constitution'
         $clearBefore = $false
-    } elseif ($statusNoFeature -or -not $paths.FEATURE_DIR -or -not (Test-Path $paths.FEATURE_DIR -PathType Container -ErrorAction SilentlyContinue)) {
+    } elseif ($noFeatureBranch -or -not $paths.FEATURE_DIR -or -not (Test-Path $paths.FEATURE_DIR -PathType Container -ErrorAction SilentlyContinue)) {
         $nextStep = '/iikit-01-specify <description>'
         $clearBefore = $false
     } elseif (-not $vSpec) {

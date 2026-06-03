@@ -6,6 +6,7 @@ JSON_MODE=false
 SHORT_NAME=""
 BRANCH_NUMBER=""
 SKIP_BRANCH=false
+DRY_RUN=false
 ARGS=()
 i=1
 while [ $i -le $# ]; do
@@ -16,6 +17,9 @@ while [ $i -le $# ]; do
             ;;
         --skip-branch)
             SKIP_BRANCH=true
+            ;;
+        --dry-run)
+            DRY_RUN=true
             ;;
         --short-name)
             if [ $((i + 1)) -gt $# ]; then
@@ -44,19 +48,21 @@ while [ $i -le $# ]; do
             BRANCH_NUMBER="$next_arg"
             ;;
         --help|-h)
-            echo "Usage: $0 [--json] [--short-name <name>] [--number N] [--skip-branch] <feature_description>"
+            echo "Usage: $0 [--json] [--short-name <name>] [--number N] [--skip-branch] [--dry-run] <feature_description>"
             echo ""
             echo "Options:"
             echo "  --json              Output in JSON format"
             echo "  --short-name <name> Provide a custom short name (2-4 words) for the branch"
             echo "  --number N          Specify branch number manually (overrides auto-detection)"
             echo "  --skip-branch       Create feature directory without creating a git branch"
+            echo "  --dry-run           Preview the branch name and feature number without writing"
             echo "  --help, -h          Show this help message"
             echo ""
             echo "Examples:"
             echo "  $0 'Add user authentication system' --short-name 'user-auth'"
             echo "  $0 'Implement OAuth2 integration for API' --number 5"
             echo "  $0 --skip-branch 'Fix bug on existing branch'"
+            echo "  $0 --dry-run 'Preview without creating anything'"
             exit 0
             ;;
         *)
@@ -265,6 +271,22 @@ if [ ${#BRANCH_NAME} -gt $MAX_BRANCH_LENGTH ]; then
     >&2 echo "[specify] Truncated to: $BRANCH_NAME (${#BRANCH_NAME} bytes)"
 fi
 
+FEATURE_DIR="$SPECS_DIR/$BRANCH_NAME"
+SPEC_FILE="$FEATURE_DIR/spec.md"
+
+if [ "$DRY_RUN" = true ]; then
+    if $JSON_MODE; then
+        printf '{"BRANCH_NAME":"%s","SPEC_FILE":"%s","FEATURE_DIR":"%s","FEATURE_NUM":"%s","HAS_GIT":%s,"dry_run":true}\n' \
+            "$BRANCH_NAME" "$SPEC_FILE" "$FEATURE_DIR" "$FEATURE_NUM" "$HAS_GIT"
+    else
+        echo "[specify] DRY RUN — no branch, directory, or spec.md will be created"
+        echo "BRANCH_NAME: $BRANCH_NAME"
+        echo "SPEC_FILE: $SPEC_FILE"
+        echo "FEATURE_NUM: $FEATURE_NUM"
+    fi
+    exit 0
+fi
+
 if [ "$SKIP_BRANCH" = true ]; then
     >&2 echo "[specify] Skipping branch creation (--skip-branch). Feature directory: $BRANCH_NAME"
 elif [ "$HAS_GIT" = true ]; then
@@ -273,12 +295,10 @@ else
     >&2 echo "[specify] Warning: Git repository not detected; skipped branch creation for $BRANCH_NAME"
 fi
 
-FEATURE_DIR="$SPECS_DIR/$BRANCH_NAME"
 mkdir -p "$FEATURE_DIR"
 
 # Template path relative to script location (works for both .tessl and .claude installs)
 TEMPLATE="$SCRIPT_DIR/../../templates/spec-template.md"
-SPEC_FILE="$FEATURE_DIR/spec.md"
 if [ -f "$TEMPLATE" ]; then cp "$TEMPLATE" "$SPEC_FILE"; else touch "$SPEC_FILE"; fi
 
 # Set the SPECIFY_FEATURE environment variable

@@ -43,6 +43,25 @@ teardown() {
     [[ "$status" -eq 0 ]]
 }
 
+@test "check-prerequisites: --paths-only succeeds on non-feature branch with no features" {
+    unset SPECIFY_FEATURE
+    rm -rf specs
+    mkdir -p specs
+
+    run "$CHECK_SCRIPT" --paths-only --json
+    [[ "$status" -eq 0 ]]
+    assert_contains "$output" '"FEATURE_DIR"'
+}
+
+@test "check-prerequisites: --phase core succeeds on non-feature branch (gitflow-agnostic)" {
+    unset SPECIFY_FEATURE
+    rm -rf specs
+    mkdir -p specs
+
+    run "$CHECK_SCRIPT" --phase core --json
+    [[ "$status" -eq 0 ]]
+}
+
 # =============================================================================
 # Validation mode tests
 # =============================================================================
