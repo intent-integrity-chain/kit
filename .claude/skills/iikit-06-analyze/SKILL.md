@@ -10,6 +10,8 @@ metadata:
 
 # Intent Integrity Kit Analyze
 
+Process steps in order. Do not skip ahead.
+
 Non-destructive cross-artifact consistency analysis across spec.md, plan.md, and tasks.md.
 
 ## Operating Constraints
@@ -39,18 +41,20 @@ Load constitution per [constitution-loading.md](../iikit-core/references/constit
    - Bash: `bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selection>`
    - Windows: `pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selection>`
 
-   Then re-run the prerequisites check from step 1.
+   Then re-run the prerequisites check (item 1 of this section).
 4. Checklist gate per [checklist-gate.md](../iikit-core/references/checklist-gate.md).
 
-## Execution Steps
-
-### 1. Load Artifacts (Progressive)
+## Step 1 — Load Artifacts (Progressive)
 
 From spec.md: overview, requirements, user stories, edge cases.
 From plan.md: architecture, data model refs, phases, constraints.
 From tasks.md: task IDs, descriptions, phases, [P] markers, file paths.
 
-### 2. Build Semantic Models
+Proceed immediately to Step 2.
+
+
+
+## Step 2 — Build Semantic Models
 
 - Requirements inventory (functional + non-functional)
 - User story/action inventory with acceptance criteria
@@ -58,7 +62,11 @@ From tasks.md: task IDs, descriptions, phases, [P] markers, file paths.
 - Plan coverage mapping (requirement ID → plan.md sections where referenced)
 - Constitution rule set
 
-### 3. Detection Passes (limit 50 findings)
+Proceed immediately to Step 3.
+
+
+
+## Step 3 — Detection Passes (limit 50 findings)
 
 | Pass | Category | What to detect |
 |------|----------|----------------|
@@ -81,14 +89,22 @@ From tasks.md: task IDs, descriptions, phases, [P] markers, file paths.
 
 `BLOCKED` → report undefined steps (HIGH). `DEGRADED` → note in report only.
 
-### 4. Severity
+Proceed immediately to Step 4.
+
+
+
+## Step 4 — Severity
 
 - **CRITICAL**: constitution MUST violations, phase separation, missing core artifact, zero-coverage blocking requirement
 - **HIGH**: duplicates, conflicting requirements, ambiguous security/performance, untestable criteria
 - **MEDIUM**: terminology drift, missing non-functional coverage, underspecified edge cases
 - **LOW**: style/wording, minor redundancy
 
-### 5. Analysis Report
+Proceed immediately to Step 5.
+
+
+
+## Step 5 — Analysis Report
 
 Output to console AND write to `FEATURE_DIR/analysis.md`:
 
@@ -112,9 +128,11 @@ Output to console AND write to `FEATURE_DIR/analysis.md`:
 | <timestamp> | <score> | <coverage>% | <critical> | <high> | <medium> | <low> | <total_findings> |
 ```
 
-### 5b. Score History
+Proceed immediately to Step 6.
 
-After computing **Metrics** in step 5, persist the health score:
+## Step 6 — Persist Health Score
+
+After computing **Metrics** in Step 5, persist the health score:
 
 1. **Compute**: `score = max(0, round(100 - (critical×20 + high×5 + medium×2 + low×0.5)))`.
 2. **Read** `.specify/score-history.json` (initialize `{}` if missing).
@@ -125,14 +143,26 @@ After computing **Metrics** in step 5, persist the health score:
 6. **Display**: `Health Score: <score>/100 (<trend>)` in console and `analysis.md`.
 7. **Include** full `score_history` array for the current feature under the **Score History** table in `analysis.md`.
 
-### 6. Next Actions
+Proceed immediately to Step 7.
+
+
+
+## Step 7 — Next Actions
 
 - CRITICAL issues: recommend resolving before `/iikit-07-implement`
 - LOW/MEDIUM only: may proceed with improvement suggestions
 
-### 7. Offer Remediation
+Proceed immediately to Step 8.
+
+
+
+## Step 8 — Offer Remediation
 
 Ask: "Suggest concrete remediation edits for the top N issues?" Do NOT apply automatically.
+
+Finish here.
+
+
 
 ## Operating Principles
 

@@ -265,14 +265,16 @@ test_parallel_execution() {
         log_fail "implement SKILL.md does not reference parallel-execution.md"
     fi
 
-    # Section 6 has subsections 6.1-6.5 (bold-formatted in SKILL.md)
-    local subsections=("6.1 Task extraction" "6.2 Execution strategy" "6.3 Phase-by-phase" "6.4 Rules" "6.5 Failure handling")
+    # Step 5 body has bold-labeled sub-actions (flat, no decimals per skill-authoring).
+    # Match the exact `**<label>**` bold markers — plain grep on "Failure handling"
+    # would also match the surrounding "## Error Handling" prose and similar phrases.
+    local subsections=("Task extraction" "Execution strategy" "Phase-by-phase" "Rules" "Failure handling" "Task Commits")
     for sub in "${subsections[@]}"; do
         ((TESTS_RUN++))
-        if grep -q "$sub" "$impl"; then
-            log_pass "Section $sub present"
+        if grep -qF "**$sub**" "$impl"; then
+            log_pass "Section **$sub** bold label present"
         else
-            log_fail "Section $sub missing from implement SKILL.md"
+            log_fail "Section **$sub** bold label missing from implement SKILL.md"
         fi
     done
 
@@ -490,16 +492,16 @@ test_premise_support() {
 # ─── Task Commits ────────────────────────────────────────────────────────────
 
 test_task_commits() {
-    log_section "Task Commits (§6.6)"
+    log_section "Task Commits"
     local impl="$SKILLS_DIR/iikit-07-implement/SKILL.md"
     local ref="$SKILLS_DIR/iikit-07-implement/references/parallel-execution.md"
 
-    # Section 6.6 exists in implement skill
+    # Task Commits bold-labeled body section exists in implement skill
     ((TESTS_RUN++))
-    if grep -q '6.6 Task Commits' "$impl"; then
-        log_pass "section 6.6 Task Commits present"
+    if grep -q '\*\*Task Commits\*\*' "$impl"; then
+        log_pass "Task Commits body section present"
     else
-        log_fail "section 6.6 Task Commits missing"
+        log_fail "Task Commits body section missing"
     fi
 
     # Commit message format specified
@@ -518,12 +520,12 @@ test_task_commits() {
         log_fail "bugfix commit prefix not documented"
     fi
 
-    # parallel-execution.md references §6.6
+    # parallel-execution.md references Task Commits
     ((TESTS_RUN++))
-    if grep -q '§6.6' "$ref"; then
-        log_pass "parallel-execution.md references §6.6"
+    if grep -qi 'Task Commits' "$ref"; then
+        log_pass "parallel-execution.md references Task Commits"
     else
-        log_fail "parallel-execution.md does not reference §6.6"
+        log_fail "parallel-execution.md does not reference Task Commits"
     fi
 
     # Next Steps says "Push commits" not "Commit and push"

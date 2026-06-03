@@ -10,6 +10,8 @@ metadata:
 
 # Intent Integrity Kit Tasks
 
+Process steps in order. Do not skip ahead.
+
 Generate an actionable, dependency-ordered tasks.md for the feature.
 
 ## User Input
@@ -35,7 +37,7 @@ Load constitution per [constitution-loading.md](../iikit-core/references/constit
    ```
    Windows: `pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selection>`
 
-   Then re-run the prerequisites check from step 1.
+   Then re-run the prerequisites check (item 1 of this section).
 4. Checklist gate per [checklist-gate.md](../iikit-core/references/checklist-gate.md).
 
 ## Plan Readiness Validation
@@ -46,24 +48,34 @@ Load constitution per [constitution-loading.md](../iikit-core/references/constit
 
 Report readiness per [formatting-guide.md](../iikit-core/references/formatting-guide.md) (Plan Readiness section).
 
-## Execution Flow
-
-### 1. Load Documents
+## Step 1 — Load Documents
 
 - **Required**: `plan.md`, `spec.md`
 - **Optional**: `data-model.md`, `contracts/`, `research.md`, `quickstart.md`, `tests/features/` (.feature files)
 
 If .feature files exist (or legacy test-specs.md), tasks reference specific test IDs (e.g., "T012 [US1] Implement to pass TS-001").
 
-### 2. Tessl Convention Consultation
+Proceed immediately to Step 2.
+
+
+
+## Step 2 — Tessl Convention Consultation
 
 If Tessl installed: query primary framework tile for project structure conventions and testing framework tile for test organization. Apply to file paths and task ordering. If not available: skip silently.
 
-### 3. Generate Tasks
+Proceed immediately to Step 3.
+
+
+
+## Step 3 — Generate Tasks
 
 Extract tech stack from plan.md, user stories from spec.md, entities from data-model.md, endpoints from contracts/, decisions from research.md. Organize by user story with dependency graph and parallel markers.
 
-### 4. Task Format (REQUIRED)
+Proceed immediately to Step 4.
+
+
+
+## Step 4 — Task Format (REQUIRED)
 
 ```text
 - [ ] [TaskID] [P?] [Story?] Description with file path
@@ -91,18 +103,30 @@ Extract tech stack from plan.md, user stories from spec.md, entities from data-m
 **Correct**: `[TS-005, TS-006, TS-007, TS-008, TS-009, TS-010]`
 **Wrong**: `TS-005 through TS-010`
 
-### 5. Phase Structure
+Proceed immediately to Step 5.
+
+
+
+## Step 5 — Phase Structure
 
 - **Phase 1**: Setup (project initialization)
 - **Phase 2**: Foundational (blocking prerequisites, complete before stories)
 - **Phase 3+**: User Stories in priority order (P1, P2, P3...) — tests -> models -> services -> endpoints -> integration
 - **Final**: Polish & Cross-Cutting Concerns
 
-### 6. Task Organization
+Proceed immediately to Step 6.
+
+
+
+## Step 6 — Task Organization
 
 Map each component to its user story. Shared entities serving multiple stories go in Setup/Foundational. Each contract gets a contract test task. Story dependencies marked explicitly.
 
-### 7. Dependency Graph Validation
+Proceed immediately to Step 7.
+
+
+
+## Step 7 — Dependency Graph Validation
 
 After generating, validate:
 1. **Circular dependencies**: detect cycles, ERROR if found with resolution options
@@ -111,9 +135,17 @@ After generating, validate:
 4. **Phase boundaries**: no backward cross-phase dependencies
 5. **Story independence**: warn on priority inversions (higher-priority depending on lower)
 
-### 8. Write tasks.md
+Proceed immediately to Step 8.
+
+
+
+## Step 8 — Write tasks.md
 
 Use [tasks-template.md](../iikit-core/templates/tasks-template.md) with phases, dependencies, parallel examples, and implementation strategy.
+
+Finish here.
+
+
 
 ## Report
 

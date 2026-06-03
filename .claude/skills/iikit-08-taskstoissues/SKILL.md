@@ -10,6 +10,8 @@ metadata:
 
 # Intent Integrity Kit Tasks to Issues
 
+Process steps in order. Do not skip ahead.
+
 Convert existing tasks into dependency-ordered GitHub issues for project tracking.
 
 ## User Input
@@ -35,7 +37,7 @@ $ARGUMENTS
    ```
    Windows: `pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selection>`
 
-   Then re-run the prerequisites check from step 1.
+   Then re-run the prerequisites check (item 1 of this section).
 
 ## GitHub Remote Validation
 
@@ -45,19 +47,25 @@ git config --get remote.origin.url
 
 **CRITICAL**: Only proceed if remote is a GitHub URL (`git@github.com:` or `https://github.com/`). Otherwise ERROR.
 
-## Execution Flow
-
-### 1. Parse tasks.md
+## Step 1 — Parse tasks.md
 
 Extract: Task IDs, descriptions, phase groupings, parallel markers [P], user story labels [USn], dependencies.
 
-### 2. Prepare Labels and Title Format
+Proceed immediately to Step 2.
+
+
+
+## Step 2 — Prepare Labels and Title Format
 
 **Title format**: `[FeatureID/TaskID] [Story] Description` — feature-id extracted from `FEATURE_DIR` (e.g. `001-user-auth`).
 
 **Body**: use template from [issue-body-template.md](references/issue-body-template.md). **Labels** (create if needed): `iikit`, `phase-N`, `us-N`, `parallel`.
 
-### 3. Create Issues (parallel)
+Proceed immediately to Step 3.
+
+
+
+## Step 3 — Create Issues (parallel)
 
 Use the `Task` tool to dispatch issue creation in parallel — one subagent per chunk of tasks (split by phase or user story). Each subagent receives:
 - The chunk of tasks to create issues for
@@ -73,9 +81,17 @@ gh issue create --title "[001-user-auth/T012] [US1] Create User model" --body ".
 
 Collect all created issue numbers from subagents. Verify all returned successfully before proceeding. If some failed: report failures, continue with successful issues only.
 
-### 4. Link Dependencies
+Proceed immediately to Step 4.
+
+
+
+## Step 4 — Link Dependencies
 
 After all issues exist, edit bodies to add cross-references using `#NNN` syntax. Skip dependency links for any issues that failed to create.
+
+Finish here.
+
+
 
 ## Report
 

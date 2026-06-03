@@ -66,7 +66,7 @@ For each phase:
 5. **Post-batch checks**:
    - Run file conflict detection (see below)
    - If TDD active, run full test suite after batch (see TDD section)
-6. **Checkpoint**: Mark completed tasks `[x]` in tasks.md in a single write, then commit each task individually per §6.6
+6. **Checkpoint**: Mark completed tasks `[x]` in tasks.md in a single write, then commit each task individually per Task Commits in `iikit-07-implement` Step 5
 7. **Repeat** with remaining and newly eligible tasks until the phase is complete
 
 ## Cross-Story Protocol
