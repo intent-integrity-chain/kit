@@ -265,14 +265,16 @@ test_parallel_execution() {
         log_fail "implement SKILL.md does not reference parallel-execution.md"
     fi
 
-    # Step 5 body has bold-labeled sub-actions (flat, no decimals per skill-authoring)
-    local subsections=("Task extraction" "Execution strategy" "Phase-by-phase" "Rules" "Failure handling")
+    # Step 5 body has bold-labeled sub-actions (flat, no decimals per skill-authoring).
+    # Match the exact `**<label>**` bold markers — plain grep on "Failure handling"
+    # would also match the surrounding "## Error Handling" prose and similar phrases.
+    local subsections=("Task extraction" "Execution strategy" "Phase-by-phase" "Rules" "Failure handling" "Task Commits")
     for sub in "${subsections[@]}"; do
         ((TESTS_RUN++))
-        if grep -q "$sub" "$impl"; then
-            log_pass "Section $sub present"
+        if grep -qF "**$sub**" "$impl"; then
+            log_pass "Section **$sub** bold label present"
         else
-            log_fail "Section $sub missing from implement SKILL.md"
+            log_fail "Section **$sub** bold label missing from implement SKILL.md"
         fi
     done
 
