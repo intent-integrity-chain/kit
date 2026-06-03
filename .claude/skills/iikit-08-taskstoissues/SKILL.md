@@ -3,6 +3,7 @@ name: iikit-08-taskstoissues
 description: >-
   Convert tasks from tasks.md into GitHub Issues with labels and dependencies.
   Use when exporting work items to GitHub, setting up project boards, or assigning tasks to team members.
+argument-hint: "[--dry-run]"
 license: MIT
 metadata:
   version: "1.6.4"
