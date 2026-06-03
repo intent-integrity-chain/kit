@@ -180,10 +180,6 @@ Use `task_ids` from Step 3. Task IDs use `T-B` prefix — parsers and dashboard 
 
 **Non-TDD task set** (`determination` is NOT `mandatory`, count = 3):
 ```markdown
-
-Proceed immediately to Step 10.
-
-
 ## Bug Fix Tasks
 
 - [ ] T-BNNN [BUG-NNN] Investigate root cause for BUG-NNN: <description>
@@ -211,6 +207,8 @@ Append to existing `<feature_dir>/tasks.md`. If tasks.md does not exist, create 
 ```
 
 Do NOT modify existing entries or task IDs in tasks.md.
+
+Proceed immediately to Step 10.
 
 ## Step 10 — Commit, Dashboard & Next Steps
 

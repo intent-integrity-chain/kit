@@ -109,10 +109,6 @@ Proceed immediately to Step 5.
 Output to console AND write to `FEATURE_DIR/analysis.md`:
 
 ```markdown
-
-Proceed immediately to Step 6.
-
-
 ## Specification Analysis Report
 
 | ID | Category | Severity | Location(s) | Summary | Recommendation |
@@ -131,6 +127,8 @@ Proceed immediately to Step 6.
 |-----|-------|----------|----------|------|--------|-----|-------|
 | <timestamp> | <score> | <coverage>% | <critical> | <high> | <medium> | <low> | <total_findings> |
 ```
+
+Proceed immediately to Step 6.
 
 ## Step 6 — Persist Health Score
 
