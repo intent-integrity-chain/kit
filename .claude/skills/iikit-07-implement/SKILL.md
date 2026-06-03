@@ -68,6 +68,10 @@ Dashboard: file://$(pwd)/.specify/dashboard.html (resolve the path) — updates 
 
 Read `tasks.md` + `plan.md` (standard) or `tasks.md` + `bugs.md` (bugfix). Optional: `data-model.md`, `contracts/`, `research.md`, `quickstart.md`, `tests/features/`.
 
+Proceed immediately to Step 2.
+
+
+
 ## Step 2 — TDD Support Check
 
 If `tests/features/` directory exists (contains `.feature` files), verify assertion integrity:
@@ -79,6 +83,10 @@ bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/ba
 Parse JSON response: `PASS` (proceed), `BLOCKED` (halt, show remediation), `WARN` (proceed with caution).
 
 If TDD **mandatory** but `tests/features/` missing or empty: ERROR with `Run: /iikit-04-testify`.
+
+Proceed immediately to Step 3.
+
+
 
 ## Step 3 — Execute BDD Verification Chain
 
@@ -112,12 +120,20 @@ Block on any status other than `PASS`.
 
 Do NOT mark `[x]` in tasks.md until all three gates pass.
 
+Proceed immediately to Step 4.
+
+
+
 ## Step 4 — Setup (Dependencies, Tiles, Scaffolding)
 
 Before writing source code:
 1. **Install dependencies** from plan.md Technical Context (detect package manager, add runtime + dev deps, commit manifest + lockfile)
 2. **Install Tessl tiles** for each major dependency: `tessl search <pkg>` then `tessl install <tile>`. Query tile docs before writing library code. See [tessl-integration.md](references/tessl-integration.md).
 3. **Scaffold project** if needed. For existing directories, use force/overwrite flags. See [ignore-patterns.md](references/ignore-patterns.md) for gitignore patterns.
+
+Proceed immediately to Step 5.
+
+
 
 ## Step 5 — Execute Tasks
 
@@ -170,13 +186,25 @@ For both strategies, regenerate the dashboard after commits:
   bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/generate-dashboard-safe.sh
   ```
 
+Proceed immediately to Step 6.
+
+
+
 ## Step 6 — Output Validation
 
 Before writing ANY file: review against constitutional principles. On violation: STOP, explain, suggest alternative.
 
+Proceed immediately to Step 7.
+
+
+
 ## Step 7 — Progress Tracking
 
 Report after each task/batch. Mark completed `[x]` in tasks.md. Halt on failure.
+
+Proceed immediately to Step 8.
+
+
 
 ## Step 8 — Post-Fix GitHub Integration (Bug Fix Tasks)
 
@@ -190,9 +218,17 @@ After completing bug fix tasks (tasks with `T-B` prefix pattern):
      - **Post a comment**: use `gh issue comment` if available, otherwise `curl` the GitHub API (`POST /repos/{owner}/{repo}/issues/{number}/comments`). Comment content: root cause from bugs.md, completed fix tasks, and fix reference
    - If no GitHub issue is linked: skip silently
 
+Proceed immediately to Step 9.
+
+
+
 ## Step 9 — Completion
 
 All tasks `[x]`, features validated against spec, test execution enforcement (Step 3) satisfied, Tessl usage reported.
+
+Finish here.
+
+
 
 ## Error Handling
 

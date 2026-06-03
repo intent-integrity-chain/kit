@@ -56,6 +56,10 @@ Search spec.md for Given/When/Then patterns. If none found: ERROR with `Run: /ii
 - **Required**: `spec.md` (acceptance scenarios), `plan.md` (API contracts, tech stack)
 - **Optional**: `data-model.md` (validation rules)
 
+Proceed immediately to Step 2.
+
+
+
 ## Step 2 — Generate Gherkin Feature Files
 
 Create `.feature` files in `FEATURE_DIR/tests/features/`:
@@ -85,6 +89,10 @@ Feature-level tags for shared metadata:
 
 Use [testspec-template.md](../iikit-core/templates/testspec-template.md) as the Gherkin file template. For transformation examples, advanced constructs (Background, Scenario Outline, Rule), and syntax validation rules, see [gherkin-reference.md](references/gherkin-reference.md).
 
+Proceed immediately to Step 3.
+
+
+
 ## Step 3 — Add DO NOT MODIFY Markers
 
 Add an HTML comment at the top of each `.feature` file:
@@ -93,6 +101,10 @@ Add an HTML comment at the top of each `.feature` file:
 # Derived from requirements. Fix code to pass tests; re-run /iikit-04-testify if requirements change.
 ```
 
+Proceed immediately to Step 4.
+
+
+
 ## Step 4 — Idempotency
 
 If `tests/features/` already contains `.feature` files:
@@ -100,6 +112,10 @@ If `tests/features/` already contains `.feature` files:
 - Add new scenarios for new requirements
 - Mark removed scenarios as deprecated (comment out with `# DEPRECATED:`)
 - Show diff summary of changes
+
+Proceed immediately to Step 5.
+
+
 
 ## Step 5 — Store Assertion Integrity Hash
 
@@ -111,9 +127,17 @@ bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/ba
 
 Returns JSON with `hash` and `git_note` status. The implement skill verifies this hash before proceeding.
 
+Proceed immediately to Step 6.
+
+
+
 ## Step 6 — Report
 
 Output: TDD determination, scenario counts by source (acceptance/contract/validation), output directory path, number of `.feature` files generated, hash status (LOCKED).
+
+Finish here.
+
+
 
 ## Error Handling
 

@@ -47,9 +47,17 @@ Derive up to THREE contextual questions (skip if unambiguous from `$ARGUMENTS`):
 - Depth: lightweight sanity list or formal release gate?
 - Audience: author-only or peer PR review?
 
+Proceed immediately to Step 2.
+
+
+
 ## Step 2 — Load Feature Context
 
 Read from FEATURE_DIR: `spec.md` (required), `plan.md` (optional), `tasks.md` (optional).
+
+Proceed immediately to Step 3.
+
+
 
 ## Step 3 — Generate Checklist
 
@@ -70,9 +78,17 @@ See [checklist-examples.md](references/checklist-examples.md) for correct/wrong 
 
 Use [checklist-template.md](../iikit-core/templates/checklist-template.md) for format structure.
 
+Proceed immediately to Step 4.
+
+
+
 ## Step 4 — Gap Resolution (Interactive)
 
 For each `[Gap]` item: follow the gap resolution pattern in [conversation-guide.md](../iikit-core/references/conversation-guide.md). Present missing requirement, explain risk, offer options. On resolution: update spec.md and check item off. Skip if `--no-interactive` or no gaps.
+
+Proceed immediately to Step 5.
+
+
 
 ## Step 5 — Remaining Item Validation
 
@@ -84,9 +100,17 @@ Continue until all items are `[x]` or explicitly deferred.
 
 **IMPORTANT**: Checklists are optional — not creating one is fine. But once created, they MUST reach 100% before the skill reports success.
 
+Proceed immediately to Step 6.
+
+
+
 ## Step 6 — Report
 
 Output: checklist path, item counts (total/checked/deferred), gap resolution summary, completion percentage.
+
+Finish here.
+
+
 
 ## Record Phase Completion
 

@@ -38,6 +38,10 @@ Determine the input type:
 
 If input contains BOTH `#number` and text, prioritize the `#number` and warn that text is ignored.
 
+Proceed immediately to Step 2.
+
+
+
 ## Step 2 — Resolve Bug Source
 
 Take exactly one branch based on the input type from Step 1.
@@ -58,6 +62,10 @@ Take exactly one branch based on the input type from Step 1.
 
 Both flows converge at Step 3.
 
+Proceed immediately to Step 3.
+
+
+
 ## Step 3 — Select Feature & Full Setup
 
 Run full setup to list features, validate, and get bug ID and task IDs. First, present feature list to user. After selection:
@@ -77,6 +85,10 @@ Parse JSON for: `features` (list for display), `validation` (check `valid`), `bu
 
 If `validation.valid` is false: ERROR with the message. If `features` is empty: ERROR with "No features found."
 
+Proceed immediately to Step 4.
+
+
+
 ## Step 4 — Gather Bug Details
 
 **For text input** (from Step 2's Text Description Flow):
@@ -86,6 +98,10 @@ If `validation.valid` is false: ERROR with the message. If `features` is empty: 
 **For GitHub inbound** (from Step 2's GitHub Inbound Flow):
 - Severity is pre-filled from labels (confirm with user if mapping is ambiguous)
 - Reproduction steps are pre-filled from issue body (confirm with user)
+
+Proceed immediately to Step 5.
+
+
 
 ## Step 5 — Write bugs.md
 
@@ -106,6 +122,10 @@ If `bugs.md` already exists, append with `---` separator before the new entry. D
 
 If `bugs.md` does not exist, create it with the header `# Bug Reports: <feature-name>` followed by the entry.
 
+Proceed immediately to Step 6.
+
+
+
 ## Step 6 — Outbound GitHub Issue (Text Input Only)
 
 For text-input bugs only (NOT for GitHub inbound — issue already exists):
@@ -114,9 +134,17 @@ For text-input bugs only (NOT for GitHub inbound — issue already exists):
 2. Store returned issue number in the bugs.md GitHub Issue field
 3. If no GitHub remote configured: warn that GitHub issue creation was skipped, proceed with local workflow
 
+Proceed immediately to Step 7.
+
+
+
 ## Step 7 — TDD & Task Generation
 
 Use `tdd_determination` and `task_ids` from Step 3. Use `bug_id` from Step 3.
+
+Proceed immediately to Step 8.
+
+
 
 ## Step 8 — BDD/TDD Flow (If Mandatory)
 
@@ -142,12 +170,20 @@ If TDD is mandatory (`determination` = `mandatory`):
    ```
 5. Continue to Step 9 with TDD task variant
 
+Proceed immediately to Step 9.
+
+
+
 ## Step 9 — Generate Bug Fix Tasks
 
 Use `task_ids` from Step 3. Task IDs use `T-B` prefix — parsers and dashboard rely on this.
 
 **Non-TDD task set** (`determination` is NOT `mandatory`, count = 3):
 ```markdown
+
+Proceed immediately to Step 10.
+
+
 ## Bug Fix Tasks
 
 - [ ] T-BNNN [BUG-NNN] Investigate root cause for BUG-NNN: <description>
@@ -194,6 +230,10 @@ Next: [/clear → ] <next_step> (model: <tier>)
 [- <alt_step> — <reason> (model: <tier>)]
 - Dashboard: file://$(pwd)/.specify/dashboard.html
 ```
+
+Finish here.
+
+
 
 ## Error Handling
 

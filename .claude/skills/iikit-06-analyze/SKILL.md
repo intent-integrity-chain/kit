@@ -50,6 +50,10 @@ From spec.md: overview, requirements, user stories, edge cases.
 From plan.md: architecture, data model refs, phases, constraints.
 From tasks.md: task IDs, descriptions, phases, [P] markers, file paths.
 
+Proceed immediately to Step 2.
+
+
+
 ## Step 2 — Build Semantic Models
 
 - Requirements inventory (functional + non-functional)
@@ -57,6 +61,10 @@ From tasks.md: task IDs, descriptions, phases, [P] markers, file paths.
 - Task coverage mapping (task → requirements/stories)
 - Plan coverage mapping (requirement ID → plan.md sections where referenced)
 - Constitution rule set
+
+Proceed immediately to Step 3.
+
+
 
 ## Step 3 — Detection Passes (limit 50 findings)
 
@@ -81,6 +89,10 @@ From tasks.md: task IDs, descriptions, phases, [P] markers, file paths.
 
 `BLOCKED` → report undefined steps (HIGH). `DEGRADED` → note in report only.
 
+Proceed immediately to Step 4.
+
+
+
 ## Step 4 — Severity
 
 - **CRITICAL**: constitution MUST violations, phase separation, missing core artifact, zero-coverage blocking requirement
@@ -88,11 +100,19 @@ From tasks.md: task IDs, descriptions, phases, [P] markers, file paths.
 - **MEDIUM**: terminology drift, missing non-functional coverage, underspecified edge cases
 - **LOW**: style/wording, minor redundancy
 
+Proceed immediately to Step 5.
+
+
+
 ## Step 5 — Analysis Report
 
 Output to console AND write to `FEATURE_DIR/analysis.md`:
 
 ```markdown
+
+Proceed immediately to Step 6.
+
+
 ## Specification Analysis Report
 
 | ID | Category | Severity | Location(s) | Summary | Recommendation |
@@ -125,14 +145,26 @@ After computing **Metrics** in Step 5, persist the health score:
 6. **Display**: `Health Score: <score>/100 (<trend>)` in console and `analysis.md`.
 7. **Include** full `score_history` array for the current feature under the **Score History** table in `analysis.md`.
 
+Proceed immediately to Step 7.
+
+
+
 ## Step 7 — Next Actions
 
 - CRITICAL issues: recommend resolving before `/iikit-07-implement`
 - LOW/MEDIUM only: may proceed with improvement suggestions
 
+Proceed immediately to Step 8.
+
+
+
 ## Step 8 — Offer Remediation
 
 Ask: "Suggest concrete remediation edits for the top N issues?" Do NOT apply automatically.
+
+Finish here.
+
+
 
 ## Operating Principles
 

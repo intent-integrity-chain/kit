@@ -71,6 +71,10 @@ If no clarifiable artifact exists: ERROR with `No artifacts to clarify. Run /iik
 
 Load the target artifact and perform a structured scan using the taxonomy for that artifact type from [ambiguity-taxonomies.md](../iikit-core/references/ambiguity-taxonomies.md). Mark each area: Clear / Partial / Missing.
 
+Proceed immediately to Step 2.
+
+
+
 ## Step 2 — Generate Question Queue
 
 **Constraints**:
@@ -85,6 +89,10 @@ Load the target artifact and perform a structured scan using the taxonomy for th
 - Only include questions that materially impact downstream phases
 - Balance category coverage, exclude already-answered, favor downstream rework reduction
 
+Proceed immediately to Step 3.
+
+
+
 ## Step 3 — Sequential Questioning
 
 Present ONE question at a time.
@@ -94,6 +102,10 @@ Present ONE question at a time.
 **After answer**: validate against constraints, record, move to next.
 
 **Stop when**: all critical ambiguities resolved or user signals done.
+
+Proceed immediately to Step 4.
+
+
 
 ## Step 4 — Integration After Each Answer
 
@@ -110,6 +122,10 @@ Present ONE question at a time.
 - **Apply** changes to the `.feature` files themselves (update scenarios, add/remove steps)
 
 See [clarification-format.md](references/clarification-format.md) for format details.
+
+Proceed immediately to Step 5.
+
+
 
 ## Step 5 — Re-validate Affected Checklists
 
@@ -130,6 +146,10 @@ Append a **Checklist re-validation** entry under the active session in `spec.md`
 
 Skip this step when the target was not `spec.md` (plan, tasks, testify, checklist, constitution). Skip when no checklist files exist.
 
+Proceed immediately to Step 6.
+
+
+
 ## Step 6 — Validation
 
 After each write and final pass:
@@ -137,11 +157,19 @@ After each write and final pass:
 - All referenced IDs exist in the artifact
 - No vague placeholders or contradictions remain
 
+Proceed immediately to Step 7.
+
+
+
 ## Step 7 — Report
 
 Output: questions asked/answered, target artifact and path, sections touched, traceability summary table (clarification -> referenced items), coverage summary (category -> status), checklist re-validation diff (when step 5 ran), suggested next command.
 
 **Next command logic**: run `check-prerequisites.sh --json status` and use its `next_step` field to determine the actual next phase based on feature state.
+
+Finish here.
+
+
 
 ## Behavior Rules
 

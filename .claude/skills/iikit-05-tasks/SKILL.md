@@ -55,13 +55,25 @@ Report readiness per [formatting-guide.md](../iikit-core/references/formatting-g
 
 If .feature files exist (or legacy test-specs.md), tasks reference specific test IDs (e.g., "T012 [US1] Implement to pass TS-001").
 
+Proceed immediately to Step 2.
+
+
+
 ## Step 2 — Tessl Convention Consultation
 
 If Tessl installed: query primary framework tile for project structure conventions and testing framework tile for test organization. Apply to file paths and task ordering. If not available: skip silently.
 
+Proceed immediately to Step 3.
+
+
+
 ## Step 3 — Generate Tasks
 
 Extract tech stack from plan.md, user stories from spec.md, entities from data-model.md, endpoints from contracts/, decisions from research.md. Organize by user story with dependency graph and parallel markers.
+
+Proceed immediately to Step 4.
+
+
 
 ## Step 4 — Task Format (REQUIRED)
 
@@ -91,6 +103,10 @@ Extract tech stack from plan.md, user stories from spec.md, entities from data-m
 **Correct**: `[TS-005, TS-006, TS-007, TS-008, TS-009, TS-010]`
 **Wrong**: `TS-005 through TS-010`
 
+Proceed immediately to Step 5.
+
+
+
 ## Step 5 — Phase Structure
 
 - **Phase 1**: Setup (project initialization)
@@ -98,9 +114,17 @@ Extract tech stack from plan.md, user stories from spec.md, entities from data-m
 - **Phase 3+**: User Stories in priority order (P1, P2, P3...) — tests -> models -> services -> endpoints -> integration
 - **Final**: Polish & Cross-Cutting Concerns
 
+Proceed immediately to Step 6.
+
+
+
 ## Step 6 — Task Organization
 
 Map each component to its user story. Shared entities serving multiple stories go in Setup/Foundational. Each contract gets a contract test task. Story dependencies marked explicitly.
+
+Proceed immediately to Step 7.
+
+
 
 ## Step 7 — Dependency Graph Validation
 
@@ -111,9 +135,17 @@ After generating, validate:
 4. **Phase boundaries**: no backward cross-phase dependencies
 5. **Story independence**: warn on priority inversions (higher-priority depending on lower)
 
+Proceed immediately to Step 8.
+
+
+
 ## Step 8 — Write tasks.md
 
 Use [tasks-template.md](../iikit-core/templates/tasks-template.md) with phases, dependencies, parallel examples, and implementation strategy.
+
+Finish here.
+
+
 
 ## Report
 

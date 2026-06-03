@@ -41,11 +41,19 @@ If bug-fix intent is detected:
 3. Ask the user to confirm: proceed with specification (genuinely a new feature) or switch to `/iikit-bugfix`
 4. User confirms new feature → proceed to Step 2; user wants bugfix → stop.
 
+Proceed immediately to Step 2.
+
+
+
 ## Step 2 — Generate Branch Name
 
 Create 2-4 word action-noun name from description:
 - "I want to add user authentication" -> "user-auth"
 - "Implement OAuth2 integration for the API" -> "oauth2-api-integration"
+
+Proceed immediately to Step 3.
+
+
 
 ## Step 3 — Create Feature Branch and Directory
 
@@ -64,6 +72,10 @@ pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/po
 
 Parse JSON for `BRANCH_NAME`, `SPEC_FILE`, `FEATURE_NUM`. Only run ONCE per feature.
 
+Proceed immediately to Step 4.
+
+
+
 ## Step 4 — Generate Specification
 
 1. Parse user description — if empty: ERROR with usage example
@@ -76,21 +88,41 @@ Parse JSON for `BRANCH_NAME`, `SPEC_FILE`, `FEATURE_NUM`. Only run ONCE per feat
 
 Write to `SPEC_FILE` using [spec-template.md](../iikit-core/templates/spec-template.md) structure.
 
+Proceed immediately to Step 5.
+
+
+
 ## Step 5 — Phase Separation Validation
 
 Scan for implementation details per [phase-separation-rules.md](../iikit-core/references/phase-separation-rules.md) (Specification section). Auto-fix violations, re-validate until clean.
+
+Proceed immediately to Step 6.
+
+
 
 ## Step 6 — Create Spec Quality Checklist
 
 Generate `FEATURE_DIR/checklists/requirements.md` covering: content quality (no implementation details), requirement completeness, feature readiness.
 
+Proceed immediately to Step 7.
+
+
+
 ## Step 7 — Handle Clarifications
 
 If `[NEEDS CLARIFICATION]` markers remain, present each as a question with options table and wait for user response.
 
+Proceed immediately to Step 8.
+
+
+
 ## Step 8 — Report
 
 Output: branch name, spec file path, checklist results, readiness for next phase.
+
+Finish here.
+
+
 
 ## Guidelines
 

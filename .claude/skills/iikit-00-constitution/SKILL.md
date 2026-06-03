@@ -43,6 +43,10 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 Identify placeholder tokens `[ALL_CAPS_IDENTIFIER]`. Adapt to user's needs (more or fewer principles than template).
 
+Proceed immediately to Step 2.
+
+
+
 ## Step 2 — Collect Placeholder Values
 
 - From user input, or infer from repo context
@@ -50,25 +54,49 @@ Identify placeholder tokens `[ALL_CAPS_IDENTIFIER]`. Adapt to user's needs (more
 - `LAST_AMENDED_DATE`: today if changes made
 - `CONSTITUTION_VERSION`: semver (MAJOR: principle removal/redefinition, MINOR: new principle, PATCH: clarifications)
 
+Proceed immediately to Step 3.
+
+
+
 ## Step 3 — Draft Content
 
 Replace all placeholders, preserve heading hierarchy, ensure each principle has name + rules + rationale, governance section covers amendment/versioning/compliance.
+
+Proceed immediately to Step 4.
+
+
 
 ## Step 4 — Consistency Check
 
 Validate against [plan-template.md](../iikit-core/templates/plan-template.md), [spec-template.md](../iikit-core/templates/spec-template.md), [tasks-template.md](../iikit-core/templates/tasks-template.md).
 
+Proceed immediately to Step 5.
+
+
+
 ## Step 5 — Sync Impact Report
 
 HTML comment at top: version change, modified principles, added/removed sections, follow-up TODOs.
+
+Proceed immediately to Step 6.
+
+
 
 ## Step 6 — Validate
 
 No remaining bracket tokens, version matches report, dates in ISO format, principles are declarative and testable. Constitution MUST have at least 3 principles — if fewer, add more based on the project context.
 
+Proceed immediately to Step 7.
+
+
+
 ## Step 7 — Phase Separation Validation
 
 Scan for technology-specific content per [phase-separation-rules.md](../iikit-core/references/phase-separation-rules.md). Auto-fix violations, re-validate until clean.
+
+Proceed immediately to Step 8.
+
+
 
 ## Step 8 — Write Outputs
 
@@ -102,13 +130,25 @@ If `.specify/context.json` already exists, merge (don't overwrite other fields).
 
 **Verify**: confirm `.specify/context.json` exists and contains `tdd_determination`.
 
+Proceed immediately to Step 9.
+
+
+
 ## Step 9 — Git Init
 
 If needed, run `git init` to ensure project isolation.
 
+Proceed immediately to Step 10.
+
+
+
 ## Step 10 — Report
 
 Report version, bump rationale, TDD determination, git status.
+
+Finish here.
+
+
 
 ## Formatting
 

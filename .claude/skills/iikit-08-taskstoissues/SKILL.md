@@ -51,11 +51,19 @@ git config --get remote.origin.url
 
 Extract: Task IDs, descriptions, phase groupings, parallel markers [P], user story labels [USn], dependencies.
 
+Proceed immediately to Step 2.
+
+
+
 ## Step 2 — Prepare Labels and Title Format
 
 **Title format**: `[FeatureID/TaskID] [Story] Description` — feature-id extracted from `FEATURE_DIR` (e.g. `001-user-auth`).
 
 **Body**: use template from [issue-body-template.md](references/issue-body-template.md). **Labels** (create if needed): `iikit`, `phase-N`, `us-N`, `parallel`.
+
+Proceed immediately to Step 3.
+
+
 
 ## Step 3 — Create Issues (parallel)
 
@@ -73,9 +81,17 @@ gh issue create --title "[001-user-auth/T012] [US1] Create User model" --body ".
 
 Collect all created issue numbers from subagents. Verify all returned successfully before proceeding. If some failed: report failures, continue with successful issues only.
 
+Proceed immediately to Step 4.
+
+
+
 ## Step 4 — Link Dependencies
 
 After all issues exist, edit bodies to add cross-references using `#NNN` syntax. Skip dependency links for any issues that failed to create.
+
+Finish here.
+
+
 
 ## Report
 

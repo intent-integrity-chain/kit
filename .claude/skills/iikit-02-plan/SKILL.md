@@ -73,13 +73,25 @@ Using the plan template, define: Language/Version, Primary Dependencies, Storage
 
 When Tessl eval results are available for candidate technologies, include eval scores in the decision rationale in research.md. Higher eval scores indicate better-validated tiles and should factor into technology selection when choosing between alternatives.
 
+Proceed immediately to Step 2.
+
+
+
 ## Step 2 — Tessl Tile Discovery
 
 If Tessl is installed, discover and install tiles for all technologies. See [tessl-tile-discovery.md](references/tessl-tile-discovery.md) for the full procedure.
 
+Proceed immediately to Step 3.
+
+
+
 ## Step 3 — Resolve Unknowns
 
 For each NEEDS CLARIFICATION item and dependency: research, document findings in `research.md` with decision, rationale, and alternatives considered. Include Tessl Tiles section if applicable.
+
+Proceed immediately to Step 4.
+
+
 
 ## Step 4 — Design & Contracts
 
@@ -93,6 +105,10 @@ For each NEEDS CLARIFICATION item and dependency: research, document findings in
    bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/update-agent-context.sh claude
    ```
    Windows: `pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/update-agent-context.ps1 -AgentType claude`
+
+Proceed immediately to Step 5.
+
+
 
 ## Step 5 — Update context.json with Dashboard Data
 
@@ -124,13 +140,25 @@ jq --argjson evals '{
 }' '.planview.evalScores = $evals' "$CONTEXT_FILE" > "$CONTEXT_FILE.tmp" && mv "$CONTEXT_FILE.tmp" "$CONTEXT_FILE"
 ```
 
+Proceed immediately to Step 6.
+
+
+
 ## Step 6 — Constitution Check (Post-Design)
 
 Re-validate all technical decisions against constitutional principles. On violation: STOP, state violation, suggest compliant alternative.
 
+Proceed immediately to Step 7.
+
+
+
 ## Step 7 — Phase Separation Validation
 
 Scan plan for governance content per [phase-separation-rules.md](../iikit-core/references/phase-separation-rules.md) (Plan section). Auto-fix by replacing with constitution references, re-validate.
+
+Finish here.
+
+
 
 ## Output Validation
 
