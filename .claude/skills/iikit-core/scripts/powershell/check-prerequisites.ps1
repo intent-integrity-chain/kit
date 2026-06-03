@@ -123,7 +123,7 @@ $noFeatureBranch = $false
 # paths_only and status_mode tolerate non-feature branches.
 $softBranchMode = ($cfg.Extras -match 'status_mode') -or ($cfg.Extras -match 'paths_only')
 $branchResult = Test-FeatureBranch -Branch $currentBranch -HasGit $hasGit
-if ($branchResult -eq "NEEDS_SELECTION") {
+if ($branchResult -eq "NEEDS_SELECTION" -and -not $softBranchMode) {
     $featuresJson = Get-FeaturesJson
     if ($Json) {
         Write-Output "{`"needs_selection`":true,`"features`":$featuresJson}"
@@ -132,8 +132,10 @@ if ($branchResult -eq "NEEDS_SELECTION") {
         Write-Output "Run: /iikit-core use <feature> to select a feature."
     }
     exit 2
-} elseif ($branchResult -eq "ERROR") {
+} elseif ($branchResult -eq "ERROR" -or $branchResult -eq "NEEDS_SELECTION") {
     if ($softBranchMode) {
+        # Soft modes (paths_only, status_mode) treat both "no feature branch"
+        # and "multiple features, none active" as informational.
         $noFeatureBranch = $true
         $paths = [PSCustomObject]@{
             REPO_ROOT      = $repoRoot

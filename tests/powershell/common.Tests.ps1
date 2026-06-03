@@ -92,6 +92,45 @@ Describe "Test-FeatureBranch" {
         $result | Should -Be $true
         $env:SPECIFY_FEATURE = $null
     }
+
+    It "accepts feat/NNN- gitflow pattern (#77)" {
+        $env:SPECIFY_FEATURE = $null
+        $result = Test-FeatureBranch -Branch "feat/001-test-feature" -HasGit $true
+        $result | Should -Be "OK"
+    }
+
+    It "accepts fix/NNN- gitflow pattern (#77)" {
+        $env:SPECIFY_FEATURE = $null
+        $result = Test-FeatureBranch -Branch "fix/042-some-bug" -HasGit $true
+        $result | Should -Be "OK"
+    }
+}
+
+Describe "Get-FeatureIdFromBranch (#77)" {
+    It "returns NNN-name for standard branch" {
+        $result = Get-FeatureIdFromBranch -Branch "001-user-auth"
+        $result | Should -Be "001-user-auth"
+    }
+
+    It "strips feat/ gitflow prefix" {
+        $result = Get-FeatureIdFromBranch -Branch "feat/042-null-deref"
+        $result | Should -Be "042-null-deref"
+    }
+
+    It "strips fix/ gitflow prefix" {
+        $result = Get-FeatureIdFromBranch -Branch "fix/005-bug"
+        $result | Should -Be "005-bug"
+    }
+
+    It "returns empty for non-feature branch" {
+        $result = Get-FeatureIdFromBranch -Branch "main"
+        $result | Should -Be ''
+    }
+
+    It "returns empty for prefix without NNN-" {
+        $result = Get-FeatureIdFromBranch -Branch "feat/no-number"
+        $result | Should -Be ''
+    }
 }
 
 Describe "Find-FeatureDirByPrefix" {
@@ -120,6 +159,21 @@ Describe "Find-FeatureDirByPrefix" {
     It "returns branch path when no match" {
         $result = Find-FeatureDirByPrefix -RepoRoot $script:TestDir -BranchName "999-nonexistent"
         $result | Should -Be (Join-Path $script:TestDir "specs/999-nonexistent")
+    }
+
+    It "resolves gitflow feat/NNN- branch (#77)" {
+        New-Item -ItemType Directory -Path "specs/007-gitflow-feature" -Force | Out-Null
+
+        $result = Find-FeatureDirByPrefix -RepoRoot $script:TestDir -BranchName "feat/007-gitflow-feature"
+        $result | Should -Match "007-gitflow-feature"
+    }
+
+    It "resolves gitflow fix/NNN- branch by prefix only (#77)" {
+        New-Item -ItemType Directory -Path "specs/008-existing-feature" -Force | Out-Null
+
+        # Caller may be on fix/008-different-name; we still resolve by numeric prefix
+        $result = Find-FeatureDirByPrefix -RepoRoot $script:TestDir -BranchName "fix/008-different-name"
+        $result | Should -Match "008-existing-feature"
     }
 }
 

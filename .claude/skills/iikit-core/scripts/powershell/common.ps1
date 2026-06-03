@@ -123,27 +123,34 @@ function Get-RepoRoot {
 }
 
 function Get-CurrentBranch {
-    # Detection cascade: active-feature file > SPECIFY_FEATURE env > git branch > single feature > fallback
+    # Detection cascade (mirrors bash get_current_branch):
+    #   1. SPECIFY_FEATURE env (explicit CI override)
+    #   2. git branch — if NNN-* or prefix/NNN-* (gitflow), return extracted
+    #      feature id. This ensures branch switching picks up the correct
+    #      feature even when a stale active-feature file exists.
+    #   3. Non-feature git branch: fall back to sticky active-feature
+    #   4. Non-feature git branch, no sticky file — return raw branch
+    #   5. Non-git: sticky active-feature
+    #   6. Non-git: latest feature dir
+    #   7. "main" fallback
 
-    # 1. Check sticky active-feature file (survives restarts)
-    $active = Read-ActiveFeature
-    if ($active) {
-        return $active
-    }
-
-    # 2. Check SPECIFY_FEATURE environment variable (CI/scripts)
+    # 1. SPECIFY_FEATURE
     if ($env:SPECIFY_FEATURE) {
         return $env:SPECIFY_FEATURE
     }
 
-    # 3. Check git branch if available. If it's NNN-* or prefix/NNN-* (gitflow),
-    #    return the extracted feature id; otherwise return the raw branch.
+    # 2-4. Git branch path
     try {
         $result = git rev-parse --abbrev-ref HEAD 2>$null
-        if ($LASTEXITCODE -eq 0) {
+        if ($LASTEXITCODE -eq 0 -and $result) {
             $featureId = Get-FeatureIdFromBranch -Branch $result
             if ($featureId) {
                 return $featureId
+            }
+            # Non-feature branch: prefer sticky active-feature, else raw branch
+            $active = Read-ActiveFeature
+            if ($active) {
+                return $active
             }
             return $result
         }
@@ -151,7 +158,13 @@ function Get-CurrentBranch {
         # Git command failed
     }
 
-    # 4. For non-git repos, try to find the latest feature directory
+    # 5. Non-git: sticky active-feature
+    $active = Read-ActiveFeature
+    if ($active) {
+        return $active
+    }
+
+    # 6. Non-git: try to find the latest feature directory
     $repoRoot = Get-RepoRoot
     $specsDir = Join-Path $repoRoot "specs"
 
@@ -174,7 +187,7 @@ function Get-CurrentBranch {
         }
     }
 
-    # Final fallback
+    # 7. Final fallback
     return "main"
 }
 
