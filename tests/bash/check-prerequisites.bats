@@ -64,22 +64,13 @@ teardown() {
 
 @test "check-prerequisites: --paths-only does not exit 2 with multiple features on non-feature branch" {
     unset SPECIFY_FEATURE
-    # Multi-feature workspace; current branch is not a feature branch
+    # Multi-feature workspace; current branch is not a feature branch.
+    # paths_only must not gate on feature selection — callers (CI dry-runs,
+    # doctor #74) only want paths.
     mkdir -p specs/001-first specs/002-second
     rm -f .specify/active-feature
 
     run "$CHECK_SCRIPT" --paths-only --json
-    [[ "$status" -eq 0 ]]
-    # Must NOT prompt for selection in soft mode
-    [[ "$output" != *'"needs_selection":true'* ]]
-}
-
-@test "check-prerequisites: --phase status does not exit 2 with multiple features on non-feature branch" {
-    unset SPECIFY_FEATURE
-    mkdir -p specs/001-first specs/002-second
-    rm -f .specify/active-feature
-
-    run "$CHECK_SCRIPT" --phase status --json
     [[ "$status" -eq 0 ]]
     [[ "$output" != *'"needs_selection":true'* ]]
 }

@@ -67,20 +67,12 @@ Describe "Soft branch mode (#76)" {
     }
 
     It "-PathsOnly does not exit 2 with multiple features on non-feature branch" {
+        # paths_only must not gate on feature selection.
         New-Item -ItemType Directory -Path "specs/001-first" -Force | Out-Null
         New-Item -ItemType Directory -Path "specs/002-second" -Force | Out-Null
         Remove-Item -Path ".specify/active-feature" -Force -ErrorAction SilentlyContinue
 
         $result = & $script:CheckScript -PathsOnly -Json | Out-String
-        $result | Should -Not -Match '"needs_selection":\s*true'
-    }
-
-    It "-Phase status does not exit 2 with multiple features on non-feature branch" {
-        New-Item -ItemType Directory -Path "specs/001-first" -Force | Out-Null
-        New-Item -ItemType Directory -Path "specs/002-second" -Force | Out-Null
-        Remove-Item -Path ".specify/active-feature" -Force -ErrorAction SilentlyContinue
-
-        $result = & $script:CheckScript -Phase status -Json | Out-String
         $result | Should -Not -Match '"needs_selection":\s*true'
     }
 }

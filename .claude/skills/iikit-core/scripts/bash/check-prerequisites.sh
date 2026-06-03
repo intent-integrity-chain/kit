@@ -222,8 +222,12 @@ elif [[ "$PHASE" == "00" ]]; then
 else
     check_feature_branch "$CURRENT_BRANCH" "$HAS_GIT" || BRANCH_EXIT=$?
 fi
-if [[ $BRANCH_EXIT -eq 2 ]] && ! $SOFT_BRANCH_MODE; then
-    # Multiple features, no active one — caller should present picker
+if [[ $BRANCH_EXIT -eq 2 ]] && [[ "$P_EXTRAS" != *"paths_only"* ]]; then
+    # Multiple features, no active one — caller should present picker.
+    # paths_only is the only mode that swallows this: callers asking only
+    # for paths (CI dry-runs, doctor #74) must never be blocked by a picker.
+    # status_mode still surfaces the picker so /iikit-core status can guide
+    # the user to select a feature.
     FEATURES_JSON=$(list_features_json)
     if $JSON_MODE; then
         printf '{"needs_selection":true,"features":%s}\n' "$FEATURES_JSON"
@@ -234,9 +238,9 @@ if [[ $BRANCH_EXIT -eq 2 ]] && ! $SOFT_BRANCH_MODE; then
     exit 2
 elif [[ $BRANCH_EXIT -ne 0 ]]; then
     if $SOFT_BRANCH_MODE; then
-        # Soft modes (paths_only, status_mode) treat both "no feature branch"
-        # and "multiple features, none active" as informational — emit empty
-        # path JSON instead of gating.
+        # Soft modes treat "no feature branch" as informational — emit empty
+        # path JSON instead of gating. (paths_only additionally swallows
+        # needs_selection per the branch above.)
         FEATURE_DIR=""
         FEATURE_SPEC=""
         IMPL_PLAN=""
