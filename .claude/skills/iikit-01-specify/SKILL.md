@@ -41,7 +41,7 @@ If bug-fix intent is detected:
 3. Ask the user to confirm: proceed with specification (genuinely a new feature) or switch to `/iikit-bugfix`
 4. User confirms new feature → proceed to Step 2; user wants bugfix → stop.
 
-Proceed immediately to Step 2.
+If bug-fix intent was NOT detected, or the user confirmed this is a new feature, proceed immediately to Step 2. If the user switched to `/iikit-bugfix`, finish here.
 
 
 
