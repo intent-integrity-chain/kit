@@ -205,6 +205,29 @@ teardown() {
 }
 
 # =============================================================================
+# Gitflow branch prefix tests
+# =============================================================================
+
+@test "create-new-feature: counts feat/NNN-* gitflow branches when picking next number" {
+    git checkout -b feat/003-existing >/dev/null 2>&1
+    git checkout -b temp-branch >/dev/null 2>&1
+
+    result=$("$CREATE_SCRIPT" --json --dry-run "New feature")
+
+    # 003 exists on feat/003-existing; next should be 004
+    assert_contains "$result" '"FEATURE_NUM":"004"'
+}
+
+@test "create-new-feature: counts fix/NNN-* gitflow branches when picking next number" {
+    git checkout -b fix/012-some-bug >/dev/null 2>&1
+    git checkout -b temp-branch >/dev/null 2>&1
+
+    result=$("$CREATE_SCRIPT" --json --dry-run "New feature")
+
+    assert_contains "$result" '"FEATURE_NUM":"013"'
+}
+
+# =============================================================================
 # Bug regression tests (from e2e test findings)
 # =============================================================================
 

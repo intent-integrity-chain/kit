@@ -72,6 +72,41 @@ teardown() {
     [[ "$status" -eq 0 ]]
 }
 
+@test "extract_feature_id: returns NNN-name for standard branch" {
+    result=$(extract_feature_id "001-user-auth")
+    [[ "$result" == "001-user-auth" ]]
+}
+
+@test "extract_feature_id: strips feat/ gitflow prefix" {
+    result=$(extract_feature_id "feat/042-null-deref")
+    [[ "$result" == "042-null-deref" ]]
+}
+
+@test "extract_feature_id: strips fix/ gitflow prefix" {
+    result=$(extract_feature_id "fix/005-bug")
+    [[ "$result" == "005-bug" ]]
+}
+
+@test "extract_feature_id: returns empty for non-feature branch" {
+    run extract_feature_id "main"
+    [[ "$status" -ne 0 ]]
+}
+
+@test "extract_feature_id: returns empty for prefix without NNN-" {
+    run extract_feature_id "feat/no-number"
+    [[ "$status" -ne 0 ]]
+}
+
+@test "check_feature_branch: accepts feat/NNN- gitflow pattern" {
+    run check_feature_branch "feat/001-test-feature" "true"
+    [[ "$status" -eq 0 ]]
+}
+
+@test "check_feature_branch: accepts fix/NNN- gitflow pattern" {
+    run check_feature_branch "fix/042-some-bug" "true"
+    [[ "$status" -eq 0 ]]
+}
+
 @test "check_feature_branch: accepts SPECIFY_FEATURE override" {
     export SPECIFY_FEATURE="manual-override"
     run check_feature_branch "main" "true"
@@ -105,6 +140,21 @@ teardown() {
 
     result=$(find_feature_dir_by_prefix "$TEST_DIR" "004-fix-typo")
     assert_contains "$result" "004-original-feature"
+}
+
+@test "find_feature_dir_by_prefix: resolves gitflow feat/NNN- branch" {
+    mkdir -p specs/007-gitflow-feature
+
+    result=$(find_feature_dir_by_prefix "$TEST_DIR" "feat/007-gitflow-feature")
+    assert_contains "$result" "007-gitflow-feature"
+}
+
+@test "find_feature_dir_by_prefix: resolves gitflow fix/NNN- branch by prefix only" {
+    mkdir -p specs/008-existing-feature
+
+    # Caller may be on fix/008-different-name; we still resolve by numeric prefix
+    result=$(find_feature_dir_by_prefix "$TEST_DIR" "fix/008-different-name")
+    assert_contains "$result" "008-existing-feature"
 }
 
 @test "find_feature_dir_by_prefix: returns exact path for non-prefixed branch" {

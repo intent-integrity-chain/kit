@@ -127,8 +127,10 @@ get_highest_from_branches() {
             # Skip current branch (avoid self-inflation)
             [ "$clean_branch" = "$current_branch" ] && continue
 
-            if echo "$clean_branch" | grep -qE '^[0-9]{3}-'; then
-                number=$(echo "$clean_branch" | grep -oE '^[0-9]{3}' || echo "0")
+            # Match NNN-* (standard) and prefix/NNN-* (gitflow)
+            if echo "$clean_branch" | grep -qE '^([^/]+/)?[0-9]{3}-'; then
+                number=$(echo "$clean_branch" | grep -oE '[0-9]{3}-' | head -1 | grep -oE '^[0-9]{3}')
+                [ -z "$number" ] && number=0
                 number=$((10#$number))
                 if [ "$number" -gt "$highest" ]; then
                     highest=$number

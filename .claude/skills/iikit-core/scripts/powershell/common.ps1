@@ -93,6 +93,21 @@ function Get-FeaturesJson {
     return ($features | ConvertTo-Json -Compress -AsArray)
 }
 
+function Get-FeatureIdFromBranch {
+    # Extract the feature id from a branch name.
+    # Accepts NNN-name and prefix/NNN-name (gitflow) shapes.
+    # Returns the empty string when no feature id can be extracted.
+    param([string]$Branch)
+
+    if ($Branch -match '^[0-9]{3}-') {
+        return $Branch
+    }
+    if ($Branch -match '^[^/]+/([0-9]{3}-.+)$') {
+        return $Matches[1]
+    }
+    return ''
+}
+
 function Get-RepoRoot {
     try {
         $result = git rev-parse --show-toplevel 2>$null
@@ -121,10 +136,15 @@ function Get-CurrentBranch {
         return $env:SPECIFY_FEATURE
     }
 
-    # 3. Check git branch if available
+    # 3. Check git branch if available. If it's NNN-* or prefix/NNN-* (gitflow),
+    #    return the extracted feature id; otherwise return the raw branch.
     try {
         $result = git rev-parse --abbrev-ref HEAD 2>$null
         if ($LASTEXITCODE -eq 0) {
+            $featureId = Get-FeatureIdFromBranch -Branch $result
+            if ($featureId) {
+                return $featureId
+            }
             return $result
         }
     } catch {
@@ -179,9 +199,11 @@ function Test-FeatureBranch {
         return "OK"
     }
 
-    # Accept if branch matches NNN- pattern (standard feature branch)
-    if ($Branch -match '^[0-9]{3}-') {
-        Write-ActiveFeature -Feature $Branch
+    # Accept NNN- (standard) or prefix/NNN- (gitflow); store the extracted feature id
+    $featureId = Get-FeatureIdFromBranch -Branch $Branch
+    if ($featureId) {
+        Write-ActiveFeature -Feature $featureId
+        $env:SPECIFY_FEATURE = $featureId
         return "OK"
     }
 
@@ -225,6 +247,7 @@ function Get-FeatureDir {
 
 # Find feature directory by numeric prefix instead of exact branch match
 # This allows multiple branches to work on the same spec (e.g., 004-fix-bug, 004-add-feature)
+# Accepts gitflow-prefixed branches (e.g. feat/004-foo) by extracting the feature id first.
 function Find-FeatureDirByPrefix {
     param(
         [string]$RepoRoot,
@@ -232,6 +255,12 @@ function Find-FeatureDirByPrefix {
     )
 
     $specsDir = Join-Path $RepoRoot "specs"
+
+    # Strip gitflow prefix if present (feat/004-foo -> 004-foo)
+    $featureId = Get-FeatureIdFromBranch -Branch $BranchName
+    if ($featureId) {
+        $BranchName = $featureId
+    }
 
     # Extract numeric prefix from branch (e.g., "004" from "004-whatever")
     if ($BranchName -notmatch '^(\d{3})-') {
