@@ -123,7 +123,15 @@ $noFeatureBranch = $false
 # paths_only and status_mode tolerate non-feature branches.
 $softBranchMode = ($cfg.Extras -match 'status_mode') -or ($cfg.Extras -match 'paths_only')
 $pathsOnlyMode = ($cfg.Extras -match 'paths_only')
-$branchResult = Test-FeatureBranch -Branch $currentBranch -HasGit $hasGit
+# In soft modes the script emits JSON or status text only — suppress
+# Test-FeatureBranch's diagnostic warning/error streams so they cannot
+# contaminate the structured payload. Mirrors `2>/dev/null` in the bash
+# implementation.
+if ($softBranchMode) {
+    $branchResult = Test-FeatureBranch -Branch $currentBranch -HasGit $hasGit 2>$null 3>$null
+} else {
+    $branchResult = Test-FeatureBranch -Branch $currentBranch -HasGit $hasGit
+}
 if ($branchResult -eq "NEEDS_SELECTION" -and -not $pathsOnlyMode) {
     # Multiple features, no active one — present picker. Only paths_only
     # swallows this; status_mode still surfaces it so /iikit-core status
