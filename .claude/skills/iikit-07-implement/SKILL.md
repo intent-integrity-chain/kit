@@ -36,7 +36,7 @@ Load constitution per [constitution-loading.md](../iikit-core/references/constit
    ```bash
    bash .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash/set-active-feature.sh --json <selection>
    ```
-   Then re-run the prerequisites check from step 1.
+   Then re-run the prerequisites check (item 1 of this section).
 
 ## Commit Strategy
 

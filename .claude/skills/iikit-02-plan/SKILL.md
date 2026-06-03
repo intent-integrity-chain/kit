@@ -41,7 +41,7 @@ Load constitution per [constitution-loading.md](../iikit-core/references/constit
    ```
    Windows: `pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selection>`
 
-   Then re-run the prerequisites check from step 1.
+   Then re-run the prerequisites check (item 1 of this section).
 
 ## Spec Quality Gate
 

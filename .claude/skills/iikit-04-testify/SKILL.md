@@ -44,7 +44,7 @@ Report per [formatting-guide.md](../iikit-core/references/formatting-guide.md) (
    ```
    Windows: `pwsh .tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/powershell/set-active-feature.ps1 -Json <selection>`
 
-   Then re-run the prerequisites check from step 1.
+   Then re-run the prerequisites check (item 1 of this section).
 4. Checklist gate per [checklist-gate.md](../iikit-core/references/checklist-gate.md).
 
 ## Acceptance Scenario Validation
