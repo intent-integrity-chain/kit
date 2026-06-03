@@ -205,10 +205,16 @@ has_git && HAS_GIT="true"
 CURRENT_BRANCH=$(get_current_branch)
 
 # Check feature branch (may set SPECIFY_FEATURE, may exit 2 for needs_selection)
-STATUS_NO_FEATURE=false
+NO_FEATURE_BRANCH=false
 BRANCH_EXIT=0
-if [[ "$P_EXTRAS" == *"status_mode"* ]]; then
-    # Status mode: suppress stderr from branch validation (info goes in JSON only)
+# paths_only and status_mode tolerate non-feature branches — they emit informational
+# output rather than gating on branch shape.
+SOFT_BRANCH_MODE=false
+if [[ "$P_EXTRAS" == *"status_mode"* ]] || [[ "$P_EXTRAS" == *"paths_only"* ]]; then
+    SOFT_BRANCH_MODE=true
+fi
+if $SOFT_BRANCH_MODE; then
+    # Suppress stderr from branch validation (info goes in JSON only)
     check_feature_branch "$CURRENT_BRANCH" "$HAS_GIT" 2>/dev/null || BRANCH_EXIT=$?
 elif [[ "$PHASE" == "00" ]]; then
     # Constitution phase: skip feature branch validation entirely
@@ -216,8 +222,12 @@ elif [[ "$PHASE" == "00" ]]; then
 else
     check_feature_branch "$CURRENT_BRANCH" "$HAS_GIT" || BRANCH_EXIT=$?
 fi
-if [[ $BRANCH_EXIT -eq 2 ]]; then
-    # Multiple features, no active one — caller should present picker
+if [[ $BRANCH_EXIT -eq 2 ]] && [[ "$P_EXTRAS" != *"paths_only"* ]]; then
+    # Multiple features, no active one — caller should present picker.
+    # paths_only is the only mode that swallows this: callers asking only
+    # for paths (CI dry-runs, doctor #74) must never be blocked by a picker.
+    # status_mode still surfaces the picker so /iikit-core status can guide
+    # the user to select a feature.
     FEATURES_JSON=$(list_features_json)
     if $JSON_MODE; then
         printf '{"needs_selection":true,"features":%s}\n' "$FEATURES_JSON"
@@ -227,8 +237,10 @@ if [[ $BRANCH_EXIT -eq 2 ]]; then
     fi
     exit 2
 elif [[ $BRANCH_EXIT -ne 0 ]]; then
-    if [[ "$P_EXTRAS" == *"status_mode"* ]]; then
-        # Status mode: no feature branch is informational, not fatal
+    if $SOFT_BRANCH_MODE; then
+        # Soft modes treat "no feature branch" as informational — emit empty
+        # path JSON instead of gating. (paths_only additionally swallows
+        # needs_selection per the branch above.)
         FEATURE_DIR=""
         FEATURE_SPEC=""
         IMPL_PLAN=""
@@ -237,14 +249,14 @@ elif [[ $BRANCH_EXIT -ne 0 ]]; then
         DATA_MODEL=""
         QUICKSTART=""
         CONTRACTS_DIR=""
-        STATUS_NO_FEATURE=true
+        NO_FEATURE_BRANCH=true
     else
         exit 1
     fi
 fi
 
 # Get all feature paths (uses SPECIFY_FEATURE if set by check_feature_branch)
-if ! $STATUS_NO_FEATURE; then
+if ! $NO_FEATURE_BRANCH; then
     eval $(get_feature_paths)
 
     # Override paths if --project-root was specified
@@ -360,7 +372,7 @@ if [[ "$P_EXTRAS" == *"status_mode"* ]]; then
     if [[ -n "$FEATURE_DIR" && -d "$FEATURE_DIR" ]]; then
         local_feature=$(basename "$FEATURE_DIR")
         FEATURE_STAGE=$(get_feature_stage "$REPO_ROOT" "$local_feature")
-    elif $STATUS_NO_FEATURE; then
+    elif $NO_FEATURE_BRANCH; then
         FEATURE_STAGE="unknown"
     fi
 

@@ -93,6 +93,21 @@ function Get-FeaturesJson {
     return ($features | ConvertTo-Json -Compress -AsArray)
 }
 
+function Get-FeatureIdFromBranch {
+    # Extract the feature id from a branch name.
+    # Accepts NNN-name and prefix/NNN-name (gitflow) shapes.
+    # Returns the empty string when no feature id can be extracted.
+    param([string]$Branch)
+
+    if ($Branch -match '^[0-9]{3}-') {
+        return $Branch
+    }
+    if ($Branch -match '^[^/]+/([0-9]{3}-.+)$') {
+        return $Matches[1]
+    }
+    return ''
+}
+
 function Get-RepoRoot {
     try {
         $result = git rev-parse --show-toplevel 2>$null
@@ -108,30 +123,48 @@ function Get-RepoRoot {
 }
 
 function Get-CurrentBranch {
-    # Detection cascade: active-feature file > SPECIFY_FEATURE env > git branch > single feature > fallback
+    # Detection cascade (mirrors bash get_current_branch):
+    #   1. SPECIFY_FEATURE env (explicit CI override)
+    #   2. git branch — if NNN-* or prefix/NNN-* (gitflow), return extracted
+    #      feature id. This ensures branch switching picks up the correct
+    #      feature even when a stale active-feature file exists.
+    #   3. Non-feature git branch: fall back to sticky active-feature
+    #   4. Non-feature git branch, no sticky file — return raw branch
+    #   5. Non-git: sticky active-feature
+    #   6. Non-git: latest feature dir
+    #   7. "main" fallback
 
-    # 1. Check sticky active-feature file (survives restarts)
-    $active = Read-ActiveFeature
-    if ($active) {
-        return $active
-    }
-
-    # 2. Check SPECIFY_FEATURE environment variable (CI/scripts)
+    # 1. SPECIFY_FEATURE
     if ($env:SPECIFY_FEATURE) {
         return $env:SPECIFY_FEATURE
     }
 
-    # 3. Check git branch if available
+    # 2-4. Git branch path
     try {
         $result = git rev-parse --abbrev-ref HEAD 2>$null
-        if ($LASTEXITCODE -eq 0) {
+        if ($LASTEXITCODE -eq 0 -and $result) {
+            $featureId = Get-FeatureIdFromBranch -Branch $result
+            if ($featureId) {
+                return $featureId
+            }
+            # Non-feature branch: prefer sticky active-feature, else raw branch
+            $active = Read-ActiveFeature
+            if ($active) {
+                return $active
+            }
             return $result
         }
     } catch {
         # Git command failed
     }
 
-    # 4. For non-git repos, try to find the latest feature directory
+    # 5. Non-git: sticky active-feature
+    $active = Read-ActiveFeature
+    if ($active) {
+        return $active
+    }
+
+    # 6. Non-git: try to find the latest feature directory
     $repoRoot = Get-RepoRoot
     $specsDir = Join-Path $repoRoot "specs"
 
@@ -154,7 +187,7 @@ function Get-CurrentBranch {
         }
     }
 
-    # Final fallback
+    # 7. Final fallback
     return "main"
 }
 
@@ -179,9 +212,11 @@ function Test-FeatureBranch {
         return "OK"
     }
 
-    # Accept if branch matches NNN- pattern (standard feature branch)
-    if ($Branch -match '^[0-9]{3}-') {
-        Write-ActiveFeature -Feature $Branch
+    # Accept NNN- (standard) or prefix/NNN- (gitflow); store the extracted feature id
+    $featureId = Get-FeatureIdFromBranch -Branch $Branch
+    if ($featureId) {
+        Write-ActiveFeature -Feature $featureId
+        $env:SPECIFY_FEATURE = $featureId
         return "OK"
     }
 
@@ -225,6 +260,7 @@ function Get-FeatureDir {
 
 # Find feature directory by numeric prefix instead of exact branch match
 # This allows multiple branches to work on the same spec (e.g., 004-fix-bug, 004-add-feature)
+# Accepts gitflow-prefixed branches (e.g. feat/004-foo) by extracting the feature id first.
 function Find-FeatureDirByPrefix {
     param(
         [string]$RepoRoot,
@@ -232,6 +268,12 @@ function Find-FeatureDirByPrefix {
     )
 
     $specsDir = Join-Path $RepoRoot "specs"
+
+    # Strip gitflow prefix if present (feat/004-foo -> 004-foo)
+    $featureId = Get-FeatureIdFromBranch -Branch $BranchName
+    if ($featureId) {
+        $BranchName = $featureId
+    }
 
     # Extract numeric prefix from branch (e.g., "004" from "004-whatever")
     if ($BranchName -notmatch '^(\d{3})-') {

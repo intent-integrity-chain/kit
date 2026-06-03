@@ -119,9 +119,23 @@ if ($ProjectRoot) {
 }
 $hasGit = Test-HasGit
 $currentBranch = Get-CurrentBranch
-$statusNoFeature = $false
-$branchResult = Test-FeatureBranch -Branch $currentBranch -HasGit $hasGit
-if ($branchResult -eq "NEEDS_SELECTION") {
+$noFeatureBranch = $false
+# paths_only and status_mode tolerate non-feature branches.
+$softBranchMode = ($cfg.Extras -match 'status_mode') -or ($cfg.Extras -match 'paths_only')
+$pathsOnlyMode = ($cfg.Extras -match 'paths_only')
+# In soft modes the script emits JSON or status text only — suppress
+# Test-FeatureBranch's diagnostic warning/error streams so they cannot
+# contaminate the structured payload. Mirrors `2>/dev/null` in the bash
+# implementation.
+if ($softBranchMode) {
+    $branchResult = Test-FeatureBranch -Branch $currentBranch -HasGit $hasGit 2>$null 3>$null
+} else {
+    $branchResult = Test-FeatureBranch -Branch $currentBranch -HasGit $hasGit
+}
+if ($branchResult -eq "NEEDS_SELECTION" -and -not $pathsOnlyMode) {
+    # Multiple features, no active one — present picker. Only paths_only
+    # swallows this; status_mode still surfaces it so /iikit-core status
+    # can guide the user to select a feature.
     $featuresJson = Get-FeaturesJson
     if ($Json) {
         Write-Output "{`"needs_selection`":true,`"features`":$featuresJson}"
@@ -130,9 +144,11 @@ if ($branchResult -eq "NEEDS_SELECTION") {
         Write-Output "Run: /iikit-core use <feature> to select a feature."
     }
     exit 2
-} elseif ($branchResult -eq "ERROR") {
-    if ($cfg.Extras -match 'status_mode') {
-        $statusNoFeature = $true
+} elseif ($branchResult -eq "ERROR" -or ($branchResult -eq "NEEDS_SELECTION" -and $pathsOnlyMode)) {
+    if ($softBranchMode) {
+        # Soft modes treat "no feature branch" as informational.
+        # paths_only additionally swallows needs_selection per the branch above.
+        $noFeatureBranch = $true
         $paths = [PSCustomObject]@{
             REPO_ROOT      = $repoRoot
             CURRENT_BRANCH = $currentBranch
@@ -151,8 +167,8 @@ if ($branchResult -eq "NEEDS_SELECTION") {
     }
 }
 
-# Get all feature paths (skip if status mode with no feature)
-if (-not $statusNoFeature) {
+# Get all feature paths (skip if soft branch mode with no feature)
+if (-not $noFeatureBranch) {
     $paths = Get-FeaturePathsEnv
 
     # Override paths if -ProjectRoot was specified
@@ -269,7 +285,7 @@ if ($cfg.Extras -match 'status_mode') {
     if ($paths.FEATURE_DIR -and (Test-Path $paths.FEATURE_DIR -PathType Container -ErrorAction SilentlyContinue)) {
         $localFeature = Split-Path $paths.FEATURE_DIR -Leaf
         $featureStage = Get-FeatureStage -RepoRoot $repoRoot -Feature $localFeature
-    } elseif ($statusNoFeature) {
+    } elseif ($noFeatureBranch) {
         $featureStage = 'no-feature'
     }
 
@@ -290,7 +306,7 @@ if ($cfg.Extras -match 'status_mode') {
     if (-not $aConstitution) {
         $nextStep = '/iikit-00-constitution'
         $clearBefore = $false
-    } elseif ($statusNoFeature -or -not $paths.FEATURE_DIR -or -not (Test-Path $paths.FEATURE_DIR -PathType Container -ErrorAction SilentlyContinue)) {
+    } elseif ($noFeatureBranch -or -not $paths.FEATURE_DIR -or -not (Test-Path $paths.FEATURE_DIR -PathType Container -ErrorAction SilentlyContinue)) {
         $nextStep = '/iikit-01-specify <description>'
         $clearBefore = $false
     } elseif (-not $vSpec) {

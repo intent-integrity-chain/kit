@@ -3,6 +3,7 @@ name: iikit-core
 description: >-
   Initialize an IIKit (Intent Integrity Kit) project, uninit (remove IIKit scaffolding before `tessl uninstall`), check IIKit feature progress, select the active IIKit feature, and display the IIKit workflow command reference.
   Use when starting a new IIKit project, running IIKit init or setup, uninstalling/removing/uninit-ing IIKit before running `tessl uninstall`, checking IIKit status, switching between IIKit features, looking up IIKit available commands and phases, or asking for help with the IIKit workflow.
+argument-hint: "[init|status|use|uninit|help] [feature]"
 license: MIT
 metadata:
   version: "1.6.4"

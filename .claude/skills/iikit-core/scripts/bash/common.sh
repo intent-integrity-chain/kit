@@ -142,6 +142,24 @@ list_features_json() {
     printf ']'
 }
 
+# Extract the feature id from a branch name.
+# Accepts:
+#   NNN-name           -> NNN-name      (standard)
+#   prefix/NNN-name    -> NNN-name      (gitflow, e.g. feat/001-auth, fix/042-bug)
+# Anything else returns the empty string and exit 1.
+extract_feature_id() {
+    local branch="$1"
+    if [[ "$branch" =~ ^[0-9]{3}- ]]; then
+        echo "$branch"
+        return 0
+    fi
+    if [[ "$branch" =~ ^[^/]+/([0-9]{3}-.+)$ ]]; then
+        echo "${BASH_REMATCH[1]}"
+        return 0
+    fi
+    return 1
+}
+
 # Get repository root, with fallback for non-git repositories
 get_repo_root() {
     if git rev-parse --show-toplevel >/dev/null 2>&1; then
@@ -162,13 +180,15 @@ get_current_branch() {
         return
     fi
 
-    # 2. Check git branch — if it matches a feature pattern (NNN-*), use it
+    # 2. Check git branch — if it matches a feature pattern (NNN-* or
+    #    prefix/NNN-* gitflow style), use the extracted feature id.
     #    This ensures switching branches always picks up the correct feature,
     #    even when a stale active-feature file points elsewhere.
     local git_branch
     git_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null) && [[ -n "$git_branch" ]] && {
-        if [[ "$git_branch" =~ ^[0-9]{3}- ]]; then
-            echo "$git_branch"
+        local feature_id
+        if feature_id=$(extract_feature_id "$git_branch"); then
+            echo "$feature_id"
             return
         fi
 
@@ -238,9 +258,12 @@ check_feature_branch() {
         return 0
     fi
 
-    # Accept if branch matches NNN- pattern (standard feature branch)
-    if [[ "$branch" =~ ^[0-9]{3}- ]]; then
-        write_active_feature "$branch"
+    # Accept NNN- or prefix/NNN- (gitflow) patterns; store the extracted feature id
+    local feature_id
+    if feature_id=$(extract_feature_id "$branch"); then
+        write_active_feature "$feature_id"
+        # Export so downstream get_feature_paths uses the extracted id
+        export SPECIFY_FEATURE="$feature_id"
         return 0
     fi
 
@@ -287,10 +310,17 @@ get_feature_dir() { echo "$1/specs/$2"; }
 
 # Find feature directory by numeric prefix instead of exact branch match
 # This allows multiple branches to work on the same spec (e.g., 004-fix-bug, 004-add-feature)
+# Accepts gitflow-prefixed branches (e.g. feat/004-foo) by extracting the feature id first.
 find_feature_dir_by_prefix() {
     local repo_root="$1"
     local branch_name="$2"
     local specs_dir="$repo_root/specs"
+
+    # Strip gitflow prefix if present (feat/004-foo -> 004-foo)
+    local feature_id
+    if feature_id=$(extract_feature_id "$branch_name"); then
+        branch_name="$feature_id"
+    fi
 
     # Extract numeric prefix from branch (e.g., "004" from "004-whatever")
     if [[ ! "$branch_name" =~ ^([0-9]{3})- ]]; then

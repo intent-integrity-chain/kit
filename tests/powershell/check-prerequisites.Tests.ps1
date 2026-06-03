@@ -38,6 +38,45 @@ Describe "Paths-only mode" {
     }
 }
 
+Describe "Soft branch mode (#76)" {
+    BeforeEach {
+        $script:TestDir = New-TestDirectory
+        Push-Location $script:TestDir
+        $env:SPECIFY_FEATURE = $null
+    }
+
+    AfterEach {
+        Pop-Location
+        $env:SPECIFY_FEATURE = $null
+        Remove-TestDirectory -TestDir $script:TestDir
+    }
+
+    It "-PathsOnly succeeds on non-feature branch with no features" {
+        Remove-Item -Path "specs" -Recurse -Force -ErrorAction SilentlyContinue
+        New-Item -ItemType Directory -Path "specs" -Force | Out-Null
+
+        $result = & $script:CheckScript -PathsOnly -Json | Out-String
+        $result | Should -Match '"FEATURE_DIR"'
+    }
+
+    It "-Phase core succeeds on non-feature branch (gitflow-agnostic)" {
+        Remove-Item -Path "specs" -Recurse -Force -ErrorAction SilentlyContinue
+        New-Item -ItemType Directory -Path "specs" -Force | Out-Null
+
+        { & $script:CheckScript -Phase core -Json } | Should -Not -Throw
+    }
+
+    It "-PathsOnly does not exit 2 with multiple features on non-feature branch" {
+        # paths_only must not gate on feature selection.
+        New-Item -ItemType Directory -Path "specs/001-first" -Force | Out-Null
+        New-Item -ItemType Directory -Path "specs/002-second" -Force | Out-Null
+        Remove-Item -Path ".specify/active-feature" -Force -ErrorAction SilentlyContinue
+
+        $result = & $script:CheckScript -PathsOnly -Json | Out-String
+        $result | Should -Not -Match '"needs_selection":\s*true'
+    }
+}
+
 Describe "Validation mode" {
     BeforeEach {
         $script:TestDir = New-TestDirectory

@@ -43,6 +43,38 @@ teardown() {
     [[ "$status" -eq 0 ]]
 }
 
+@test "check-prerequisites: --paths-only succeeds on non-feature branch with no features" {
+    unset SPECIFY_FEATURE
+    rm -rf specs
+    mkdir -p specs
+
+    run "$CHECK_SCRIPT" --paths-only --json
+    [[ "$status" -eq 0 ]]
+    assert_contains "$output" '"FEATURE_DIR"'
+}
+
+@test "check-prerequisites: --phase core succeeds on non-feature branch (gitflow-agnostic)" {
+    unset SPECIFY_FEATURE
+    rm -rf specs
+    mkdir -p specs
+
+    run "$CHECK_SCRIPT" --phase core --json
+    [[ "$status" -eq 0 ]]
+}
+
+@test "check-prerequisites: --paths-only does not exit 2 with multiple features on non-feature branch" {
+    unset SPECIFY_FEATURE
+    # Multi-feature workspace; current branch is not a feature branch.
+    # paths_only must not gate on feature selection — callers (CI dry-runs,
+    # doctor #74) only want paths.
+    mkdir -p specs/001-first specs/002-second
+    rm -f .specify/active-feature
+
+    run "$CHECK_SCRIPT" --paths-only --json
+    [[ "$status" -eq 0 ]]
+    [[ "$output" != *'"needs_selection":true'* ]]
+}
+
 # =============================================================================
 # Validation mode tests
 # =============================================================================

@@ -12,6 +12,8 @@ param(
     [int]$Number = 0,
     [Alias('b')]
     [switch]$SkipBranch,
+    [Alias('d')]
+    [switch]$DryRun,
     [Alias('h')]
     [switch]$Help
 )
@@ -19,19 +21,21 @@ $ErrorActionPreference = 'Stop'
 
 # Show help if requested
 if ($Help) {
-    Write-Host "Usage: ./create-new-feature.ps1 [-Json] [-ShortName <name>] [-Number N] [-SkipBranch] <feature description>"
+    Write-Host "Usage: ./create-new-feature.ps1 [-Json] [-ShortName <name>] [-Number N] [-SkipBranch] [-DryRun] <feature description>"
     Write-Host ""
     Write-Host "Options:"
     Write-Host "  -Json               Output in JSON format"
     Write-Host "  -ShortName <name>   Provide a custom short name (2-4 words) for the branch"
     Write-Host "  -Number N           Specify branch number manually (overrides auto-detection)"
     Write-Host "  -SkipBranch         Create feature directory without creating a git branch"
+    Write-Host "  -DryRun             Preview the branch name and feature number without writing"
     Write-Host "  -Help               Show this help message"
     Write-Host ""
     Write-Host "Examples:"
     Write-Host "  ./create-new-feature.ps1 'Add user authentication system' -ShortName 'user-auth'"
     Write-Host "  ./create-new-feature.ps1 'Implement OAuth2 integration for API'"
     Write-Host "  ./create-new-feature.ps1 -SkipBranch 'Fix bug on existing branch'"
+    Write-Host "  ./create-new-feature.ps1 -DryRun 'Preview without creating anything'"
     exit 0
 }
 
@@ -93,8 +97,8 @@ function Get-HighestNumberFromBranches {
                 # Clean branch name: remove leading markers and remote prefixes
                 $cleanBranch = $branch.Trim() -replace '^\*?\s+', '' -replace '^remotes/[^/]+/', ''
 
-                # Extract feature number if branch matches pattern ###-*
-                if ($cleanBranch -match '^(\d+)-') {
+                # Extract feature number from NNN-* (standard) or prefix/NNN-* (gitflow)
+                if ($cleanBranch -match '^(?:[^/]+/)?(\d{3})-') {
                     $num = [int]$matches[1]
                     if ($num -gt $highest) { $highest = $num }
                 }
@@ -257,6 +261,29 @@ if ($branchName.Length -gt $maxBranchLength) {
     Write-Warning "[specify] Truncated to: $branchName ($($branchName.Length) bytes)"
 }
 
+$featureDir = Join-Path $specsDir $branchName
+$specFile = Join-Path $featureDir 'spec.md'
+
+if ($DryRun) {
+    if ($Json) {
+        $obj = [PSCustomObject]@{
+            BRANCH_NAME = $branchName
+            SPEC_FILE   = $specFile
+            FEATURE_DIR = $featureDir
+            FEATURE_NUM = $featureNum
+            HAS_GIT     = $hasGit
+            dry_run     = $true
+        }
+        $obj | ConvertTo-Json -Compress
+    } else {
+        Write-Output "[specify] DRY RUN — no branch, directory, or spec.md will be created"
+        Write-Output "BRANCH_NAME: $branchName"
+        Write-Output "SPEC_FILE: $specFile"
+        Write-Output "FEATURE_NUM: $featureNum"
+    }
+    exit 0
+}
+
 if ($SkipBranch) {
     Write-Warning "[specify] Skipping branch creation (-SkipBranch). Feature directory: $branchName"
 } elseif ($hasGit) {
@@ -269,12 +296,10 @@ if ($SkipBranch) {
     Write-Warning "[specify] Warning: Git repository not detected; skipped branch creation for $branchName"
 }
 
-$featureDir = Join-Path $specsDir $branchName
 New-Item -ItemType Directory -Path $featureDir -Force | Out-Null
 
 # Template path relative to script location (works for both .tessl and .claude installs)
 $template = Join-Path $PSScriptRoot '..\..\templates\spec-template.md'
-$specFile = Join-Path $featureDir 'spec.md'
 if (Test-Path $template) {
     Copy-Item $template $specFile -Force
 } else {

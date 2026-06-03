@@ -5,6 +5,7 @@ description: >-
   asks targeted questions with option tables, and writes answers back into the artifact's Clarifications section.
   Use when requirements are unclear, a plan has trade-off gaps, checklist thresholds feel wrong, test scenarios are imprecise,
   task dependencies seem off, or constitution principles are vague.
+argument-hint: "[spec|plan|checklist|testify|tasks|constitution]"
 license: MIT
 metadata:
   version: "2.6.0"

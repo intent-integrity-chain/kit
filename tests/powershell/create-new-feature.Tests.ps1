@@ -147,4 +147,56 @@ Describe "create-new-feature" {
             $json.BRANCH_NAME.Length | Should -BeLessOrEqual 244
         }
     }
+
+    Context "Dry-run (#76)" {
+        It "DryRun does not create directory" {
+            & $script:CreateScript -Json -DryRun -Description "Preview only feature" | Out-Null
+
+            $children = Get-ChildItem -Path "specs" -ErrorAction SilentlyContinue
+            $children | Should -BeNullOrEmpty
+        }
+
+        It "DryRun does not create git branch" {
+            $originalBranch = git branch --show-current
+            & $script:CreateScript -Json -DryRun -Description "Preview only feature" | Out-Null
+
+            $currentBranch = git branch --show-current
+            $currentBranch | Should -Be $originalBranch
+        }
+
+        It "DryRun emits dry_run=true in JSON" {
+            $result = & $script:CreateScript -Json -DryRun -Description "Preview only feature" | Out-String
+
+            $result | Should -Match '"dry_run":\s*true'
+            $result | Should -Match '"BRANCH_NAME"'
+            $result | Should -Match '"FEATURE_NUM"'
+        }
+
+        It "DryRun respects ShortName and Number" {
+            $result = & $script:CreateScript -Json -DryRun -ShortName "user-auth" -Number 7 -Description "ignored desc" | Out-String
+
+            $result | Should -Match '"FEATURE_NUM":\s*"007"'
+            $result | Should -Match "user-auth"
+        }
+    }
+
+    Context "Gitflow branch prefix (#77)" {
+        It "counts feat/NNN-* gitflow branches when picking next number" {
+            git checkout -b "feat/003-existing" 2>&1 | Out-Null
+            git checkout -b "temp-branch" 2>&1 | Out-Null
+
+            $result = & $script:CreateScript -Json -DryRun -Description "New feature" | Out-String
+
+            $result | Should -Match '"FEATURE_NUM":\s*"004"'
+        }
+
+        It "counts fix/NNN-* gitflow branches when picking next number" {
+            git checkout -b "fix/012-some-bug" 2>&1 | Out-Null
+            git checkout -b "temp-branch" 2>&1 | Out-Null
+
+            $result = & $script:CreateScript -Json -DryRun -Description "New feature" | Out-String
+
+            $result | Should -Match '"FEATURE_NUM":\s*"013"'
+        }
+    }
 }
