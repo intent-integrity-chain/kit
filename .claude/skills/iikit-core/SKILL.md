@@ -29,7 +29,7 @@ Parse the user input to determine which subcommand to execute. Available subcomm
 
 Initialize intent-integrity-kit in the current directory. Handles the full project bootstrap: git init, optional GitHub repo creation, or cloning an existing repo. Optionally seeds the project backlog from an existing PRD/SDD document.
 
-**Argument parsing**: The `$ARGUMENTS` after `init` may include an optional path or URL to a PRD/SDD document (e.g., `/iikit-core init ./docs/prd.md` or `/iikit-core init <PRD-url>`). If present, store it as `prd_source` for use in the "Seed backlog from PRD" sub-action. The PRD-seeding flow is user-opt-in only and follows the consent model documented in [prd-seeding.md](references/prd-seeding.md#security-and-consent-model).
+**Argument parsing**: The `$ARGUMENTS` after `init` may include an optional reference to a PRD/SDD document the user wants to seed from (e.g., `/iikit-core init ./docs/prd.md`). If present, store it as `prd_source` for use in the "Seed backlog from PRD" sub-action. The PRD-seeding flow is user-opt-in only and follows the consent model documented in [prd-seeding.md](references/prd-seeding.md#security-and-consent-model).
 
 Sub-procedure (perform in order):
 
