@@ -215,7 +215,7 @@ After completing bug fix tasks (tasks with `T-B` prefix pattern):
    - Read the `GitHub Issue` field from the bug's entry in bugs.md
    - If a GitHub issue is linked (e.g., `#42`):
      - **Close via commit**: include `Fixes #<number>` in the last task's commit message (per Task Commits in Step 5)
-     - **Post a comment**: use `gh issue comment` if available, otherwise `curl` the GitHub API (`POST /repos/{owner}/{repo}/issues/{number}/comments`). Comment content: root cause from bugs.md, completed fix tasks, and fix reference
+     - **Post a comment**: post a comment to the linked issue using whichever tool is available. Comment content: root cause from bugs.md, completed fix tasks, and fix reference.
    - If no GitHub issue is linked: skip silently
 
 Proceed immediately to Step 9.
@@ -252,7 +252,7 @@ Parse `next_step` from JSON:
 
 Push commits to remote if available: `git push`. If on a feature branch, offer to merge:
 - **A) Merge locally**: `git checkout main && git merge <branch>`
-- **B) Create PR**: `gh pr create` if available, otherwise provide the GitHub URL
+- **B) Create PR**: open a pull request on the project's tracker using whichever tool is available, or report the steps for the user to open it manually
 - **C) Skip**: user will handle it
 
 ```

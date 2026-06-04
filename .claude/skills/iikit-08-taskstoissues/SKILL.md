@@ -46,7 +46,7 @@ $ARGUMENTS
 git config --get remote.origin.url
 ```
 
-**CRITICAL**: Only proceed if remote is a GitHub URL (`git@github.com:` or `https://github.com/`). Otherwise ERROR.
+**CRITICAL**: Only proceed if the configured remote is a GitHub remote (SSH or HTTPS form). Otherwise ERROR.
 
 ## Step 1 — Parse tasks.md
 
@@ -71,14 +71,14 @@ Proceed immediately to Step 3.
 Use the `Task` tool to dispatch issue creation in parallel — one subagent per chunk of tasks (split by phase or user story). Each subagent receives:
 - The chunk of tasks to create issues for
 - The feature-id, repo owner/name, and label set
-- Instructions to use `gh issue create` if available, otherwise `curl` the GitHub API
+- Instructions to create each issue on the project's tracker using whichever tool is available; pass the task title, body, and labels
 
-```bash
-# Preferred:
-gh issue create --title "[001-user-auth/T012] [US1] Create User model" --body "..." --label "iikit,phase-3,us-1"
+```text
+Example title: [001-user-auth/T012] [US1] Create User model
+Example labels: iikit,phase-3,us-1
 ```
 
-**CRITICAL**: Never create issues in repositories that don't match the remote URL. Verify before dispatching.
+**CRITICAL**: Never create issues in repositories that don't match the project's configured remote. Verify before dispatching.
 
 Collect all created issue numbers from subagents. Verify all returned successfully before proceeding. If some failed: report failures, continue with successful issues only.
 
