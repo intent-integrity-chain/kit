@@ -537,10 +537,10 @@ test_task_commits() {
     fi
 }
 
-# ─── GitHub API Fallback ────────────────────────────────────────────────────
+# ─── GitHub Operations: tool-agnostic, no hard gh dependency ───────────────
 
 test_github_fallback() {
-    log_section "GitHub API Fallback (no gh hard dependency)"
+    log_section "GitHub Operations (tool-agnostic, no gh hard dependency)"
 
     # implement skill: uses Fixes #N for closing
     ((TESTS_RUN++))
@@ -550,29 +550,19 @@ test_github_fallback() {
         log_fail "implement: missing Fixes #N commit pattern"
     fi
 
-    # implement skill: curl fallback for comments
-    ((TESTS_RUN++))
-    if grep -q 'curl.*GitHub API\|curl.*github' "$SKILLS_DIR/iikit-07-implement/SKILL.md"; then
-        log_pass "implement: curl fallback for GitHub comments"
-    else
-        log_fail "implement: no curl fallback for GitHub comments"
-    fi
-
-    # bugfix skill: curl fallback for issue operations
-    ((TESTS_RUN++))
-    if grep -q 'curl.*GitHub API\|curl.*github' "$SKILLS_DIR/iikit-bugfix/SKILL.md"; then
-        log_pass "bugfix: curl fallback for GitHub operations"
-    else
-        log_fail "bugfix: no curl fallback for GitHub operations"
-    fi
-
-    # taskstoissues: curl fallback
-    ((TESTS_RUN++))
-    if grep -q 'curl.*GitHub API\|curl.*github' "$SKILLS_DIR/iikit-08-taskstoissues/SKILL.md"; then
-        log_pass "taskstoissues: curl fallback for issue creation"
-    else
-        log_fail "taskstoissues: no curl fallback for issue creation"
-    fi
+    # Skills that operate on GitHub issues must describe the operation
+    # without prescribing a specific URL-fetch tool. They reference
+    # "whichever tool is available" so the agent picks gh, WebFetch, etc.
+    # at runtime. See #82 follow-up — explicit gh/curl prescription
+    # tripped Snyk's E005/W011 moderation findings.
+    for skill in iikit-07-implement iikit-bugfix iikit-08-taskstoissues; do
+        ((TESTS_RUN++))
+        if grep -q 'whichever tool is available' "$SKILLS_DIR/$skill/SKILL.md"; then
+            log_pass "$skill: describes GitHub operations tool-agnostically"
+        else
+            log_fail "$skill: missing tool-agnostic phrasing for GitHub operations"
+        fi
+    done
 
     # No skill should skip GitHub operations just because gh is missing
     ((TESTS_RUN++))
