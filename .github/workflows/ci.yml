@@ -83,7 +83,7 @@ jobs:
           cd "$TESTDIR"
           git init && git config user.email "test@test.com" && git config user.name "Test"
           tessl init
-          tessl install tessl-labs/intent-integrity-kit
+          tessl install tessl-labs/intent-integrity-kit@2.10.9 --accept-warnings
           SCRIPTS=".tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
           test -f "$SCRIPTS/testify-tdd.sh"
           test -f "$SCRIPTS/../dashboard/template.js"
@@ -103,7 +103,7 @@ jobs:
           TESTDIR=$(mktemp -d)
           cd "$TESTDIR"
           git init && git config user.email "test@test.com" && git config user.name "Test"
-          tessl init && tessl install tessl-labs/intent-integrity-kit
+          tessl init && tessl install tessl-labs/intent-integrity-kit@2.10.9 --accept-warnings
           SCRIPTS=".tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
           DASHBOARD=".tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/dashboard"
           cat > CONSTITUTION.md << 'CONST'
@@ -135,7 +135,7 @@ jobs:
           TESTDIR=$(mktemp -d)
           cd "$TESTDIR"
           git init && git config user.email "test@test.com" && git config user.name "Test"
-          tessl init && tessl install tessl-labs/intent-integrity-kit
+          tessl init && tessl install tessl-labs/intent-integrity-kit@2.10.9 --accept-warnings
           SCRIPTS=".tessl/plugins/tessl-labs/intent-integrity-kit/skills/iikit-core/scripts/bash"
           cp "$WORKSPACE_HOOK" .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
           mkdir -p specs/001-test/tests/features
